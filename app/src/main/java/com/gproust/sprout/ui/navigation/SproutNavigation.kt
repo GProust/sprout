@@ -32,8 +32,8 @@ import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
+import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
-import com.gproust.sprout.ui.mother.MotherScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
@@ -47,7 +47,7 @@ object Routes {
     const val SLEEP = "sleep"
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
-    const val MOTHER = "mother"
+    const val HEALTH = "health"
     const val PROFILE = "profile"
 }
 
@@ -141,8 +141,8 @@ private fun MainScaffold() {
             composable(Routes.SLEEP) { SleepScreen() }
             composable(Routes.DIAPER) { DiaperScreen() }
             composable(Routes.GROWTH) { GrowthScreen() }
-            composable(Routes.MOTHER) {
-                MotherScreen(onBack = { navController.popBackStack() })
+            composable(Routes.HEALTH) {
+                HealthScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(onBack = { navController.popBackStack() })

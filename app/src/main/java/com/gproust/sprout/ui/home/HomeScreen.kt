@@ -101,8 +101,8 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             CenterAlignedTopAppBar(
                 title = { Text("Sprout") },
                 actions = {
-                    IconButton(onClick = { onNavigate(Routes.MOTHER) }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Mother's health")
+                    IconButton(onClick = { onNavigate(Routes.HEALTH) }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Wellbeing")
                     }
                     IconButton(onClick = { onNavigate(Routes.PROFILE) }) {
                         Icon(Icons.Filled.Person, contentDescription = "Baby profile")
@@ -192,7 +192,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             QuickAction("😴  Sleep", onClick = { onNavigate(Routes.SLEEP) })
             QuickAction("🧷  Diaper", onClick = { onNavigate(Routes.DIAPER) })
             QuickAction("📏  Growth", onClick = { onNavigate(Routes.GROWTH) })
-            QuickAction("💚  Mother's health", onClick = { onNavigate(Routes.MOTHER) })
+            QuickAction("💚  Wellbeing", onClick = { onNavigate(Routes.HEALTH) })
         }
     }
 }
