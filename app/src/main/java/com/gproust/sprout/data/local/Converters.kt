@@ -33,4 +33,16 @@ class Converters {
 
     @TypeConverter
     fun stringToBreastState(value: String?): BreastState? = value?.let { BreastState.valueOf(it) }
+
+    @TypeConverter
+    fun recoveryToString(value: Recovery?): String? = value?.name
+
+    @TypeConverter
+    fun stringToRecovery(value: String?): Recovery? = value?.let { Recovery.valueOf(it) }
+
+    @TypeConverter
+    fun parentRoleToString(value: ParentRole?): String? = value?.name
+
+    @TypeConverter
+    fun stringToParentRole(value: String?): ParentRole? = value?.let { ParentRole.valueOf(it) }
 }

@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.common.greetingFor
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
 import com.gproust.sprout.ui.common.startOfDay
@@ -49,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 data class HomeUiState(
+    val parentName: String? = null,
     val babyName: String? = null,
     val ageText: String? = null,
     val hasProfile: Boolean = false,
@@ -60,11 +63,12 @@ data class HomeUiState(
 
 class HomeViewModel(repository: SproutRepository) : ViewModel() {
     val uiState = combine(
+        repository.parentProfile,
         repository.baby,
         repository.feedings,
         repository.sleeps,
         repository.diapers,
-    ) { baby, feedings, sleeps, diapers ->
+    ) { parent, baby, feedings, sleeps, diapers ->
         val now = System.currentTimeMillis()
         val dayStart = startOfDay(now)
 
@@ -73,6 +77,7 @@ class HomeViewModel(repository: SproutRepository) : ViewModel() {
             .sumOf { (it.endTime ?: now) - it.startTime }
 
         HomeUiState(
+            parentName = parent?.name,
             babyName = baby?.name,
             ageText = baby?.let { babyAge(it.birthDate, now) },
             hasProfile = baby != null,
@@ -89,6 +94,7 @@ class HomeViewModel(repository: SproutRepository) : ViewModel() {
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val now = remember { System.currentTimeMillis() }
 
     Scaffold(
         topBar = {
@@ -115,6 +121,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
                     if (state.hasProfile) {
+                        state.parentName?.let { parent ->
+                            Text(
+                                "${greetingFor(now)}, $parent 👋",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 6.dp),
+                            )
+                        }
                         Text(
                             state.babyName.orEmpty(),
                             style = MaterialTheme.typography.headlineSmall,

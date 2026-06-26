@@ -36,6 +36,7 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.MotherHealthEntity
+import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -44,6 +45,8 @@ import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDateTime
+import com.gproust.sprout.ui.common.label
+import com.gproust.sprout.ui.common.moodEmoji
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -90,6 +93,7 @@ fun MotherScreen(onBack: () -> Unit) {
 
 private fun motherSubtitle(entry: MotherHealthEntity): String {
     val parts = buildList {
+        entry.recovery?.let { add("Healing: ${it.label()}") }
         entry.bleeding?.let { add("Bleeding: ${it.label()}") }
         entry.breast?.let { add("Breasts: ${it.label()}") }
         if (!entry.notes.isNullOrBlank()) add(entry.notes)
@@ -97,33 +101,12 @@ private fun motherSubtitle(entry: MotherHealthEntity): String {
     return parts.joinToString(" · ")
 }
 
-private fun moodEmoji(mood: Int): String = when (mood) {
-    1 -> "😢"
-    2 -> "🙁"
-    3 -> "😐"
-    4 -> "🙂"
-    else -> "😄"
-}
-
-private fun Bleeding.label(): String = when (this) {
-    Bleeding.NONE -> "None"
-    Bleeding.LIGHT -> "Light"
-    Bleeding.MODERATE -> "Moderate"
-    Bleeding.HEAVY -> "Heavy"
-}
-
-private fun BreastState.label(): String = when (this) {
-    BreastState.NORMAL -> "Normal"
-    BreastState.TENDER -> "Tender"
-    BreastState.ENGORGED -> "Engorged"
-    BreastState.PAINFUL -> "Painful"
-}
-
 @Composable
 private fun MotherAddCard(onAdd: (MotherHealthEntity) -> Unit) {
     var mood by remember { mutableIntStateOf(3) }
     var bleeding by remember { mutableStateOf<Bleeding?>(null) }
     var breast by remember { mutableStateOf<BreastState?>(null) }
+    var recovery by remember { mutableStateOf<Recovery?>(null) }
     var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
@@ -155,6 +138,14 @@ private fun MotherAddCard(onAdd: (MotherHealthEntity) -> Unit) {
                 labelOf = { it.label() },
             )
 
+            FieldLabel("Recovery / healing")
+            ChoiceChips(
+                options = Recovery.entries,
+                selected = recovery,
+                onSelect = { recovery = if (recovery == it) null else it },
+                labelOf = { it.label() },
+            )
+
             FieldLabel("Time")
             TimePickerField(label = "At", millis = time, onChange = { time = it })
 
@@ -170,12 +161,14 @@ private fun MotherAddCard(onAdd: (MotherHealthEntity) -> Unit) {
                             mood = mood,
                             bleeding = bleeding,
                             breast = breast,
+                            recovery = recovery,
                             notes = notes.ifBlank { null },
                         ),
                     )
                     mood = 3
                     bleeding = null
                     breast = null
+                    recovery = null
                     notes = ""
                     time = System.currentTimeMillis()
                 }) {

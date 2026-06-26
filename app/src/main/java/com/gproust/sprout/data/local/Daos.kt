@@ -18,6 +18,18 @@ interface BabyDao {
 }
 
 @Dao
+interface ParentProfileDao {
+    @Query("SELECT * FROM parent_profile WHERE id = 1 LIMIT 1")
+    fun observeProfile(): Flow<ParentProfileEntity?>
+
+    @Upsert
+    suspend fun upsert(profile: ParentProfileEntity)
+
+    @Query("UPDATE parent_profile SET lastCheckIn = :time WHERE id = 1")
+    suspend fun updateLastCheckIn(time: Long)
+}
+
+@Dao
 interface FeedingDao {
     @Query("SELECT * FROM feeding ORDER BY startTime DESC")
     fun observeAll(): Flow<List<FeedingEntity>>

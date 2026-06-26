@@ -15,6 +15,7 @@ import com.gproust.sprout.ui.home.HomeViewModel
 import com.gproust.sprout.ui.mother.MotherViewModel
 import com.gproust.sprout.ui.profile.ProfileViewModel
 import com.gproust.sprout.ui.sleep.SleepViewModel
+import com.gproust.sprout.ui.startup.StartupViewModel
 
 /**
  * Builds every ViewModel in the app from the shared [SproutRepository].
@@ -26,6 +27,7 @@ class SproutViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when {
+            modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository)
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository)
             modelClass.isAssignableFrom(FeedingViewModel::class.java) -> FeedingViewModel(repository)
             modelClass.isAssignableFrom(SleepViewModel::class.java) -> SleepViewModel(repository)

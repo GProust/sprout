@@ -27,6 +27,25 @@ fun startOfDay(epochMillis: Long): Long =
     Instant.ofEpochMilli(epochMillis).atZone(zone()).toLocalDate()
         .atStartOfDay(zone()).toInstant().toEpochMilli()
 
+/** True when both timestamps fall on the same calendar day (local time). */
+fun isSameDay(a: Long, b: Long): Boolean {
+    val dayA = Instant.ofEpochMilli(a).atZone(zone()).toLocalDate()
+    val dayB = Instant.ofEpochMilli(b).atZone(zone()).toLocalDate()
+    return dayA == dayB
+}
+
+/** A time-of-day greeting such as "Good morning" / "Good afternoon" / "Good evening". */
+fun greetingForHour(hour: Int): String = when (hour) {
+    in 5..11 -> "Good morning"
+    in 12..17 -> "Good afternoon"
+    in 18..21 -> "Good evening"
+    else -> "Hello"
+}
+
+/** A time-of-day greeting for the given instant. */
+fun greetingFor(epochMillis: Long): String =
+    greetingForHour(Instant.ofEpochMilli(epochMillis).atZone(zone()).hour)
+
 /** Human readable elapsed time, e.g. "just now", "5m ago", "2h ago", "3d ago". */
 fun formatRelative(epochMillis: Long, now: Long): String {
     val deltaMin = (now - epochMillis) / 60_000L

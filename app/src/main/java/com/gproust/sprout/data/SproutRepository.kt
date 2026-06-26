@@ -5,6 +5,7 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.MotherHealthEntity
+import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.SproutDatabase
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,11 @@ import kotlinx.coroutines.flow.Flow
  * Single point of access to persisted data, backing all ViewModels.
  */
 class SproutRepository(private val db: SproutDatabase) {
+
+    // Parent profile (the owner of this device)
+    val parentProfile: Flow<ParentProfileEntity?> = db.parentProfileDao().observeProfile()
+    suspend fun saveParentProfile(profile: ParentProfileEntity) = db.parentProfileDao().upsert(profile)
+    suspend fun updateParentLastCheckIn(time: Long) = db.parentProfileDao().updateLastCheckIn(time)
 
     // Baby profile
     val baby: Flow<BabyEntity?> = db.babyDao().observeBaby()

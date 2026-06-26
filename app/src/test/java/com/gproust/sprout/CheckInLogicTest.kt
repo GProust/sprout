@@ -1,0 +1,36 @@
+package com.gproust.sprout
+
+import com.gproust.sprout.ui.common.greetingForHour
+import com.gproust.sprout.ui.common.isSameDay
+import com.gproust.sprout.ui.startup.needsCheckIn
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class CheckInLogicTest {
+
+    private val t = 1_700_000_000_000L
+    private val twoDays = 2L * 24 * 60 * 60_000
+
+    @Test
+    fun sameDay_detectsCalendarDay() {
+        assertTrue(isSameDay(t, t))
+        assertFalse(isSameDay(t, t + twoDays))
+    }
+
+    @Test
+    fun needsCheckIn_trueWhenNeverOrAnotherDay() {
+        assertTrue("never checked in", needsCheckIn(null, t))
+        assertTrue("checked in two days ago", needsCheckIn(t, t + twoDays))
+        assertFalse("already checked in today", needsCheckIn(t, t))
+    }
+
+    @Test
+    fun greeting_byTimeOfDay() {
+        assertEquals("Good morning", greetingForHour(8))
+        assertEquals("Good afternoon", greetingForHour(14))
+        assertEquals("Good evening", greetingForHour(20))
+        assertEquals("Hello", greetingForHour(2))
+    }
+}

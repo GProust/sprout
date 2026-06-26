@@ -1,5 +1,7 @@
 package com.gproust.sprout.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BabyChangingStation
@@ -7,28 +9,37 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Monitor
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.mother.MotherScreen
+import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
+import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.sleep.SleepScreen
+import com.gproust.sprout.ui.startup.Startup
+import com.gproust.sprout.ui.startup.StartupViewModel
 
 object Routes {
     const val HOME = "home"
@@ -54,8 +65,38 @@ private val bottomDestinations = listOf(
     BottomDestination(Routes.GROWTH, "Growth", Icons.Filled.Monitor),
 )
 
+/**
+ * Root composable: chooses between onboarding, the daily check-in, and the main app
+ * based on the startup stage.
+ */
 @Composable
 fun SproutApp() {
+    val startupVm: StartupViewModel = viewModel(factory = rememberSproutViewModelFactory())
+    val stage by startupVm.startup.collectAsState()
+
+    when (val s = stage) {
+        Startup.Loading -> LoadingScreen()
+        Startup.Onboarding -> OnboardingScreen(onFinish = startupVm::completeOnboarding)
+        is Startup.CheckIn -> DailyCheckInScreen(
+            name = s.name,
+            role = s.role,
+            babyName = s.babyName,
+            onSubmitMother = startupVm::submitMotherCheckIn,
+            onDone = startupVm::markCheckedIn,
+        )
+        Startup.Main -> MainScaffold()
+    }
+}
+
+@Composable
+private fun LoadingScreen() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun MainScaffold() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
