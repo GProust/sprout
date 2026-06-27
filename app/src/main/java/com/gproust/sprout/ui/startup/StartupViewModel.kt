@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BabyEntity
+import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.common.isSameDay
@@ -20,6 +21,7 @@ sealed interface Startup {
         val name: String,
         val gaveBirth: Boolean,
         val breastfeeding: Boolean,
+        val deliveryType: DeliveryType?,
     ) : Startup
     data object Main : Startup
 }
@@ -35,7 +37,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         when {
             profile == null -> Startup.Onboarding
             needsCheckIn(profile.lastCheckIn, now) ->
-                Startup.CheckIn(profile.name, profile.gaveBirth, profile.breastfeeding)
+                Startup.CheckIn(profile.name, profile.gaveBirth, profile.breastfeeding, profile.deliveryType)
             else -> Startup.Main
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Startup.Loading)
@@ -44,6 +46,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         name: String,
         gaveBirth: Boolean,
         breastfeeding: Boolean,
+        deliveryType: DeliveryType?,
         babyName: String,
         birthDate: Long,
     ) {
@@ -57,6 +60,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
                     name = name.trim(),
                     gaveBirth = gaveBirth,
                     breastfeeding = breastfeeding,
+                    deliveryType = if (gaveBirth) deliveryType else null,
                     lastCheckIn = null,
                 ),
             )

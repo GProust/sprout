@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
+import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.common.ChoiceChips
@@ -45,6 +46,7 @@ import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDateTime
+import com.gproust.sprout.ui.common.healingFieldLabel
 import com.gproust.sprout.ui.common.label
 import com.gproust.sprout.ui.common.moodEmoji
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
@@ -60,6 +62,9 @@ class HealthViewModel(private val repository: SproutRepository) : ViewModel() {
     val breastfeeding = repository.parentProfile
         .map { it?.breastfeeding ?: false }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val deliveryType = repository.parentProfile
+        .map { it?.deliveryType }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val entries = repository.wellbeing
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -73,6 +78,7 @@ fun HealthScreen(onBack: () -> Unit) {
     val vm: HealthViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val gaveBirth by vm.gaveBirth.collectAsState()
     val breastfeeding by vm.breastfeeding.collectAsState()
+    val deliveryType by vm.deliveryType.collectAsState()
     val entries by vm.entries.collectAsState()
 
     Scaffold(topBar = { SproutTopBar("Wellbeing", onBack = onBack) }) { padding ->
@@ -85,6 +91,7 @@ fun HealthScreen(onBack: () -> Unit) {
                 WellbeingAddCard(
                     gaveBirth = gaveBirth,
                     breastfeeding = breastfeeding,
+                    deliveryType = deliveryType,
                     onAdd = vm::add,
                 )
             }
@@ -121,6 +128,7 @@ private fun wellbeingSubtitle(entry: WellbeingEntity): String {
 private fun WellbeingAddCard(
     gaveBirth: Boolean,
     breastfeeding: Boolean,
+    deliveryType: DeliveryType?,
     onAdd: (WellbeingEntity) -> Unit,
 ) {
     var mood by remember { mutableIntStateOf(3) }
@@ -143,7 +151,7 @@ private fun WellbeingAddCard(
             )
 
             if (gaveBirth) {
-                FieldLabel("Recovery / healing")
+                FieldLabel(healingFieldLabel(deliveryType))
                 ChoiceChips(
                     options = Recovery.entries,
                     selected = recovery,

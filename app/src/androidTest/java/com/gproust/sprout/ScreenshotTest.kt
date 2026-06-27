@@ -18,6 +18,7 @@ import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
+import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.DiaperType
 import com.gproust.sprout.data.local.FeedType
@@ -68,7 +69,14 @@ class ScreenshotTest {
         val hour = 3_600_000L
         val day = 24L * hour
         repo.saveParentProfile(
-            ParentProfileEntity(1L, "Marise", gaveBirth = true, breastfeeding = true, lastCheckIn = null),
+            ParentProfileEntity(
+                1L,
+                "Marise",
+                gaveBirth = true,
+                breastfeeding = true,
+                deliveryType = DeliveryType.CESAREAN,
+                lastCheckIn = null,
+            ),
         )
         repo.saveBaby(BabyEntity(1L, "Léa", now - 21 * day))
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
@@ -124,7 +132,7 @@ class ScreenshotTest {
         rule.setContent { SproutTheme { slot.value() } }
 
         // Onboarding — step through the whole flow.
-        show { OnboardingScreen { _, _, _, _, _ -> } }
+        show { OnboardingScreen { _, _, _, _, _, _ -> } }
         save("01-onboarding-1-welcome")
         tap("Get started")
         save("01-onboarding-2-about-you")
@@ -136,7 +144,16 @@ class ScreenshotTest {
         save("01-onboarding-4-care")
 
         // Daily check-in for a birthing, breastfeeding parent (all questions).
-        show { DailyCheckInScreen("Marise", gaveBirth = true, breastfeeding = true, onSubmit = {}, onSkip = {}) }
+        show {
+            DailyCheckInScreen(
+                "Marise",
+                gaveBirth = true,
+                breastfeeding = true,
+                deliveryType = DeliveryType.CESAREAN,
+                onSubmit = {},
+                onSkip = {},
+            )
+        }
         save("02-checkin-birthing-1-intro")
         tap("Begin")
         save("02-checkin-birthing-2-mood")
@@ -150,7 +167,16 @@ class ScreenshotTest {
         save("02-checkin-birthing-6-notes")
 
         // Daily check-in for a non-birthing parent (just mood + notes).
-        show { DailyCheckInScreen("Tom", gaveBirth = false, breastfeeding = false, onSubmit = {}, onSkip = {}) }
+        show {
+            DailyCheckInScreen(
+                "Tom",
+                gaveBirth = false,
+                breastfeeding = false,
+                deliveryType = null,
+                onSubmit = {},
+                onSkip = {},
+            )
+        }
         save("03-checkin-partner-1-intro")
         tap("Begin")
         save("03-checkin-partner-2-mood")

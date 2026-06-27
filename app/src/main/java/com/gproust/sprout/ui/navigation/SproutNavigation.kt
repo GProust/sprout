@@ -81,6 +81,7 @@ fun SproutApp() {
             name = s.name,
             gaveBirth = s.gaveBirth,
             breastfeeding = s.breastfeeding,
+            deliveryType = s.deliveryType,
             onSubmit = startupVm::submitCheckIn,
             onSkip = startupVm::markCheckedIn,
         )

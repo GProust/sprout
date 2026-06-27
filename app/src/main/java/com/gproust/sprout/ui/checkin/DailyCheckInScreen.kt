@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
+import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.common.CheckInQuestion
@@ -37,6 +38,7 @@ import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.checkInQuestions
 import com.gproust.sprout.ui.common.greetingFor
+import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.label
 import com.gproust.sprout.ui.common.moodEmoji
 
@@ -45,6 +47,7 @@ fun DailyCheckInScreen(
     name: String,
     gaveBirth: Boolean,
     breastfeeding: Boolean,
+    deliveryType: DeliveryType?,
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
 ) {
@@ -53,7 +56,14 @@ fun DailyCheckInScreen(
     val questions = remember(gaveBirth, breastfeeding) { checkInQuestions(gaveBirth, breastfeeding) }
 
     Surface(Modifier.fillMaxSize()) {
-        CheckInFlow(greeting = greeting, now = now, questions = questions, onSubmit = onSubmit, onSkip = onSkip)
+        CheckInFlow(
+            greeting = greeting,
+            now = now,
+            questions = questions,
+            deliveryType = deliveryType,
+            onSubmit = onSubmit,
+            onSkip = onSkip,
+        )
     }
 }
 
@@ -62,6 +72,7 @@ private fun CheckInFlow(
     greeting: String,
     now: Long,
     questions: List<CheckInQuestion>,
+    deliveryType: DeliveryType?,
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
 ) {
@@ -97,7 +108,7 @@ private fun CheckInFlow(
     QuestionPage(
         step = step,
         total = total,
-        title = title(question),
+        title = title(question, deliveryType),
         onSkip = onSkip,
         onBack = { step -= 1 },
         onNext = { if (isLast) save() else step += 1 },
@@ -133,9 +144,9 @@ private fun CheckInFlow(
     }
 }
 
-private fun title(question: CheckInQuestion): String = when (question) {
+private fun title(question: CheckInQuestion, deliveryType: DeliveryType?): String = when (question) {
     CheckInQuestion.MOOD -> "How are you feeling today?"
-    CheckInQuestion.HEALING -> "How is your healing coming along?"
+    CheckInQuestion.HEALING -> healingQuestion(deliveryType)
     CheckInQuestion.BLEEDING -> "Any bleeding today?"
     CheckInQuestion.BREASTS -> "How do your breasts feel?"
     CheckInQuestion.NOTES -> "Anything you'd like to note?"

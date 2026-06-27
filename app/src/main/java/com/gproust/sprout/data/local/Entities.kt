@@ -21,6 +21,9 @@ enum class BreastState { NORMAL, TENDER, ENGORGED, PAINFUL }
 /** How a parent's postpartum recovery / healing feels. */
 enum class Recovery { GREAT, GOOD, SORE, PAINFUL }
 
+/** How the baby was delivered — tailors the healing question. */
+enum class DeliveryType { VAGINAL, CESAREAN }
+
 /**
  * The baby's profile. A single row (id = 1) is used by the app.
  */
@@ -98,6 +101,8 @@ data class ParentProfileEntity(
     val name: String,
     val gaveBirth: Boolean = false,
     val breastfeeding: Boolean = false,
+    /** Only meaningful when [gaveBirth] is true; tailors the healing question. */
+    val deliveryType: DeliveryType? = null,
     /** Epoch millis of the last completed/dismissed daily check-in. */
     val lastCheckIn: Long? = null,
 )

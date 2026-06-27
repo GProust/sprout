@@ -39,4 +39,10 @@ class Converters {
 
     @TypeConverter
     fun stringToRecovery(value: String?): Recovery? = value?.let { Recovery.valueOf(it) }
+
+    @TypeConverter
+    fun deliveryTypeToString(value: DeliveryType?): String? = value?.name
+
+    @TypeConverter
+    fun stringToDeliveryType(value: String?): DeliveryType? = value?.let { DeliveryType.valueOf(it) }
 }

@@ -89,7 +89,7 @@ abstract class SproutDatabase : RoomDatabase() {
                     "CREATE TABLE IF NOT EXISTS `parent_profile_new` (" +
                         "`id` INTEGER NOT NULL, `name` TEXT NOT NULL, " +
                         "`gaveBirth` INTEGER NOT NULL, `breastfeeding` INTEGER NOT NULL, " +
-                        "`lastCheckIn` INTEGER, PRIMARY KEY(`id`))",
+                        "`deliveryType` TEXT, `lastCheckIn` INTEGER, PRIMARY KEY(`id`))",
                 )
                 db.execSQL(
                     "INSERT INTO `parent_profile_new` (id, name, gaveBirth, breastfeeding, lastCheckIn) " +

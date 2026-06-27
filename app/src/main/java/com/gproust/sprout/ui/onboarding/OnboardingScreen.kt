@@ -29,8 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gproust.sprout.data.local.DeliveryType
+import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.FieldLabel
+import com.gproust.sprout.ui.common.label
 
 @Composable
 fun OnboardingScreen(
@@ -38,6 +41,7 @@ fun OnboardingScreen(
         name: String,
         gaveBirth: Boolean,
         breastfeeding: Boolean,
+        deliveryType: DeliveryType?,
         babyName: String,
         birthDate: Long,
     ) -> Unit,
@@ -48,6 +52,7 @@ fun OnboardingScreen(
     var birthDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var gaveBirth by remember { mutableStateOf(false) }
     var breastfeeding by remember { mutableStateOf(false) }
+    var deliveryType by remember { mutableStateOf<DeliveryType?>(null) }
 
     Box(Modifier.fillMaxSize().padding(24.dp)) {
         Column(
@@ -75,10 +80,21 @@ fun OnboardingScreen(
                     babyName = babyName,
                     gaveBirth = gaveBirth,
                     onGaveBirth = { gaveBirth = it },
+                    deliveryType = deliveryType,
+                    onDeliveryType = { deliveryType = it },
                     breastfeeding = breastfeeding,
                     onBreastfeeding = { breastfeeding = it },
                     onBack = { step = 2 },
-                    onFinish = { onFinish(name, gaveBirth, breastfeeding, babyName, birthDate) },
+                    onFinish = {
+                        onFinish(
+                            name,
+                            gaveBirth,
+                            breastfeeding,
+                            if (gaveBirth) deliveryType else null,
+                            babyName,
+                            birthDate,
+                        )
+                    },
                 )
             }
         }
@@ -186,6 +202,8 @@ private fun CareStep(
     babyName: String,
     gaveBirth: Boolean,
     onGaveBirth: (Boolean) -> Unit,
+    deliveryType: DeliveryType?,
+    onDeliveryType: (DeliveryType?) -> Unit,
     breastfeeding: Boolean,
     onBreastfeeding: (Boolean) -> Unit,
     onBack: () -> Unit,
@@ -199,7 +217,7 @@ private fun CareStep(
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "This just tailors your daily check-in. Both are optional.",
+        "This just tailors your daily check-in. Everything is optional.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -211,6 +229,16 @@ private fun CareStep(
         checked = gaveBirth,
         onChecked = onGaveBirth,
     )
+    if (gaveBirth) {
+        FieldLabel("How was the birth?")
+        ChoiceChips(
+            options = DeliveryType.entries,
+            selected = deliveryType,
+            onSelect = { onDeliveryType(if (deliveryType == it) null else it) },
+            labelOf = { it.label() },
+        )
+        Spacer(Modifier.height(8.dp))
+    }
     ToggleRow(
         label = "Are you breastfeeding $who?",
         help = "Adds a question about breast comfort.",

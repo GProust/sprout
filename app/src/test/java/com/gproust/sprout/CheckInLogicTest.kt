@@ -5,8 +5,10 @@ import com.gproust.sprout.ui.common.CheckInQuestion.BREASTS
 import com.gproust.sprout.ui.common.CheckInQuestion.HEALING
 import com.gproust.sprout.ui.common.CheckInQuestion.MOOD
 import com.gproust.sprout.ui.common.CheckInQuestion.NOTES
+import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.ui.common.checkInQuestions
 import com.gproust.sprout.ui.common.greetingForHour
+import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.isSameDay
 import com.gproust.sprout.ui.startup.needsCheckIn
 import org.junit.Assert.assertEquals
@@ -48,6 +50,13 @@ class CheckInLogicTest {
             listOf(MOOD, HEALING, BLEEDING, BREASTS, NOTES),
             checkInQuestions(gaveBirth = true, breastfeeding = true),
         )
+    }
+
+    @Test
+    fun healingQuestion_tailoredToDeliveryType() {
+        assertEquals("How is your healing coming along?", healingQuestion(null))
+        assertEquals("How is your perineal healing?", healingQuestion(DeliveryType.VAGINAL))
+        assertEquals("How is your incision healing?", healingQuestion(DeliveryType.CESAREAN))
     }
 
     @Test
