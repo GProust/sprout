@@ -57,8 +57,10 @@ class ScreenshotTest {
     private val app
         get() = instrumentation.targetContext.applicationContext as SproutApplication
 
+    // Internal files dir so CI can pull via `run-as` (external Android/data is
+    // not adb-accessible on API 30+).
     private val outputDir: File
-        get() = instrumentation.targetContext.getExternalFilesDir("screenshots")!!.also { it.mkdirs() }
+        get() = File(instrumentation.targetContext.filesDir, "screenshots").also { it.mkdirs() }
 
     private fun seed() = runBlocking {
         val repo = app.repository

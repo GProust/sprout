@@ -56,14 +56,12 @@ jobs:
           script: |
             adb uninstall com.gproust.sprout || true
             ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.gproust.sprout.ScreenshotTest
-            mkdir -p pulled
-            adb pull /storage/emulated/0/Android/data/com.gproust.sprout/files/screenshots ./pulled || true
-
-      - name: Collect screenshots
-        run: |
-          mkdir -p screenshots
-          find ./pulled -name '*.png' -exec cp {} screenshots/ \;
-          echo "Collected:" && ls -1 screenshots || true
+            mkdir -p screenshots
+            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do
+              name=$(echo "$f" | tr -d '\r')
+              adb exec-out run-as com.gproust.sprout cat "files/screenshots/$name" > "screenshots/$name"
+            done
+            echo "Pulled screenshots:" && ls -1 screenshots || true
 
       - name: Upload screenshots artifact
         uses: actions/upload-artifact@v4
