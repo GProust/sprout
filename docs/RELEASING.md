@@ -172,10 +172,31 @@ git tag v1.0 && git push origin v1.0
 ```
 
 ### F-Droid (free, FOSS-only store)
-F-Droid is a natural home for a GPL app. Submit a metadata file to
-`fdroiddata` (<https://gitlab.com/fdroid/fdroiddata>). F-Droid builds from
-source and signs with its own key, so no keystore sharing is needed. It reads
-the same `fastlane/metadata/` layout this repo already uses.
+F-Droid is a natural home for a GPL app, and Sprout already meets F-Droid's
+inclusion requirements:
+
+- ✅ **FOSS license** — GPL-3.0-only.
+- ✅ **No proprietary dependencies** — only AndroidX / Jetpack Compose / Room /
+  Kotlin / KSP, all Apache-2.0. No Google Play Services, Firebase or ads.
+- ✅ **No anti-features** — the app declares **no permissions** (no `INTERNET`),
+  has no trackers, and is fully offline.
+- ✅ **Listing metadata** — `fastlane/metadata/android/en-US/` (title,
+  descriptions, changelogs, and `images/phoneScreenshots/`).
+- ✅ **Tag-based versioning** — releases are tagged `vX.Y` matching `versionName`.
+
+**To submit (one-time):**
+
+1. Tag the release so F-Droid has a commit to build: `git tag v1.0 && git push origin v1.0`.
+2. Fork <https://gitlab.com/fdroid/fdroiddata>.
+3. Copy [`docs/fdroid/com.gproust.sprout.yml`](fdroid/com.gproust.sprout.yml)
+   into the fork as `metadata/com.gproust.sprout.yml`.
+4. Test the recipe locally with `fdroid build -v -l com.gproust.sprout`
+   (via `fdroidserver`), then open a merge request.
+
+F-Droid builds from source on its own server and **signs with its own key**, so
+none of the `SPROUT_*` signing secrets are involved — the recipe is all that's
+needed. For each new release, bump `versionCode`/`versionName`, tag it, and
+F-Droid auto-detects the new tag (`UpdateCheckMode: Tags`).
 
 > **Trademark note:** the GPL covers the *code*, not the *name and icon* (see
 > [`TRADEMARK.md`](../TRADEMARK.md)). Anyone publishing a **fork** to a store
