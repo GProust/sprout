@@ -39,10 +39,4 @@ class Converters {
 
     @TypeConverter
     fun stringToRecovery(value: String?): Recovery? = value?.let { Recovery.valueOf(it) }
-
-    @TypeConverter
-    fun parentRoleToString(value: ParentRole?): String? = value?.name
-
-    @TypeConverter
-    fun stringToParentRole(value: String?): ParentRole? = value?.let { ParentRole.valueOf(it) }
 }

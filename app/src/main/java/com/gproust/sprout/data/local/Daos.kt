@@ -78,25 +78,13 @@ interface GrowthDao {
 }
 
 @Dao
-interface MotherHealthDao {
-    @Query("SELECT * FROM mother_health ORDER BY time DESC")
-    fun observeAll(): Flow<List<MotherHealthEntity>>
+interface WellbeingDao {
+    @Query("SELECT * FROM wellbeing ORDER BY time DESC")
+    fun observeAll(): Flow<List<WellbeingEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: MotherHealthEntity)
+    suspend fun insert(entity: WellbeingEntity)
 
     @Delete
-    suspend fun delete(entity: MotherHealthEntity)
-}
-
-@Dao
-interface CoParentHealthDao {
-    @Query("SELECT * FROM co_parent_health ORDER BY time DESC")
-    fun observeAll(): Flow<List<CoParentHealthEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: CoParentHealthEntity)
-
-    @Delete
-    suspend fun delete(entity: CoParentHealthEntity)
+    suspend fun delete(entity: WellbeingEntity)
 }

@@ -3,11 +3,11 @@ package com.gproust.sprout.ui.onboarding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,19 +29,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gproust.sprout.data.local.ParentRole
-import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.FieldLabel
-import com.gproust.sprout.ui.common.label
 
 @Composable
 fun OnboardingScreen(
-    onFinish: (name: String, role: ParentRole, babyName: String, birthDate: Long) -> Unit,
+    onFinish: (
+        name: String,
+        gaveBirth: Boolean,
+        breastfeeding: Boolean,
+        babyName: String,
+        birthDate: Long,
+    ) -> Unit,
 ) {
     var step by remember { mutableIntStateOf(0) }
     var name by remember { mutableStateOf("") }
-    var role by remember { mutableStateOf<ParentRole?>(null) }
+    var gaveBirth by remember { mutableStateOf(false) }
+    var breastfeeding by remember { mutableStateOf(false) }
     var babyName by remember { mutableStateOf("") }
     var birthDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
@@ -55,8 +60,10 @@ fun OnboardingScreen(
                 1 -> AboutYouStep(
                     name = name,
                     onName = { name = it },
-                    role = role,
-                    onRole = { role = it },
+                    gaveBirth = gaveBirth,
+                    onGaveBirth = { gaveBirth = it },
+                    breastfeeding = breastfeeding,
+                    onBreastfeeding = { breastfeeding = it },
                     onBack = { step = 0 },
                     onNext = { step = 2 },
                 )
@@ -66,7 +73,7 @@ fun OnboardingScreen(
                     birthDate = birthDate,
                     onBirthDate = { birthDate = it },
                     onBack = { step = 1 },
-                    onFinish = { onFinish(name, role ?: ParentRole.CO_PARENT, babyName, birthDate) },
+                    onFinish = { onFinish(name, gaveBirth, breastfeeding, babyName, birthDate) },
                 )
             }
         }
@@ -97,8 +104,10 @@ private fun WelcomeStep(onNext: () -> Unit) {
 private fun AboutYouStep(
     name: String,
     onName: (String) -> Unit,
-    role: ParentRole?,
-    onRole: (ParentRole) -> Unit,
+    gaveBirth: Boolean,
+    onGaveBirth: (Boolean) -> Unit,
+    breastfeeding: Boolean,
+    onBreastfeeding: (Boolean) -> Unit,
     onBack: () -> Unit,
     onNext: () -> Unit,
 ) {
@@ -109,7 +118,7 @@ private fun AboutYouStep(
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "So we can greet you properly each day.",
+        "This just tailors the daily check-in to you. Both are optional.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -122,20 +131,49 @@ private fun AboutYouStep(
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
-    FieldLabel("Which best describes you?")
-    ChoiceChips(
-        options = ParentRole.entries,
-        selected = role,
-        onSelect = onRole,
-        labelOf = { it.label() },
+    Spacer(Modifier.height(8.dp))
+    ToggleRow(
+        label = "Did you give birth?",
+        help = "Adds gentle questions about your healing and bleeding.",
+        checked = gaveBirth,
+        onChecked = onGaveBirth,
+    )
+    ToggleRow(
+        label = "Are you breastfeeding?",
+        help = "Adds a question about breast comfort.",
+        checked = breastfeeding,
+        onChecked = onBreastfeeding,
     )
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
         nextLabel = "Next",
-        nextEnabled = name.isNotBlank() && role != null,
+        nextEnabled = name.isNotBlank(),
         onNext = onNext,
     )
+}
+
+@Composable
+private fun ToggleRow(
+    label: String,
+    help: String,
+    checked: Boolean,
+    onChecked: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                help,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onChecked)
+    }
 }
 
 @Composable

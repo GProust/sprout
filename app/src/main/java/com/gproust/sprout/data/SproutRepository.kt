@@ -1,13 +1,12 @@
 package com.gproust.sprout.data
 
 import com.gproust.sprout.data.local.BabyEntity
-import com.gproust.sprout.data.local.CoParentHealthEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
-import com.gproust.sprout.data.local.MotherHealthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.local.SproutDatabase
 import kotlinx.coroutines.flow.Flow
 
@@ -45,13 +44,8 @@ class SproutRepository(private val db: SproutDatabase) {
     suspend fun addGrowth(entity: GrowthEntity) = db.growthDao().insert(entity)
     suspend fun deleteGrowth(entity: GrowthEntity) = db.growthDao().delete(entity)
 
-    // Mother health
-    val motherHealth: Flow<List<MotherHealthEntity>> = db.motherHealthDao().observeAll()
-    suspend fun addMotherHealth(entity: MotherHealthEntity) = db.motherHealthDao().insert(entity)
-    suspend fun deleteMotherHealth(entity: MotherHealthEntity) = db.motherHealthDao().delete(entity)
-
-    // Co-parent health
-    val coParentHealth: Flow<List<CoParentHealthEntity>> = db.coParentHealthDao().observeAll()
-    suspend fun addCoParentHealth(entity: CoParentHealthEntity) = db.coParentHealthDao().insert(entity)
-    suspend fun deleteCoParentHealth(entity: CoParentHealthEntity) = db.coParentHealthDao().delete(entity)
+    // Wellbeing (parent check-ins)
+    val wellbeing: Flow<List<WellbeingEntity>> = db.wellbeingDao().observeAll()
+    suspend fun addWellbeing(entity: WellbeingEntity) = db.wellbeingDao().insert(entity)
+    suspend fun deleteWellbeing(entity: WellbeingEntity) = db.wellbeingDao().delete(entity)
 }

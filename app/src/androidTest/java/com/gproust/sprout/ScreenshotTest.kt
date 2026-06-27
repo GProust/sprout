@@ -20,11 +20,10 @@ import com.gproust.sprout.data.local.DiaperType
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
-import com.gproust.sprout.data.local.MotherHealthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
-import com.gproust.sprout.data.local.ParentRole
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -42,7 +41,7 @@ import org.junit.runner.RunWith
 import java.io.File
 
 /**
- * Renders each visual feature and writes a PNG to the app's external files dir,
+ * Renders each visual feature and writes a PNG to the app's internal files dir,
  * which CI pulls off the emulator and commits to the PR. Not a pass/fail test —
  * it exists to produce screenshots.
  */
@@ -57,8 +56,6 @@ class ScreenshotTest {
     private val app
         get() = instrumentation.targetContext.applicationContext as SproutApplication
 
-    // Internal files dir so CI can pull via `run-as` (external Android/data is
-    // not adb-accessible on API 30+).
     private val outputDir: File
         get() = File(instrumentation.targetContext.filesDir, "screenshots").also { it.mkdirs() }
 
@@ -67,7 +64,9 @@ class ScreenshotTest {
         val now = System.currentTimeMillis()
         val hour = 3_600_000L
         val day = 24L * hour
-        repo.saveParentProfile(ParentProfileEntity(1L, "Marise", ParentRole.MOTHER, null))
+        repo.saveParentProfile(
+            ParentProfileEntity(1L, "Marise", gaveBirth = true, breastfeeding = true, lastCheckIn = null),
+        )
         repo.saveBaby(BabyEntity(1L, "Léa", now - 21 * day))
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
@@ -76,13 +75,13 @@ class ScreenshotTest {
         repo.addDiaper(DiaperEntity(time = now - 3 * hour, type = DiaperType.DIRTY))
         repo.addGrowth(GrowthEntity(time = now - 14 * day, weightGrams = 3200, heightMm = 500))
         repo.addGrowth(GrowthEntity(time = now, weightGrams = 3900, heightMm = 530))
-        repo.addMotherHealth(
-            MotherHealthEntity(
+        repo.addWellbeing(
+            WellbeingEntity(
                 time = now - day,
                 mood = 4,
                 bleeding = Bleeding.LIGHT,
-                breast = BreastState.TENDER,
                 recovery = Recovery.GOOD,
+                breast = BreastState.TENDER,
                 notes = "Feeling a bit more like myself today",
             ),
         )
@@ -98,15 +97,15 @@ class ScreenshotTest {
         seed()
 
         val screens: List<Pair<String, @androidx.compose.runtime.Composable () -> Unit>> = listOf(
-            "01-onboarding" to { OnboardingScreen { _, _, _, _ -> } },
-            "02-daily-checkin-mother" to { DailyCheckInScreen("Marise", ParentRole.MOTHER, "Léa", {}, {}) },
-            "03-daily-checkin-coparent" to { DailyCheckInScreen("Tom", ParentRole.CO_PARENT, "Léa", {}, {}) },
+            "01-onboarding" to { OnboardingScreen { _, _, _, _, _ -> } },
+            "02-daily-checkin-birthing" to { DailyCheckInScreen("Marise", gaveBirth = true, breastfeeding = true, onSubmit = {}, onSkip = {}) },
+            "03-daily-checkin-partner" to { DailyCheckInScreen("Tom", gaveBirth = false, breastfeeding = false, onSubmit = {}, onSkip = {}) },
             "04-home" to { HomeScreen {} },
             "05-feeding" to { FeedingScreen() },
             "06-sleep" to { SleepScreen() },
             "07-diaper" to { DiaperScreen() },
             "08-growth" to { GrowthScreen() },
-            "09-wellbeing-board" to { HealthScreen {} },
+            "09-wellbeing" to { HealthScreen {} },
             "10-profile" to { ProfileScreen {} },
         )
 
