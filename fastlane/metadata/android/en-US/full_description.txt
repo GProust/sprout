@@ -16,4 +16,4 @@ PRIVACY FIRST
 
 All data is stored locally on your device (SQLite). Nothing is uploaded, sold or shared. Uninstalling the app removes your data.
 
-Sprout is source-available software licensed for noncommercial use only (PolyForm Noncommercial 1.0.0).
+Sprout is free, open-source software, licensed under the GNU GPLv3.

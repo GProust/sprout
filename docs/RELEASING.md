@@ -1,8 +1,8 @@
 # Releasing & Publishing Sprout
 
 This guide is the end-to-end process for shipping Sprout to users. It covers
-**Google Play** (the main Android "app store") and a **direct distribution**
-route (GitHub Releases) for the signed APK.
+**Google Play** (the main Android "app store") and **open distribution**
+routes (GitHub Releases and F-Droid) that fit Sprout's GPLv3 license well.
 
 > **Note on the iOS App Store:** Sprout is a native Android app (Kotlin +
 > Jetpack Compose). It cannot be published to Apple's App Store without being
@@ -158,10 +158,10 @@ upload a new production release.
 
 ---
 
-## 6. Direct distribution (GitHub Releases)
+## 6. Open distribution (fits the GPLv3 license)
 
-The source is public, so alongside Google Play you can also hand out the signed
-APK for sideloading.
+Because Sprout is GPLv3, the source is public and you can also distribute the
+binary openly:
 
 ### GitHub Releases
 Tag a version and let CI build and attach the signed APK (see
@@ -171,11 +171,15 @@ Tag a version and let CI build and attach the signed APK (see
 git tag v1.0 && git push origin v1.0
 ```
 
-> **Note — not F-Droid.** F-Droid only accepts OSI-approved free/open-source
-> licenses. Sprout uses the **PolyForm Noncommercial** license, which is
-> source-available but *not* open-source, so it is **not eligible for F-Droid**.
-> If reaching F-Droid matters more than the noncommercial restriction, switch
-> back to an open-source license (e.g. GPLv3).
+### F-Droid (free, FOSS-only store)
+F-Droid is a natural home for a GPL app. Submit a metadata file to
+`fdroiddata` (<https://gitlab.com/fdroid/fdroiddata>). F-Droid builds from
+source and signs with its own key, so no keystore sharing is needed. It reads
+the same `fastlane/metadata/` layout this repo already uses.
+
+> **Trademark note:** the GPL covers the *code*, not the *name and icon* (see
+> [`TRADEMARK.md`](../TRADEMARK.md)). Anyone publishing a **fork** to a store
+> must rename and re-brand it; only the official build should ship as "Sprout".
 
 ---
 
