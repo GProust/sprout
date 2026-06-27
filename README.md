@@ -65,6 +65,26 @@ device with `adb install`.
 Every push and pull request runs [GitHub Actions](.github/workflows/ci.yml): lint, unit
 tests, and a debug APK build. The APK is uploaded as a build artifact.
 
+Pushing a version tag (`vX.Y`) runs the [release workflow](.github/workflows/release.yml),
+which builds the signed `.aab`/`.apk` and attaches the APK to a GitHub Release.
+
+## Releasing & publishing
+
+See **[docs/RELEASING.md](docs/RELEASING.md)** for the full step-by-step process for
+publishing to the Google Play Store (and the open GitHub Release / F-Droid route).
+
+## Privacy
+
+Sprout collects nothing — all data stays on your device. See [PRIVACY.md](PRIVACY.md).
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Sprout is free software licensed under the **GNU General Public License v3.0** —
+see [LICENSE](LICENSE).
+
+This means anyone may use, study, modify and redistribute Sprout, **provided
+any distributed version remains open-source under the GPLv3**. Note that the
+GPL is a copyleft license: it keeps the software open, but it does **not** by
+itself forbid charging money for copies.
+
+Copyright © 2026 Guillaume Proust.
