@@ -2,13 +2,16 @@ package com.gproust.sprout
 
 import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.gproust.sprout.data.local.BabyEntity
@@ -41,9 +44,9 @@ import org.junit.runner.RunWith
 import java.io.File
 
 /**
- * Renders each visual feature and writes a PNG to the app's internal files dir,
- * which CI pulls off the emulator and commits to the PR. Not a pass/fail test —
- * it exists to produce screenshots.
+ * Renders each visual feature — clicking through the multi-step flows — and
+ * writes a PNG per page to the app's internal files dir, which CI pulls off the
+ * emulator and commits to the PR. Not a pass/fail test; it produces screenshots.
  */
 @RunWith(AndroidJUnit4::class)
 class ScreenshotTest {
@@ -87,6 +90,29 @@ class ScreenshotTest {
         )
     }
 
+    private val slot = mutableStateOf<@Composable () -> Unit>({})
+
+    private fun settle() {
+        rule.waitForIdle()
+        Thread.sleep(400)
+        rule.waitForIdle()
+    }
+
+    private fun show(content: @Composable () -> Unit) {
+        rule.runOnUiThread { slot.value = content }
+        settle()
+    }
+
+    private fun tap(text: String) {
+        rule.onNodeWithText(text).performClick()
+        settle()
+    }
+
+    private fun type(text: String) {
+        rule.onNode(hasSetTextAction()).performTextInput(text)
+        rule.waitForIdle()
+    }
+
     private fun save(name: String) {
         val bmp = rule.onRoot().captureToImage().asAndroidBitmap()
         File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
@@ -95,34 +121,56 @@ class ScreenshotTest {
     @Test
     fun captureScreens() {
         seed()
+        rule.setContent { SproutTheme { slot.value() } }
 
-        val screens: List<Pair<String, @androidx.compose.runtime.Composable () -> Unit>> = listOf(
-            "01-onboarding" to { OnboardingScreen { _, _, _, _, _ -> } },
-            "02-daily-checkin-birthing" to { DailyCheckInScreen("Marise", gaveBirth = true, breastfeeding = true, onSubmit = {}, onSkip = {}) },
-            "03-daily-checkin-partner" to { DailyCheckInScreen("Tom", gaveBirth = false, breastfeeding = false, onSubmit = {}, onSkip = {}) },
-            "04-home" to { HomeScreen {} },
-            "05-feeding" to { FeedingScreen() },
-            "06-sleep" to { SleepScreen() },
-            "07-diaper" to { DiaperScreen() },
-            "08-growth" to { GrowthScreen() },
-            "09-wellbeing" to { HealthScreen {} },
-            "10-profile" to { ProfileScreen {} },
-        )
+        // Onboarding — step through the whole flow.
+        show { OnboardingScreen { _, _, _, _, _ -> } }
+        save("01-onboarding-1-welcome")
+        tap("Get started")
+        save("01-onboarding-2-about-you")
+        type("Marise")
+        tap("Next")
+        save("01-onboarding-3-baby")
+        type("Léa")
+        tap("Next")
+        save("01-onboarding-4-care")
 
-        var index by mutableIntStateOf(0)
-        rule.setContent {
-            SproutTheme {
-                screens[index].second()
-            }
-        }
+        // Daily check-in for a birthing, breastfeeding parent (all questions).
+        show { DailyCheckInScreen("Marise", gaveBirth = true, breastfeeding = true, onSubmit = {}, onSkip = {}) }
+        save("02-checkin-birthing-1-intro")
+        tap("Begin")
+        save("02-checkin-birthing-2-mood")
+        tap("Next")
+        save("02-checkin-birthing-3-healing")
+        tap("Next")
+        save("02-checkin-birthing-4-bleeding")
+        tap("Next")
+        save("02-checkin-birthing-5-breasts")
+        tap("Next")
+        save("02-checkin-birthing-6-notes")
 
-        for (i in screens.indices) {
-            rule.runOnUiThread { index = i }
-            rule.waitForIdle()
-            // Give Room flows a moment to emit seeded data into the screen.
-            Thread.sleep(700)
-            rule.waitForIdle()
-            save(screens[i].first)
-        }
+        // Daily check-in for a non-birthing parent (just mood + notes).
+        show { DailyCheckInScreen("Tom", gaveBirth = false, breastfeeding = false, onSubmit = {}, onSkip = {}) }
+        save("03-checkin-partner-1-intro")
+        tap("Begin")
+        save("03-checkin-partner-2-mood")
+        tap("Next")
+        save("03-checkin-partner-3-notes")
+
+        // Single-page screens.
+        show { HomeScreen {} }
+        save("04-home")
+        show { FeedingScreen() }
+        save("05-feeding")
+        show { SleepScreen() }
+        save("06-sleep")
+        show { DiaperScreen() }
+        save("07-diaper")
+        show { GrowthScreen() }
+        save("08-growth")
+        show { HealthScreen {} }
+        save("09-wellbeing")
+        show { ProfileScreen {} }
+        save("10-profile")
     }
 }
