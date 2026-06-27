@@ -29,8 +29,8 @@ import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
+import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
-import com.gproust.sprout.ui.mother.MotherScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
@@ -106,7 +106,7 @@ class ScreenshotTest {
             "06-sleep" to { SleepScreen() },
             "07-diaper" to { DiaperScreen() },
             "08-growth" to { GrowthScreen() },
-            "09-mother-health" to { MotherScreen {} },
+            "09-wellbeing-board" to { HealthScreen {} },
             "10-profile" to { ProfileScreen {} },
         )
 
