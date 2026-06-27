@@ -38,6 +38,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Build app + test APKs
+        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -53,11 +56,15 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
-          # NOTE: android-emulator-runner executes each line in its own shell,
-          # so multi-line shell constructs must stay on a single line.
+          # NOTE: android-emulator-runner runs each line in its own shell, so
+          # multi-line constructs must stay on one line. We install + `am instrument`
+          # (instead of Gradle's connectedAndroidTest, which uninstalls the app
+          # afterwards and wipes the captured screenshots) so the app stays
+          # installed and `run-as` can read its internal files.
           script: |
-            adb uninstall com.gproust.sprout || true
-            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.gproust.sprout.ScreenshotTest
+            adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+            adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner
             mkdir -p screenshots
             for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "screenshots/$n"; done
             ls -1 screenshots || true
@@ -72,9 +79,10 @@ jobs:
       - name: Commit screenshots to the PR branch
         if: github.event_name == 'pull_request'
         run: |
+          find screenshots -type f ! -name '*.png' -delete || true
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add screenshots
+          git add -A screenshots
           if git diff --cached --quiet; then
             echo "No screenshot changes to commit."
           else
