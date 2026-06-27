@@ -53,15 +53,14 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
+          # NOTE: android-emulator-runner executes each line in its own shell,
+          # so multi-line shell constructs must stay on a single line.
           script: |
             adb uninstall com.gproust.sprout || true
             ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.gproust.sprout.ScreenshotTest
             mkdir -p screenshots
-            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do
-              name=$(echo "$f" | tr -d '\r')
-              adb exec-out run-as com.gproust.sprout cat "files/screenshots/$name" > "screenshots/$name"
-            done
-            echo "Pulled screenshots:" && ls -1 screenshots || true
+            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "screenshots/$n"; done
+            ls -1 screenshots || true
 
       - name: Upload screenshots artifact
         uses: actions/upload-artifact@v4
