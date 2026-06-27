@@ -44,10 +44,10 @@ fun OnboardingScreen(
 ) {
     var step by remember { mutableIntStateOf(0) }
     var name by remember { mutableStateOf("") }
-    var gaveBirth by remember { mutableStateOf(false) }
-    var breastfeeding by remember { mutableStateOf(false) }
     var babyName by remember { mutableStateOf("") }
     var birthDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var gaveBirth by remember { mutableStateOf(false) }
+    var breastfeeding by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize().padding(24.dp)) {
         Column(
@@ -60,19 +60,24 @@ fun OnboardingScreen(
                 1 -> AboutYouStep(
                     name = name,
                     onName = { name = it },
-                    gaveBirth = gaveBirth,
-                    onGaveBirth = { gaveBirth = it },
-                    breastfeeding = breastfeeding,
-                    onBreastfeeding = { breastfeeding = it },
                     onBack = { step = 0 },
                     onNext = { step = 2 },
                 )
-                else -> BabyStep(
+                2 -> BabyStep(
                     babyName = babyName,
                     onBabyName = { babyName = it },
                     birthDate = birthDate,
                     onBirthDate = { birthDate = it },
                     onBack = { step = 1 },
+                    onNext = { step = 3 },
+                )
+                else -> CareStep(
+                    babyName = babyName,
+                    gaveBirth = gaveBirth,
+                    onGaveBirth = { gaveBirth = it },
+                    breastfeeding = breastfeeding,
+                    onBreastfeeding = { breastfeeding = it },
+                    onBack = { step = 2 },
                     onFinish = { onFinish(name, gaveBirth, breastfeeding, babyName, birthDate) },
                 )
             }
@@ -104,10 +109,6 @@ private fun WelcomeStep(onNext: () -> Unit) {
 private fun AboutYouStep(
     name: String,
     onName: (String) -> Unit,
-    gaveBirth: Boolean,
-    onGaveBirth: (Boolean) -> Unit,
-    breastfeeding: Boolean,
-    onBreastfeeding: (Boolean) -> Unit,
     onBack: () -> Unit,
     onNext: () -> Unit,
 ) {
@@ -118,7 +119,7 @@ private fun AboutYouStep(
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "This just tailors the daily check-in to you. Both are optional.",
+        "So we can greet you properly each day.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -131,19 +132,6 @@ private fun AboutYouStep(
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
-    Spacer(Modifier.height(8.dp))
-    ToggleRow(
-        label = "Did you give birth?",
-        help = "Adds gentle questions about your healing and bleeding.",
-        checked = gaveBirth,
-        onChecked = onGaveBirth,
-    )
-    ToggleRow(
-        label = "Are you breastfeeding?",
-        help = "Adds a question about breast comfort.",
-        checked = breastfeeding,
-        onChecked = onBreastfeeding,
-    )
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
@@ -154,36 +142,13 @@ private fun AboutYouStep(
 }
 
 @Composable
-private fun ToggleRow(
-    label: String,
-    help: String,
-    checked: Boolean,
-    onChecked: (Boolean) -> Unit,
-) {
-    Row(
-        Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                help,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Switch(checked = checked, onCheckedChange = onChecked)
-    }
-}
-
-@Composable
 private fun BabyStep(
     babyName: String,
     onBabyName: (String) -> Unit,
     birthDate: Long,
     onBirthDate: (Long) -> Unit,
     onBack: () -> Unit,
-    onFinish: () -> Unit,
+    onNext: () -> Unit,
 ) {
     Text(
         "Your little one",
@@ -210,10 +175,78 @@ private fun BabyStep(
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
+        nextLabel = "Next",
+        nextEnabled = true,
+        onNext = onNext,
+    )
+}
+
+@Composable
+private fun CareStep(
+    babyName: String,
+    gaveBirth: Boolean,
+    onGaveBirth: (Boolean) -> Unit,
+    breastfeeding: Boolean,
+    onBreastfeeding: (Boolean) -> Unit,
+    onBack: () -> Unit,
+    onFinish: () -> Unit,
+) {
+    val who = babyName.trim().ifBlank { "your baby" }
+    Text(
+        "Caring for $who",
+        style = MaterialTheme.typography.headlineSmall,
+        fontWeight = FontWeight.Bold,
+    )
+    Spacer(Modifier.height(8.dp))
+    Text(
+        "This just tailors your daily check-in. Both are optional.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+    )
+    Spacer(Modifier.height(24.dp))
+    ToggleRow(
+        label = "Did you give birth to $who?",
+        help = "Adds gentle questions about your healing and bleeding.",
+        checked = gaveBirth,
+        onChecked = onGaveBirth,
+    )
+    ToggleRow(
+        label = "Are you breastfeeding $who?",
+        help = "Adds a question about breast comfort.",
+        checked = breastfeeding,
+        onChecked = onBreastfeeding,
+    )
+    Spacer(Modifier.height(32.dp))
+    StepButtons(
+        onBack = onBack,
         nextLabel = "All done",
         nextEnabled = true,
         onNext = onFinish,
     )
+}
+
+@Composable
+private fun ToggleRow(
+    label: String,
+    help: String,
+    checked: Boolean,
+    onChecked: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                help,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onChecked)
+    }
 }
 
 @Composable
