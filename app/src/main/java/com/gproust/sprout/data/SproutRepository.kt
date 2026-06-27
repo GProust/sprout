@@ -1,6 +1,7 @@
 package com.gproust.sprout.data
 
 import com.gproust.sprout.data.local.BabyEntity
+import com.gproust.sprout.data.local.CoParentHealthEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
@@ -48,4 +49,9 @@ class SproutRepository(private val db: SproutDatabase) {
     val motherHealth: Flow<List<MotherHealthEntity>> = db.motherHealthDao().observeAll()
     suspend fun addMotherHealth(entity: MotherHealthEntity) = db.motherHealthDao().insert(entity)
     suspend fun deleteMotherHealth(entity: MotherHealthEntity) = db.motherHealthDao().delete(entity)
+
+    // Co-parent health
+    val coParentHealth: Flow<List<CoParentHealthEntity>> = db.coParentHealthDao().observeAll()
+    suspend fun addCoParentHealth(entity: CoParentHealthEntity) = db.coParentHealthDao().insert(entity)
+    suspend fun deleteCoParentHealth(entity: CoParentHealthEntity) = db.coParentHealthDao().delete(entity)
 }

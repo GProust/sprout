@@ -88,3 +88,15 @@ interface MotherHealthDao {
     @Delete
     suspend fun delete(entity: MotherHealthEntity)
 }
+
+@Dao
+interface CoParentHealthDao {
+    @Query("SELECT * FROM co_parent_health ORDER BY time DESC")
+    fun observeAll(): Flow<List<CoParentHealthEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: CoParentHealthEntity)
+
+    @Delete
+    suspend fun delete(entity: CoParentHealthEntity)
+}

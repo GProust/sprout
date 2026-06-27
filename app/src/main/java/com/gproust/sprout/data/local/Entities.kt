@@ -84,6 +84,18 @@ data class MotherHealthEntity(
 )
 
 /**
+ * A co-parent's own daily wellbeing check-in (mood + a note).
+ */
+@Entity(tableName = "co_parent_health")
+data class CoParentHealthEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val time: Long,
+    /** Mood on a 1 (low) to 5 (great) scale. */
+    val mood: Int,
+    val notes: String? = null,
+)
+
+/**
  * The profile of the parent using this device (a single row, id = 1).
  * Stored per-device so that, once partner sync arrives, each phone carries
  * its own parent identity.

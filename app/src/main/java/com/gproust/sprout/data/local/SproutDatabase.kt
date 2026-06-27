@@ -16,9 +16,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DiaperEntity::class,
         GrowthEntity::class,
         MotherHealthEntity::class,
+        CoParentHealthEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -29,6 +30,7 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun diaperDao(): DiaperDao
     abstract fun growthDao(): GrowthDao
     abstract fun motherHealthDao(): MotherHealthDao
+    abstract fun coParentHealthDao(): CoParentHealthDao
     abstract fun parentProfileDao(): ParentProfileDao
 
     companion object {
@@ -48,13 +50,25 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /** v2 -> v3: add the co-parent wellbeing table. */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `co_parent_health` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`time` INTEGER NOT NULL, `mood` INTEGER NOT NULL, " +
+                        "`notes` TEXT)",
+                )
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     SproutDatabase::class.java,
                     "sprout.db",
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }
