@@ -1,0 +1,19 @@
+Sprout is a simple, private tracker for your newborn's first weeks and months — and for keeping an eye on the mother's postpartum recovery too.
+
+Everything stays on your device. There are no accounts, no cloud, no ads and no tracking. Sprout doesn't even ask for internet access.
+
+FEATURES
+
+• Feeding — breast (left/right/both), bottle (ml) and solids, with timestamps.
+• Sleep — log naps and nights with start/end times and automatic durations.
+• Diapers — wet, dirty or mixed changes.
+• Growth — weight, height and head circumference, with a weight-trend chart.
+• Mother's health — postpartum check-ins for mood, bleeding (lochia), breast comfort and notes.
+• Dashboard — today's feeds, sleep total and diaper count at a glance.
+• Two-parent friendly — a shared wellbeing board with per-parent edit permissions.
+
+PRIVACY FIRST
+
+All data is stored locally on your device (SQLite). Nothing is uploaded, sold or shared. Uninstalling the app removes your data.
+
+Sprout is free, open-source software, licensed under the GNU GPLv3.

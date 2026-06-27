@@ -1,9 +1,25 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
+
+// Release signing credentials are loaded from `keystore.properties` (local, git-ignored)
+// or, if that file is absent, from environment variables (used by CI). When neither is
+// present the release build stays unsigned so debug work and CI without secrets keep working.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        FileInputStream(keystorePropertiesFile).use { load(it) }
+    }
+}
+
+fun signingValue(propKey: String, envKey: String): String? =
+    keystoreProperties.getProperty(propKey) ?: System.getenv(envKey)
 
 android {
     namespace = "com.gproust.sprout"
@@ -22,13 +38,30 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val storeFilePath = signingValue("storeFile", "SPROUT_KEYSTORE_FILE")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = signingValue("storePassword", "SPROUT_KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "SPROUT_KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "SPROUT_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // Kept off so an untested R8 pass can't ship a broken release build.
+            // See docs/RELEASING.md for how to enable and validate minification.
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Only attach the signing config when a keystore is actually configured.
+            signingConfigs.getByName("release").takeIf { it.storeFile != null }
+                ?.let { signingConfig = it }
         }
     }
     compileOptions {

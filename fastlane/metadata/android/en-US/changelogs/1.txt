@@ -1,0 +1,3 @@
+First public release of Sprout — track feeding, sleep, diapers and growth,
+plus postpartum check-ins for mum. Fully offline; your data never leaves the
+device.
