@@ -71,7 +71,7 @@ which builds the signed `.aab`/`.apk` and attaches the APK to a GitHub Release.
 ## Releasing & publishing
 
 See **[docs/RELEASING.md](docs/RELEASING.md)** for the full step-by-step process for
-publishing to the Google Play Store (and the open GitHub Release / F-Droid route).
+publishing to the Google Play Store (and the open GitHub Release route).
 
 ## Privacy
 
@@ -79,12 +79,13 @@ Sprout collects nothing — all data stays on your device. See [PRIVACY.md](PRIV
 
 ## License
 
-Sprout is free software licensed under the **GNU General Public License v3.0** —
-see [LICENSE](LICENSE).
+Sprout is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE)**.
 
-This means anyone may use, study, modify and redistribute Sprout, **provided
-any distributed version remains open-source under the GPLv3**. Note that the
-GPL is a copyleft license: it keeps the software open, but it does **not** by
-itself forbid charging money for copies.
+You may use, modify and share Sprout for **any noncommercial purpose** — personal
+use, research, education, and use by charitable or government organizations. You
+may **not** use it for commercial advantage or monetary compensation. This is a
+*source-available* license, not an open-source/OSI license.
+
+For commercial-use licensing, contact the copyright holder.
 
 Copyright © 2026 Guillaume Proust.
