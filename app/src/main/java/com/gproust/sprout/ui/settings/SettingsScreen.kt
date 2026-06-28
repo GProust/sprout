@@ -1,15 +1,26 @@
 package com.gproust.sprout.ui.settings
 
 import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -17,14 +28,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.ui.common.SproutTopBar
 
-/** A selectable language: null tag = follow the system. */
-private data class LanguageChoice(val tag: String?, val label: String)
+/** A selectable language: null tag = follow the system; null flag = use the globe icon. */
+private data class LanguageChoice(
+    val tag: String?,
+    val label: String,
+    @param:DrawableRes val flag: Int?,
+)
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -32,9 +49,14 @@ fun SettingsScreen(onBack: () -> Unit) {
     val current = AppLocale.currentTag(context)
 
     val choices = listOf(
-        LanguageChoice(null, stringResource(R.string.settings_language_system)),
-        LanguageChoice("en", stringResource(R.string.language_en)),
-        LanguageChoice("fr", stringResource(R.string.language_fr)),
+        LanguageChoice(null, stringResource(R.string.settings_language_system), null),
+        LanguageChoice("en", stringResource(R.string.language_en), R.drawable.flag_en),
+        LanguageChoice("fr", stringResource(R.string.language_fr), R.drawable.flag_fr),
+        LanguageChoice("de", stringResource(R.string.language_de), R.drawable.flag_de),
+        LanguageChoice("es", stringResource(R.string.language_es), R.drawable.flag_es),
+        LanguageChoice("it", stringResource(R.string.language_it), R.drawable.flag_it),
+        LanguageChoice("pl", stringResource(R.string.language_pl), R.drawable.flag_pl),
+        LanguageChoice("pt", stringResource(R.string.language_pt), R.drawable.flag_pt),
     )
 
     Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_settings), onBack = onBack) }) { padding ->
@@ -54,6 +76,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 val choice = choices[i]
                 LanguageRow(
                     label = choice.label,
+                    flag = choice.flag,
                     selected = isSelected(current, choice.tag),
                     onSelect = { chooseLanguage(context, choice.tag) },
                 )
@@ -74,19 +97,44 @@ private fun chooseLanguage(context: Context, tag: String?) {
 }
 
 @Composable
-private fun LanguageRow(label: String, selected: Boolean, onSelect: () -> Unit) {
+private fun LanguageRow(label: String, @DrawableRes flag: Int?, selected: Boolean, onSelect: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .selectable(selected = selected, onClick = onSelect)
-            .padding(vertical = 12.dp),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RadioButton(selected = selected, onClick = null)
+        FlagSlot(flag)
         Text(
             label,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 12.dp),
+            modifier = Modifier.weight(1f).padding(start = 16.dp),
+        )
+        RadioButton(selected = selected, onClick = null)
+    }
+}
+
+/** A fixed-size leading slot: the country flag, or a globe for "System default". */
+@Composable
+private fun FlagSlot(@DrawableRes flag: Int?) {
+    if (flag == null) {
+        Box(Modifier.width(30.dp), contentAlignment = Alignment.Center) {
+            Icon(
+                Icons.Filled.Public,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    } else {
+        Image(
+            painter = painterResource(flag),
+            contentDescription = null,
+            modifier = Modifier
+                .size(width = 30.dp, height = 20.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(3.dp)),
         )
     }
 }
