@@ -239,4 +239,14 @@
     <string name="treatment_channel_desc">Recordatorios para dar a tu bebé sus tratamientos</string>
     <string name="treatment_notif_text">Es la hora de esta dosis.</string>
     <string name="treatment_notif_text_baby">Es la hora de la dosis de %1$s.</string>
+
+    <!-- Recordatorios de tomas -->
+    <string name="settings_feeding_reminders">Recordatorios de tomas</string>
+    <string name="settings_feeding_reminders_desc">Avísame cuando haya pasado demasiado tiempo desde la última toma.</string>
+    <string name="settings_feeding_interval_label">Recordarme si una toma supera</string>
+    <string name="feeding_channel_name">Recordatorios de tomas</string>
+    <string name="feeding_channel_desc">Recordatorios cuando ha pasado un rato desde la última toma</string>
+    <string name="feeding_notif_title">¿Hora de una toma?</string>
+    <string name="feeding_notif_title_baby">¿Hora de alimentar a %1$s?</string>
+    <string name="feeding_notif_text">Han pasado %1$s desde la última toma.</string>
 </resources>

@@ -239,4 +239,14 @@
     <string name="treatment_channel_desc">Erinnerungen, deinem Baby seine Behandlungen zu geben</string>
     <string name="treatment_notif_text">Es ist Zeit für diese Dosis.</string>
     <string name="treatment_notif_text_baby">Es ist Zeit für die Dosis von %1$s.</string>
+
+    <!-- Mahlzeit-Erinnerungen -->
+    <string name="settings_feeding_reminders">Mahlzeit-Erinnerungen</string>
+    <string name="settings_feeding_reminders_desc">Erinnere mich, wenn die letzte Mahlzeit zu lange her ist.</string>
+    <string name="settings_feeding_interval_label">Erinnern, wenn eine Mahlzeit länger her ist als</string>
+    <string name="feeding_channel_name">Mahlzeit-Erinnerungen</string>
+    <string name="feeding_channel_desc">Erinnerungen, wenn die letzte Mahlzeit eine Weile her ist</string>
+    <string name="feeding_notif_title">Zeit für eine Mahlzeit?</string>
+    <string name="feeding_notif_title_baby">Zeit, %1$s zu füttern?</string>
+    <string name="feeding_notif_text">Die letzte Mahlzeit war vor %1$s.</string>
 </resources>

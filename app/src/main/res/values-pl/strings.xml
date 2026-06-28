@@ -245,4 +245,14 @@
     <string name="treatment_channel_desc">Przypomnienia o podaniu dziecku leczenia</string>
     <string name="treatment_notif_text">Czas na tę dawkę.</string>
     <string name="treatment_notif_text_baby">Czas na dawkę dla %1$s.</string>
+
+    <!-- Przypomnienia o karmieniu -->
+    <string name="settings_feeding_reminders">Przypomnienia o karmieniu</string>
+    <string name="settings_feeding_reminders_desc">Przypomnij, gdy od ostatniego karmienia minęło zbyt dużo czasu.</string>
+    <string name="settings_feeding_interval_label">Przypomnij, jeśli od karmienia minie więcej niż</string>
+    <string name="feeding_channel_name">Przypomnienia o karmieniu</string>
+    <string name="feeding_channel_desc">Przypomnienia, gdy od ostatniego karmienia minęło trochę czasu</string>
+    <string name="feeding_notif_title">Czas na karmienie?</string>
+    <string name="feeding_notif_title_baby">Czas nakarmić %1$s?</string>
+    <string name="feeding_notif_text">Od ostatniego karmienia minęło %1$s.</string>
 </resources>
