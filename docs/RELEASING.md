@@ -164,12 +164,11 @@ Because Sprout is GPLv3, the source is public and you can also distribute the
 binary openly:
 
 ### GitHub Releases
-Tag a version and let CI build and attach the signed APK (see
-[`.github/workflows/release.yml`](../.github/workflows/release.yml)):
-
-```bash
-git tag v1.0 && git push origin v1.0
-```
+The [release workflow](../.github/workflows/release.yml) is **manual**. In the
+GitHub UI go to **Actions → Release → Run workflow**, and enter the tag to
+publish (e.g. `v1.0`). It builds the signed `.aab`/`.apk`, uploads them as run
+artifacts, and — because you supplied a tag — creates that tag and a GitHub
+Release with the APK attached. Leave the tag empty to only build the artifacts.
 
 ### F-Droid (free, FOSS-only store)
 F-Droid is a natural home for a GPL app, and Sprout already meets F-Droid's
@@ -213,5 +212,5 @@ F-Droid auto-detects the new tag (`UpdateCheckMode: Tags`).
 - [ ] Installed and smoke-tested a release build on a device
 - [ ] Store listing text + screenshots current
 - [ ] Privacy policy URL reachable; Data safety form matches it
-- [ ] Git tag pushed (`vX.Y`)
+- [ ] Release workflow run (Actions → Release) with the `vX.Y` tag
 - [ ] Production rollout started in Play Console

@@ -65,8 +65,9 @@ device with `adb install`.
 Every push and pull request runs [GitHub Actions](.github/workflows/ci.yml): lint, unit
 tests, and a debug APK build. The APK is uploaded as a build artifact.
 
-Pushing a version tag (`vX.Y`) runs the [release workflow](.github/workflows/release.yml),
-which builds the signed `.aab`/`.apk` and attaches the APK to a GitHub Release.
+The [release workflow](.github/workflows/release.yml) is **manual** — run it from
+**Actions → Release → Run workflow** to build the signed `.aab`/`.apk`; pass a tag
+(e.g. `v1.0`) to also publish a GitHub Release with the APK attached.
 
 ## Releasing & publishing
 
