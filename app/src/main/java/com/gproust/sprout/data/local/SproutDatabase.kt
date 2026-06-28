@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -145,14 +145,23 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /** v6 -> v7: record per-breast durations for breastfeeding sessions. */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `leftDurationMs` INTEGER")
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `rightDurationMs` INTEGER")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     SproutDatabase::class.java,
                     "sprout.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
-                    .build().also { instance = it }
+                ).addMigrations(
+                    MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+                ).build().also { instance = it }
             }
     }
 }

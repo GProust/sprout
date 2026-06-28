@@ -128,6 +128,20 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
 
+    <!-- Breastfeeding live timer -->
+    <string name="feeding_breastfeeding">Allaitement</string>
+    <string name="feeding_nursing_hint">Démarrez une tétée et changez de côté au fil de la tétée.</string>
+    <string name="feeding_start_left">Démarrer à gauche</string>
+    <string name="feeding_start_right">Démarrer à droite</string>
+    <string name="feeding_on_left">Sein gauche en cours</string>
+    <string name="feeding_on_right">Sein droit en cours</string>
+    <string name="feeding_switch_to_left">Passer à gauche</string>
+    <string name="feeding_switch_to_right">Passer à droite</string>
+    <string name="feeding_last_switch">Dernier changement à %1$s</string>
+    <string name="feeding_stop_save">Arrêter et enregistrer</string>
+    <!-- Côté + durée, p. ex. « Gauche 8m » -->
+    <string name="feeding_side_time">%1$s %2$s</string>
+
     <!-- Sleep -->
     <string name="screen_sleep">Sommeil</string>
     <string name="sleep_empty">Aucun sommeil enregistré pour le moment.</string>

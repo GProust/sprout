@@ -79,6 +79,22 @@ fun formatDuration(context: Context, millis: Long): String {
 }
 
 /**
+ * Formats a running timer as "M:SS", or "H:MM:SS" once it passes an hour.
+ * Digits only, so it's locale-neutral and needs no Context.
+ */
+fun formatClock(millis: Long): String {
+    val totalSec = abs(millis) / 1000L
+    val hours = totalSec / 3600
+    val minutes = (totalSec % 3600) / 60
+    val seconds = totalSec % 60
+    return if (hours > 0) {
+        "%d:%02d:%02d".format(hours, minutes, seconds)
+    } else {
+        "%d:%02d".format(minutes, seconds)
+    }
+}
+
+/**
  * Baby age relative to [now], e.g. "5 days", "3 weeks, 2 days", "4 months".
  */
 fun babyAge(context: Context, birthDateMillis: Long, now: Long): String {
