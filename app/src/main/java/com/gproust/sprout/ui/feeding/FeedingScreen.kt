@@ -171,7 +171,7 @@ fun FeedingScreen() {
                     onCancel = vm::cancelNursing,
                 )
             }
-            item { OtherFeedCard(onAdd = vm::add) }
+            item { ManualFeedCard(onAdd = vm::add) }
             item {
                 Text(
                     stringResource(R.string.history),
@@ -322,35 +322,51 @@ private fun SideTotal(label: String, value: String, active: Boolean) {
     }
 }
 
-/** Manual entry for bottle and solid feeds (breastfeeding uses the live timer). */
+/**
+ * Manual entry for any feed — including a past breastfeed — without using the
+ * live timer. Useful for logging a feed after the fact, or a quick bottle/solid.
+ */
 @Composable
-private fun OtherFeedCard(onAdd: (FeedingEntity) -> Unit) {
+private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
     val context = LocalContext.current
-    var type by remember { mutableStateOf(FeedType.BOTTLE) }
+    var type by remember { mutableStateOf(FeedType.BREAST) }
+    var side by remember { mutableStateOf(BreastSide.LEFT) }
     var amount by remember { mutableStateOf("") }
     var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
     Card {
         Column(Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.feeding_bottle_solids), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.feeding_log_title), style = MaterialTheme.typography.titleMedium)
 
             FieldLabel(stringResource(R.string.field_type))
             ChoiceChips(
-                options = listOf(FeedType.BOTTLE, FeedType.SOLID),
+                options = FeedType.entries,
                 selected = type,
                 onSelect = { type = it },
                 labelOf = { it.label(context) },
             )
 
-            if (type == FeedType.BOTTLE) {
-                FieldLabel(stringResource(R.string.field_amount))
-                NumberField(
-                    label = stringResource(R.string.field_amount),
-                    value = amount,
-                    onChange = { amount = it },
-                    suffix = stringResource(R.string.unit_ml),
-                )
+            when (type) {
+                FeedType.BREAST -> {
+                    FieldLabel(stringResource(R.string.field_side))
+                    ChoiceChips(
+                        options = BreastSide.entries,
+                        selected = side,
+                        onSelect = { side = it },
+                        labelOf = { it.label(context) },
+                    )
+                }
+                FeedType.BOTTLE -> {
+                    FieldLabel(stringResource(R.string.field_amount))
+                    NumberField(
+                        label = stringResource(R.string.field_amount),
+                        value = amount,
+                        onChange = { amount = it },
+                        suffix = stringResource(R.string.unit_ml),
+                    )
+                }
+                FeedType.SOLID -> Unit
             }
 
             FieldLabel(stringResource(R.string.field_time))
@@ -365,6 +381,7 @@ private fun OtherFeedCard(onAdd: (FeedingEntity) -> Unit) {
                     onAdd(
                         FeedingEntity(
                             type = type,
+                            side = if (type == FeedType.BREAST) side else null,
                             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
                             startTime = time,
                             notes = notes.ifBlank { null },

@@ -140,7 +140,6 @@
     <string name="feeding_switch_to_right">Switch to right</string>
     <string name="feeding_last_switch">Last switch at %1$s</string>
     <string name="feeding_stop_save">Stop &amp; save</string>
-    <string name="feeding_bottle_solids">Bottle or solids</string>
     <!-- Side + duration, e.g. "Left 8m" -->
     <string name="feeding_side_time">%1$s %2$s</string>
 

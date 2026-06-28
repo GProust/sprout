@@ -86,6 +86,17 @@ class ScreenshotTest {
         )
         // Logs are stamped with the active baby (Léa).
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
+        // A completed breastfeed that switched sides — shows the per-side breakdown.
+        repo.addFeeding(
+            FeedingEntity(
+                type = FeedType.BREAST,
+                side = BreastSide.BOTH,
+                startTime = now - 4 * hour,
+                endTime = now - 4 * hour + 13 * 60_000L,
+                leftDurationMs = 8 * 60_000L,
+                rightDurationMs = 5 * 60_000L,
+            ),
+        )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
         repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
         repo.addDiaper(DiaperEntity(time = now - hour, type = DiaperType.WET))
@@ -205,6 +216,22 @@ class ScreenshotTest {
         save("04-home")
         show { FeedingScreen() }
         save("05-feeding")
+        // Live breastfeeding timer: start on the left, let it run, then switch
+        // sides. The ticking LaunchedEffect never completes, so we stop the test
+        // clock auto-advancing (which would spin waitForIdle) and drive frames by
+        // hand around each capture.
+        rule.mainClock.autoAdvance = false
+        rule.onNodeWithText("Start left").performClick()
+        rule.mainClock.advanceTimeByFrame()
+        Thread.sleep(2200)
+        rule.mainClock.advanceTimeBy(1000) // let the per-second tick fire
+        save("05-feeding-2-nursing")
+        rule.onNodeWithText("Switch to right").performClick()
+        rule.mainClock.advanceTimeByFrame()
+        Thread.sleep(1500)
+        rule.mainClock.advanceTimeBy(1000)
+        save("05-feeding-3-switched")
+        rule.mainClock.autoAdvance = true
         show { SleepScreen() }
         save("06-sleep")
         show { DiaperScreen() }
