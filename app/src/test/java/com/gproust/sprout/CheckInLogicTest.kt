@@ -1,6 +1,14 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.ui.common.CheckInQuestion.BLEEDING
+import com.gproust.sprout.ui.common.CheckInQuestion.BREASTS
+import com.gproust.sprout.ui.common.CheckInQuestion.HEALING
+import com.gproust.sprout.ui.common.CheckInQuestion.MOOD
+import com.gproust.sprout.ui.common.CheckInQuestion.NOTES
+import com.gproust.sprout.data.local.DeliveryType
+import com.gproust.sprout.ui.common.checkInQuestions
 import com.gproust.sprout.ui.common.greetingForHour
+import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.isSameDay
 import com.gproust.sprout.ui.startup.needsCheckIn
 import org.junit.Assert.assertEquals
@@ -24,6 +32,31 @@ class CheckInLogicTest {
         assertTrue("never checked in", needsCheckIn(null, t))
         assertTrue("checked in two days ago", needsCheckIn(t, t + twoDays))
         assertFalse("already checked in today", needsCheckIn(t, t))
+    }
+
+    @Test
+    fun checkInQuestions_dependOnCapabilities() {
+        // Everyone gets mood + notes; nobody is left out.
+        assertEquals(listOf(MOOD, NOTES), checkInQuestions(gaveBirth = false, breastfeeding = false))
+        // A birthing parent also gets the postpartum questions.
+        assertEquals(
+            listOf(MOOD, HEALING, BLEEDING, NOTES),
+            checkInQuestions(gaveBirth = true, breastfeeding = false),
+        )
+        // A non-birthing parent who breastfeeds (e.g. induced lactation) gets the breast question.
+        assertEquals(listOf(MOOD, BREASTS, NOTES), checkInQuestions(gaveBirth = false, breastfeeding = true))
+        // Both at once (e.g. co-nursing) gets everything.
+        assertEquals(
+            listOf(MOOD, HEALING, BLEEDING, BREASTS, NOTES),
+            checkInQuestions(gaveBirth = true, breastfeeding = true),
+        )
+    }
+
+    @Test
+    fun healingQuestion_tailoredToDeliveryType() {
+        assertEquals("How is your healing coming along?", healingQuestion(null))
+        assertEquals("How is your perineal healing?", healingQuestion(DeliveryType.VAGINAL))
+        assertEquals("How is your incision healing?", healingQuestion(DeliveryType.CESAREAN))
     }
 
     @Test
