@@ -129,6 +129,21 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
 
+    <!-- Breastfeeding live timer -->
+    <string name="feeding_breastfeeding">Breastfeeding</string>
+    <string name="feeding_nursing_hint">Start a feed and tap to switch sides as you go.</string>
+    <string name="feeding_start_left">Start left</string>
+    <string name="feeding_start_right">Start right</string>
+    <string name="feeding_on_left">On the left breast</string>
+    <string name="feeding_on_right">On the right breast</string>
+    <string name="feeding_switch_to_left">Switch to left</string>
+    <string name="feeding_switch_to_right">Switch to right</string>
+    <string name="feeding_last_switch">Last switch at %1$s</string>
+    <string name="feeding_stop_save">Stop &amp; save</string>
+    <string name="feeding_bottle_solids">Bottle or solids</string>
+    <!-- Side + duration, e.g. "Left 8m" -->
+    <string name="feeding_side_time">%1$s %2$s</string>
+
     <!-- Sleep -->
     <string name="screen_sleep">Sleep</string>
     <string name="sleep_empty">No sleep logged yet.</string>

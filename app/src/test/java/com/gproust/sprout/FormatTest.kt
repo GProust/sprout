@@ -3,6 +3,7 @@ package com.gproust.sprout
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.common.formatClock
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
 import org.junit.Assert.assertEquals
@@ -25,6 +26,15 @@ class FormatTest {
         assertEquals("45m", formatDuration(context, 45L * 60_000))
         assertEquals("2h", formatDuration(context, 120L * 60_000))
         assertEquals("30s", formatDuration(context, 30L * 1000))
+    }
+
+    @Test
+    fun clock_formatsRunningTimer() {
+        assertEquals("0:00", formatClock(0L))
+        assertEquals("0:05", formatClock(5L * 1000))
+        assertEquals("1:30", formatClock(90L * 1000))
+        assertEquals("12:00", formatClock(12L * 60_000))
+        assertEquals("1:05:09", formatClock(60L * 60_000 + 5L * 60_000 + 9L * 1000))
     }
 
     @Test

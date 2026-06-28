@@ -45,10 +45,15 @@ data class FeedingEntity(
     /** Which baby this entry belongs to; stamped by the repository on insert. */
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val type: FeedType,
+    /** Which breast(s) were used; [BreastSide.BOTH] when the session switched sides. */
     val side: BreastSide? = null,
     val amountMl: Int? = null,
     val startTime: Long,
     val endTime: Long? = null,
+    /** Time spent on the left breast, in millis (breastfeeding sessions only). */
+    val leftDurationMs: Long? = null,
+    /** Time spent on the right breast, in millis (breastfeeding sessions only). */
+    val rightDurationMs: Long? = null,
     val notes: String? = null,
 )
 
