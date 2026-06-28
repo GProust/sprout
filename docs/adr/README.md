@@ -30,10 +30,9 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted |
 | [0006](0006-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
 | [0007](0007-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
-| [0008](0008-multiple-babies-active-baby-model.md) | Multiple babies via an active-baby model | Accepted |
 
 > Reclassified to the [Business & Product Decision Records](../decisions/): the
-> inclusive parent model (now [BDR-0001](../decisions/0001-inclusive-parent-model.md))
-> and the GPLv3 / trademark decision (now
-> [BDR-0002](../decisions/0002-gplv3-copyleft-reserved-trademark.md)). Their old ADR
-> numbers (0005, 0009) are retired.
+> inclusive parent model ([BDR-0001](../decisions/0001-inclusive-parent-model.md)),
+> the GPLv3 / trademark decision ([BDR-0002](../decisions/0002-gplv3-copyleft-reserved-trademark.md)),
+> and supporting multiple babies ([BDR-0003](../decisions/0003-multiple-babies.md)).
+> Their old ADR numbers (0005, 0008, 0009) are retired.

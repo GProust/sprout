@@ -12,6 +12,9 @@ Sprout should be usable in more than one language and should follow the user's
 device language without extra setup. Early screens hard-coded English strings,
 which would have made any second language a large retrofit.
 
+This ADR is the **technical mechanism**; the product decision to default to the
+device's language is [BDR-0004](../decisions/0004-default-to-system-language.md).
+
 ## Decision
 
 All user-facing text lives in **Android string resources**:

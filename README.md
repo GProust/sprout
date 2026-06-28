@@ -49,9 +49,10 @@ The significant decisions behind Sprout are recorded with their rationale, split
 into two logs:
 
 - **[docs/adr/](docs/adr/)** — *architecture* decisions: local-only storage, no
-  first-party backend, the tech stack, CI, multiple babies, and more.
-- **[docs/decisions/](docs/decisions/)** — *business & product* decisions: the
-  inclusive parent model, licensing, and other domain/policy rules.
+  first-party backend, the tech stack, localization mechanism, CI, and more.
+- **[docs/decisions/](docs/decisions/)** — *business & product* decisions:
+  the inclusive parent model, supporting multiple babies, defaulting to the
+  device language, licensing, and other domain/policy rules.
 
 ## Building
 

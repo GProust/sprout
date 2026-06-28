@@ -31,7 +31,7 @@ Build natively for Android in **Kotlin**, with:
   test (pure functions and ViewModel state).
 - The repository indirection means cross-cutting data rules live in one place —
   e.g. scoping every log to the active baby
-  ([ADR-0008](0008-multiple-babies-active-baby-model.md)).
+  ([BDR-0003](../decisions/0003-multiple-babies.md)).
 - **Android only.** No iOS or web; reaching another platform later would mean a
   rewrite or a move to a cross-platform stack.
 - Tied to the Compose/Material 3 release cadence and its learning curve.
