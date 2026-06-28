@@ -254,6 +254,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             QuickAction(stringResource(R.string.quick_sleep), onClick = { onNavigate(Routes.SLEEP) })
             QuickAction(stringResource(R.string.quick_diaper), onClick = { onNavigate(Routes.DIAPER) })
             QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })
+            QuickAction(stringResource(R.string.quick_treatments), onClick = { onNavigate(Routes.TREATMENTS) })
             QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
         }
     }

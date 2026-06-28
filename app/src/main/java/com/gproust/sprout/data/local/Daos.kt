@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,9 @@ interface BabyDao {
 
     @Query("SELECT * FROM baby WHERE archived = 0 ORDER BY birthDate ASC, id ASC LIMIT 1")
     suspend fun firstActiveBaby(): BabyEntity?
+
+    @Query("SELECT name FROM baby WHERE id = :id LIMIT 1")
+    suspend fun nameById(id: Long): String?
 
     @Insert
     suspend fun insert(baby: BabyEntity): Long
@@ -112,6 +116,32 @@ interface GrowthDao {
     suspend fun delete(entity: GrowthEntity)
 
     @Query("DELETE FROM growth WHERE babyId = :babyId")
+    suspend fun deleteForBaby(babyId: Long)
+}
+
+@Dao
+interface TreatmentDao {
+    /** Active treatments for a baby. */
+    @Query("SELECT * FROM treatment WHERE babyId = :babyId AND active = 1 ORDER BY name ASC")
+    fun observeForBaby(babyId: Long): Flow<List<TreatmentEntity>>
+
+    @Query("SELECT * FROM treatment WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): TreatmentEntity?
+
+    /** Every active treatment with reminders on — used to (re)schedule alarms, e.g. after a reboot. */
+    @Query("SELECT * FROM treatment WHERE active = 1 AND remindersEnabled = 1")
+    suspend fun activeWithReminders(): List<TreatmentEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: TreatmentEntity): Long
+
+    @Update
+    suspend fun update(entity: TreatmentEntity)
+
+    @Delete
+    suspend fun delete(entity: TreatmentEntity)
+
+    @Query("DELETE FROM treatment WHERE babyId = :babyId")
     suspend fun deleteForBaby(babyId: Long)
 }
 

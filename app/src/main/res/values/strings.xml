@@ -252,4 +252,36 @@
     <string name="cd_stop_tracking_baby">Stop tracking %1$s</string>
     <string name="cd_restore_baby">Restore %1$s</string>
     <string name="cd_delete_baby">Delete %1$s</string>
+
+    <!-- Treatments / medications -->
+    <string name="screen_treatments">Treatments</string>
+    <string name="quick_treatments">💊  Treatments</string>
+    <string name="treatment_empty">No treatments yet. Add one with the + button — e.g. Vitamin D every day.</string>
+    <string name="treatment_add">Add treatment</string>
+    <string name="treatment_new">New treatment</string>
+    <string name="treatment_edit">Edit treatment</string>
+    <string name="treatment_title_dose">%1$s · %2$s</string>
+    <string name="treatment_reminders_off">Reminders off</string>
+    <string name="treatment_name">Name (e.g. Vitamin D)</string>
+    <string name="treatment_dose">Dose (optional, e.g. 1 drop)</string>
+    <string name="treatment_frequency">How often</string>
+    <string name="treatment_freq_daily">Every day</string>
+    <string name="treatment_freq_weekly">Every week</string>
+    <string name="treatment_freq_every_n_label">Every N days</string>
+    <string name="treatment_freq_every_n">Every %1$d days</string>
+    <string name="treatment_every_n_days">Days between doses</string>
+    <string name="treatment_days_suffix">days</string>
+    <string name="treatment_times">Reminder times</string>
+    <string name="treatment_add_time">Add a time</string>
+    <string name="treatment_start">Start date</string>
+    <string name="treatment_has_end">Set an end date</string>
+    <string name="treatment_end">End date</string>
+    <string name="treatment_remind_me">Remind me</string>
+    <string name="treatment_schedule_summary">%1$s · %2$s</string>
+
+    <!-- Treatment reminder notifications -->
+    <string name="treatment_channel_name">Treatment reminders</string>
+    <string name="treatment_channel_desc">Reminders to give your baby their treatments</string>
+    <string name="treatment_notif_text">It\'s time for this dose.</string>
+    <string name="treatment_notif_text_baby">It\'s time for %1$s\'s dose.</string>
 </resources>

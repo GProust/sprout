@@ -7,6 +7,7 @@ import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.local.SproutDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,6 +60,9 @@ class SproutRepository(private val db: SproutDatabase) {
 
     suspend fun updateBaby(baby: BabyEntity) = db.babyDao().upsert(baby)
 
+    /** The name of a baby by id (for notifications); null if it no longer exists. */
+    suspend fun babyName(id: Long): String? = db.babyDao().nameById(id)
+
     suspend fun setActiveBaby(babyId: Long) = db.parentProfileDao().updateActiveBaby(babyId)
 
     /** Stop tracking a baby: keep its data but take it out of the active rotation. */
@@ -76,6 +80,7 @@ class SproutRepository(private val db: SproutDatabase) {
             db.sleepDao().deleteForBaby(babyId)
             db.diaperDao().deleteForBaby(babyId)
             db.growthDao().deleteForBaby(babyId)
+            db.treatmentDao().deleteForBaby(babyId)
             db.babyDao().deleteById(babyId)
         }
         reassignActiveIfNeeded(babyId)
@@ -128,6 +133,21 @@ class SproutRepository(private val db: SproutDatabase) {
         db.growthDao().insert(entity.copy(babyId = id))
     }
     suspend fun deleteGrowth(entity: GrowthEntity) = db.growthDao().delete(entity)
+
+    // Treatments (medications/reminders — per active baby)
+    val treatments: Flow<List<TreatmentEntity>> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(emptyList()) else db.treatmentDao().observeForBaby(id)
+    }
+    suspend fun addTreatment(entity: TreatmentEntity): Long? {
+        val id = activeBabyId.first() ?: return null
+        return db.treatmentDao().insert(entity.copy(babyId = id))
+    }
+    suspend fun updateTreatment(entity: TreatmentEntity) = db.treatmentDao().update(entity)
+    suspend fun deleteTreatment(entity: TreatmentEntity) = db.treatmentDao().delete(entity)
+    suspend fun getTreatment(id: Long): TreatmentEntity? = db.treatmentDao().getById(id)
+
+    /** All active treatments (across babies) that want reminders — for (re)scheduling alarms. */
+    suspend fun treatmentsWithReminders(): List<TreatmentEntity> = db.treatmentDao().activeWithReminders()
 
     // Wellbeing (parent check-ins — per parent, not per baby)
     val wellbeing: Flow<List<WellbeingEntity>> = db.wellbeingDao().observeAll()
