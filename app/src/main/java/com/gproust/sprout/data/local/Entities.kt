@@ -82,6 +82,36 @@ data class GrowthEntity(
 )
 
 /**
+ * A recurring treatment/medication for a baby — e.g. "Vitamin D, 1 drop, every
+ * day for a year". Belongs to a baby (stamped by the repository on insert) and
+ * drives optional daily reminders.
+ *
+ * The schedule is "every [intervalDays] days, at each time in [timesOfDay]",
+ * running from [startDate] through [endDate] (inclusive; null = ongoing).
+ */
+@Entity(tableName = "treatment", indices = [Index("babyId")])
+data class TreatmentEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** Which baby this treatment is for; stamped by the repository on insert. */
+    val babyId: Long = 0L,
+    val name: String,
+    /** Optional dose description, e.g. "400 IU" or "1 drop". */
+    val dose: String? = null,
+    /** Days between doses: 1 = daily, 7 = weekly, N = every N days. */
+    val intervalDays: Int = 1,
+    /** Reminder times on a dosing day, as minutes since midnight (e.g. 540 = 09:00). */
+    val timesOfDay: List<Int> = listOf(9 * 60),
+    /** First dosing day (epoch millis). */
+    val startDate: Long,
+    /** Last dosing day, inclusive (epoch millis); null = ongoing. */
+    val endDate: Long? = null,
+    val remindersEnabled: Boolean = true,
+    /** False once the treatment is removed/stopped; kept out of the active list. */
+    val active: Boolean = true,
+    val notes: String? = null,
+)
+
+/**
  * A parent's daily wellbeing check-in. Mood and notes apply to everyone;
  * the postpartum fields (bleeding, recovery) and breast comfort are only
  * filled in when they're relevant to that parent.

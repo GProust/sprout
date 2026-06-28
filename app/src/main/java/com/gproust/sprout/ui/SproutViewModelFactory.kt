@@ -17,6 +17,7 @@ import com.gproust.sprout.ui.home.HomeViewModel
 import com.gproust.sprout.ui.profile.ProfileViewModel
 import com.gproust.sprout.ui.sleep.SleepViewModel
 import com.gproust.sprout.ui.startup.StartupViewModel
+import com.gproust.sprout.ui.treatments.TreatmentsViewModel
 
 /**
  * Builds every ViewModel in the app from the shared [SproutRepository].
@@ -37,6 +38,7 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(GrowthViewModel::class.java) -> GrowthViewModel(repository)
             modelClass.isAssignableFrom(HealthViewModel::class.java) -> HealthViewModel(repository)
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository)
+            modelClass.isAssignableFrom(TreatmentsViewModel::class.java) -> TreatmentsViewModel(repository, context)
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         } as T
     }

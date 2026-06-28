@@ -26,6 +26,7 @@ import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
@@ -37,6 +38,7 @@ import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
+import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.theme.SproutTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -90,6 +92,16 @@ class ScreenshotTest {
         repo.addDiaper(DiaperEntity(time = now - 3 * hour, type = DiaperType.DIRTY))
         repo.addGrowth(GrowthEntity(time = now - 14 * day, weightGrams = 3200, heightMm = 500))
         repo.addGrowth(GrowthEntity(time = now, weightGrams = 3900, heightMm = 530))
+        repo.addTreatment(
+            TreatmentEntity(
+                name = "Vitamin D",
+                dose = "1 drop",
+                intervalDays = 1,
+                timesOfDay = listOf(9 * 60),
+                startDate = now - 7 * day,
+                endDate = now + 358 * day,
+            ),
+        )
         repo.addWellbeing(
             WellbeingEntity(
                 time = now - day,
@@ -206,5 +218,7 @@ class ScreenshotTest {
         save("10-profile-babies")
         show { SettingsScreen {} }
         save("11-settings")
+        show { TreatmentsScreen {} }
+        save("12-treatments")
     }
 }

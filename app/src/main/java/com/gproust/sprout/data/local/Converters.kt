@@ -45,4 +45,12 @@ class Converters {
 
     @TypeConverter
     fun stringToDeliveryType(value: String?): DeliveryType? = value?.let { DeliveryType.valueOf(it) }
+
+    /** Stores a list of ints (e.g. reminder times in minutes) as a comma-separated string. */
+    @TypeConverter
+    fun intListToString(value: List<Int>?): String? = value?.joinToString(",")
+
+    @TypeConverter
+    fun stringToIntList(value: String?): List<Int>? =
+        value?.split(",")?.filter { it.isNotBlank() }?.map { it.toInt() }
 }

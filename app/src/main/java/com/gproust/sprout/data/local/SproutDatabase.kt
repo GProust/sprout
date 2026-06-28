@@ -15,10 +15,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SleepEntity::class,
         DiaperEntity::class,
         GrowthEntity::class,
+        TreatmentEntity::class,
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -28,6 +29,7 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun sleepDao(): SleepDao
     abstract fun diaperDao(): DiaperDao
     abstract fun growthDao(): GrowthDao
+    abstract fun treatmentDao(): TreatmentDao
     abstract fun wellbeingDao(): WellbeingDao
     abstract fun parentProfileDao(): ParentProfileDao
 
@@ -127,13 +129,29 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /** v5 -> v6: add the per-baby `treatment` table (medications + reminders). */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `treatment` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`babyId` INTEGER NOT NULL, `name` TEXT NOT NULL, `dose` TEXT, " +
+                        "`intervalDays` INTEGER NOT NULL, `timesOfDay` TEXT NOT NULL, " +
+                        "`startDate` INTEGER NOT NULL, `endDate` INTEGER, " +
+                        "`remindersEnabled` INTEGER NOT NULL, `active` INTEGER NOT NULL, " +
+                        "`notes` TEXT)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_treatment_babyId` ON `treatment` (`babyId`)")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     SproutDatabase::class.java,
                     "sprout.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build().also { instance = it }
             }
     }

@@ -248,4 +248,36 @@
     <string name="cd_stop_tracking_baby">Arrêter le suivi de %1$s</string>
     <string name="cd_restore_baby">Restaurer %1$s</string>
     <string name="cd_delete_baby">Supprimer %1$s</string>
+
+    <!-- Traitements / médicaments -->
+    <string name="screen_treatments">Traitements</string>
+    <string name="quick_treatments">💊  Traitements</string>
+    <string name="treatment_empty">Aucun traitement pour le moment. Ajoutez-en un avec le bouton + — par ex. vitamine D tous les jours.</string>
+    <string name="treatment_add">Ajouter un traitement</string>
+    <string name="treatment_new">Nouveau traitement</string>
+    <string name="treatment_edit">Modifier le traitement</string>
+    <string name="treatment_title_dose">%1$s · %2$s</string>
+    <string name="treatment_reminders_off">Rappels désactivés</string>
+    <string name="treatment_name">Nom (par ex. vitamine D)</string>
+    <string name="treatment_dose">Dose (facultatif, par ex. 1 goutte)</string>
+    <string name="treatment_frequency">Fréquence</string>
+    <string name="treatment_freq_daily">Tous les jours</string>
+    <string name="treatment_freq_weekly">Toutes les semaines</string>
+    <string name="treatment_freq_every_n_label">Tous les N jours</string>
+    <string name="treatment_freq_every_n">Tous les %1$d jours</string>
+    <string name="treatment_every_n_days">Jours entre les prises</string>
+    <string name="treatment_days_suffix">jours</string>
+    <string name="treatment_times">Heures de rappel</string>
+    <string name="treatment_add_time">Ajouter une heure</string>
+    <string name="treatment_start">Date de début</string>
+    <string name="treatment_has_end">Définir une date de fin</string>
+    <string name="treatment_end">Date de fin</string>
+    <string name="treatment_remind_me">Me rappeler</string>
+    <string name="treatment_schedule_summary">%1$s · %2$s</string>
+
+    <!-- Notifications de rappel de traitement -->
+    <string name="treatment_channel_name">Rappels de traitement</string>
+    <string name="treatment_channel_desc">Rappels pour administrer les traitements de votre bébé</string>
+    <string name="treatment_notif_text">C\'est l\'heure de la prise.</string>
+    <string name="treatment_notif_text_baby">C\'est l\'heure de la prise de %1$s.</string>
 </resources>
