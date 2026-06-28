@@ -1,0 +1,11 @@
+# Code owners for Sprout.
+#
+# These owners are automatically requested for review on pull requests that
+# touch matching files. Enforcement (blocking merge until a code owner
+# approves) also requires "Require review from Code Owners" to be enabled in
+# the branch ruleset / protection for `main`.
+#
+# Syntax: https://docs.github.com/articles/about-code-owners
+
+# Default owner for everything in the repository.
+* @GProust
