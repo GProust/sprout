@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.growth
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,11 +32,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.ui.common.DatePickerField
@@ -64,8 +68,9 @@ fun GrowthScreen() {
     val vm: GrowthViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val growth by vm.growth.collectAsState()
     val lineColor = MaterialTheme.colorScheme.primary
+    val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar("Growth") }) { padding ->
+    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_growth)) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
@@ -78,7 +83,10 @@ fun GrowthScreen() {
                 item {
                     Card {
                         Column(Modifier.padding(16.dp)) {
-                            Text("Weight trend", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                stringResource(R.string.growth_weight_trend),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
                             Spacer(Modifier.height(8.dp))
                             WeightChart(
                                 points = weighed.map { it.time to it.weightGrams!! },
@@ -89,8 +97,8 @@ fun GrowthScreen() {
                                 Modifier.fillMaxWidth().padding(top = 4.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text(formatDate(weighed.first().time), style = MaterialTheme.typography.labelSmall)
-                                Text(formatDate(weighed.last().time), style = MaterialTheme.typography.labelSmall)
+                                Text(formatDate(context, weighed.first().time), style = MaterialTheme.typography.labelSmall)
+                                Text(formatDate(context, weighed.last().time), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -98,16 +106,20 @@ fun GrowthScreen() {
             }
 
             item {
-                Text("History", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
             if (growth.isEmpty()) {
-                item { EmptyHint("No measurements logged yet.") }
+                item { EmptyHint(stringResource(R.string.growth_empty)) }
             }
             items(growth, key = { it.id }) { entry ->
                 EntryCard(
-                    title = growthTitle(entry),
+                    title = growthTitle(context, entry),
                     subtitle = entry.notes.orEmpty(),
-                    meta = formatDate(entry.time),
+                    meta = formatDate(context, entry.time),
                     icon = Icons.Filled.Monitor,
                     onDelete = { vm.delete(entry) },
                 )
@@ -116,13 +128,14 @@ fun GrowthScreen() {
     }
 }
 
-private fun growthTitle(entry: GrowthEntity): String {
+private fun growthTitle(context: Context, entry: GrowthEntity): String {
     val parts = buildList {
-        entry.weightGrams?.let { add("%.2f kg".format(it / 1000.0)) }
-        entry.heightMm?.let { add("%.1f cm".format(it / 10.0)) }
-        entry.headMm?.let { add("head %.1f cm".format(it / 10.0)) }
+        entry.weightGrams?.let { add(context.getString(R.string.growth_weight_kg, it / 1000.0)) }
+        entry.heightMm?.let { add(context.getString(R.string.growth_height_cm, it / 10.0)) }
+        entry.headMm?.let { add(context.getString(R.string.growth_head_cm, it / 10.0)) }
     }
-    return if (parts.isEmpty()) "Measurement" else parts.joinToString(" · ")
+    return if (parts.isEmpty()) context.getString(R.string.growth_measurement)
+    else parts.joinToString(context.getString(R.string.feeding_detail_separator))
 }
 
 @Composable
@@ -166,17 +179,32 @@ private fun GrowthAddCard(onAdd: (GrowthEntity) -> Unit) {
 
     Card {
         Column(Modifier.padding(16.dp)) {
-            Text("Log a measurement", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.growth_log_title), style = MaterialTheme.typography.titleMedium)
 
-            FieldLabel("Weight")
-            NumberField(label = "Weight", value = weight, onChange = { weight = it }, suffix = "g")
-            FieldLabel("Height")
-            NumberField(label = "Height", value = height, onChange = { height = it }, suffix = "cm")
-            FieldLabel("Head circumference")
-            NumberField(label = "Head", value = head, onChange = { head = it }, suffix = "cm")
+            FieldLabel(stringResource(R.string.field_weight))
+            NumberField(
+                label = stringResource(R.string.field_weight),
+                value = weight,
+                onChange = { weight = it },
+                suffix = stringResource(R.string.unit_g),
+            )
+            FieldLabel(stringResource(R.string.field_height))
+            NumberField(
+                label = stringResource(R.string.field_height),
+                value = height,
+                onChange = { height = it },
+                suffix = stringResource(R.string.unit_cm),
+            )
+            FieldLabel(stringResource(R.string.field_head))
+            NumberField(
+                label = stringResource(R.string.field_head_short),
+                value = head,
+                onChange = { head = it },
+                suffix = stringResource(R.string.unit_cm),
+            )
 
-            FieldLabel("Date")
-            DatePickerField(label = "On", millis = date, onChange = { date = it })
+            FieldLabel(stringResource(R.string.field_date))
+            DatePickerField(label = stringResource(R.string.picker_on), millis = date, onChange = { date = it })
 
             Spacer(Modifier.height(8.dp))
             NotesField(value = notes, onChange = { notes = it })
@@ -202,7 +230,7 @@ private fun GrowthAddCard(onAdd: (GrowthEntity) -> Unit) {
                         date = System.currentTimeMillis()
                     },
                 ) {
-                    Text("Add measurement")
+                    Text(stringResource(R.string.growth_add))
                 }
             }
         }

@@ -1,3 +1,233 @@
 <resources>
-    <string name="app_name">Sprout</string>
+    <!-- Brand name — intentionally not translated. -->
+    <string name="app_name" translatable="false">Sprout</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Back</string>
+    <string name="action_next">Next</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="history">History</string>
+
+    <!-- Content descriptions (accessibility) -->
+    <string name="cd_back">Back</string>
+    <string name="cd_delete">Delete</string>
+    <string name="cd_wellbeing">Wellbeing</string>
+    <string name="cd_baby_profile">Baby profile</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_feed">Feed</string>
+    <string name="nav_sleep">Sleep</string>
+    <string name="nav_diaper">Diaper</string>
+    <string name="nav_growth">Growth</string>
+
+    <!-- Shared fields -->
+    <string name="field_notes_optional">Notes (optional)</string>
+    <string name="field_baby_name">Baby\'s name</string>
+    <string name="field_date_of_birth">Date of birth</string>
+    <string name="field_type">Type</string>
+    <string name="field_time">Time</string>
+    <string name="field_date">Date</string>
+
+    <!-- Date / time picker button labels (rendered as "label: value") -->
+    <string name="picker_from">From</string>
+    <string name="picker_to">To</string>
+    <string name="picker_at">At</string>
+    <string name="picker_on">On</string>
+    <string name="picker_born">Born</string>
+
+    <!-- Locale-aware date/time patterns (java.time) -->
+    <string name="fmt_date">MMM d</string>
+    <string name="fmt_datetime">MMM d, HH:mm</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="greeting_hello">Hello</string>
+
+    <!-- Relative time -->
+    <string name="relative_just_now">just now</string>
+    <string name="relative_minutes">%1$dm ago</string>
+    <string name="relative_hours">%1$dh ago</string>
+    <string name="relative_days">%1$dd ago</string>
+
+    <!-- Durations -->
+    <string name="duration_seconds">%1$ds</string>
+    <string name="duration_minutes">%1$dm</string>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$dh %2$dm</string>
+
+    <!-- Baby age -->
+    <string name="age_not_born">not born yet</string>
+    <string name="age_weeks_days">%1$s, %2$s</string>
+    <plurals name="age_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="age_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <plurals name="age_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to Sprout</string>
+    <string name="onboarding_welcome_body">A gentle space to track your little one\'s first weeks — and to look after you, too.\n\nLet\'s set things up. It\'ll only take a moment.</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_about_title">A little about you</string>
+    <string name="onboarding_about_subtitle">So we can greet you properly each day.</string>
+    <string name="onboarding_your_name">Your name</string>
+    <string name="onboarding_baby_title">Your little one</string>
+    <string name="onboarding_baby_subtitle">You can always change this later in the profile.</string>
+    <string name="onboarding_default_baby">your baby</string>
+    <string name="onboarding_care_title">Caring for %1$s</string>
+    <string name="onboarding_care_subtitle">This just tailors your daily check-in. Everything is optional.</string>
+    <string name="onboarding_gave_birth_q">Did you give birth to %1$s?</string>
+    <string name="onboarding_gave_birth_help">Adds gentle questions about your healing and bleeding.</string>
+    <string name="onboarding_birth_how">How was the birth?</string>
+    <string name="onboarding_breastfeeding_q">Are you breastfeeding %1$s?</string>
+    <string name="onboarding_breastfeeding_help">Adds a question about breast comfort.</string>
+    <string name="onboarding_all_done">All done</string>
+
+    <!-- Home -->
+    <string name="home_greeting">%1$s, %2$s 👋</string>
+    <string name="home_last_feed">Last feed: %1$s</string>
+    <string name="home_welcome_no_profile">Welcome to Sprout 🌱</string>
+    <string name="home_setup_prompt">Set up your baby\'s profile to get started.</string>
+    <string name="home_setup_profile">Set up profile</string>
+    <string name="home_today">Today</string>
+    <string name="home_log">Log</string>
+    <string name="stat_feeds">Feeds</string>
+    <string name="stat_sleep">Sleep</string>
+    <string name="stat_diapers">Diapers</string>
+    <string name="quick_feeding">🍼  Feeding</string>
+    <string name="quick_sleep">😴  Sleep</string>
+    <string name="quick_diaper">🧷  Diaper</string>
+    <string name="quick_growth">📏  Growth</string>
+    <string name="quick_wellbeing">💚  Wellbeing</string>
+
+    <!-- Feeding -->
+    <string name="screen_feeding">Feeding</string>
+    <string name="feeding_empty">No feedings logged yet. Add your first above.</string>
+    <string name="feeding_log_title">Log a feeding</string>
+    <string name="feeding_add">Add feeding</string>
+    <string name="field_side">Side</string>
+    <string name="field_amount">Amount</string>
+    <string name="feed_type_breast">Breast</string>
+    <string name="feed_type_bottle">Bottle</string>
+    <string name="feed_type_solid">Solids</string>
+    <string name="side_left">Left</string>
+    <string name="side_right">Right</string>
+    <string name="side_both">Both</string>
+    <string name="unit_ml">ml</string>
+    <string name="feeding_detail_separator"> · </string>
+    <string name="feeding_amount_ml">%1$d ml</string>
+
+    <!-- Sleep -->
+    <string name="screen_sleep">Sleep</string>
+    <string name="sleep_empty">No sleep logged yet.</string>
+    <string name="sleep_log_title">Log sleep</string>
+    <string name="sleep_add">Add sleep</string>
+    <string name="sleep_entry_title">Sleep</string>
+    <string name="sleep_already_woke">Already woke up</string>
+    <string name="field_start">Start</string>
+    <string name="field_end">End</string>
+    <string name="sleep_range">%1$s – %2$s · %3$s</string>
+    <string name="sleep_ongoing">Started %1$s (ongoing)</string>
+
+    <!-- Diaper -->
+    <string name="screen_diapers">Diapers</string>
+    <string name="diaper_empty">No diaper changes logged yet.</string>
+    <string name="diaper_log_title">Log a change</string>
+    <string name="diaper_add">Add change</string>
+    <string name="diaper_wet">Wet</string>
+    <string name="diaper_dirty">Dirty</string>
+    <string name="diaper_mixed">Mixed</string>
+
+    <!-- Growth -->
+    <string name="screen_growth">Growth</string>
+    <string name="growth_empty">No measurements logged yet.</string>
+    <string name="growth_log_title">Log a measurement</string>
+    <string name="growth_add">Add measurement</string>
+    <string name="growth_weight_trend">Weight trend</string>
+    <string name="growth_measurement">Measurement</string>
+    <string name="field_weight">Weight</string>
+    <string name="field_height">Height</string>
+    <string name="field_head">Head circumference</string>
+    <string name="field_head_short">Head</string>
+    <string name="unit_g">g</string>
+    <string name="unit_cm">cm</string>
+    <string name="growth_weight_kg">%1$.2f kg</string>
+    <string name="growth_height_cm">%1$.1f cm</string>
+    <string name="growth_head_cm">head %1$.1f cm</string>
+
+    <!-- Wellbeing / Health -->
+    <string name="screen_wellbeing">Wellbeing</string>
+    <string name="wellbeing_empty">No check-ins logged yet. Take care of yourself too 💚</string>
+    <string name="wellbeing_add_title">How are you feeling?</string>
+    <string name="wellbeing_add">Add check-in</string>
+    <string name="field_mood">Mood</string>
+    <string name="field_bleeding">Bleeding (lochia)</string>
+    <string name="field_breast_comfort">Breast comfort</string>
+    <string name="wellbeing_mood_title">%1$s Mood %2$d/5</string>
+    <string name="wellbeing_sub_healing">Healing: %1$s</string>
+    <string name="wellbeing_sub_bleeding">Bleeding: %1$s</string>
+    <string name="wellbeing_sub_breasts">Breasts: %1$s</string>
+
+    <!-- Health enum labels -->
+    <string name="bleeding_none">None</string>
+    <string name="bleeding_light">Light</string>
+    <string name="bleeding_moderate">Moderate</string>
+    <string name="bleeding_heavy">Heavy</string>
+    <string name="breast_normal">Normal</string>
+    <string name="breast_tender">Tender</string>
+    <string name="breast_engorged">Engorged</string>
+    <string name="breast_painful">Painful</string>
+    <string name="recovery_great">Great</string>
+    <string name="recovery_good">Good</string>
+    <string name="recovery_sore">Sore</string>
+    <string name="recovery_painful">Painful</string>
+    <string name="delivery_vaginal">Vaginal</string>
+    <string name="delivery_cesarean">C-section</string>
+
+    <!-- Healing question, worded by delivery type -->
+    <string name="healing_q_cesarean">How is your incision healing?</string>
+    <string name="healing_q_vaginal">How is your perineal healing?</string>
+    <string name="healing_q_generic">How is your healing coming along?</string>
+    <string name="healing_label_cesarean">Incision healing</string>
+    <string name="healing_label_vaginal">Perineal healing</string>
+    <string name="healing_label_generic">Recovery / healing</string>
+
+    <!-- Daily check-in -->
+    <string name="checkin_greeting">%1$s, %2$s</string>
+    <string name="checkin_intro_body">Let\'s take a moment for you — just a few quick questions, one at a time.</string>
+    <string name="checkin_begin">Begin</string>
+    <string name="checkin_skip">Not now</string>
+    <string name="checkin_progress">Question %1$d of %2$d</string>
+    <string name="checkin_save">Save today\'s check-in</string>
+    <string name="checkin_q_mood">How are you feeling today?</string>
+    <string name="checkin_q_bleeding">Any bleeding today?</string>
+    <string name="checkin_q_breasts">How do your breasts feel?</string>
+    <string name="checkin_q_notes">Anything you\'d like to note?</string>
+
+    <!-- Profile -->
+    <string name="screen_baby_profile">Baby profile</string>
+    <string name="profile_age">Age: %1$s</string>
+    <string name="profile_enter_name">Please enter a name</string>
+    <string name="profile_saved">Profile saved</string>
+
+    <!-- Settings -->
+    <string name="cd_settings">Settings</string>
+    <string name="screen_settings">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System default</string>
+    <!-- Language names are shown in their own language; not translated. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_fr" translatable="false">Français</string>
 </resources>

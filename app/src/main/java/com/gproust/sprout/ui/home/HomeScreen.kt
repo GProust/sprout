@@ -2,6 +2,7 @@
 
 package com.gproust.sprout.ui.home
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,8 +34,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gproust.sprout.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,7 +66,7 @@ data class HomeUiState(
     val lastFeedText: String? = null,
 )
 
-class HomeViewModel(repository: SproutRepository) : ViewModel() {
+class HomeViewModel(repository: SproutRepository, private val context: Context) : ViewModel() {
     val uiState = combine(
         repository.parentProfile,
         repository.baby,
@@ -79,13 +84,13 @@ class HomeViewModel(repository: SproutRepository) : ViewModel() {
         HomeUiState(
             parentName = parent?.name,
             babyName = baby?.name,
-            ageText = baby?.let { babyAge(it.birthDate, now) },
+            ageText = baby?.let { babyAge(context, it.birthDate, now) },
             hasProfile = baby != null,
             feedsToday = feedings.count { it.startTime >= dayStart },
             diapersToday = diapers.count { it.time >= dayStart },
-            sleepTodayText = formatDuration(sleepMillisToday),
+            sleepTodayText = formatDuration(context, sleepMillisToday),
             lastFeedText = feedings.maxByOrNull { it.startTime }
-                ?.let { formatRelative(it.startTime, now) },
+                ?.let { formatRelative(context, it.startTime, now) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 }
@@ -94,18 +99,31 @@ class HomeViewModel(repository: SproutRepository) : ViewModel() {
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val context = LocalContext.current
     val now = remember { System.currentTimeMillis() }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Sprout") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = { onNavigate(Routes.HEALTH) }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Wellbeing")
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = stringResource(R.string.cd_wellbeing),
+                        )
                     }
                     IconButton(onClick = { onNavigate(Routes.PROFILE) }) {
-                        Icon(Icons.Filled.Person, contentDescription = "Baby profile")
+                        Icon(
+                            Icons.Filled.Person,
+                            contentDescription = stringResource(R.string.cd_baby_profile),
+                        )
+                    }
+                    IconButton(onClick = { onNavigate(Routes.SETTINGS) }) {
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.cd_settings),
+                        )
                     }
                 },
             )
@@ -123,7 +141,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     if (state.hasProfile) {
                         state.parentName?.let { parent ->
                             Text(
-                                "${greetingFor(now)}, $parent 👋",
+                                stringResource(R.string.home_greeting, greetingFor(context, now), parent),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(bottom = 6.dp),
@@ -141,44 +159,51 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         )
                         state.lastFeedText?.let {
                             Text(
-                                "Last feed: $it",
+                                stringResource(R.string.home_last_feed, it),
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.padding(top = 8.dp),
                             )
                         }
                     } else {
-                        Text("Welcome to Sprout 🌱", style = MaterialTheme.typography.titleLarge)
                         Text(
-                            "Set up your baby's profile to get started.",
+                            stringResource(R.string.home_welcome_no_profile),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                        Text(
+                            stringResource(R.string.home_setup_prompt),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(top = 4.dp),
                         )
                         Spacer(Modifier.height(12.dp))
                         OutlinedButton(onClick = { onNavigate(Routes.PROFILE) }) {
-                            Text("Set up profile")
+                            Text(stringResource(R.string.home_setup_profile))
                         }
                     }
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-            Text("Today", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                stringResource(R.string.home_today),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
-                    label = "Feeds",
+                    label = stringResource(R.string.stat_feeds),
                     value = state.feedsToday.toString(),
                     icon = Icons.Filled.LocalDrink,
                     modifier = Modifier.weight(1f),
                 )
                 StatCard(
-                    label = "Sleep",
+                    label = stringResource(R.string.stat_sleep),
                     value = state.sleepTodayText,
                     icon = Icons.Filled.Bedtime,
                     modifier = Modifier.weight(1f),
                 )
                 StatCard(
-                    label = "Diapers",
+                    label = stringResource(R.string.stat_diapers),
                     value = state.diapersToday.toString(),
                     icon = Icons.Filled.BabyChangingStation,
                     modifier = Modifier.weight(1f),
@@ -186,13 +211,17 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             }
 
             Spacer(Modifier.height(16.dp))
-            Text("Log", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                stringResource(R.string.home_log),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
             Spacer(Modifier.height(8.dp))
-            QuickAction("🍼  Feeding", onClick = { onNavigate(Routes.FEEDING) })
-            QuickAction("😴  Sleep", onClick = { onNavigate(Routes.SLEEP) })
-            QuickAction("🧷  Diaper", onClick = { onNavigate(Routes.DIAPER) })
-            QuickAction("📏  Growth", onClick = { onNavigate(Routes.GROWTH) })
-            QuickAction("💚  Wellbeing", onClick = { onNavigate(Routes.HEALTH) })
+            QuickAction(stringResource(R.string.quick_feeding), onClick = { onNavigate(Routes.FEEDING) })
+            QuickAction(stringResource(R.string.quick_sleep), onClick = { onNavigate(Routes.SLEEP) })
+            QuickAction(stringResource(R.string.quick_diaper), onClick = { onNavigate(Routes.DIAPER) })
+            QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })
+            QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
         }
     }
 }

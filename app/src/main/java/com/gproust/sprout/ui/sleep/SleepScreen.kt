@@ -28,11 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.ui.common.EmptyHint
@@ -60,8 +63,9 @@ class SleepViewModel(private val repository: SproutRepository) : ViewModel() {
 fun SleepScreen() {
     val vm: SleepViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val sleeps by vm.sleeps.collectAsState()
+    val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar("Sleep") }) { padding ->
+    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_sleep)) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
@@ -69,17 +73,26 @@ fun SleepScreen() {
         ) {
             item { SleepAddCard(onAdd = vm::add) }
             item {
-                Text("History", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
             if (sleeps.isEmpty()) {
-                item { EmptyHint("No sleep logged yet.") }
+                item { EmptyHint(stringResource(R.string.sleep_empty)) }
             }
             items(sleeps, key = { it.id }) { entry ->
                 val subtitle = entry.endTime?.let {
-                    "${formatTime(entry.startTime)} – ${formatTime(it)} · ${formatDuration(it - entry.startTime)}"
-                } ?: "Started ${formatTime(entry.startTime)} (ongoing)"
+                    stringResource(
+                        R.string.sleep_range,
+                        formatTime(entry.startTime),
+                        formatTime(it),
+                        formatDuration(context, it - entry.startTime),
+                    )
+                } ?: stringResource(R.string.sleep_ongoing, formatTime(entry.startTime))
                 EntryCard(
-                    title = "Sleep",
+                    title = stringResource(R.string.sleep_entry_title),
                     subtitle = if (entry.notes.isNullOrBlank()) subtitle else "$subtitle\n${entry.notes}",
                     meta = formatTime(entry.startTime),
                     icon = Icons.Filled.Bedtime,
@@ -99,23 +112,23 @@ private fun SleepAddCard(onAdd: (SleepEntity) -> Unit) {
 
     Card {
         Column(Modifier.padding(16.dp)) {
-            Text("Log sleep", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.sleep_log_title), style = MaterialTheme.typography.titleMedium)
 
-            FieldLabel("Start")
-            TimePickerField(label = "From", millis = start, onChange = { start = it })
+            FieldLabel(stringResource(R.string.field_start))
+            TimePickerField(label = stringResource(R.string.picker_from), millis = start, onChange = { start = it })
 
             Row(
                 Modifier.fillMaxWidth().padding(top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text("Already woke up")
+                Text(stringResource(R.string.sleep_already_woke))
                 Switch(checked = hasEnded, onCheckedChange = { hasEnded = it })
             }
 
             if (hasEnded) {
-                FieldLabel("End")
-                TimePickerField(label = "To", millis = end, onChange = { end = it })
+                FieldLabel(stringResource(R.string.field_end))
+                TimePickerField(label = stringResource(R.string.picker_to), millis = end, onChange = { end = it })
             }
 
             Spacer(Modifier.height(8.dp))
@@ -135,7 +148,7 @@ private fun SleepAddCard(onAdd: (SleepEntity) -> Unit) {
                     start = System.currentTimeMillis()
                     end = System.currentTimeMillis()
                 }) {
-                    Text("Add sleep")
+                    Text(stringResource(R.string.sleep_add))
                 }
             }
         }

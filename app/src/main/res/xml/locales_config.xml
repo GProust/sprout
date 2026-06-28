@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Languages the app ships with. The system picks the best match for the device
+  locale and falls back to the default (values/ = English) when none matches.
+  To add a language later: create res/values-<code>/strings.xml and add a
+  <locale> line here.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="fr" />
+</locale-config>

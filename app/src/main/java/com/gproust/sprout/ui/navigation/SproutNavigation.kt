@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.gproust.sprout.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -37,6 +40,7 @@ import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.startup.Startup
 import com.gproust.sprout.ui.startup.StartupViewModel
@@ -49,20 +53,21 @@ object Routes {
     const val GROWTH = "growth"
     const val HEALTH = "health"
     const val PROFILE = "profile"
+    const val SETTINGS = "settings"
 }
 
 private data class BottomDestination(
     val route: String,
-    val label: String,
+    @param:StringRes val labelRes: Int,
     val icon: ImageVector,
 )
 
 private val bottomDestinations = listOf(
-    BottomDestination(Routes.HOME, "Home", Icons.Filled.Home),
-    BottomDestination(Routes.FEEDING, "Feed", Icons.Filled.LocalDrink),
-    BottomDestination(Routes.SLEEP, "Sleep", Icons.Filled.Bedtime),
-    BottomDestination(Routes.DIAPER, "Diaper", Icons.Filled.BabyChangingStation),
-    BottomDestination(Routes.GROWTH, "Growth", Icons.Filled.Monitor),
+    BottomDestination(Routes.HOME, R.string.nav_home, Icons.Filled.Home),
+    BottomDestination(Routes.FEEDING, R.string.nav_feed, Icons.Filled.LocalDrink),
+    BottomDestination(Routes.SLEEP, R.string.nav_sleep, Icons.Filled.Bedtime),
+    BottomDestination(Routes.DIAPER, R.string.nav_diaper, Icons.Filled.BabyChangingStation),
+    BottomDestination(Routes.GROWTH, R.string.nav_growth, Icons.Filled.Monitor),
 )
 
 /**
@@ -122,8 +127,10 @@ private fun MainScaffold() {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(dest.icon, contentDescription = dest.label) },
-                            label = { Text(dest.label) },
+                            icon = {
+                                Icon(dest.icon, contentDescription = stringResource(dest.labelRes))
+                            },
+                            label = { Text(stringResource(dest.labelRes)) },
                         )
                     }
                 }
@@ -147,6 +154,9 @@ private fun MainScaffold() {
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.gproust.sprout
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.ui.common.CheckInQuestion.BLEEDING
 import com.gproust.sprout.ui.common.CheckInQuestion.BREASTS
 import com.gproust.sprout.ui.common.CheckInQuestion.HEALING
@@ -15,8 +17,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], qualifiers = "en")
 class CheckInLogicTest {
+
+    private val context: Context = ApplicationProvider.getApplicationContext()
 
     private val t = 1_700_000_000_000L
     private val twoDays = 2L * 24 * 60 * 60_000
@@ -54,16 +63,16 @@ class CheckInLogicTest {
 
     @Test
     fun healingQuestion_tailoredToDeliveryType() {
-        assertEquals("How is your healing coming along?", healingQuestion(null))
-        assertEquals("How is your perineal healing?", healingQuestion(DeliveryType.VAGINAL))
-        assertEquals("How is your incision healing?", healingQuestion(DeliveryType.CESAREAN))
+        assertEquals("How is your healing coming along?", healingQuestion(context, null))
+        assertEquals("How is your perineal healing?", healingQuestion(context, DeliveryType.VAGINAL))
+        assertEquals("How is your incision healing?", healingQuestion(context, DeliveryType.CESAREAN))
     }
 
     @Test
     fun greeting_byTimeOfDay() {
-        assertEquals("Good morning", greetingForHour(8))
-        assertEquals("Good afternoon", greetingForHour(14))
-        assertEquals("Good evening", greetingForHour(20))
-        assertEquals("Hello", greetingForHour(2))
+        assertEquals("Good morning", greetingForHour(context, 8))
+        assertEquals("Good afternoon", greetingForHour(context, 14))
+        assertEquals("Good evening", greetingForHour(context, 20))
+        assertEquals("Hello", greetingForHour(context, 2))
     }
 }
