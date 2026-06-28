@@ -226,4 +226,26 @@
     <string name="screen_settings">Paramètres</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_system">Langue du système</string>
+
+    <!-- Common actions (multi-baby) -->
+    <string name="action_add">Ajouter</string>
+    <string name="action_delete">Supprimer</string>
+
+    <!-- Babies (plusieurs bébés : jumeaux / fratrie) -->
+    <string name="screen_babies">Bébés</string>
+    <string name="babies_empty">Aucun bébé pour le moment — ajoutez votre petit pour commencer le suivi.</string>
+    <string name="baby_active">Actif</string>
+    <string name="baby_make_active">Rendre actif</string>
+    <string name="baby_add">Ajouter un bébé</string>
+    <string name="baby_editor_edit">Modifier %1$s</string>
+    <string name="babies_not_tracking">Suivi arrêté</string>
+    <string name="babies_not_tracking_help">Leur historique est conservé. Restaurez pour reprendre le suivi.</string>
+    <string name="babies_manage">Gérer les bébés…</string>
+    <string name="baby_delete_title">Supprimer %1$s ?</string>
+    <string name="baby_delete_body">Cela supprime définitivement %1$s ainsi que tous ses repas, sommeils, couches et mesures de croissance. Cette action est irréversible.</string>
+    <string name="cd_switch_baby">Changer de bébé</string>
+    <string name="cd_edit_baby">Modifier %1$s</string>
+    <string name="cd_stop_tracking_baby">Arrêter le suivi de %1$s</string>
+    <string name="cd_restore_baby">Restaurer %1$s</string>
+    <string name="cd_delete_baby">Supprimer %1$s</string>
 </resources>

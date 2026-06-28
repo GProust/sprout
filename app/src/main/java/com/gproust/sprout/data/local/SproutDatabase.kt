@@ -18,7 +18,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -103,13 +103,37 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v4 -> v5: support several babies. Tag every existing log with the one
+         * current baby (id = 1), add an `archived` flag for "stop tracking", and
+         * remember which baby is selected on the parent profile.
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `baby` ADD COLUMN `archived` INTEGER NOT NULL DEFAULT 0")
+
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `babyId` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `sleep` ADD COLUMN `babyId` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `diaper` ADD COLUMN `babyId` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `growth` ADD COLUMN `babyId` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_feeding_babyId` ON `feeding` (`babyId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sleep_babyId` ON `sleep` (`babyId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_diaper_babyId` ON `diaper` (`babyId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_growth_babyId` ON `growth` (`babyId`)")
+
+                db.execSQL("ALTER TABLE `parent_profile` ADD COLUMN `activeBabyId` INTEGER")
+                // Point the existing profile at the one baby it already had.
+                db.execSQL("UPDATE `parent_profile` SET `activeBabyId` = 1 WHERE EXISTS (SELECT 1 FROM `baby` WHERE id = 1)")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     SproutDatabase::class.java,
                     "sprout.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build().also { instance = it }
             }
     }

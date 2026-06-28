@@ -230,4 +230,26 @@
     <!-- Language names are shown in their own language; not translated. -->
     <string name="language_en" translatable="false">English</string>
     <string name="language_fr" translatable="false">Français</string>
+
+    <!-- Common actions (multi-baby) -->
+    <string name="action_add">Add</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Babies (multiple babies: twins / siblings) -->
+    <string name="screen_babies">Babies</string>
+    <string name="babies_empty">No babies yet — add your little one to start tracking.</string>
+    <string name="baby_active">Active</string>
+    <string name="baby_make_active">Make active</string>
+    <string name="baby_add">Add a baby</string>
+    <string name="baby_editor_edit">Edit %1$s</string>
+    <string name="babies_not_tracking">Not tracking</string>
+    <string name="babies_not_tracking_help">Their history is kept. Restore to track again.</string>
+    <string name="babies_manage">Manage babies…</string>
+    <string name="baby_delete_title">Delete %1$s?</string>
+    <string name="baby_delete_body">This permanently removes %1$s and every feeding, sleep, diaper and growth entry for them. This can\'t be undone.</string>
+    <string name="cd_switch_baby">Switch baby</string>
+    <string name="cd_edit_baby">Edit %1$s</string>
+    <string name="cd_stop_tracking_baby">Stop tracking %1$s</string>
+    <string name="cd_restore_baby">Restore %1$s</string>
+    <string name="cd_delete_baby">Delete %1$s</string>
 </resources>

@@ -3,7 +3,9 @@
 package com.gproust.sprout.ui.home
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +16,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BabyChangingStation
 import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +39,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -43,6 +53,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.greetingFor
@@ -53,7 +64,9 @@ import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val parentName: String? = null,
@@ -66,7 +79,18 @@ data class HomeUiState(
     val lastFeedText: String? = null,
 )
 
-class HomeViewModel(repository: SproutRepository, private val context: Context) : ViewModel() {
+class HomeViewModel(
+    private val repository: SproutRepository,
+    private val context: Context,
+) : ViewModel() {
+    val babies = repository.babies
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val activeBabyId = repository.parentProfile
+        .map { it?.activeBabyId }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setActiveBaby(id: Long) = viewModelScope.launch { repository.setActiveBaby(id) }
+
     val uiState = combine(
         repository.parentProfile,
         repository.baby,
@@ -99,13 +123,22 @@ class HomeViewModel(repository: SproutRepository, private val context: Context) 
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val babies by vm.babies.collectAsState()
+    val activeId by vm.activeBabyId.collectAsState()
     val context = LocalContext.current
     val now = remember { System.currentTimeMillis() }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = {
+                    BabySwitcher(
+                        babies = babies,
+                        activeId = activeId,
+                        onSelect = vm::setActiveBaby,
+                        onManage = { onNavigate(Routes.PROFILE) },
+                    )
+                },
                 actions = {
                     IconButton(onClick = { onNavigate(Routes.HEALTH) }) {
                         Icon(
@@ -116,7 +149,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     IconButton(onClick = { onNavigate(Routes.PROFILE) }) {
                         Icon(
                             Icons.Filled.Person,
-                            contentDescription = stringResource(R.string.cd_baby_profile),
+                            contentDescription = stringResource(R.string.screen_babies),
                         )
                     }
                     IconButton(onClick = { onNavigate(Routes.SETTINGS) }) {
@@ -222,6 +255,64 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             QuickAction(stringResource(R.string.quick_diaper), onClick = { onNavigate(Routes.DIAPER) })
             QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })
             QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
+        }
+    }
+}
+
+/**
+ * Top-bar title that shows the active baby's name and, when there's more than
+ * one baby, lets you switch between them or jump to managing them.
+ */
+@Composable
+private fun BabySwitcher(
+    babies: List<BabyEntity>,
+    activeId: Long?,
+    onSelect: (Long) -> Unit,
+    onManage: () -> Unit,
+) {
+    val active = babies.firstOrNull { it.id == activeId }
+    val title = active?.name ?: stringResource(R.string.app_name)
+
+    if (babies.size < 2) {
+        Text(title)
+        return
+    }
+
+    var open by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { open = true },
+        ) {
+            Text(title)
+            Icon(
+                Icons.Filled.ArrowDropDown,
+                contentDescription = stringResource(R.string.cd_switch_baby),
+            )
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            babies.forEach { baby ->
+                DropdownMenuItem(
+                    text = { Text(baby.name) },
+                    onClick = {
+                        onSelect(baby.id)
+                        open = false
+                    },
+                    leadingIcon = if (baby.id == activeId) {
+                        { Icon(Icons.Filled.Check, contentDescription = null) }
+                    } else {
+                        null
+                    },
+                )
+            }
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.babies_manage)) },
+                onClick = {
+                    open = false
+                    onManage()
+                },
+            )
         }
     }
 }
