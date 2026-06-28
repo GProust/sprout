@@ -118,3 +118,45 @@ The Drive backend will need a Google Cloud project with:
 - Google Sign-In configured in the optional flavor.
 
 No secrets are committed; the OAuth client id is configured per build.
+
+---
+
+## 6. Mid-term vision: connectors & interoperability
+
+Two separate seams grow out of this design. Keeping them apart is deliberate —
+they have different audiences and different data shapes.
+
+### 6a. Storage connectors ("different drives")
+
+The [`SyncBackend`](../app/src/main/java/com/gproust/sprout/sync/SyncBackend.kt)
+interface is intentionally just *list / read / write files in a folder*, so a new
+provider is **one new class** — no change to the snapshot format or the reconciler:
+
+| Connector | Notes |
+|-----------|-------|
+| Local folder | ✅ implemented (`FolderSyncBackend`); also powers plain export/import |
+| Google Drive | first cloud target; proprietary → optional Google-only flavor |
+| **WebDAV / Nextcloud** | FOSS-friendly → can ship in the default/F-Droid build |
+| Dropbox / OneDrive / S3 | further proprietary options behind the same seam |
+
+Because the merge is provider-agnostic, a user could even mix connectors (e.g.
+back up to their own Nextcloud while sharing a folder with a partner on Drive).
+
+### 6b. Clinical / human export ("for maternity, hospital, any doctor")
+
+This is **not** the sync format. The device-snapshot JSON is internal and
+lossless; a clinician wants a **curated, read-only, human-readable report** for a
+chosen baby and date range:
+
+- **CSV** — one file per log type (feeding/sleep/diaper/growth/wellbeing), easy
+  to open in any spreadsheet. The CSV *generation* is pure Kotlin and unit-tested;
+  no cloud needed.
+- **Printable PDF / summary** — growth with WHO percentiles, feeding & sleep
+  patterns, diaper counts; sharable via Android's share sheet.
+- **Health interoperability (later)** — a FHIR-flavoured export is possible once
+  the basics are in place, but CSV + PDF covers the immediate "hand it to the
+  doctor" need.
+
+The export path reads Room directly and is independent of any connector, so it
+can land before — or entirely without — cloud sync.
+
