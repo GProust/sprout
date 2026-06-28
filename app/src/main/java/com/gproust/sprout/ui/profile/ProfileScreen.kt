@@ -265,11 +265,13 @@ private fun BabyCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(
-                        feedingReminderSummary(context, baby),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    feedingReminderSummary(context, baby)?.let { summary ->
+                        Text(
+                            summary,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 if (isActive) {
                     Icon(
@@ -419,19 +421,20 @@ private fun BabyEditorDialog(
 private fun BabyEntity.hasFeedingReminderOverride(): Boolean =
     feedingReminderEnabled != null || feedingReminderIntervalMinutes != null
 
-/** A one-line summary of a baby's effective feeding reminder, for the baby card. */
-private fun feedingReminderSummary(context: Context, baby: BabyEntity): String {
-    if (!baby.hasFeedingReminderOverride()) {
-        return context.getString(R.string.baby_reminder_summary_default)
-    }
+/**
+ * A one-line summary of a baby's effective feeding reminder for the baby card,
+ * or null when the reminder is effectively off for this baby (nothing to show).
+ */
+private fun feedingReminderSummary(context: Context, baby: BabyEntity): String? {
     val eff = effectiveFeedingReminder(context, baby)
-    return if (!eff.enabled) {
-        context.getString(R.string.baby_reminder_summary_off)
-    } else {
+    if (!eff.enabled) return null
+    return if (baby.hasFeedingReminderOverride()) {
         context.getString(
             R.string.baby_reminder_summary_every,
             formatDuration(context, eff.intervalMinutes * 60_000L),
         )
+    } else {
+        context.getString(R.string.baby_reminder_summary_default)
     }
 }
 

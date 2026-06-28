@@ -270,7 +270,6 @@
     <string name="baby_reminder_custom_on">Remplace le réglage par défaut de l\'application.</string>
     <string name="baby_reminder_custom_off">Suit le réglage par défaut de l\'application.</string>
     <string name="baby_reminder_summary_default">Rappel de repas : par défaut</string>
-    <string name="baby_reminder_summary_off">Rappel de repas : désactivé</string>
     <string name="baby_reminder_summary_every">Rappel de repas : toutes les %1$s</string>
 
     <!-- Traitements / médicaments -->

@@ -219,7 +219,6 @@
     <string name="baby_reminder_custom_on">Überschreibt die App-Standardeinstellung.</string>
     <string name="baby_reminder_custom_off">Folgt der App-Standardeinstellung.</string>
     <string name="baby_reminder_summary_default">Mahlzeit-Erinnerung: Standard</string>
-    <string name="baby_reminder_summary_off">Mahlzeit-Erinnerung: aus</string>
     <string name="baby_reminder_summary_every">Mahlzeit-Erinnerung: alle %1$s</string>
     <string name="screen_treatments">Behandlungen</string>
     <string name="quick_treatments">💊  Behandlungen</string>

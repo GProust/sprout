@@ -279,7 +279,6 @@
     <string name="baby_reminder_custom_on">Overrides the app-wide default.</string>
     <string name="baby_reminder_custom_off">Following the app-wide default.</string>
     <string name="baby_reminder_summary_default">Feeding reminder: default</string>
-    <string name="baby_reminder_summary_off">Feeding reminder: off</string>
     <string name="baby_reminder_summary_every">Feeding reminder: every %1$s</string>
 
     <!-- Treatments / medications -->

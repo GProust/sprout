@@ -225,7 +225,6 @@
     <string name="baby_reminder_custom_on">Zastępuje domyślne ustawienie aplikacji.</string>
     <string name="baby_reminder_custom_off">Zgodne z domyślnym ustawieniem aplikacji.</string>
     <string name="baby_reminder_summary_default">Przypomnienie o karmieniu: domyślne</string>
-    <string name="baby_reminder_summary_off">Przypomnienie o karmieniu: wyłączone</string>
     <string name="baby_reminder_summary_every">Przypomnienie o karmieniu: co %1$s</string>
     <string name="screen_treatments">Leczenie</string>
     <string name="quick_treatments">💊  Leczenie</string>
