@@ -1,0 +1,37 @@
+# 9. GPLv3 copyleft with a reserved trademark
+
+Date: 2026-06-28
+
+## Status
+
+Accepted
+
+## Context
+
+Sprout handles sensitive family and health data, so users have to trust what the
+app does with it. Open source makes that auditable. But "open source" alone would
+let someone ship a closed, modified — possibly malicious — fork, or trade on the
+Sprout name and icon.
+
+## Decision
+
+License the app under the **GNU General Public License v3.0** (`LICENSE`). GPLv3's
+copyleft means any redistributed, modified version must also publish its source
+under the GPL — a closed fork that hides what it does with user data is not
+permitted.
+
+Separately, the **name "Sprout" and the app icon/logo are reserved** and are *not*
+covered by the GPL (`TRADEMARK.md`): forks must rename and re-brand. The app also
+ships a `PRIVACY.md` stating that it collects nothing.
+
+## Consequences
+
+- The code is auditable and forks are kept honest — a redistributed version must
+  show its source, which matters for a health/privacy app.
+- **GPLv3 is incompatible with proprietary/closed reuse**; anyone building on
+  Sprout inherits copyleft.
+- Forks can exist but must drop the Sprout brand, protecting users from confusingly
+  similar copies.
+- Distribution channels (e.g. Google Play, F-Droid) must be handled in a way
+  compatible with GPLv3 and the reserved-trademark terms — see
+  [docs/RELEASING.md](../RELEASING.md).

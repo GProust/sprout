@@ -43,6 +43,12 @@ app/src/main/java/com/gproust/sprout/
     ├── home/  feeding/  sleep/  diaper/  growth/  mother/  profile/
 ```
 
+## Architecture decisions
+
+The significant design choices — local-only storage, no first-party backend,
+the inclusive parent model, and more — are recorded with their rationale in
+**[docs/adr/](docs/adr/)**.
+
 ## Building
 
 You'll need **JDK 17** and the **Android SDK** (easiest via [Android Studio](https://developer.android.com/studio)).
