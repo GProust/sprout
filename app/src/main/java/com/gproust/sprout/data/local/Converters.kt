@@ -41,8 +41,8 @@ class Converters {
     fun stringToRecovery(value: String?): Recovery? = value?.let { Recovery.valueOf(it) }
 
     @TypeConverter
-    fun parentRoleToString(value: ParentRole?): String? = value?.name
+    fun deliveryTypeToString(value: DeliveryType?): String? = value?.name
 
     @TypeConverter
-    fun stringToParentRole(value: String?): ParentRole? = value?.let { ParentRole.valueOf(it) }
+    fun stringToDeliveryType(value: String?): DeliveryType? = value?.let { DeliveryType.valueOf(it) }
 }

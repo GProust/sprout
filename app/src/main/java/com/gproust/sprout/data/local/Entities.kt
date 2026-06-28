@@ -15,14 +15,14 @@ enum class DiaperType { WET, DIRTY, MIXED }
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
-/** Breast comfort state for the mother. */
+/** Breast comfort state (for a breastfeeding parent). */
 enum class BreastState { NORMAL, TENDER, ENGORGED, PAINFUL }
 
-/** How the mother's postpartum recovery / healing feels. */
+/** How a parent's postpartum recovery / healing feels. */
 enum class Recovery { GREAT, GOOD, SORE, PAINFUL }
 
-/** Which parent is using this device. */
-enum class ParentRole { MOTHER, CO_PARENT }
+/** How the baby was delivered — tailors the healing question. */
+enum class DeliveryType { VAGINAL, CESAREAN }
 
 /**
  * The baby's profile. A single row (id = 1) is used by the app.
@@ -71,40 +71,38 @@ data class GrowthEntity(
     val notes: String? = null,
 )
 
-@Entity(tableName = "mother_health")
-data class MotherHealthEntity(
+/**
+ * A parent's daily wellbeing check-in. Mood and notes apply to everyone;
+ * the postpartum fields (bleeding, recovery) and breast comfort are only
+ * filled in when they're relevant to that parent.
+ */
+@Entity(tableName = "wellbeing")
+data class WellbeingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val time: Long,
     /** Mood on a 1 (low) to 5 (great) scale. */
     val mood: Int,
     val bleeding: Bleeding? = null,
-    val breast: BreastState? = null,
     val recovery: Recovery? = null,
-    val notes: String? = null,
-)
-
-/**
- * A co-parent's own daily wellbeing check-in (mood + a note).
- */
-@Entity(tableName = "co_parent_health")
-data class CoParentHealthEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val time: Long,
-    /** Mood on a 1 (low) to 5 (great) scale. */
-    val mood: Int,
+    val breast: BreastState? = null,
     val notes: String? = null,
 )
 
 /**
  * The profile of the parent using this device (a single row, id = 1).
- * Stored per-device so that, once partner sync arrives, each phone carries
- * its own parent identity.
+ * Capabilities ([gaveBirth], [breastfeeding]) — not a fixed role — decide which
+ * wellbeing questions are shown, so every kind of family is covered. Stored
+ * per-device so that, once partner sync arrives, each phone carries its own
+ * parent identity.
  */
 @Entity(tableName = "parent_profile")
 data class ParentProfileEntity(
     @PrimaryKey val id: Long = 1L,
     val name: String,
-    val role: ParentRole,
+    val gaveBirth: Boolean = false,
+    val breastfeeding: Boolean = false,
+    /** Only meaningful when [gaveBirth] is true; tailors the healing question. */
+    val deliveryType: DeliveryType? = null,
     /** Epoch millis of the last completed/dismissed daily check-in. */
     val lastCheckIn: Long? = null,
 )
