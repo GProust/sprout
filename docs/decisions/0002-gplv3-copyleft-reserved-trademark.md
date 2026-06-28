@@ -22,7 +22,9 @@ under the GPL — a closed fork that hides what it does with user data is not
 permitted.
 
 Separately, the **name "Sprout" and the app icon/logo are reserved** and are *not*
-covered by the GPL (`TRADEMARK.md`): forks must rename and re-brand. The app also
+covered by the GPL (`TRADEMARK.md`). This is narrow on purpose: forking, improving
+and contributing are unrestricted — a fork only needs its own name and icon if it
+is **published** in a way users could mistake for the official app. The app also
 ships a `PRIVACY.md` stating that it collects nothing.
 
 ## Consequences
@@ -31,8 +33,9 @@ ships a `PRIVACY.md` stating that it collects nothing.
   show its source, which matters for a health/privacy app.
 - **GPLv3 is incompatible with proprietary/closed reuse**; anyone building on
   Sprout inherits copyleft.
-- Forks can exist but must drop the Sprout brand, protecting users from confusingly
-  similar copies.
+- Forks can exist and be improved freely; only a **published** version that could
+  be confused with the official app needs its own name and icon. This protects
+  users from impersonation without discouraging good-faith contributors.
 - Distribution channels (e.g. Google Play, F-Droid) must be handled in a way
   compatible with GPLv3 and the reserved-trademark terms — see
   [docs/RELEASING.md](../RELEASING.md).

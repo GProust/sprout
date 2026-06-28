@@ -102,7 +102,10 @@ distributed version stays open-source under the GPLv3** (copyleft). This keeps
 forks honest: a redistributed, modified version must also publish its source —
 no one can hide proprietary or malicious changes inside a closed fork.
 
-The **name "Sprout" and the app icon/logo are reserved** and are *not* covered
-by the GPL — forks must rename and re-brand. See [TRADEMARK.md](TRADEMARK.md).
+**Forking and improving Sprout is welcome.** The **name "Sprout" and the app
+icon/logo are reserved** and are *not* covered by the GPL — but that only means
+you should use your own name and icon if you *publish* a build others could
+mistake for the official app. Forking, improving and contributing back are
+unrestricted. See [TRADEMARK.md](TRADEMARK.md).
 
 Copyright © 2026 Guillaume Proust.
