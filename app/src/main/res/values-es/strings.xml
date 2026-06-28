@@ -211,6 +211,16 @@
     <string name="cd_stop_tracking_baby">Dejar de hacer seguimiento de %1$s</string>
     <string name="cd_restore_baby">Restaurar a %1$s</string>
     <string name="cd_delete_baby">Eliminar a %1$s</string>
+    <string name="cd_feeding_reminder_baby">Recordatorio de tomas para %1$s</string>
+
+    <!-- Recordatorio de tomas personalizado por bebé -->
+    <string name="baby_reminder_title">Recordatorio de tomas · %1$s</string>
+    <string name="baby_reminder_use_custom">Ajuste personalizado para este bebé</string>
+    <string name="baby_reminder_custom_on">Anula el ajuste predeterminado de la app.</string>
+    <string name="baby_reminder_custom_off">Sigue el ajuste predeterminado de la app.</string>
+    <string name="baby_reminder_summary_default">Recordatorio de tomas: predeterminado</string>
+    <string name="baby_reminder_summary_off">Recordatorio de tomas: desactivado</string>
+    <string name="baby_reminder_summary_every">Recordatorio de tomas: cada %1$s</string>
     <string name="screen_treatments">Tratamientos</string>
     <string name="quick_treatments">💊  Tratamientos</string>
     <string name="treatment_empty">Aún no hay tratamientos. Añade uno con el botón + (p. ej. Vitamina D cada día).</string>

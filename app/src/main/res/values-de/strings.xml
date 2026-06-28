@@ -211,6 +211,16 @@
     <string name="cd_stop_tracking_baby">Tracking für %1$s beenden</string>
     <string name="cd_restore_baby">%1$s wiederherstellen</string>
     <string name="cd_delete_baby">%1$s löschen</string>
+    <string name="cd_feeding_reminder_baby">Mahlzeit-Erinnerung für %1$s</string>
+
+    <!-- Mahlzeit-Erinnerung pro Baby -->
+    <string name="baby_reminder_title">Mahlzeit-Erinnerung · %1$s</string>
+    <string name="baby_reminder_use_custom">Eigene Einstellung für dieses Baby</string>
+    <string name="baby_reminder_custom_on">Überschreibt die App-Standardeinstellung.</string>
+    <string name="baby_reminder_custom_off">Folgt der App-Standardeinstellung.</string>
+    <string name="baby_reminder_summary_default">Mahlzeit-Erinnerung: Standard</string>
+    <string name="baby_reminder_summary_off">Mahlzeit-Erinnerung: aus</string>
+    <string name="baby_reminder_summary_every">Mahlzeit-Erinnerung: alle %1$s</string>
     <string name="screen_treatments">Behandlungen</string>
     <string name="quick_treatments">💊  Behandlungen</string>
     <string name="treatment_empty">Noch keine Behandlungen. Füge mit der +-Schaltfläche eine hinzu — z. B. Vitamin D jeden Tag.</string>

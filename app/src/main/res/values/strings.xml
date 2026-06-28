@@ -271,6 +271,16 @@
     <string name="cd_stop_tracking_baby">Stop tracking %1$s</string>
     <string name="cd_restore_baby">Restore %1$s</string>
     <string name="cd_delete_baby">Delete %1$s</string>
+    <string name="cd_feeding_reminder_baby">Feeding reminder for %1$s</string>
+
+    <!-- Per-baby feeding reminder override -->
+    <string name="baby_reminder_title">Feeding reminder · %1$s</string>
+    <string name="baby_reminder_use_custom">Custom setting for this baby</string>
+    <string name="baby_reminder_custom_on">Overrides the app-wide default.</string>
+    <string name="baby_reminder_custom_off">Following the app-wide default.</string>
+    <string name="baby_reminder_summary_default">Feeding reminder: default</string>
+    <string name="baby_reminder_summary_off">Feeding reminder: off</string>
+    <string name="baby_reminder_summary_every">Feeding reminder: every %1$s</string>
 
     <!-- Treatments / medications -->
     <string name="screen_treatments">Treatments</string>

@@ -211,6 +211,16 @@
     <string name="cd_stop_tracking_baby">Parar de acompanhar %1$s</string>
     <string name="cd_restore_baby">Restaurar %1$s</string>
     <string name="cd_delete_baby">Eliminar %1$s</string>
+    <string name="cd_feeding_reminder_baby">Lembrete de refeições para %1$s</string>
+
+    <!-- Lembrete de refeições personalizado por bebé -->
+    <string name="baby_reminder_title">Lembrete de refeições · %1$s</string>
+    <string name="baby_reminder_use_custom">Definição personalizada para este bebé</string>
+    <string name="baby_reminder_custom_on">Substitui a predefinição da aplicação.</string>
+    <string name="baby_reminder_custom_off">Segue a predefinição da aplicação.</string>
+    <string name="baby_reminder_summary_default">Lembrete de refeições: predefinido</string>
+    <string name="baby_reminder_summary_off">Lembrete de refeições: desativado</string>
+    <string name="baby_reminder_summary_every">Lembrete de refeições: a cada %1$s</string>
     <string name="screen_treatments">Tratamentos</string>
     <string name="quick_treatments">💊  Tratamentos</string>
     <string name="treatment_empty">Ainda não há tratamentos. Adicione um com o botão + — por exemplo, Vitamina D todos os dias.</string>

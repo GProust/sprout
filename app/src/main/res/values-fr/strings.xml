@@ -262,6 +262,16 @@
     <string name="cd_stop_tracking_baby">Arrêter le suivi de %1$s</string>
     <string name="cd_restore_baby">Restaurer %1$s</string>
     <string name="cd_delete_baby">Supprimer %1$s</string>
+    <string name="cd_feeding_reminder_baby">Rappel de repas pour %1$s</string>
+
+    <!-- Rappel de repas personnalisé par bébé -->
+    <string name="baby_reminder_title">Rappel de repas · %1$s</string>
+    <string name="baby_reminder_use_custom">Réglage personnalisé pour ce bébé</string>
+    <string name="baby_reminder_custom_on">Remplace le réglage par défaut de l\'application.</string>
+    <string name="baby_reminder_custom_off">Suit le réglage par défaut de l\'application.</string>
+    <string name="baby_reminder_summary_default">Rappel de repas : par défaut</string>
+    <string name="baby_reminder_summary_off">Rappel de repas : désactivé</string>
+    <string name="baby_reminder_summary_every">Rappel de repas : toutes les %1$s</string>
 
     <!-- Traitements / médicaments -->
     <string name="screen_treatments">Traitements</string>
