@@ -1,4 +1,4 @@
-# 6. Localization with Android string resources
+# 5. Localization with Android string resources
 
 Date: 2026-06-28
 

@@ -14,10 +14,9 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 ## Conventions
 
 - One decision per file, named `NNNN-short-title.md` (zero-padded, monotonic).
-- ADRs are **immutable**. Don't rewrite history — if a decision changes, add a new
-  ADR and set the old one's status to `Superseded by ADR-XXXX`. Numbers are never
-  reused, so gaps are expected (e.g. records that were reclassified to the
-  [decisions log](../decisions/)).
+- Once an ADR is **accepted (merged)** it is immutable: don't rewrite history or
+  renumber — if a decision changes, add a new ADR and set the old one's status to
+  `Superseded by ADR-XXXX`.
 - Statuses: `Proposed`, `Accepted`, `Deprecated`, `Superseded by ADR-XXXX`.
 
 ## Index
@@ -28,11 +27,10 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0002](0002-local-first-on-device-storage.md) | Local-first, on-device storage | Accepted |
 | [0003](0003-no-first-party-backend-user-owned-sync.md) | No first-party backend; sync through user-owned storage | Accepted (mechanism proposed) |
 | [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted |
-| [0006](0006-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
-| [0007](0007-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
+| [0005](0005-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
+| [0006](0006-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
 
-> Reclassified to the [Business & Product Decision Records](../decisions/): the
-> inclusive parent model ([BDR-0001](../decisions/0001-inclusive-parent-model.md)),
-> the GPLv3 / trademark decision ([BDR-0002](../decisions/0002-gplv3-copyleft-reserved-trademark.md)),
-> and supporting multiple babies ([BDR-0003](../decisions/0003-multiple-babies.md)).
-> Their old ADR numbers (0005, 0008, 0009) are retired.
+> Product, domain, and business decisions live in the
+> [Business & Product Decision Records](../decisions/) — including the inclusive
+> parent model, supporting multiple babies, the system-language default, and
+> licensing.

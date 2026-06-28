@@ -44,7 +44,7 @@ destructive fallback), so that an upgrade never silently drops a user's history.
 - **Migrations are our responsibility.** Every schema change needs a tested
   migration; getting one wrong risks user data, and our CI (not a local toolchain)
   is what validates the Room schema — see
-  [ADR-0007](0007-ci-as-build-verifier-and-screenshots.md).
+  [ADR-0006](0006-ci-as-build-verifier-and-screenshots.md).
 
 ## Alternatives considered
 

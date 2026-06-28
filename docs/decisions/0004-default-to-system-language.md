@@ -16,7 +16,7 @@ phone in one language but prefer an app in another.
 
 This is a product/UX decision about **what language the app speaks by default**,
 separate from the technical question of *how* we store translations (that's
-[ADR-0006](../adr/0006-localization-with-android-resources.md)).
+[ADR-0005](../adr/0005-localization-with-android-resources.md)).
 
 ## Decision
 
@@ -37,6 +37,6 @@ the exception; the default is "match the phone".
 - We take on the obligation to **keep translations complete** for every shipped
   language, so "match the phone" doesn't surprise a user with missing text — this
   is enforced technically by treating missing translations as a build failure
-  ([ADR-0006](../adr/0006-localization-with-android-resources.md)).
+  ([ADR-0005](../adr/0005-localization-with-android-resources.md)).
 - Adding a language is a content task (a new translation set), not a product
   redesign — the default behaviour already covers it.

@@ -29,10 +29,13 @@ We will keep decisions as short Markdown records in the lightweight Nygard forma
 - **`docs/decisions/` — Business & Product Decision Records (BDR-NNNN):** product,
   domain, and business/legal rules.
 
-Both logs use the same format and conventions. Records are **immutable** once
-accepted; when a decision changes we add a new record and mark the old one
-`Superseded by …` rather than editing it in place. Numbers are never reused.
-Decisions that are genuinely both (e.g. *no first-party backend* — a business
+Both logs use the same format and conventions. Once a record is **accepted
+(merged)** it is immutable and its number is fixed: when a decision changes we add
+a new record and mark the old one `Superseded by …` rather than editing or
+renumbering it. (Until then — while a record is still a draft in review — numbers
+may be tidied up.) Decisions that are genuinely both (e.g. *no first-party backend*
+— a business constraint realised as an architectural choice) live in the ADR log
+and are cross-linked from the BDR log.
 constraint realised as an architectural choice) live in the ADR log and are
 cross-linked from the BDR log.
 

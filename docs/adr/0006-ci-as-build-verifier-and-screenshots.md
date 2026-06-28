@@ -1,4 +1,4 @@
-# 7. CI as the build verifier, with screenshots in PRs
+# 6. CI as the build verifier, with screenshots in PRs
 
 Date: 2026-06-28
 
