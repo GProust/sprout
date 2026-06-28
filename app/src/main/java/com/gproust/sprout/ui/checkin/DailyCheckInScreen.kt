@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.checkin
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gproust.sprout.R
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
@@ -51,8 +55,9 @@ fun DailyCheckInScreen(
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
 ) {
+    val context = LocalContext.current
     val now = remember { System.currentTimeMillis() }
-    val greeting = "${greetingFor(now)}, $name"
+    val greeting = stringResource(R.string.checkin_greeting, greetingFor(context, now), name)
     val questions = remember(gaveBirth, breastfeeding) { checkInQuestions(gaveBirth, breastfeeding) }
 
     Surface(Modifier.fillMaxSize()) {
@@ -76,6 +81,7 @@ private fun CheckInFlow(
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
 ) {
+    val context = LocalContext.current
     // step 0 = intro, steps 1..N = the questions.
     var step by remember { mutableIntStateOf(0) }
     var mood by remember { mutableIntStateOf(3) }
@@ -108,11 +114,11 @@ private fun CheckInFlow(
     QuestionPage(
         step = step,
         total = total,
-        title = title(question, deliveryType),
+        title = title(context, question, deliveryType),
         onSkip = onSkip,
         onBack = { step -= 1 },
         onNext = { if (isLast) save() else step += 1 },
-        nextLabel = if (isLast) "Save today's check-in" else "Next",
+        nextLabel = if (isLast) stringResource(R.string.checkin_save) else stringResource(R.string.action_next),
     ) {
         when (question) {
             CheckInQuestion.MOOD -> ChoiceChips(
@@ -125,32 +131,33 @@ private fun CheckInFlow(
                 options = Recovery.entries,
                 selected = recovery,
                 onSelect = { recovery = if (recovery == it) null else it },
-                labelOf = { it.label() },
+                labelOf = { it.label(context) },
             )
             CheckInQuestion.BLEEDING -> ChoiceChips(
                 options = Bleeding.entries,
                 selected = bleeding,
                 onSelect = { bleeding = if (bleeding == it) null else it },
-                labelOf = { it.label() },
+                labelOf = { it.label(context) },
             )
             CheckInQuestion.BREASTS -> ChoiceChips(
                 options = BreastState.entries,
                 selected = breast,
                 onSelect = { breast = if (breast == it) null else it },
-                labelOf = { it.label() },
+                labelOf = { it.label(context) },
             )
             CheckInQuestion.NOTES -> NotesField(value = notes, onChange = { notes = it })
         }
     }
 }
 
-private fun title(question: CheckInQuestion, deliveryType: DeliveryType?): String = when (question) {
-    CheckInQuestion.MOOD -> "How are you feeling today?"
-    CheckInQuestion.HEALING -> healingQuestion(deliveryType)
-    CheckInQuestion.BLEEDING -> "Any bleeding today?"
-    CheckInQuestion.BREASTS -> "How do your breasts feel?"
-    CheckInQuestion.NOTES -> "Anything you'd like to note?"
-}
+private fun title(context: Context, question: CheckInQuestion, deliveryType: DeliveryType?): String =
+    when (question) {
+        CheckInQuestion.MOOD -> context.getString(R.string.checkin_q_mood)
+        CheckInQuestion.HEALING -> healingQuestion(context, deliveryType)
+        CheckInQuestion.BLEEDING -> context.getString(R.string.checkin_q_bleeding)
+        CheckInQuestion.BREASTS -> context.getString(R.string.checkin_q_breasts)
+        CheckInQuestion.NOTES -> context.getString(R.string.checkin_q_notes)
+    }
 
 @Composable
 private fun IntroPage(greeting: String, onSkip: () -> Unit, onBegin: () -> Unit) {
@@ -166,13 +173,15 @@ private fun IntroPage(greeting: String, onSkip: () -> Unit, onBegin: () -> Unit)
         Text("$greeting 🌸", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
         Text(
-            "Let's take a moment for you — just a few quick questions, one at a time.",
+            stringResource(R.string.checkin_intro_body),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(32.dp))
-        Button(onClick = onBegin, modifier = Modifier.fillMaxWidth()) { Text("Begin") }
+        Button(onClick = onBegin, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.checkin_begin))
+        }
     }
 }
 
@@ -201,7 +210,7 @@ private fun QuestionPage(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Question $step of $total",
+            stringResource(R.string.checkin_progress, step, total),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -211,7 +220,9 @@ private fun QuestionPage(
         content()
         Spacer(Modifier.height(32.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Back") }
+            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.action_back))
+            }
             Button(onClick = onNext, modifier = Modifier.weight(1f)) { Text(nextLabel) }
         }
     }
@@ -220,6 +231,6 @@ private fun QuestionPage(
 @Composable
 private fun SkipRow(onSkip: () -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        TextButton(onClick = onSkip) { Text("Not now") }
+        TextButton(onClick = onSkip) { Text(stringResource(R.string.checkin_skip)) }
     }
 }

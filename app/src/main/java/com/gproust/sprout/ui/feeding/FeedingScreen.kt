@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.feeding
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +26,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
@@ -59,8 +64,9 @@ class FeedingViewModel(private val repository: SproutRepository) : ViewModel() {
 fun FeedingScreen() {
     val vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val feedings by vm.feedings.collectAsState()
+    val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar("Feeding") }) { padding ->
+    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
@@ -69,17 +75,17 @@ fun FeedingScreen() {
             item { FeedingAddCard(onAdd = vm::add) }
             item {
                 Text(
-                    "History",
-                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                    stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
             if (feedings.isEmpty()) {
-                item { EmptyHint("No feedings logged yet. Add your first above.") }
+                item { EmptyHint(stringResource(R.string.feeding_empty)) }
             }
             items(feedings, key = { it.id }) { entry ->
                 EntryCard(
-                    title = feedingTitle(entry),
+                    title = feedingTitle(context, entry),
                     subtitle = entry.notes.orEmpty(),
                     meta = formatTime(entry.startTime),
                     icon = Icons.Filled.LocalDrink,
@@ -90,20 +96,36 @@ fun FeedingScreen() {
     }
 }
 
-private fun feedingTitle(entry: FeedingEntity): String = when (entry.type) {
-    FeedType.BREAST -> "Breast" + (entry.side?.let { " · ${it.label()}" } ?: "")
-    FeedType.BOTTLE -> "Bottle" + (entry.amountMl?.let { " · $it ml" } ?: "")
-    FeedType.SOLID -> "Solids"
+private fun feedingTitle(context: Context, entry: FeedingEntity): String {
+    val sep = context.getString(R.string.feeding_detail_separator)
+    return when (entry.type) {
+        FeedType.BREAST -> context.getString(R.string.feed_type_breast) +
+            (entry.side?.let { sep + it.label(context) } ?: "")
+        FeedType.BOTTLE -> context.getString(R.string.feed_type_bottle) +
+            (entry.amountMl?.let { sep + context.getString(R.string.feeding_amount_ml, it) } ?: "")
+        FeedType.SOLID -> context.getString(R.string.feed_type_solid)
+    }
 }
 
-private fun BreastSide.label(): String = when (this) {
-    BreastSide.LEFT -> "Left"
-    BreastSide.RIGHT -> "Right"
-    BreastSide.BOTH -> "Both"
-}
+private fun BreastSide.label(context: Context): String = context.getString(
+    when (this) {
+        BreastSide.LEFT -> R.string.side_left
+        BreastSide.RIGHT -> R.string.side_right
+        BreastSide.BOTH -> R.string.side_both
+    },
+)
+
+private fun FeedType.label(context: Context): String = context.getString(
+    when (this) {
+        FeedType.BREAST -> R.string.feed_type_breast
+        FeedType.BOTTLE -> R.string.feed_type_bottle
+        FeedType.SOLID -> R.string.feed_type_solid
+    },
+)
 
 @Composable
 private fun FeedingAddCard(onAdd: (FeedingEntity) -> Unit) {
+    val context = LocalContext.current
     var type by remember { mutableStateOf(FeedType.BREAST) }
     var side by remember { mutableStateOf(BreastSide.LEFT) }
     var amount by remember { mutableStateOf("") }
@@ -112,35 +134,40 @@ private fun FeedingAddCard(onAdd: (FeedingEntity) -> Unit) {
 
     Card {
         Column(Modifier.padding(16.dp)) {
-            Text("Log a feeding", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.feeding_log_title), style = MaterialTheme.typography.titleMedium)
 
-            FieldLabel("Type")
+            FieldLabel(stringResource(R.string.field_type))
             ChoiceChips(
                 options = FeedType.entries,
                 selected = type,
                 onSelect = { type = it },
-                labelOf = { it.label() },
+                labelOf = { it.label(context) },
             )
 
             when (type) {
                 FeedType.BREAST -> {
-                    FieldLabel("Side")
+                    FieldLabel(stringResource(R.string.field_side))
                     ChoiceChips(
                         options = BreastSide.entries,
                         selected = side,
                         onSelect = { side = it },
-                        labelOf = { it.label() },
+                        labelOf = { it.label(context) },
                     )
                 }
                 FeedType.BOTTLE -> {
-                    FieldLabel("Amount")
-                    NumberField(label = "Amount", value = amount, onChange = { amount = it }, suffix = "ml")
+                    FieldLabel(stringResource(R.string.field_amount))
+                    NumberField(
+                        label = stringResource(R.string.field_amount),
+                        value = amount,
+                        onChange = { amount = it },
+                        suffix = stringResource(R.string.unit_ml),
+                    )
                 }
                 FeedType.SOLID -> Unit
             }
 
-            FieldLabel("Time")
-            TimePickerField(label = "At", millis = time, onChange = { time = it })
+            FieldLabel(stringResource(R.string.field_time))
+            TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })
 
             Spacer(Modifier.height(8.dp))
             NotesField(value = notes, onChange = { notes = it })
@@ -161,15 +188,9 @@ private fun FeedingAddCard(onAdd: (FeedingEntity) -> Unit) {
                     notes = ""
                     time = System.currentTimeMillis()
                 }) {
-                    Text("Add feeding")
+                    Text(stringResource(R.string.feeding_add))
                 }
             }
         }
     }
-}
-
-private fun FeedType.label(): String = when (this) {
-    FeedType.BREAST -> "Breast"
-    FeedType.BOTTLE -> "Bottle"
-    FeedType.SOLID -> "Solids"
 }

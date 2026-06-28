@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -22,13 +23,14 @@ import com.gproust.sprout.ui.startup.StartupViewModel
  */
 class SproutViewModelFactory(
     private val repository: SproutRepository,
+    private val context: Context,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when {
             modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository)
-            modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository)
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository, context)
             modelClass.isAssignableFrom(FeedingViewModel::class.java) -> FeedingViewModel(repository)
             modelClass.isAssignableFrom(SleepViewModel::class.java) -> SleepViewModel(repository)
             modelClass.isAssignableFrom(DiaperViewModel::class.java) -> DiaperViewModel(repository)
@@ -44,5 +46,5 @@ class SproutViewModelFactory(
 @Composable
 fun rememberSproutViewModelFactory(): SproutViewModelFactory {
     val app = LocalContext.current.applicationContext as SproutApplication
-    return remember { SproutViewModelFactory(app.repository) }
+    return remember { SproutViewModelFactory(app.repository, app) }
 }

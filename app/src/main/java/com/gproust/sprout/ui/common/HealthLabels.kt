@@ -1,5 +1,7 @@
 package com.gproust.sprout.ui.common
 
+import android.content.Context
+import com.gproust.sprout.R
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
@@ -14,42 +16,54 @@ fun moodEmoji(mood: Int): String = when (mood) {
     else -> "😄"
 }
 
-fun Bleeding.label(): String = when (this) {
-    Bleeding.NONE -> "None"
-    Bleeding.LIGHT -> "Light"
-    Bleeding.MODERATE -> "Moderate"
-    Bleeding.HEAVY -> "Heavy"
-}
+fun Bleeding.label(context: Context): String = context.getString(
+    when (this) {
+        Bleeding.NONE -> R.string.bleeding_none
+        Bleeding.LIGHT -> R.string.bleeding_light
+        Bleeding.MODERATE -> R.string.bleeding_moderate
+        Bleeding.HEAVY -> R.string.bleeding_heavy
+    },
+)
 
-fun BreastState.label(): String = when (this) {
-    BreastState.NORMAL -> "Normal"
-    BreastState.TENDER -> "Tender"
-    BreastState.ENGORGED -> "Engorged"
-    BreastState.PAINFUL -> "Painful"
-}
+fun BreastState.label(context: Context): String = context.getString(
+    when (this) {
+        BreastState.NORMAL -> R.string.breast_normal
+        BreastState.TENDER -> R.string.breast_tender
+        BreastState.ENGORGED -> R.string.breast_engorged
+        BreastState.PAINFUL -> R.string.breast_painful
+    },
+)
 
-fun Recovery.label(): String = when (this) {
-    Recovery.GREAT -> "Great"
-    Recovery.GOOD -> "Good"
-    Recovery.SORE -> "Sore"
-    Recovery.PAINFUL -> "Painful"
-}
+fun Recovery.label(context: Context): String = context.getString(
+    when (this) {
+        Recovery.GREAT -> R.string.recovery_great
+        Recovery.GOOD -> R.string.recovery_good
+        Recovery.SORE -> R.string.recovery_sore
+        Recovery.PAINFUL -> R.string.recovery_painful
+    },
+)
 
-fun DeliveryType.label(): String = when (this) {
-    DeliveryType.VAGINAL -> "Vaginal"
-    DeliveryType.CESAREAN -> "C-section"
-}
+fun DeliveryType.label(context: Context): String = context.getString(
+    when (this) {
+        DeliveryType.VAGINAL -> R.string.delivery_vaginal
+        DeliveryType.CESAREAN -> R.string.delivery_cesarean
+    },
+)
 
 /** The check-in's healing question, worded for the delivery type. */
-fun healingQuestion(deliveryType: DeliveryType?): String = when (deliveryType) {
-    DeliveryType.CESAREAN -> "How is your incision healing?"
-    DeliveryType.VAGINAL -> "How is your perineal healing?"
-    null -> "How is your healing coming along?"
-}
+fun healingQuestion(context: Context, deliveryType: DeliveryType?): String = context.getString(
+    when (deliveryType) {
+        DeliveryType.CESAREAN -> R.string.healing_q_cesarean
+        DeliveryType.VAGINAL -> R.string.healing_q_vaginal
+        null -> R.string.healing_q_generic
+    },
+)
 
 /** Short field label for the healing question, worded for the delivery type. */
-fun healingFieldLabel(deliveryType: DeliveryType?): String = when (deliveryType) {
-    DeliveryType.CESAREAN -> "Incision healing"
-    DeliveryType.VAGINAL -> "Perineal healing"
-    null -> "Recovery / healing"
-}
+fun healingFieldLabel(context: Context, deliveryType: DeliveryType?): String = context.getString(
+    when (deliveryType) {
+        DeliveryType.CESAREAN -> R.string.healing_label_cesarean
+        DeliveryType.VAGINAL -> R.string.healing_label_vaginal
+        null -> R.string.healing_label_generic
+    },
+)

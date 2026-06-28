@@ -23,10 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.ui.common.DatePickerField
@@ -69,7 +71,7 @@ fun ProfileScreen(onBack: () -> Unit) {
         }
     }
 
-    Scaffold(topBar = { SproutTopBar("Baby profile", onBack = onBack) }) { padding ->
+    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_baby_profile), onBack = onBack) }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -80,32 +82,32 @@ fun ProfileScreen(onBack: () -> Unit) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Baby's name") },
+                label = { Text(stringResource(R.string.field_baby_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            FieldLabel("Date of birth")
-            DatePickerField(label = "Born", millis = birthDate, onChange = { birthDate = it })
+            FieldLabel(stringResource(R.string.field_date_of_birth))
+            DatePickerField(label = stringResource(R.string.picker_born), millis = birthDate, onChange = { birthDate = it })
 
             Spacer(Modifier.height(8.dp))
-            Text("Age: ${babyAge(birthDate, System.currentTimeMillis())}")
+            Text(stringResource(R.string.profile_age, babyAge(context, birthDate, System.currentTimeMillis())))
 
             Spacer(Modifier.height(24.dp))
             Button(
                 onClick = {
                     if (name.isBlank()) {
-                        Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.profile_enter_name), Toast.LENGTH_SHORT).show()
                     } else {
                         vm.save(name, birthDate) {
-                            Toast.makeText(context, "Profile saved", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.profile_saved), Toast.LENGTH_SHORT).show()
                             onBack()
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.action_save))
             }
         }
     }

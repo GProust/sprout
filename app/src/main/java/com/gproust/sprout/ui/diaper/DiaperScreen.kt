@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.diaper
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,11 +27,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.DiaperType
@@ -59,8 +63,9 @@ class DiaperViewModel(private val repository: SproutRepository) : ViewModel() {
 fun DiaperScreen() {
     val vm: DiaperViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val diapers by vm.diapers.collectAsState()
+    val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar("Diapers") }) { padding ->
+    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_diapers)) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
@@ -68,14 +73,18 @@ fun DiaperScreen() {
         ) {
             item { DiaperAddCard(onAdd = vm::add) }
             item {
-                Text("History", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.history),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
             if (diapers.isEmpty()) {
-                item { EmptyHint("No diaper changes logged yet.") }
+                item { EmptyHint(stringResource(R.string.diaper_empty)) }
             }
             items(diapers, key = { it.id }) { entry ->
                 EntryCard(
-                    title = entry.type.label(),
+                    title = entry.type.label(context),
                     subtitle = entry.notes.orEmpty(),
                     meta = formatTime(entry.time),
                     icon = Icons.Filled.BabyChangingStation,
@@ -86,32 +95,35 @@ fun DiaperScreen() {
     }
 }
 
-private fun DiaperType.label(): String = when (this) {
-    DiaperType.WET -> "Wet"
-    DiaperType.DIRTY -> "Dirty"
-    DiaperType.MIXED -> "Mixed"
-}
+private fun DiaperType.label(context: Context): String = context.getString(
+    when (this) {
+        DiaperType.WET -> R.string.diaper_wet
+        DiaperType.DIRTY -> R.string.diaper_dirty
+        DiaperType.MIXED -> R.string.diaper_mixed
+    },
+)
 
 @Composable
 private fun DiaperAddCard(onAdd: (DiaperEntity) -> Unit) {
+    val context = LocalContext.current
     var type by remember { mutableStateOf(DiaperType.WET) }
     var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
     Card {
         Column(Modifier.padding(16.dp)) {
-            Text("Log a change", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.diaper_log_title), style = MaterialTheme.typography.titleMedium)
 
-            FieldLabel("Type")
+            FieldLabel(stringResource(R.string.field_type))
             ChoiceChips(
                 options = DiaperType.entries,
                 selected = type,
                 onSelect = { type = it },
-                labelOf = { it.label() },
+                labelOf = { it.label(context) },
             )
 
-            FieldLabel("Time")
-            TimePickerField(label = "At", millis = time, onChange = { time = it })
+            FieldLabel(stringResource(R.string.field_time))
+            TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })
 
             Spacer(Modifier.height(8.dp))
             NotesField(value = notes, onChange = { notes = it })
@@ -129,7 +141,7 @@ private fun DiaperAddCard(onAdd: (DiaperEntity) -> Unit) {
                     notes = ""
                     time = System.currentTimeMillis()
                 }) {
-                    Text("Add change")
+                    Text(stringResource(R.string.diaper_add))
                 }
             }
         }

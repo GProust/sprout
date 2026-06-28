@@ -38,10 +38,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.window.Dialog
+import com.gproust.sprout.R
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
@@ -53,7 +56,10 @@ fun SproutTopBar(title: String, onBack: (() -> Unit)? = null) {
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back),
+                    )
                 }
             }
         },
@@ -117,7 +123,7 @@ fun EntryCard(
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Filled.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.cd_delete),
                     tint = MaterialTheme.colorScheme.outline,
                 )
             }
@@ -192,7 +198,7 @@ fun NotesField(value: String, onChange: (String) -> Unit, modifier: Modifier = M
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
-        label = { Text("Notes (optional)") },
+        label = { Text(stringResource(R.string.field_notes_optional)) },
         modifier = modifier.fillMaxWidth(),
     )
 }
@@ -202,8 +208,9 @@ private fun zone(): ZoneId = ZoneId.systemDefault()
 @Composable
 fun DatePickerField(label: String, millis: Long, onChange: (Long) -> Unit) {
     var open by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) {
-        Text("$label: ${formatDate(millis)}")
+        Text("$label: ${formatDate(context, millis)}")
     }
     if (open) {
         val state = rememberDatePickerState(initialSelectedDateMillis = millis)
@@ -219,9 +226,11 @@ fun DatePickerField(label: String, millis: Long, onChange: (Long) -> Unit) {
                         onChange(combined)
                     }
                     open = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.action_ok)) }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
+            dismissButton = {
+                TextButton(onClick = { open = false }) { Text(stringResource(R.string.action_cancel)) }
+            },
         ) {
             DatePicker(state = state)
         }
@@ -247,14 +256,16 @@ fun TimePickerField(label: String, millis: Long, onChange: (Long) -> Unit) {
                     Text(label, style = MaterialTheme.typography.titleMedium)
                     Box(Modifier.padding(vertical = 16.dp)) { TimePicker(state = state) }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = { open = false }) { Text("Cancel") }
+                        TextButton(onClick = { open = false }) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
                         TextButton(onClick = {
                             val newTime = LocalTime.of(state.hour, state.minute)
                             val combined = current.toLocalDate().atTime(newTime)
                                 .atZone(zone()).toInstant().toEpochMilli()
                             onChange(combined)
                             open = false
-                        }) { Text("OK") }
+                        }) { Text(stringResource(R.string.action_ok)) }
                     }
                 }
             }

@@ -26,9 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gproust.sprout.R
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.DatePickerField
@@ -106,19 +109,21 @@ private fun WelcomeStep(onNext: () -> Unit) {
     Text("🌱", style = MaterialTheme.typography.displayLarge)
     Spacer(Modifier.height(16.dp))
     Text(
-        "Welcome to Sprout",
+        stringResource(R.string.onboarding_welcome_title),
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(12.dp))
     Text(
-        "A gentle space to track your little one's first weeks — and to look after you, too.\n\nLet's set things up. It'll only take a moment.",
+        stringResource(R.string.onboarding_welcome_body),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(32.dp))
-    Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) { Text("Get started") }
+    Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.onboarding_get_started))
+    }
 }
 
 @Composable
@@ -129,13 +134,13 @@ private fun AboutYouStep(
     onNext: () -> Unit,
 ) {
     Text(
-        "A little about you",
+        stringResource(R.string.onboarding_about_title),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "So we can greet you properly each day.",
+        stringResource(R.string.onboarding_about_subtitle),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -144,14 +149,14 @@ private fun AboutYouStep(
     OutlinedTextField(
         value = name,
         onValueChange = onName,
-        label = { Text("Your name") },
+        label = { Text(stringResource(R.string.onboarding_your_name)) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
-        nextLabel = "Next",
+        nextLabel = stringResource(R.string.action_next),
         nextEnabled = name.isNotBlank(),
         onNext = onNext,
     )
@@ -167,13 +172,13 @@ private fun BabyStep(
     onNext: () -> Unit,
 ) {
     Text(
-        "Your little one",
+        stringResource(R.string.onboarding_baby_title),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "You can always change this later in the profile.",
+        stringResource(R.string.onboarding_baby_subtitle),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -182,16 +187,16 @@ private fun BabyStep(
     OutlinedTextField(
         value = babyName,
         onValueChange = onBabyName,
-        label = { Text("Baby's name") },
+        label = { Text(stringResource(R.string.field_baby_name)) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
-    FieldLabel("Date of birth")
-    DatePickerField(label = "Born", millis = birthDate, onChange = onBirthDate)
+    FieldLabel(stringResource(R.string.field_date_of_birth))
+    DatePickerField(label = stringResource(R.string.picker_born), millis = birthDate, onChange = onBirthDate)
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
-        nextLabel = "Next",
+        nextLabel = stringResource(R.string.action_next),
         nextEnabled = true,
         onNext = onNext,
     )
@@ -209,46 +214,48 @@ private fun CareStep(
     onBack: () -> Unit,
     onFinish: () -> Unit,
 ) {
-    val who = babyName.trim().ifBlank { "your baby" }
+    val context = LocalContext.current
+    val defaultBaby = stringResource(R.string.onboarding_default_baby)
+    val who = babyName.trim().ifBlank { defaultBaby }
     Text(
-        "Caring for $who",
+        stringResource(R.string.onboarding_care_title, who),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        "This just tailors your daily check-in. Everything is optional.",
+        stringResource(R.string.onboarding_care_subtitle),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(24.dp))
     ToggleRow(
-        label = "Did you give birth to $who?",
-        help = "Adds gentle questions about your healing and bleeding.",
+        label = stringResource(R.string.onboarding_gave_birth_q, who),
+        help = stringResource(R.string.onboarding_gave_birth_help),
         checked = gaveBirth,
         onChecked = onGaveBirth,
     )
     if (gaveBirth) {
-        FieldLabel("How was the birth?")
+        FieldLabel(stringResource(R.string.onboarding_birth_how))
         ChoiceChips(
             options = DeliveryType.entries,
             selected = deliveryType,
             onSelect = { onDeliveryType(if (deliveryType == it) null else it) },
-            labelOf = { it.label() },
+            labelOf = { it.label(context) },
         )
         Spacer(Modifier.height(8.dp))
     }
     ToggleRow(
-        label = "Are you breastfeeding $who?",
-        help = "Adds a question about breast comfort.",
+        label = stringResource(R.string.onboarding_breastfeeding_q, who),
+        help = stringResource(R.string.onboarding_breastfeeding_help),
         checked = breastfeeding,
         onChecked = onBreastfeeding,
     )
     Spacer(Modifier.height(32.dp))
     StepButtons(
         onBack = onBack,
-        nextLabel = "All done",
+        nextLabel = stringResource(R.string.onboarding_all_done),
         nextEnabled = true,
         onNext = onFinish,
     )
@@ -285,7 +292,9 @@ private fun StepButtons(
     onNext: () -> Unit,
 ) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Back") }
+        OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.action_back))
+        }
         Button(onClick = onNext, enabled = nextEnabled, modifier = Modifier.weight(1f)) {
             Text(nextLabel)
         }
