@@ -244,6 +244,11 @@
     <!-- Language names are shown in their own language; not translated. -->
     <string name="language_en" translatable="false">English</string>
     <string name="language_fr" translatable="false">Français</string>
+    <string name="language_it" translatable="false">Italiano</string>
+    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_es" translatable="false">Español</string>
+    <string name="language_pl" translatable="false">Polski</string>
+    <string name="language_pt" translatable="false">Português</string>
 
     <!-- Common actions (multi-baby) -->
     <string name="action_add">Add</string>
