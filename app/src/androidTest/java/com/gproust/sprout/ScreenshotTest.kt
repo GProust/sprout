@@ -28,6 +28,7 @@ import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
+import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -123,6 +124,9 @@ class ScreenshotTest {
                 notes = "Feeling a bit more like myself today",
             ),
         )
+        // Feeding reminders are off by default; the Settings captures toggle them
+        // on explicitly (see captureScreens) to show both states honestly.
+        FeedingReminderSettings.setEnabled(app, false)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
@@ -243,8 +247,15 @@ class ScreenshotTest {
         // Babies manager: both babies, the active marker, and add/track/delete actions.
         show { ProfileScreen {} }
         save("10-profile-babies")
+        // Settings with feeding reminders OFF — the real default (opt-in).
+        FeedingReminderSettings.setEnabled(app, false)
         show { SettingsScreen {} }
         save("11-settings")
+        // Same screen with reminders turned ON, to show the interval options.
+        FeedingReminderSettings.setEnabled(app, true)
+        FeedingReminderSettings.setIntervalMinutes(app, 180)
+        show { SettingsScreen {} }
+        save("11-settings-2-feeding-on")
         show { TreatmentsScreen {} }
         save("12-treatments")
     }

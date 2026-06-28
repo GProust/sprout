@@ -239,4 +239,14 @@
     <string name="treatment_channel_desc">Lembretes para dar os tratamentos ao seu bebé</string>
     <string name="treatment_notif_text">Está na hora desta dose.</string>
     <string name="treatment_notif_text_baby">Está na hora da dose de %1$s.</string>
+
+    <!-- Lembretes de refeições -->
+    <string name="settings_feeding_reminders">Lembretes de refeições</string>
+    <string name="settings_feeding_reminders_desc">Avisar-me quando passar demasiado tempo desde a última refeição.</string>
+    <string name="settings_feeding_interval_label">Lembrar-me se uma refeição passar de</string>
+    <string name="feeding_channel_name">Lembretes de refeições</string>
+    <string name="feeding_channel_desc">Lembretes quando já passou algum tempo desde a última refeição</string>
+    <string name="feeding_notif_title">Horas de uma refeição?</string>
+    <string name="feeding_notif_title_baby">Horas de alimentar %1$s?</string>
+    <string name="feeding_notif_text">Já passaram %1$s desde a última refeição.</string>
 </resources>

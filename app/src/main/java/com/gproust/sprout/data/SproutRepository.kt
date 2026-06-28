@@ -60,6 +60,15 @@ class SproutRepository(private val db: SproutDatabase) {
 
     suspend fun updateBaby(baby: BabyEntity) = db.babyDao().upsert(baby)
 
+    /** All tracked babies as a one-shot list (for (re)scheduling feeding reminders). */
+    suspend fun activeBabies(): List<BabyEntity> = db.babyDao().activeBabiesOnce()
+
+    /** A baby by id, only if it still exists and is tracked (used when a reminder fires). */
+    suspend fun activeBaby(babyId: Long): BabyEntity? = db.babyDao().activeBabyById(babyId)
+
+    /** The id of the currently selected baby, read once (off a flow). */
+    suspend fun activeBabyIdNow(): Long? = db.parentProfileDao().profileOnce()?.activeBabyId
+
     /** The name of a baby by id (for notifications); null if it no longer exists. */
     suspend fun babyName(id: Long): String? = db.babyDao().nameById(id)
 
@@ -103,6 +112,9 @@ class SproutRepository(private val db: SproutDatabase) {
         db.feedingDao().insert(entity.copy(babyId = id))
     }
     suspend fun deleteFeeding(entity: FeedingEntity) = db.feedingDao().delete(entity)
+
+    /** Epoch millis of a baby's most recent feed, or null if none yet. */
+    suspend fun lastFeedTime(babyId: Long): Long? = db.feedingDao().lastFeedTime(babyId)
 
     // Sleep
     val sleeps: Flow<List<SleepEntity>> = activeBabyId.flatMapLatest { id ->

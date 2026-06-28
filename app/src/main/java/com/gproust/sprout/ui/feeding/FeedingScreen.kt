@@ -43,6 +43,7 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -78,15 +79,26 @@ data class NursingSession(
     val lastSwitch: Long? = null,
 )
 
-class FeedingViewModel(private val repository: SproutRepository) : ViewModel() {
+class FeedingViewModel(
+    private val repository: SproutRepository,
+    private val context: Context,
+) : ViewModel() {
     val feedings = repository.feedings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _nursing = MutableStateFlow<NursingSession?>(null)
     val nursing: StateFlow<NursingSession?> = _nursing.asStateFlow()
 
-    fun add(entity: FeedingEntity) = viewModelScope.launch { repository.addFeeding(entity) }
-    fun delete(entity: FeedingEntity) = viewModelScope.launch { repository.deleteFeeding(entity) }
+    fun add(entity: FeedingEntity) = viewModelScope.launch {
+        repository.addFeeding(entity)
+        // A feed was logged → push the "too long since a feed" reminder out.
+        FeedingReminders.rescheduleActiveBaby(context, repository)
+    }
+
+    fun delete(entity: FeedingEntity) = viewModelScope.launch {
+        repository.deleteFeeding(entity)
+        FeedingReminders.rescheduleActiveBaby(context, repository)
+    }
 
     /** Begin timing a breastfeeding session on [side] (left or right). */
     fun startNursing(side: BreastSide) {

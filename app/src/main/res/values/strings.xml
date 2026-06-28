@@ -303,4 +303,14 @@
     <string name="treatment_channel_desc">Reminders to give your baby their treatments</string>
     <string name="treatment_notif_text">It\'s time for this dose.</string>
     <string name="treatment_notif_text_baby">It\'s time for %1$s\'s dose.</string>
+
+    <!-- Feeding reminders -->
+    <string name="settings_feeding_reminders">Feeding reminders</string>
+    <string name="settings_feeding_reminders_desc">Nudge me when it\'s been too long since a feed.</string>
+    <string name="settings_feeding_interval_label">Remind me if a feed is more than</string>
+    <string name="feeding_channel_name">Feeding reminders</string>
+    <string name="feeding_channel_desc">Reminders when it\'s been a while since the last feed</string>
+    <string name="feeding_notif_title">Time for a feed?</string>
+    <string name="feeding_notif_title_baby">Time to feed %1$s?</string>
+    <string name="feeding_notif_text">It\'s been %1$s since the last feed.</string>
 </resources>

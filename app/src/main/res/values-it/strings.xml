@@ -239,4 +239,14 @@
     <string name="treatment_channel_desc">Promemoria per somministrare i trattamenti al tuo bambino</string>
     <string name="treatment_notif_text">È ora di questa dose.</string>
     <string name="treatment_notif_text_baby">È ora della dose di %1$s.</string>
+
+    <!-- Promemoria pasti -->
+    <string name="settings_feeding_reminders">Promemoria pasti</string>
+    <string name="settings_feeding_reminders_desc">Avvisami quando è passato troppo tempo dall\'ultimo pasto.</string>
+    <string name="settings_feeding_interval_label">Ricordami se un pasto supera</string>
+    <string name="feeding_channel_name">Promemoria pasti</string>
+    <string name="feeding_channel_desc">Promemoria quando è passato un po\' dall\'ultimo pasto</string>
+    <string name="feeding_notif_title">Ora di un pasto?</string>
+    <string name="feeding_notif_title_baby">Ora di nutrire %1$s?</string>
+    <string name="feeding_notif_text">È passato %1$s dall\'ultimo pasto.</string>
 </resources>
