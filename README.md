@@ -43,6 +43,17 @@ app/src/main/java/com/gproust/sprout/
     ├── home/  feeding/  sleep/  diaper/  growth/  mother/  profile/
 ```
 
+## Design decisions
+
+The significant decisions behind Sprout are recorded with their rationale, split
+into two logs:
+
+- **[docs/adr/](docs/adr/)** — *architecture* decisions: local-only storage, no
+  first-party backend, the tech stack, localization mechanism, CI, and more.
+- **[docs/decisions/](docs/decisions/)** — *business & product* decisions:
+  the inclusive parent model, supporting multiple babies, defaulting to the
+  device language, licensing, and other domain/policy rules.
+
 ## Building
 
 You'll need **JDK 17** and the **Android SDK** (easiest via [Android Studio](https://developer.android.com/studio)).
