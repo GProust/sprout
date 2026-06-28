@@ -1,6 +1,8 @@
 package com.gproust.sprout.data.local
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /** Type of a feeding session. */
@@ -25,18 +27,23 @@ enum class Recovery { GREAT, GOOD, SORE, PAINFUL }
 enum class DeliveryType { VAGINAL, CESAREAN }
 
 /**
- * The baby's profile. A single row (id = 1) is used by the app.
+ * A baby's profile. The app supports several (twins, or siblings over time);
+ * each gets an auto-generated [id]. [archived] babies are kept but hidden from
+ * the active rotation ("stop tracking") so their history isn't lost.
  */
 @Entity(tableName = "baby")
 data class BabyEntity(
-    @PrimaryKey val id: Long = 1L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String,
     val birthDate: Long,
+    @ColumnInfo(defaultValue = "0") val archived: Boolean = false,
 )
 
-@Entity(tableName = "feeding")
+@Entity(tableName = "feeding", indices = [Index("babyId")])
 data class FeedingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** Which baby this entry belongs to; stamped by the repository on insert. */
+    @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val type: FeedType,
     val side: BreastSide? = null,
     val amountMl: Int? = null,
@@ -45,25 +52,28 @@ data class FeedingEntity(
     val notes: String? = null,
 )
 
-@Entity(tableName = "sleep")
+@Entity(tableName = "sleep", indices = [Index("babyId")])
 data class SleepEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val startTime: Long,
     val endTime: Long? = null,
     val notes: String? = null,
 )
 
-@Entity(tableName = "diaper")
+@Entity(tableName = "diaper", indices = [Index("babyId")])
 data class DiaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val time: Long,
     val type: DiaperType,
     val notes: String? = null,
 )
 
-@Entity(tableName = "growth")
+@Entity(tableName = "growth", indices = [Index("babyId")])
 data class GrowthEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val time: Long,
     val weightGrams: Int? = null,
     val heightMm: Int? = null,
@@ -105,4 +115,6 @@ data class ParentProfileEntity(
     val deliveryType: DeliveryType? = null,
     /** Epoch millis of the last completed/dismissed daily check-in. */
     val lastCheckIn: Long? = null,
+    /** Which baby is currently selected for viewing/logging; null if none yet. */
+    val activeBabyId: Long? = null,
 )

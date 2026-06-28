@@ -14,7 +14,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
@@ -68,6 +67,9 @@ class ScreenshotTest {
         val now = System.currentTimeMillis()
         val hour = 3_600_000L
         val day = 24L * hour
+        // Twins, to show the baby switcher and the babies manager.
+        val lea = repo.addBaby("Léa", now - 21 * day)
+        repo.addBaby("Noah", now - 21 * day)
         repo.saveParentProfile(
             ParentProfileEntity(
                 1L,
@@ -76,9 +78,10 @@ class ScreenshotTest {
                 breastfeeding = true,
                 deliveryType = DeliveryType.CESAREAN,
                 lastCheckIn = null,
+                activeBabyId = lea,
             ),
         )
-        repo.saveBaby(BabyEntity(1L, "Léa", now - 21 * day))
+        // Logs are stamped with the active baby (Léa).
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
         repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
@@ -183,7 +186,8 @@ class ScreenshotTest {
         tap("Next")
         save("03-checkin-partner-3-notes")
 
-        // Single-page screens.
+        // Single-page screens. The Home top bar shows the active baby (Léa) with
+        // the switcher affordance, since two babies are seeded.
         show { HomeScreen {} }
         save("04-home")
         show { FeedingScreen() }
@@ -196,7 +200,8 @@ class ScreenshotTest {
         save("08-growth")
         show { HealthScreen {} }
         save("09-wellbeing")
+        // Babies manager: both babies, the active marker, and add/track/delete actions.
         show { ProfileScreen {} }
-        save("10-profile")
+        save("10-profile-babies")
     }
 }
