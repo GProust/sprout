@@ -7,6 +7,9 @@ All data stays on the device (Room/SQLite). No accounts, no cloud, no tracking.
 
 ## Features
 
+- **👶 Multiple babies** — track twins or siblings side by side. Switch the active
+  baby from the home top bar; add, edit, **stop tracking** (keeps the history), or
+  permanently delete a baby and all of their logs from the Babies screen.
 - **🍼 Feeding** — breast (left/right/both), bottle (ml), and solids, with timestamps.
 - **😴 Sleep** — log naps and nights with start/end times and automatic durations.
 - **🧷 Diapers** — wet / dirty / mixed changes.

@@ -3,7 +3,6 @@ package com.gproust.sprout.ui.startup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gproust.sprout.data.SproutRepository
-import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.WellbeingEntity
@@ -51,8 +50,10 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         birthDate: Long,
     ) {
         viewModelScope.launch {
-            if (babyName.isNotBlank()) {
-                repository.saveBaby(BabyEntity(id = 1L, name = babyName.trim(), birthDate = birthDate))
+            val babyId = if (babyName.isNotBlank()) {
+                repository.addBaby(babyName, birthDate)
+            } else {
+                null
             }
             repository.saveParentProfile(
                 ParentProfileEntity(
@@ -62,6 +63,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
                     breastfeeding = breastfeeding,
                     deliveryType = if (gaveBirth) deliveryType else null,
                     lastCheckIn = null,
+                    activeBabyId = babyId,
                 ),
             )
         }
