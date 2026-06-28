@@ -1,6 +1,6 @@
 <resources>
     <!-- Brand name — intentionally not translated. -->
-    <string name="app_name">Sprout</string>
+    <string name="app_name" translatable="false">Sprout</string>
 
     <!-- Common actions -->
     <string name="action_back">Back</string>
