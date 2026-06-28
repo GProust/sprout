@@ -43,11 +43,15 @@ app/src/main/java/com/gproust/sprout/
     ├── home/  feeding/  sleep/  diaper/  growth/  mother/  profile/
 ```
 
-## Architecture decisions
+## Design decisions
 
-The significant design choices — local-only storage, no first-party backend,
-the inclusive parent model, and more — are recorded with their rationale in
-**[docs/adr/](docs/adr/)**.
+The significant decisions behind Sprout are recorded with their rationale, split
+into two logs:
+
+- **[docs/adr/](docs/adr/)** — *architecture* decisions: local-only storage, no
+  first-party backend, the tech stack, CI, multiple babies, and more.
+- **[docs/decisions/](docs/decisions/)** — *business & product* decisions: the
+  inclusive parent model, licensing, and other domain/policy rules.
 
 ## Building
 

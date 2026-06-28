@@ -1,6 +1,7 @@
-# 5. Capability-based, inclusive parent model
+# BDR-1. Capability-based, inclusive parent model
 
 Date: 2026-06-28
+Type: Product / Domain rule
 
 ## Status
 
@@ -13,6 +14,9 @@ attached postpartum questions (healing, bleeding, breast comfort) to "the mother
 That excludes or misgenders many real families: co-nursing lesbian couples,
 adoptive parents, single parents, and any arrangement that doesn't map onto one
 "mother" and one "co-parent".
+
+This is a decision about the **domain** — who a "parent" is and how we ask about
+their body and recovery — rather than about how the software is built.
 
 ## Decision
 
@@ -38,5 +42,5 @@ to pick a label.
 - The UI carries a little more conditional logic (which questions to show), but
   that logic is centralized and unit-tested as pure functions.
 - The model is per-device, which is forward-compatible with user-owned sync
-  ([ADR-0003](0003-no-first-party-backend-user-owned-sync.md)) — each phone carries
-  its own parent identity.
+  ([ADR-0003](../adr/0003-no-first-party-backend-user-owned-sync.md)) — each phone
+  carries its own parent identity.

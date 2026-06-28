@@ -1,6 +1,7 @@
-# 9. GPLv3 copyleft with a reserved trademark
+# BDR-2. GPLv3 copyleft with a reserved trademark
 
 Date: 2026-06-28
+Type: Business / Legal
 
 ## Status
 
@@ -11,7 +12,7 @@ Accepted
 Sprout handles sensitive family and health data, so users have to trust what the
 app does with it. Open source makes that auditable. But "open source" alone would
 let someone ship a closed, modified — possibly malicious — fork, or trade on the
-Sprout name and icon.
+Sprout name and icon. This is a licensing and brand decision, not a technical one.
 
 ## Decision
 
@@ -35,3 +36,11 @@ ships a `PRIVACY.md` stating that it collects nothing.
 - Distribution channels (e.g. Google Play, F-Droid) must be handled in a way
   compatible with GPLv3 and the reserved-trademark terms — see
   [docs/RELEASING.md](../RELEASING.md).
+
+## Relationship to the privacy stance
+
+This reinforces, but is distinct from, the data-handling decisions in
+[ADR-0002 (local-first storage)](../adr/0002-local-first-on-device-storage.md) and
+[ADR-0003 (no first-party backend)](../adr/0003-no-first-party-backend-user-owned-sync.md):
+those keep data on the user's device; this keeps the *code* open so the claim is
+verifiable.

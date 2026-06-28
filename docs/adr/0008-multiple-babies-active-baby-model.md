@@ -26,7 +26,7 @@ Support several babies, with a single **active baby** selected at a time:
   **permanently delete** a baby together with all of its logs.
 - Wellbeing stays **per-parent**, not per-baby — a birth and recovery belong to the
   person, not to a particular child
-  ([ADR-0005](0005-capability-based-inclusive-parent-model.md)).
+  ([BDR-0001](../decisions/0001-inclusive-parent-model.md)).
 - The schema migration **backfills** existing logs to the current baby, so upgrades
   lose no data ([ADR-0002](0002-local-first-on-device-storage.md)).
 
