@@ -124,9 +124,9 @@ class ScreenshotTest {
                 notes = "Feeling a bit more like myself today",
             ),
         )
-        // Turn feeding reminders on so the Settings screenshot shows the controls.
-        FeedingReminderSettings.setEnabled(app, true)
-        FeedingReminderSettings.setIntervalMinutes(app, 180)
+        // Feeding reminders are off by default; the Settings captures toggle them
+        // on explicitly (see captureScreens) to show both states honestly.
+        FeedingReminderSettings.setEnabled(app, false)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
@@ -247,8 +247,15 @@ class ScreenshotTest {
         // Babies manager: both babies, the active marker, and add/track/delete actions.
         show { ProfileScreen {} }
         save("10-profile-babies")
+        // Settings with feeding reminders OFF — the real default (opt-in).
+        FeedingReminderSettings.setEnabled(app, false)
         show { SettingsScreen {} }
         save("11-settings")
+        // Same screen with reminders turned ON, to show the interval options.
+        FeedingReminderSettings.setEnabled(app, true)
+        FeedingReminderSettings.setIntervalMinutes(app, 180)
+        show { SettingsScreen {} }
+        save("11-settings-2-feeding-on")
         show { TreatmentsScreen {} }
         save("12-treatments")
     }
