@@ -9,6 +9,7 @@ import android.content.Intent
 import androidx.core.content.getSystemService
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
 
 /** Epoch millis at which a baby becomes "overdue" given its last feed. */
@@ -19,13 +20,28 @@ fun feedingReminderTrigger(lastFeedTime: Long, intervalMinutes: Int): Long =
 fun feedingReminderOverdue(lastFeedTime: Long, now: Long, intervalMinutes: Int): Boolean =
     now - lastFeedTime >= intervalMinutes * 60_000L
 
+/** The feeding-reminder behaviour in force for a baby once its override is resolved. */
+data class EffectiveFeedingReminder(val enabled: Boolean, val intervalMinutes: Int)
+
+/**
+ * Resolves a baby's effective feeding reminder: each field is the baby's own
+ * override when set, otherwise the device-global [FeedingReminderSettings].
+ */
+fun effectiveFeedingReminder(context: Context, baby: BabyEntity): EffectiveFeedingReminder =
+    EffectiveFeedingReminder(
+        enabled = baby.feedingReminderEnabled ?: FeedingReminderSettings.isEnabled(context),
+        intervalMinutes = baby.feedingReminderIntervalMinutes
+            ?: FeedingReminderSettings.intervalMinutes(context),
+    )
+
 /**
  * Schedules "it's been a while since the last feed" reminders with [AlarmManager].
  *
  * One inexact `setAndAllowWhileIdle` alarm per baby, armed at `lastFeed + maxGap`.
  * Logging a feed re-arms it (so a fed baby is never nudged); the alarm is a single
- * nudge — it does not repeat. A single device-local setting
- * ([FeedingReminderSettings]) turns it on/off and sets the gap for all babies.
+ * nudge — it does not repeat. A device-local setting ([FeedingReminderSettings])
+ * sets the default on/off and gap for all babies; each baby can override it (see
+ * [effectiveFeedingReminder]).
  */
 object FeedingReminders {
     const val CHANNEL_ID = "feeding_reminders"
@@ -51,21 +67,22 @@ object FeedingReminders {
 
     fun notificationId(babyId: Long): Int = (NOTIFICATION_ID_BASE + babyId).toInt()
 
-    /** Cancel then re-arm reminders for every tracked baby based on the current setting. */
+    /** Cancel then re-arm reminders for every tracked baby based on its effective setting. */
     suspend fun rescheduleAll(context: Context, repository: SproutRepository) {
-        val enabled = FeedingReminderSettings.isEnabled(context)
-        val interval = FeedingReminderSettings.intervalMinutes(context)
         repository.activeBabies().forEach { baby ->
             cancel(context, baby.id)
-            if (enabled) armFromLastFeed(context, repository, baby.id, interval)
+            val eff = effectiveFeedingReminder(context, baby)
+            if (eff.enabled) armFromLastFeed(context, repository, baby.id, eff.intervalMinutes)
         }
     }
 
-    /** Re-arm a single baby's reminder after its feeds change (a feed logged or removed). */
+    /** Re-arm a single baby's reminder after its feeds or override change. */
     suspend fun rescheduleForBaby(context: Context, repository: SproutRepository, babyId: Long) {
         cancel(context, babyId)
-        if (!FeedingReminderSettings.isEnabled(context)) return
-        armFromLastFeed(context, repository, babyId, FeedingReminderSettings.intervalMinutes(context))
+        val baby = repository.activeBaby(babyId) ?: return
+        val eff = effectiveFeedingReminder(context, baby)
+        if (!eff.enabled) return
+        armFromLastFeed(context, repository, babyId, eff.intervalMinutes)
     }
 
     /** Convenience for the feeding screen: re-arm whichever baby is currently active. */

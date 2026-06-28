@@ -37,6 +37,15 @@ data class BabyEntity(
     val name: String,
     val birthDate: Long,
     @ColumnInfo(defaultValue = "0") val archived: Boolean = false,
+    /**
+     * Per-baby feeding-reminder override. Null means "follow the device-global
+     * setting"; non-null overrides whether this baby is reminded and after how
+     * long. The two fields move together in the UI (a baby either uses the
+     * default or has its own custom setting), but stay independently nullable so
+     * the effective value resolves each field as `override ?? global`.
+     */
+    val feedingReminderEnabled: Boolean? = null,
+    val feedingReminderIntervalMinutes: Int? = null,
 )
 
 @Entity(tableName = "feeding", indices = [Index("babyId")])

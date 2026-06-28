@@ -37,7 +37,7 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(DiaperViewModel::class.java) -> DiaperViewModel(repository)
             modelClass.isAssignableFrom(GrowthViewModel::class.java) -> GrowthViewModel(repository)
             modelClass.isAssignableFrom(HealthViewModel::class.java) -> HealthViewModel(repository)
-            modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository)
+            modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository, context)
             modelClass.isAssignableFrom(TreatmentsViewModel::class.java) -> TreatmentsViewModel(repository, context)
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         } as T

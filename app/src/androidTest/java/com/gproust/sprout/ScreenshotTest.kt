@@ -66,6 +66,9 @@ class ScreenshotTest {
     private val outputDir: File
         get() = File(instrumentation.targetContext.filesDir, "screenshots").also { it.mkdirs() }
 
+    /** Set in [seed] so captures can reference the first baby (e.g. its reminder override). */
+    private var leaId = 0L
+
     private fun seed() = runBlocking {
         val repo = app.repository
         val now = System.currentTimeMillis()
@@ -73,6 +76,7 @@ class ScreenshotTest {
         val day = 24L * hour
         // Twins, to show the baby switcher and the babies manager.
         val lea = repo.addBaby("Léa", now - 21 * day)
+        leaId = lea
         repo.addBaby("Noah", now - 21 * day)
         repo.saveParentProfile(
             ParentProfileEntity(
@@ -247,6 +251,19 @@ class ScreenshotTest {
         // Babies manager: both babies, the active marker, and add/track/delete actions.
         show { ProfileScreen {} }
         save("10-profile-babies")
+        // Same manager after giving Léa a custom feeding-reminder override (every
+        // 2h) while Noah keeps following the app default — shows the per-baby
+        // summary line and the reminder action. (The override dialog itself is an
+        // AlertDialog popup, which onRoot() can't capture.)
+        runBlocking {
+            app.repository.activeBaby(leaId)?.let {
+                app.repository.updateBaby(
+                    it.copy(feedingReminderEnabled = true, feedingReminderIntervalMinutes = 120),
+                )
+            }
+        }
+        show { ProfileScreen {} }
+        save("10-profile-babies-2-reminder-override")
         // Settings with feeding reminders OFF — the real default (opt-in).
         FeedingReminderSettings.setEnabled(app, false)
         show { SettingsScreen {} }

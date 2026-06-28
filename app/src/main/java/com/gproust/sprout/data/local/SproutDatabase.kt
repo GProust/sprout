@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -153,6 +153,18 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v7 -> v8: add the per-baby feeding-reminder override. Both columns are
+         * nullable and default to NULL, so every existing baby keeps following the
+         * device-global feeding-reminder setting until an override is set.
+         */
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `baby` ADD COLUMN `feedingReminderEnabled` INTEGER")
+                db.execSQL("ALTER TABLE `baby` ADD COLUMN `feedingReminderIntervalMinutes` INTEGER")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -161,6 +173,7 @@ abstract class SproutDatabase : RoomDatabase() {
                     "sprout.db",
                 ).addMigrations(
                     MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+                    MIGRATION_7_8,
                 ).build().also { instance = it }
             }
     }

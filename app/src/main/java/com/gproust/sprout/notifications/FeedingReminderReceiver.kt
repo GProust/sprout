@@ -14,7 +14,6 @@ import com.gproust.sprout.MainActivity
 import com.gproust.sprout.R
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.ui.common.formatDuration
-import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,14 +37,15 @@ class FeedingReminderReceiver : BroadcastReceiver() {
 
                 val babyId = intent.getLongExtra(FeedingReminders.EXTRA_BABY_ID, -1L)
                 if (babyId < 0) return@launch
-                if (!FeedingReminderSettings.isEnabled(context)) return@launch
 
                 val baby = app.repository.activeBaby(babyId) ?: return@launch
+                val eff = effectiveFeedingReminder(context, baby)
+                if (!eff.enabled) return@launch
+
                 val last = app.repository.lastFeedTime(babyId) ?: return@launch
-                val interval = FeedingReminderSettings.intervalMinutes(context)
                 val now = System.currentTimeMillis()
                 // A feed logged after this alarm was armed would have re-armed it; guard anyway.
-                if (!feedingReminderOverdue(last, now, interval)) return@launch
+                if (!feedingReminderOverdue(last, now, eff.intervalMinutes)) return@launch
 
                 notify(context, babyId, baby.name, now - last)
             } finally {

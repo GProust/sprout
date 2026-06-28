@@ -217,6 +217,15 @@
     <string name="cd_stop_tracking_baby">Przestań śledzić %1$s</string>
     <string name="cd_restore_baby">Przywróć %1$s</string>
     <string name="cd_delete_baby">Usuń %1$s</string>
+    <string name="cd_feeding_reminder_baby">Przypomnienie o karmieniu dla %1$s</string>
+
+    <!-- Przypomnienie o karmieniu osobne dla dziecka -->
+    <string name="baby_reminder_title">Przypomnienie o karmieniu · %1$s</string>
+    <string name="baby_reminder_use_custom">Własne ustawienie dla tego dziecka</string>
+    <string name="baby_reminder_custom_on">Zastępuje domyślne ustawienie aplikacji.</string>
+    <string name="baby_reminder_custom_off">Zgodne z domyślnym ustawieniem aplikacji.</string>
+    <string name="baby_reminder_summary_default">Przypomnienie o karmieniu: domyślne</string>
+    <string name="baby_reminder_summary_every">Przypomnienie o karmieniu: co %1$s</string>
     <string name="screen_treatments">Leczenie</string>
     <string name="quick_treatments">💊  Leczenie</string>
     <string name="treatment_empty">Brak leczenia. Dodaj je przyciskiem + — np. witamina D codziennie.</string>
