@@ -32,7 +32,7 @@ class SproutViewModelFactory(
         return when {
             modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository)
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository, context)
-            modelClass.isAssignableFrom(FeedingViewModel::class.java) -> FeedingViewModel(repository)
+            modelClass.isAssignableFrom(FeedingViewModel::class.java) -> FeedingViewModel(repository, context)
             modelClass.isAssignableFrom(SleepViewModel::class.java) -> SleepViewModel(repository)
             modelClass.isAssignableFrom(DiaperViewModel::class.java) -> DiaperViewModel(repository)
             modelClass.isAssignableFrom(GrowthViewModel::class.java) -> GrowthViewModel(repository)

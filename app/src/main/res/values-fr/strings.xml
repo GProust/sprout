@@ -294,4 +294,14 @@
     <string name="treatment_channel_desc">Rappels pour administrer les traitements de votre bébé</string>
     <string name="treatment_notif_text">C\'est l\'heure de la prise.</string>
     <string name="treatment_notif_text_baby">C\'est l\'heure de la prise de %1$s.</string>
+
+    <!-- Rappels de repas -->
+    <string name="settings_feeding_reminders">Rappels de repas</string>
+    <string name="settings_feeding_reminders_desc">Me prévenir quand le dernier repas remonte à trop longtemps.</string>
+    <string name="settings_feeding_interval_label">Me rappeler si un repas dépasse</string>
+    <string name="feeding_channel_name">Rappels de repas</string>
+    <string name="feeding_channel_desc">Rappels quand le dernier repas remonte à un moment</string>
+    <string name="feeding_notif_title">C\'est l\'heure du repas ?</string>
+    <string name="feeding_notif_title_baby">C\'est l\'heure du repas de %1$s ?</string>
+    <string name="feeding_notif_text">Cela fait %1$s depuis le dernier repas.</string>
 </resources>

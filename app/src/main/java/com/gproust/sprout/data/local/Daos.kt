@@ -25,6 +25,14 @@ interface BabyDao {
     @Query("SELECT * FROM baby WHERE archived = 0 ORDER BY birthDate ASC, id ASC LIMIT 1")
     suspend fun firstActiveBaby(): BabyEntity?
 
+    /** All tracked babies, as a one-shot list (for (re)scheduling reminders). */
+    @Query("SELECT * FROM baby WHERE archived = 0")
+    suspend fun activeBabiesOnce(): List<BabyEntity>
+
+    /** A baby by id, only if it still exists and is being tracked. */
+    @Query("SELECT * FROM baby WHERE id = :id AND archived = 0 LIMIT 1")
+    suspend fun activeBabyById(id: Long): BabyEntity?
+
     @Query("SELECT name FROM baby WHERE id = :id LIMIT 1")
     suspend fun nameById(id: Long): String?
 
@@ -63,6 +71,10 @@ interface ParentProfileDao {
 interface FeedingDao {
     @Query("SELECT * FROM feeding WHERE babyId = :babyId ORDER BY startTime DESC")
     fun observeForBaby(babyId: Long): Flow<List<FeedingEntity>>
+
+    /** Epoch millis of the most recent feed for a baby, or null if none yet. */
+    @Query("SELECT MAX(startTime) FROM feeding WHERE babyId = :babyId")
+    suspend fun lastFeedTime(babyId: Long): Long?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)

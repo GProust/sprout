@@ -28,6 +28,7 @@ import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
+import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -123,6 +124,9 @@ class ScreenshotTest {
                 notes = "Feeling a bit more like myself today",
             ),
         )
+        // Turn feeding reminders on so the Settings screenshot shows the controls.
+        FeedingReminderSettings.setEnabled(app, true)
+        FeedingReminderSettings.setIntervalMinutes(app, 180)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
