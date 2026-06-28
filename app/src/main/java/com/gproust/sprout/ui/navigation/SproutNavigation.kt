@@ -40,6 +40,7 @@ import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.startup.Startup
 import com.gproust.sprout.ui.startup.StartupViewModel
@@ -52,6 +53,7 @@ object Routes {
     const val GROWTH = "growth"
     const val HEALTH = "health"
     const val PROFILE = "profile"
+    const val SETTINGS = "settings"
 }
 
 private data class BottomDestination(
@@ -152,6 +154,9 @@ private fun MainScaffold() {
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
         }
     }

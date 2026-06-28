@@ -220,4 +220,10 @@
     <string name="profile_age">Âge : %1$s</string>
     <string name="profile_enter_name">Veuillez saisir un prénom</string>
     <string name="profile_saved">Profil enregistré</string>
+
+    <!-- Settings -->
+    <string name="cd_settings">Paramètres</string>
+    <string name="screen_settings">Paramètres</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_system">Langue du système</string>
 </resources>

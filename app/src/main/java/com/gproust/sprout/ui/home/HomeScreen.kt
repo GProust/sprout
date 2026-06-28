@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -116,6 +117,12 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         Icon(
                             Icons.Filled.Person,
                             contentDescription = stringResource(R.string.cd_baby_profile),
+                        )
+                    }
+                    IconButton(onClick = { onNavigate(Routes.SETTINGS) }) {
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.cd_settings),
                         )
                     }
                 },

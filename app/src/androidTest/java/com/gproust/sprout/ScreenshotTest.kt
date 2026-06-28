@@ -36,6 +36,7 @@ import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
+import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.theme.SproutTheme
 import kotlinx.coroutines.runBlocking
@@ -198,5 +199,7 @@ class ScreenshotTest {
         save("09-wellbeing")
         show { ProfileScreen {} }
         save("10-profile")
+        show { SettingsScreen {} }
+        save("11-settings")
     }
 }

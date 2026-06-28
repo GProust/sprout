@@ -221,4 +221,13 @@
     <string name="profile_age">Age: %1$s</string>
     <string name="profile_enter_name">Please enter a name</string>
     <string name="profile_saved">Profile saved</string>
+
+    <!-- Settings -->
+    <string name="cd_settings">Settings</string>
+    <string name="screen_settings">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System default</string>
+    <!-- Language names are shown in their own language; not translated. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_fr" translatable="false">Français</string>
 </resources>
