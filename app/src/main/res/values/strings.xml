@@ -160,9 +160,22 @@
     <string name="diaper_empty">No diaper changes logged yet.</string>
     <string name="diaper_log_title">Log a change</string>
     <string name="diaper_add">Add change</string>
-    <string name="diaper_wet">Wet</string>
-    <string name="diaper_dirty">Dirty</string>
-    <string name="diaper_mixed">Mixed</string>
+    <string name="diaper_contents">What\'s in the diaper?</string>
+    <string name="diaper_urine">Urine</string>
+    <string name="diaper_stool">Stool</string>
+    <string name="diaper_both">Urine + stool</string>
+    <string name="diaper_stool_color">Stool color</string>
+    <!-- Joins details in a history entry, e.g. "Yellow · soft" -->
+    <string name="diaper_separator"> · </string>
+    <!-- Predefined stool colours -->
+    <string name="stool_color_yellow">Yellow</string>
+    <string name="stool_color_green">Green</string>
+    <string name="stool_color_brown">Brown</string>
+    <string name="stool_color_pale">Pale yellow</string>
+    <string name="stool_color_clay">Clay / grey</string>
+    <string name="stool_color_white">White</string>
+    <string name="stool_color_black">Black</string>
+    <string name="stool_color_red">Red</string>
 
     <!-- Growth -->
     <string name="screen_growth">Growth</string>
