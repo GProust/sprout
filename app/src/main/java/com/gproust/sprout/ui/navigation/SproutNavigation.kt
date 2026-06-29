@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.gproust.sprout.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -71,6 +72,28 @@ private val bottomDestinations = listOf(
     BottomDestination(Routes.DIAPER, R.string.nav_diaper, Icons.Filled.BabyChangingStation),
     BottomDestination(Routes.GROWTH, R.string.nav_growth, Icons.Filled.Monitor),
 )
+
+/**
+ * Navigates to a top-level (bottom-bar) destination using the multiple-back-stack
+ * pattern: each tab keeps its own back stack, saved and restored as you switch.
+ *
+ * This must be used for every navigation to a bottom-bar destination — including
+ * the shortcuts on the Home screen. Reaching one of these destinations with a
+ * plain [NavController.navigate] would push it on top of Home instead of making
+ * it a sibling tab, which corrupts the saved state and makes the Home tab restore
+ * the wrong screen (e.g. tapping Home landing on Diaper).
+ */
+private fun NavController.navigateToBottomDestination(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+private fun isBottomDestination(route: String) = bottomDestinations.any { it.route == route }
 
 /**
  * Root composable: chooses between onboarding, the daily check-in, and the main app
@@ -120,15 +143,7 @@ private fun MainScaffold() {
                             ?.any { it.route == dest.route } == true
                         NavigationBarItem(
                             selected = selected,
-                            onClick = {
-                                navController.navigate(dest.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
+                            onClick = { navController.navigateToBottomDestination(dest.route) },
                             icon = {
                                 Icon(dest.icon, contentDescription = stringResource(dest.labelRes))
                             },
@@ -145,7 +160,13 @@ private fun MainScaffold() {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(Routes.HOME) {
-                HomeScreen(onNavigate = { route -> navController.navigate(route) })
+                HomeScreen(onNavigate = { route ->
+                    if (isBottomDestination(route)) {
+                        navController.navigateToBottomDestination(route)
+                    } else {
+                        navController.navigate(route)
+                    }
+                })
             }
             composable(Routes.FEEDING) { FeedingScreen() }
             composable(Routes.SLEEP) { SleepScreen() }
