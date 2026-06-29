@@ -90,6 +90,11 @@
     <string name="feeding_empty">Aún no hay tomas registradas. Añade la primera arriba.</string>
     <string name="feeding_log_title">Registrar una toma</string>
     <string name="feeding_add">Añadir toma</string>
+    <string name="feeding_edit_title">Editar toma</string>
+    <string name="feeding_length">¿Cuánto tiempo?</string>
+    <string name="feeding_length_end">Hora de fin</string>
+    <string name="field_duration">Duración</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Lado</string>
     <string name="field_amount">Cantidad</string>
     <string name="feed_type_breast">Pecho</string>

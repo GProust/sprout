@@ -116,6 +116,11 @@
     <string name="feeding_empty">Aucun repas enregistré pour le moment. Ajoutez le premier ci-dessus.</string>
     <string name="feeding_log_title">Enregistrer un repas</string>
     <string name="feeding_add">Ajouter le repas</string>
+    <string name="feeding_edit_title">Modifier la tétée</string>
+    <string name="feeding_length">Combien de temps ?</string>
+    <string name="feeding_length_end">Heure de fin</string>
+    <string name="field_duration">Durée</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Côté</string>
     <string name="field_amount">Quantité</string>
     <string name="feed_type_breast">Sein</string>

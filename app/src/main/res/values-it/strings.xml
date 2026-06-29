@@ -90,6 +90,11 @@
     <string name="feeding_empty">Nessun pasto registrato finora. Aggiungi il primo qui sopra.</string>
     <string name="feeding_log_title">Registra un pasto</string>
     <string name="feeding_add">Aggiungi pasto</string>
+    <string name="feeding_edit_title">Modifica poppata</string>
+    <string name="feeding_length">Quanto a lungo?</string>
+    <string name="feeding_length_end">Ora di fine</string>
+    <string name="field_duration">Durata</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Lato</string>
     <string name="field_amount">Quantità</string>
     <string name="feed_type_breast">Seno</string>

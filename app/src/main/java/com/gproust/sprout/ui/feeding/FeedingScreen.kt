@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -173,6 +174,16 @@ fun FeedingScreen(
     val feedings by vm.feedings.collectAsState()
     val nursing by vm.nursing.collectAsState()
     val context = LocalContext.current
+    var editing by remember { mutableStateOf<FeedingEntity?>(null) }
+
+    editing?.let { entry ->
+        EditFeedingDialog(
+            entry = entry,
+            onDismiss = { editing = null },
+            onSave = { vm.add(it); editing = null },
+            onDelete = { vm.delete(entry); editing = null },
+        )
+    }
 
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) },
@@ -207,6 +218,7 @@ fun FeedingScreen(
                     meta = formatTime(entry.startTime),
                     icon = Icons.Filled.LocalDrink,
                     onDelete = { vm.delete(entry) },
+                    onClick = { editing = entry },
                 )
             }
         }
@@ -395,83 +407,200 @@ private fun SideTotal(label: String, value: String, active: Boolean) {
 
 /**
  * Manual entry for any feed — including a past breastfeed — without using the
- * live timer. Records a start time and an optional end time, so a bottle or
- * solids feed can capture how long it took.
+ * live timer. A breastfeed can record its length as an end time or a duration;
+ * bottle and solids just need a time.
  */
 @Composable
 private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
-    val context = LocalContext.current
-    var type by remember { mutableStateOf(FeedType.BREAST) }
-    var side by remember { mutableStateOf(BreastSide.LEFT) }
-    var amount by remember { mutableStateOf("") }
-    var start by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    var end by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    var notes by remember { mutableStateOf("") }
-
     Card {
         Column(Modifier.padding(16.dp)) {
             Text(stringResource(R.string.feeding_log_title), style = MaterialTheme.typography.titleMedium)
+            FeedingForm(
+                initial = null,
+                submitLabel = stringResource(R.string.feeding_add),
+                onSubmit = onAdd,
+            )
+        }
+    }
+}
 
-            FieldLabel(stringResource(R.string.field_type))
+/** Edit (or delete) an existing feed in a dialog, reusing [FeedingForm]. */
+@Composable
+private fun EditFeedingDialog(
+    entry: FeedingEntity,
+    onDismiss: () -> Unit,
+    onSave: (FeedingEntity) -> Unit,
+    onDelete: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            ) {
+                Text(
+                    stringResource(R.string.feeding_edit_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                FeedingForm(
+                    initial = entry,
+                    submitLabel = stringResource(R.string.action_save),
+                    onSubmit = onSave,
+                    onDelete = onDelete,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The shared feed editor used both for manual logging (no [initial]) and for
+ * editing an existing entry. Holds its own field state, re-initialised whenever
+ * [initial] changes. When adding, the fields reset after submitting.
+ */
+@Composable
+private fun FeedingForm(
+    initial: FeedingEntity?,
+    submitLabel: String,
+    onSubmit: (FeedingEntity) -> Unit,
+    onDelete: (() -> Unit)? = null,
+) {
+    val context = LocalContext.current
+    val now = System.currentTimeMillis()
+
+    // The recorded length of an existing breastfeed, derived from its end time
+    // or, for older timer entries, the sum of the per-side durations.
+    val initialLengthMs = initial?.let { e ->
+        e.endTime?.let { (it - e.startTime).takeIf { d -> d > 0 } }
+            ?: ((e.leftDurationMs ?: 0L) + (e.rightDurationMs ?: 0L)).takeIf { it > 0 }
+    }
+
+    var type by remember(initial) { mutableStateOf(initial?.type ?: FeedType.BREAST) }
+    var side by remember(initial) { mutableStateOf(initial?.side ?: BreastSide.LEFT) }
+    var amount by remember(initial) { mutableStateOf(initial?.amountMl?.toString() ?: "") }
+    var start by remember(initial) { mutableLongStateOf(initial?.startTime ?: now) }
+    // Whether the breastfeed's length is entered as an end time or a duration.
+    var byEnd by remember(initial) { mutableStateOf(initial?.endTime != null) }
+    var end by remember(initial) {
+        mutableLongStateOf(initial?.endTime ?: (initial?.startTime ?: now))
+    }
+    var durationMin by remember(initial) {
+        mutableStateOf(initialLengthMs?.let { (it / 60_000L).toString() } ?: "")
+    }
+    var notes by remember(initial) { mutableStateOf(initial?.notes ?: "") }
+
+    fun reset() {
+        type = FeedType.BREAST
+        side = BreastSide.LEFT
+        amount = ""
+        start = System.currentTimeMillis()
+        byEnd = false
+        end = System.currentTimeMillis()
+        durationMin = ""
+        notes = ""
+    }
+
+    fun build(): FeedingEntity {
+        // Length only applies to breastfeeds; from an end time or a duration.
+        val lengthMs = when {
+            type != FeedType.BREAST -> null
+            byEnd -> (end - start).takeIf { it > 0 }
+            else -> durationMin.toLongOrNull()?.times(60_000L)?.takeIf { it > 0 }
+        }
+        val breast = type == FeedType.BREAST
+        return FeedingEntity(
+            id = initial?.id ?: 0L,
+            type = type,
+            side = if (breast) side else null,
+            amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
+            startTime = start,
+            endTime = if (breast) lengthMs?.let { start + it } else null,
+            // Attribute a single-sided length to that side so the history shows
+            // it; a both-sides length is kept only as the total (end time).
+            leftDurationMs = if (breast && side == BreastSide.LEFT) lengthMs else null,
+            rightDurationMs = if (breast && side == BreastSide.RIGHT) lengthMs else null,
+            notes = notes.ifBlank { null },
+        )
+    }
+
+    FieldLabel(stringResource(R.string.field_type))
+    ChoiceChips(
+        options = FeedType.entries,
+        selected = type,
+        onSelect = { type = it },
+        labelOf = { it.label(context) },
+    )
+
+    when (type) {
+        FeedType.BREAST -> {
+            FieldLabel(stringResource(R.string.field_side))
             ChoiceChips(
-                options = FeedType.entries,
-                selected = type,
-                onSelect = { type = it },
+                options = BreastSide.entries,
+                selected = side,
+                onSelect = { side = it },
                 labelOf = { it.label(context) },
             )
+        }
+        FeedType.BOTTLE -> {
+            FieldLabel(stringResource(R.string.field_amount))
+            NumberField(
+                label = stringResource(R.string.field_amount),
+                value = amount,
+                onChange = { amount = it },
+                suffix = stringResource(R.string.unit_ml),
+            )
+        }
+        FeedType.SOLID -> Unit
+    }
 
-            when (type) {
-                FeedType.BREAST -> {
-                    FieldLabel(stringResource(R.string.field_side))
-                    ChoiceChips(
-                        options = BreastSide.entries,
-                        selected = side,
-                        onSelect = { side = it },
-                        labelOf = { it.label(context) },
-                    )
-                }
-                FeedType.BOTTLE -> {
-                    FieldLabel(stringResource(R.string.field_amount))
-                    NumberField(
-                        label = stringResource(R.string.field_amount),
-                        value = amount,
-                        onChange = { amount = it },
-                        suffix = stringResource(R.string.unit_ml),
-                    )
-                }
-                FeedType.SOLID -> Unit
-            }
+    FieldLabel(stringResource(R.string.field_time))
+    TimePickerField(label = stringResource(R.string.picker_at), millis = start, onChange = { start = it })
 
-            FieldLabel(stringResource(R.string.field_time))
-            TimePickerField(label = stringResource(R.string.picker_from), millis = start, onChange = { start = it })
-            Spacer(Modifier.height(8.dp))
+    if (type == FeedType.BREAST) {
+        val durationLabel = stringResource(R.string.field_duration)
+        val endLabel = stringResource(R.string.feeding_length_end)
+        FieldLabel(stringResource(R.string.feeding_length))
+        ChoiceChips(
+            options = listOf(false, true),
+            selected = byEnd,
+            onSelect = { byEnd = it },
+            labelOf = { if (it) endLabel else durationLabel },
+        )
+        Spacer(Modifier.height(4.dp))
+        if (byEnd) {
             TimePickerField(label = stringResource(R.string.picker_to), millis = end, onChange = { end = it })
+        } else {
+            NumberField(
+                label = stringResource(R.string.field_duration),
+                value = durationMin,
+                onChange = { durationMin = it },
+                suffix = stringResource(R.string.unit_min),
+            )
+        }
+    }
 
-            Spacer(Modifier.height(8.dp))
-            NotesField(value = notes, onChange = { notes = it })
+    Spacer(Modifier.height(8.dp))
+    NotesField(value = notes, onChange = { notes = it })
 
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Button(onClick = {
-                    onAdd(
-                        FeedingEntity(
-                            type = type,
-                            side = if (type == FeedType.BREAST) side else null,
-                            amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
-                            startTime = start,
-                            // Only keep an end time that actually follows the start.
-                            endTime = end.takeIf { it > start },
-                            notes = notes.ifBlank { null },
-                        ),
-                    )
-                    amount = ""
-                    notes = ""
-                    start = System.currentTimeMillis()
-                    end = System.currentTimeMillis()
-                }) {
-                    Text(stringResource(R.string.feeding_add))
-                }
+    Spacer(Modifier.height(12.dp))
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = if (onDelete != null) Arrangement.SpaceBetween else Arrangement.End,
+    ) {
+        if (onDelete != null) {
+            TextButton(onClick = onDelete) {
+                Text(
+                    stringResource(R.string.action_delete),
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
+        }
+        Button(onClick = {
+            onSubmit(build())
+            if (initial == null) reset()
+        }) {
+            Text(submitLabel)
         }
     }
 }
@@ -491,24 +620,27 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
     val sep = context.getString(R.string.feeding_detail_separator)
     val parts = mutableListOf<String>()
     if (entry.type == FeedType.BREAST) {
-        entry.leftDurationMs?.let {
-            parts += context.getString(
-                R.string.feeding_side_time,
-                context.getString(R.string.side_left),
-                formatDuration(context, it),
-            )
-        }
-        entry.rightDurationMs?.let {
-            parts += context.getString(
-                R.string.feeding_side_time,
-                context.getString(R.string.side_right),
-                formatDuration(context, it),
-            )
-        }
-    } else {
-        // Bottle / solids logged with an end time: show how long it took.
-        entry.endTime?.takeIf { it > entry.startTime }?.let {
-            parts += formatDuration(context, it - entry.startTime)
+        val hasPerSide = entry.leftDurationMs != null || entry.rightDurationMs != null
+        if (hasPerSide) {
+            entry.leftDurationMs?.let {
+                parts += context.getString(
+                    R.string.feeding_side_time,
+                    context.getString(R.string.side_left),
+                    formatDuration(context, it),
+                )
+            }
+            entry.rightDurationMs?.let {
+                parts += context.getString(
+                    R.string.feeding_side_time,
+                    context.getString(R.string.side_right),
+                    formatDuration(context, it),
+                )
+            }
+        } else {
+            // A both-sides or quick breastfeed: show the total length only.
+            entry.endTime?.takeIf { it > entry.startTime }?.let {
+                parts += formatDuration(context, it - entry.startTime)
+            }
         }
     }
     entry.notes?.takeIf { it.isNotBlank() }?.let { parts += it }

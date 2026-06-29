@@ -2,6 +2,7 @@
 
 package com.gproust.sprout.ui.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,8 +94,12 @@ fun EntryCard(
     icon: ImageVector,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    val cardModifier = modifier.fillMaxWidth().let {
+        if (onClick != null) it.clickable(onClick = onClick) else it
+    }
+    Card(modifier = cardModifier) {
         Row(
             Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,

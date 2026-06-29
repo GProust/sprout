@@ -96,6 +96,11 @@
     <string name="feeding_empty">Brak zapisanych karmień. Dodaj pierwsze powyżej.</string>
     <string name="feeding_log_title">Zapisz karmienie</string>
     <string name="feeding_add">Dodaj karmienie</string>
+    <string name="feeding_edit_title">Edytuj karmienie</string>
+    <string name="feeding_length">Jak długo?</string>
+    <string name="feeding_length_end">Godzina zakończenia</string>
+    <string name="field_duration">Czas trwania</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Strona</string>
     <string name="field_amount">Ilość</string>
     <string name="feed_type_breast">Pierś</string>

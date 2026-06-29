@@ -116,9 +116,14 @@
     <string name="screen_feeding">Feeding</string>
     <string name="feeding_empty">No feedings logged yet. Add your first above.</string>
     <string name="feeding_log_title">Log a feeding</string>
+    <string name="feeding_edit_title">Edit feeding</string>
     <string name="feeding_add">Add feeding</string>
+    <string name="feeding_length">How long?</string>
+    <string name="feeding_length_end">End time</string>
     <string name="field_side">Side</string>
     <string name="field_amount">Amount</string>
+    <string name="field_duration">Duration</string>
+    <string name="unit_min">min</string>
     <string name="feed_type_breast">Breast</string>
     <string name="feed_type_bottle">Bottle</string>
     <string name="feed_type_solid">Solids</string>

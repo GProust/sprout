@@ -90,6 +90,11 @@
     <string name="feeding_empty">Ainda não há refeições registadas. Adicione a primeira acima.</string>
     <string name="feeding_log_title">Registar uma refeição</string>
     <string name="feeding_add">Adicionar refeição</string>
+    <string name="feeding_edit_title">Editar mamada</string>
+    <string name="feeding_length">Quanto tempo?</string>
+    <string name="feeding_length_end">Hora de fim</string>
+    <string name="field_duration">Duração</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Lado</string>
     <string name="field_amount">Quantidade</string>
     <string name="feed_type_breast">Mama</string>
