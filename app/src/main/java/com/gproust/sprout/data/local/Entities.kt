@@ -11,8 +11,12 @@ enum class FeedType { BREAST, BOTTLE, SOLID }
 /** Which breast was used during a breastfeeding session. */
 enum class BreastSide { LEFT, RIGHT, BOTH }
 
-/** Contents of a diaper change. */
-enum class DiaperType { WET, DIRTY, MIXED }
+/**
+ * Predefined stool ("selles") colours, offered as a colour scale when logging a
+ * diaper change. Ordered roughly from the most common newborn colours to the
+ * ones worth keeping an eye on.
+ */
+enum class StoolColor { YELLOW, GREEN, BROWN, ORANGE, BLACK, RED, WHITE }
 
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
@@ -75,12 +79,22 @@ data class SleepEntity(
     val notes: String? = null,
 )
 
+/**
+ * A diaper change. Rather than a single mutually-exclusive type, a change is a
+ * checklist of what was present: [wet] (urines) and/or [dirty] (selles). When
+ * stool is present, [stoolColor] optionally records its colour.
+ */
 @Entity(tableName = "diaper", indices = [Index("babyId")])
 data class DiaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val time: Long,
-    val type: DiaperType,
+    /** Urine present in this change ("urines"). */
+    @ColumnInfo(defaultValue = "0") val wet: Boolean = false,
+    /** Stool present in this change ("selles"). */
+    @ColumnInfo(defaultValue = "0") val dirty: Boolean = false,
+    /** Stool colour, when stool is present; null otherwise. */
+    val stoolColor: StoolColor? = null,
     val notes: String? = null,
 )
 

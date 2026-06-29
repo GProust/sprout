@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -165,6 +165,35 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v8 -> v9: rework a diaper change from a single type (WET/DIRTY/MIXED)
+         * into a checklist — `wet` (urines) and `dirty` (selles) — plus an
+         * optional `stoolColor`. Existing rows are backfilled from their old
+         * type, and the now-unused `type` column is dropped by recreating the
+         * table.
+         */
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `diaper_new` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`babyId` INTEGER NOT NULL DEFAULT 1, `time` INTEGER NOT NULL, " +
+                        "`wet` INTEGER NOT NULL DEFAULT 0, `dirty` INTEGER NOT NULL DEFAULT 0, " +
+                        "`stoolColor` TEXT, `notes` TEXT)",
+                )
+                db.execSQL(
+                    "INSERT INTO `diaper_new` (id, babyId, time, wet, dirty, stoolColor, notes) " +
+                        "SELECT id, babyId, time, " +
+                        "CASE WHEN type IN ('WET', 'MIXED') THEN 1 ELSE 0 END, " +
+                        "CASE WHEN type IN ('DIRTY', 'MIXED') THEN 1 ELSE 0 END, " +
+                        "NULL, notes FROM `diaper`",
+                )
+                db.execSQL("DROP TABLE `diaper`")
+                db.execSQL("ALTER TABLE `diaper_new` RENAME TO `diaper`")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_diaper_babyId` ON `diaper` (`babyId`)")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -173,7 +202,7 @@ abstract class SproutDatabase : RoomDatabase() {
                     "sprout.db",
                 ).addMigrations(
                     MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-                    MIGRATION_7_8,
+                    MIGRATION_7_8, MIGRATION_8_9,
                 ).build().also { instance = it }
             }
     }

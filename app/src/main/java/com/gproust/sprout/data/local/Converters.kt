@@ -17,10 +17,10 @@ class Converters {
     fun stringToBreastSide(value: String?): BreastSide? = value?.let { BreastSide.valueOf(it) }
 
     @TypeConverter
-    fun diaperTypeToString(value: DiaperType?): String? = value?.name
+    fun stoolColorToString(value: StoolColor?): String? = value?.name
 
     @TypeConverter
-    fun stringToDiaperType(value: String?): DiaperType? = value?.let { DiaperType.valueOf(it) }
+    fun stringToStoolColor(value: String?): StoolColor? = value?.let { StoolColor.valueOf(it) }
 
     @TypeConverter
     fun bleedingToString(value: Bleeding?): String? = value?.name

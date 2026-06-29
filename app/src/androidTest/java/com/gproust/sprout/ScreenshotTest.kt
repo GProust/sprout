@@ -19,13 +19,13 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.DiaperEntity
-import com.gproust.sprout.data.local.DiaperType
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
@@ -104,8 +104,8 @@ class ScreenshotTest {
         )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
         repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
-        repo.addDiaper(DiaperEntity(time = now - hour, type = DiaperType.WET))
-        repo.addDiaper(DiaperEntity(time = now - 3 * hour, type = DiaperType.DIRTY))
+        repo.addDiaper(DiaperEntity(time = now - hour, wet = true))
+        repo.addDiaper(DiaperEntity(time = now - 3 * hour, dirty = true, stoolColor = StoolColor.YELLOW))
         repo.addGrowth(GrowthEntity(time = now - 14 * day, weightGrams = 3200, heightMm = 500))
         repo.addGrowth(GrowthEntity(time = now, weightGrams = 3900, heightMm = 530))
         repo.addTreatment(
