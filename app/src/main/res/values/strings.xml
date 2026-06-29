@@ -131,7 +131,7 @@
 
     <!-- Breastfeeding live timer -->
     <string name="feeding_breastfeeding">Breastfeeding</string>
-    <string name="feeding_nursing_hint">Start a feed and tap to switch sides as you go.</string>
+    <string name="feeding_resume">Resume feeding · %1$s</string>
     <string name="feeding_start_left">Start left</string>
     <string name="feeding_start_right">Start right</string>
     <string name="feeding_on_left">On the left breast</string>

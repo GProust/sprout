@@ -102,7 +102,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Stillen</string>
-    <string name="feeding_nursing_hint">Starte eine Mahlzeit und tippe, um zwischendurch die Seite zu wechseln.</string>
+    <string name="feeding_resume">Stillen fortsetzen · %1$s</string>
     <string name="feeding_start_left">Links starten</string>
     <string name="feeding_start_right">Rechts starten</string>
     <string name="feeding_on_left">An der linken Brust</string>

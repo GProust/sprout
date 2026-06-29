@@ -102,7 +102,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Allattamento al seno</string>
-    <string name="feeding_nursing_hint">Avvia un pasto e tocca per cambiare lato mentre allatti.</string>
+    <string name="feeding_resume">Riprendi la poppata · %1$s</string>
     <string name="feeding_start_left">Inizia a sinistra</string>
     <string name="feeding_start_right">Inizia a destra</string>
     <string name="feeding_on_left">Sul seno sinistro</string>

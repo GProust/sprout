@@ -130,7 +130,7 @@
 
     <!-- Breastfeeding live timer -->
     <string name="feeding_breastfeeding">Allaitement</string>
-    <string name="feeding_nursing_hint">Démarrez une tétée et changez de côté au fil de la tétée.</string>
+    <string name="feeding_resume">Reprendre la tétée · %1$s</string>
     <string name="feeding_start_left">Démarrer à gauche</string>
     <string name="feeding_start_right">Démarrer à droite</string>
     <string name="feeding_on_left">Sein gauche en cours</string>

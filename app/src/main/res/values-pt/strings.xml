@@ -102,7 +102,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Amamentação</string>
-    <string name="feeding_nursing_hint">Inicie uma mamada e toque para trocar de lado à medida que avança.</string>
+    <string name="feeding_resume">Retomar a mamada · %1$s</string>
     <string name="feeding_start_left">Começar à esquerda</string>
     <string name="feeding_start_right">Começar à direita</string>
     <string name="feeding_on_left">Na mama esquerda</string>

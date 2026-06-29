@@ -32,6 +32,7 @@ import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
+import com.gproust.sprout.ui.feeding.NursingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
@@ -224,13 +225,13 @@ class ScreenshotTest {
         save("04-home")
         show { FeedingScreen() }
         save("05-feeding")
-        // Live breastfeeding timer: start on the left, let it run, then switch
-        // sides. The ticking LaunchedEffect never completes, so we stop the test
-        // clock auto-advancing (which would spin waitForIdle) and drive frames by
-        // hand around each capture.
+        // Live breastfeeding timer, now its own screen: start on the left, let it
+        // run, then switch sides. The ticking LaunchedEffect never completes, so we
+        // stop the test clock auto-advancing (which would spin waitForIdle) and
+        // drive frames by hand around each capture.
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithText("Start left").performClick()
-        rule.mainClock.advanceTimeByFrame()
+        show { NursingScreen(side = BreastSide.LEFT) }
+        rule.mainClock.advanceTimeByFrame() // let the start-session effect run
         Thread.sleep(2200)
         rule.mainClock.advanceTimeBy(1000) // let the per-second tick fire
         save("05-feeding-2-nursing")

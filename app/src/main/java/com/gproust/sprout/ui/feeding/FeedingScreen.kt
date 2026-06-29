@@ -2,6 +2,7 @@ package com.gproust.sprout.ui.feeding
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,14 +12,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -162,27 +166,29 @@ class FeedingViewModel(
 }
 
 @Composable
-fun FeedingScreen() {
-    val vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory())
+fun FeedingScreen(
+    onOpenNursing: (BreastSide) -> Unit = {},
+    vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
+) {
     val feedings by vm.feedings.collectAsState()
     val nursing by vm.nursing.collectAsState()
     val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) }) { padding ->
+    Scaffold(
+        topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) },
+        bottomBar = {
+            NursingBar(
+                session = nursing,
+                onStart = onOpenNursing,
+                onResume = { nursing?.let { onOpenNursing(it.currentSide) } },
+            )
+        },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                NursingCard(
-                    session = nursing,
-                    onStart = vm::startNursing,
-                    onSwitch = vm::switchBreast,
-                    onStop = vm::stopNursing,
-                    onCancel = vm::cancelNursing,
-                )
-            }
             item { ManualFeedCard(onAdd = vm::add) }
             item {
                 Text(
@@ -207,41 +213,90 @@ fun FeedingScreen() {
     }
 }
 
+/**
+ * The breastfeeding start/stop controls, pinned to the bottom of the feeding
+ * screen. Idle: a Left and a Right button (positioned to match the breast).
+ * Running: a single button that re-opens the live timer, showing elapsed time
+ * so a session left in the background is never forgotten.
+ */
 @Composable
-private fun NursingCard(
+private fun NursingBar(
     session: NursingSession?,
     onStart: (BreastSide) -> Unit,
-    onSwitch: () -> Unit,
-    onStop: (String) -> Unit,
-    onCancel: () -> Unit,
+    onResume: () -> Unit,
 ) {
-    ElevatedCard {
-        Column(Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.feeding_breastfeeding), style = MaterialTheme.typography.titleMedium)
+    Surface(tonalElevation = 3.dp) {
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            Text(
+                stringResource(R.string.feeding_breastfeeding),
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Spacer(Modifier.height(8.dp))
             if (session == null) {
-                NursingIdle(onStart = onStart)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(onClick = { onStart(BreastSide.LEFT) }, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.feeding_start_left))
+                    }
+                    Button(onClick = { onStart(BreastSide.RIGHT) }, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.feeding_start_right))
+                    }
+                }
             } else {
-                NursingRunning(session = session, onSwitch = onSwitch, onStop = onStop, onCancel = onCancel)
+                var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+                LaunchedEffect(session.sessionStart) {
+                    while (true) {
+                        now = System.currentTimeMillis()
+                        delay(1000)
+                    }
+                }
+                val totalMs = (session.leftMs + session.rightMs +
+                    (now - session.segmentStart)).coerceAtLeast(0L)
+                Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.feeding_resume, formatClock(totalMs)))
+                }
             }
         }
     }
 }
 
+/**
+ * Full-screen live breastfeeding timer. Started from the feeding screen's
+ * Left/Right buttons; lets you switch sides (banking each segment's duration)
+ * and stop to save, or cancel to discard. Leaving via Back keeps the session
+ * running so it can be resumed.
+ */
 @Composable
-private fun NursingIdle(onStart: (BreastSide) -> Unit) {
-    Text(
-        stringResource(R.string.feeding_nursing_hint),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 4.dp),
-    )
-    Spacer(Modifier.height(12.dp))
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Button(onClick = { onStart(BreastSide.LEFT) }, modifier = Modifier.weight(1f)) {
-            Text(stringResource(R.string.feeding_start_left))
-        }
-        Button(onClick = { onStart(BreastSide.RIGHT) }, modifier = Modifier.weight(1f)) {
-            Text(stringResource(R.string.feeding_start_right))
+fun NursingScreen(
+    side: BreastSide,
+    onDone: () -> Unit = {},
+    vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
+) {
+    val session by vm.nursing.collectAsState()
+
+    // Start a session on first entry (or after process death lost the in-memory
+    // one). An already-running session — e.g. resumed from the bar — is kept.
+    LaunchedEffect(Unit) {
+        if (vm.nursing.value == null) vm.startNursing(side)
+    }
+
+    Scaffold(
+        topBar = {
+            SproutTopBar(stringResource(R.string.feeding_breastfeeding), onBack = onDone)
+        },
+    ) { padding ->
+        val s = session
+        if (s == null) {
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            NursingRunning(
+                session = s,
+                onSwitch = vm::switchBreast,
+                onStop = { notes -> vm.stopNursing(notes); onDone() },
+                onCancel = { vm.cancelNursing(); onDone() },
+                modifier = Modifier.fillMaxSize().padding(padding),
+            )
         }
     }
 }
@@ -252,6 +307,7 @@ private fun NursingRunning(
     onSwitch: () -> Unit,
     onStop: (String) -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
@@ -270,49 +326,52 @@ private fun NursingRunning(
     val totalMs = leftMs + rightMs
     val onLeft = session.currentSide == BreastSide.LEFT
 
-    Spacer(Modifier.height(12.dp))
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(8.dp))
         Text(
             formatClock(totalMs),
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold,
         )
         Text(
             stringResource(if (onLeft) R.string.feeding_on_left else R.string.feeding_on_right),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary,
         )
-    }
 
-    Spacer(Modifier.height(12.dp))
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        SideTotal(label = stringResource(R.string.side_left), value = formatClock(leftMs), active = onLeft)
-        SideTotal(label = stringResource(R.string.side_right), value = formatClock(rightMs), active = !onLeft)
-    }
-    session.lastSwitch?.let {
-        Text(
-            stringResource(R.string.feeding_last_switch, formatTime(it)),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-    }
-
-    Spacer(Modifier.height(12.dp))
-    FilledTonalButton(onClick = onSwitch, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(if (onLeft) R.string.feeding_switch_to_right else R.string.feeding_switch_to_left))
-    }
-
-    Spacer(Modifier.height(8.dp))
-    NotesField(value = notes, onChange = { notes = it })
-
-    Spacer(Modifier.height(8.dp))
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-            Text(stringResource(R.string.action_cancel))
+        Spacer(Modifier.height(24.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            SideTotal(label = stringResource(R.string.side_left), value = formatClock(leftMs), active = onLeft)
+            SideTotal(label = stringResource(R.string.side_right), value = formatClock(rightMs), active = !onLeft)
         }
-        Button(onClick = { onStop(notes) }, modifier = Modifier.weight(1f)) {
-            Text(stringResource(R.string.feeding_stop_save))
+        session.lastSwitch?.let {
+            Text(
+                stringResource(R.string.feeding_last_switch, formatTime(it)),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+        FilledTonalButton(onClick = onSwitch, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(if (onLeft) R.string.feeding_switch_to_right else R.string.feeding_switch_to_left))
+        }
+
+        Spacer(Modifier.height(12.dp))
+        NotesField(value = notes, onChange = { notes = it })
+
+        Spacer(Modifier.height(12.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.action_cancel))
+            }
+            Button(onClick = { onStop(notes) }, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.feeding_stop_save))
+            }
         }
     }
 }
@@ -336,7 +395,8 @@ private fun SideTotal(label: String, value: String, active: Boolean) {
 
 /**
  * Manual entry for any feed — including a past breastfeed — without using the
- * live timer. Useful for logging a feed after the fact, or a quick bottle/solid.
+ * live timer. Records a start time and an optional end time, so a bottle or
+ * solids feed can capture how long it took.
  */
 @Composable
 private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
@@ -344,7 +404,8 @@ private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
     var type by remember { mutableStateOf(FeedType.BREAST) }
     var side by remember { mutableStateOf(BreastSide.LEFT) }
     var amount by remember { mutableStateOf("") }
-    var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var start by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var end by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
     Card {
@@ -382,7 +443,9 @@ private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
             }
 
             FieldLabel(stringResource(R.string.field_time))
-            TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })
+            TimePickerField(label = stringResource(R.string.picker_from), millis = start, onChange = { start = it })
+            Spacer(Modifier.height(8.dp))
+            TimePickerField(label = stringResource(R.string.picker_to), millis = end, onChange = { end = it })
 
             Spacer(Modifier.height(8.dp))
             NotesField(value = notes, onChange = { notes = it })
@@ -395,13 +458,16 @@ private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
                             type = type,
                             side = if (type == FeedType.BREAST) side else null,
                             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
-                            startTime = time,
+                            startTime = start,
+                            // Only keep an end time that actually follows the start.
+                            endTime = end.takeIf { it > start },
                             notes = notes.ifBlank { null },
                         ),
                     )
                     amount = ""
                     notes = ""
-                    time = System.currentTimeMillis()
+                    start = System.currentTimeMillis()
+                    end = System.currentTimeMillis()
                 }) {
                     Text(stringResource(R.string.feeding_add))
                 }
@@ -438,6 +504,11 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
                 context.getString(R.string.side_right),
                 formatDuration(context, it),
             )
+        }
+    } else {
+        // Bottle / solids logged with an end time: show how long it took.
+        entry.endTime?.takeIf { it > entry.startTime }?.let {
+            parts += formatDuration(context, it - entry.startTime)
         }
     }
     entry.notes?.takeIf { it.isNotBlank() }?.let { parts += it }

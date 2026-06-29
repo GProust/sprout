@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,13 +29,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
+import com.gproust.sprout.ui.feeding.FeedingViewModel
+import com.gproust.sprout.ui.feeding.NursingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
@@ -50,6 +56,7 @@ import com.gproust.sprout.ui.startup.StartupViewModel
 object Routes {
     const val HOME = "home"
     const val FEEDING = "feeding"
+    const val FEEDING_NURSING = "feeding/nursing/{side}"
     const val SLEEP = "sleep"
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
@@ -168,7 +175,27 @@ private fun MainScaffold() {
                     }
                 })
             }
-            composable(Routes.FEEDING) { FeedingScreen() }
+            composable(Routes.FEEDING) {
+                FeedingScreen(onOpenNursing = { side ->
+                    navController.navigate("feeding/nursing/${side.name}")
+                })
+            }
+            composable(
+                Routes.FEEDING_NURSING,
+                arguments = listOf(navArgument("side") { type = NavType.StringType }),
+            ) { entry ->
+                val side = entry.arguments?.getString("side")
+                    ?.let { runCatching { BreastSide.valueOf(it) }.getOrNull() }
+                    ?: BreastSide.LEFT
+                // Share the feeding screen's ViewModel so the live session is the
+                // same one its bottom bar started and can resume.
+                val feedingEntry = remember(entry) { navController.getBackStackEntry(Routes.FEEDING) }
+                val vm: FeedingViewModel = viewModel(
+                    viewModelStoreOwner = feedingEntry,
+                    factory = rememberSproutViewModelFactory(),
+                )
+                NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
+            }
             composable(Routes.SLEEP) { SleepScreen() }
             composable(Routes.DIAPER) { DiaperScreen() }
             composable(Routes.GROWTH) { GrowthScreen() }

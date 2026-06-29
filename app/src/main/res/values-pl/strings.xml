@@ -108,7 +108,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Karmienie piersią</string>
-    <string name="feeding_nursing_hint">Rozpocznij karmienie i dotknij, aby zmieniać stronę na bieżąco.</string>
+    <string name="feeding_resume">Wznów karmienie · %1$s</string>
     <string name="feeding_start_left">Zacznij od lewej</string>
     <string name="feeding_start_right">Zacznij od prawej</string>
     <string name="feeding_on_left">Lewa pierś</string>

@@ -102,7 +102,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Lactancia</string>
-    <string name="feeding_nursing_hint">Inicia una toma y toca para cambiar de lado sobre la marcha.</string>
+    <string name="feeding_resume">Reanudar la toma · %1$s</string>
     <string name="feeding_start_left">Empezar izquierdo</string>
     <string name="feeding_start_right">Empezar derecho</string>
     <string name="feeding_on_left">En el pecho izquierdo</string>
