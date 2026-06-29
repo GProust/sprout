@@ -141,10 +141,11 @@
     <string name="stool_color_yellow">Żółty</string>
     <string name="stool_color_green">Zielony</string>
     <string name="stool_color_brown">Brązowy</string>
-    <string name="stool_color_orange">Pomarańczowy</string>
+    <string name="stool_color_pale">Bladożółty</string>
+    <string name="stool_color_clay">Gliniany / szary</string>
+    <string name="stool_color_white">Biały / odbarwiony</string>
     <string name="stool_color_black">Czarny</string>
     <string name="stool_color_red">Czerwony</string>
-    <string name="stool_color_white">Biały / jasny</string>
     <string name="screen_growth">Wzrost</string>
     <string name="growth_empty">Brak zapisanych pomiarów.</string>
     <string name="growth_log_title">Zapisz pomiar</string>

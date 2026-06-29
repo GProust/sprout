@@ -13,10 +13,12 @@ enum class BreastSide { LEFT, RIGHT, BOTH }
 
 /**
  * Predefined stool ("selles") colours, offered as a colour scale when logging a
- * diaper change. Ordered roughly from the most common newborn colours to the
- * ones worth keeping an eye on.
+ * diaper change. Inspired by the infant stool colour cards used for newborn
+ * cholestasis screening (e.g. the HUG Geneva "carte colorimétrique des selles"):
+ * the common healthy colours first, then the pale/acholic range those cards
+ * exist to flag, and finally the blood-related colours.
  */
-enum class StoolColor { YELLOW, GREEN, BROWN, ORANGE, BLACK, RED, WHITE }
+enum class StoolColor { YELLOW, GREEN, BROWN, PALE, CLAY, WHITE, BLACK, RED }
 
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }

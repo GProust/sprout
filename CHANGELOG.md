@@ -7,8 +7,10 @@ All notable changes to Sprout are documented here. This project follows
 
 - 🧷 Diaper log reworked — a change is now a checklist of what's present
   (urine and/or stool, "urines" / "selles" in French) rather than a single
-  type, and stool changes can record a colour from a predefined colour scale.
-  Existing entries are migrated automatically.
+  type, and stool changes can record a colour from a predefined scale
+  inspired by infant stool colour cards (healthy yellow/green/brown, the
+  pale/clay/white range, plus black and red). Existing entries are migrated
+  automatically.
 
 ## [1.0] — 2026-06-27
 

@@ -170,10 +170,11 @@
     <string name="stool_color_yellow">Jaune</string>
     <string name="stool_color_green">Vert</string>
     <string name="stool_color_brown">Marron</string>
-    <string name="stool_color_orange">Orange</string>
+    <string name="stool_color_pale">Jaune pâle</string>
+    <string name="stool_color_clay">Mastic / gris</string>
+    <string name="stool_color_white">Blanc / décoloré</string>
     <string name="stool_color_black">Noir</string>
     <string name="stool_color_red">Rouge</string>
-    <string name="stool_color_white">Blanc / pâle</string>
 
     <!-- Growth -->
     <string name="screen_growth">Croissance</string>

@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -105,7 +106,8 @@ class ScreenshotTest {
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
         repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
         repo.addDiaper(DiaperEntity(time = now - hour, wet = true))
-        repo.addDiaper(DiaperEntity(time = now - 3 * hour, dirty = true, stoolColor = StoolColor.YELLOW))
+        repo.addDiaper(DiaperEntity(time = now - 3 * hour, wet = true, dirty = true, stoolColor = StoolColor.YELLOW))
+        repo.addDiaper(DiaperEntity(time = now - 5 * hour, wet = true, dirty = true, stoolColor = StoolColor.GREEN))
         repo.addGrowth(GrowthEntity(time = now - 14 * day, weightGrams = 3200, heightMm = 500))
         repo.addGrowth(GrowthEntity(time = now, weightGrams = 3900, heightMm = 530))
         repo.addTreatment(
@@ -148,6 +150,11 @@ class ScreenshotTest {
 
     private fun tap(text: String) {
         rule.onNodeWithText(text).performClick()
+        settle()
+    }
+
+    private fun tapDesc(description: String) {
+        rule.onNodeWithContentDescription(description).performClick()
         settle()
     }
 
@@ -244,6 +251,11 @@ class ScreenshotTest {
         save("06-sleep")
         show { DiaperScreen() }
         save("07-diaper")
+        // Tick "Stool" to reveal the predefined stool-colour scale, then pick one.
+        tap("Stool")
+        save("07-diaper-2-stool-colour")
+        tapDesc("Brown")
+        save("07-diaper-3-colour-picked")
         show { GrowthScreen() }
         save("08-growth")
         show { HealthScreen {} }

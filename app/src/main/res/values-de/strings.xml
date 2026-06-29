@@ -135,10 +135,11 @@
     <string name="stool_color_yellow">Gelb</string>
     <string name="stool_color_green">Grün</string>
     <string name="stool_color_brown">Braun</string>
-    <string name="stool_color_orange">Orange</string>
+    <string name="stool_color_pale">Hellgelb</string>
+    <string name="stool_color_clay">Lehm / grau</string>
+    <string name="stool_color_white">Weiß / entfärbt</string>
     <string name="stool_color_black">Schwarz</string>
     <string name="stool_color_red">Rot</string>
-    <string name="stool_color_white">Weiß / hell</string>
     <string name="screen_growth">Wachstum</string>
     <string name="growth_empty">Noch keine Messungen eingetragen.</string>
     <string name="growth_log_title">Messung eintragen</string>

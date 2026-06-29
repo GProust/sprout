@@ -135,10 +135,11 @@
     <string name="stool_color_yellow">Amarelo</string>
     <string name="stool_color_green">Verde</string>
     <string name="stool_color_brown">Castanho</string>
-    <string name="stool_color_orange">Laranja</string>
+    <string name="stool_color_pale">Amarelo pálido</string>
+    <string name="stool_color_clay">Argila / cinzento</string>
+    <string name="stool_color_white">Branco / descolorado</string>
     <string name="stool_color_black">Preto</string>
     <string name="stool_color_red">Vermelho</string>
-    <string name="stool_color_white">Branco / claro</string>
     <string name="screen_growth">Crescimento</string>
     <string name="growth_empty">Ainda não há medições registadas.</string>
     <string name="growth_log_title">Registar uma medição</string>

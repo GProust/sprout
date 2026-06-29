@@ -171,10 +171,11 @@
     <string name="stool_color_yellow">Yellow</string>
     <string name="stool_color_green">Green</string>
     <string name="stool_color_brown">Brown</string>
-    <string name="stool_color_orange">Orange</string>
+    <string name="stool_color_pale">Pale yellow</string>
+    <string name="stool_color_clay">Clay / grey</string>
+    <string name="stool_color_white">White</string>
     <string name="stool_color_black">Black</string>
     <string name="stool_color_red">Red</string>
-    <string name="stool_color_white">White / pale</string>
 
     <!-- Growth -->
     <string name="screen_growth">Growth</string>

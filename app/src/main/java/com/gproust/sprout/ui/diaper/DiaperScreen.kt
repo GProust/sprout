@@ -119,22 +119,30 @@ private fun StoolColor.label(context: Context): String = context.getString(
         StoolColor.YELLOW -> R.string.stool_color_yellow
         StoolColor.GREEN -> R.string.stool_color_green
         StoolColor.BROWN -> R.string.stool_color_brown
-        StoolColor.ORANGE -> R.string.stool_color_orange
+        StoolColor.PALE -> R.string.stool_color_pale
+        StoolColor.CLAY -> R.string.stool_color_clay
+        StoolColor.WHITE -> R.string.stool_color_white
         StoolColor.BLACK -> R.string.stool_color_black
         StoolColor.RED -> R.string.stool_color_red
-        StoolColor.WHITE -> R.string.stool_color_white
     },
 )
 
-/** Swatch colour for the picker. */
+/** Swatch colour for the picker (approximating the infant stool colour card). */
 private fun StoolColor.swatch(): Color = when (this) {
-    StoolColor.YELLOW -> Color(0xFFE9C547)
-    StoolColor.GREEN -> Color(0xFF7AA661)
-    StoolColor.BROWN -> Color(0xFF8B5E3C)
-    StoolColor.ORANGE -> Color(0xFFE08A3C)
-    StoolColor.BLACK -> Color(0xFF3A352F)
-    StoolColor.RED -> Color(0xFFC0392B)
-    StoolColor.WHITE -> Color(0xFFEFE9DA)
+    StoolColor.YELLOW -> Color(0xFFE7C24B)
+    StoolColor.GREEN -> Color(0xFF7C8A4A)
+    StoolColor.BROWN -> Color(0xFF7A5230)
+    StoolColor.PALE -> Color(0xFFEADFB4)
+    StoolColor.CLAY -> Color(0xFFD7D0BE)
+    StoolColor.WHITE -> Color(0xFFF1EFE8)
+    StoolColor.BLACK -> Color(0xFF36322C)
+    StoolColor.RED -> Color(0xFFB23A2E)
+}
+
+/** True for pale swatches that need a dark check mark to stay legible. */
+private fun StoolColor.isLight(): Boolean = when (this) {
+    StoolColor.YELLOW, StoolColor.PALE, StoolColor.CLAY, StoolColor.WHITE -> true
+    else -> false
 }
 
 /** History title from the checklist: "Urine", "Stool", or "Urine + stool". */
@@ -265,11 +273,7 @@ private fun StoolColorPicker(selected: StoolColor?, onSelect: (StoolColor?) -> U
                     Icon(
                         Icons.Filled.Check,
                         contentDescription = null,
-                        tint = if (color == StoolColor.WHITE || color == StoolColor.YELLOW) {
-                            Color(0xFF3A352F)
-                        } else {
-                            Color.White
-                        },
+                        tint = if (color.isLight()) Color(0xFF3A352F) else Color.White,
                         modifier = Modifier.size(20.dp),
                     )
                 }
