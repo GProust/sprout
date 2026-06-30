@@ -96,6 +96,12 @@
     <string name="feeding_empty">Brak zapisanych karmień. Dodaj pierwsze powyżej.</string>
     <string name="feeding_log_title">Zapisz karmienie</string>
     <string name="feeding_add">Dodaj karmienie</string>
+    <string name="feeding_edit_title">Edytuj karmienie</string>
+    <string name="feeding_length">Jak długo?</string>
+    <string name="feeding_length_end">Godzina zakończenia</string>
+    <string name="field_duration">Czas trwania</string>
+    <string name="feeding_duration_minutes">Czas trwania (minuty)</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Strona</string>
     <string name="field_amount">Ilość</string>
     <string name="feed_type_breast">Pierś</string>
@@ -108,7 +114,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Karmienie piersią</string>
-    <string name="feeding_nursing_hint">Rozpocznij karmienie i dotknij, aby zmieniać stronę na bieżąco.</string>
+    <string name="feeding_resume">Wznów karmienie · %1$s</string>
     <string name="feeding_start_left">Zacznij od lewej</string>
     <string name="feeding_start_right">Zacznij od prawej</string>
     <string name="feeding_on_left">Lewa pierś</string>

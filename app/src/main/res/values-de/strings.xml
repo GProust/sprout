@@ -90,6 +90,12 @@
     <string name="feeding_empty">Noch keine Mahlzeiten eingetragen. Füge oben deine erste hinzu.</string>
     <string name="feeding_log_title">Mahlzeit eintragen</string>
     <string name="feeding_add">Mahlzeit hinzufügen</string>
+    <string name="feeding_edit_title">Mahlzeit bearbeiten</string>
+    <string name="feeding_length">Wie lange?</string>
+    <string name="feeding_length_end">Endzeit</string>
+    <string name="field_duration">Dauer</string>
+    <string name="feeding_duration_minutes">Dauer (Minuten)</string>
+    <string name="unit_min">Min.</string>
     <string name="field_side">Seite</string>
     <string name="field_amount">Menge</string>
     <string name="feed_type_breast">Brust</string>
@@ -102,7 +108,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Stillen</string>
-    <string name="feeding_nursing_hint">Starte eine Mahlzeit und tippe, um zwischendurch die Seite zu wechseln.</string>
+    <string name="feeding_resume">Stillen fortsetzen · %1$s</string>
     <string name="feeding_start_left">Links starten</string>
     <string name="feeding_start_right">Rechts starten</string>
     <string name="feeding_on_left">An der linken Brust</string>

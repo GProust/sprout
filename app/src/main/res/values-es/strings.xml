@@ -90,6 +90,12 @@
     <string name="feeding_empty">Aún no hay tomas registradas. Añade la primera arriba.</string>
     <string name="feeding_log_title">Registrar una toma</string>
     <string name="feeding_add">Añadir toma</string>
+    <string name="feeding_edit_title">Editar toma</string>
+    <string name="feeding_length">¿Cuánto tiempo?</string>
+    <string name="feeding_length_end">Hora de fin</string>
+    <string name="field_duration">Duración</string>
+    <string name="feeding_duration_minutes">Duración (minutos)</string>
+    <string name="unit_min">min</string>
     <string name="field_side">Lado</string>
     <string name="field_amount">Cantidad</string>
     <string name="feed_type_breast">Pecho</string>
@@ -102,7 +108,7 @@
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="feeding_breastfeeding">Lactancia</string>
-    <string name="feeding_nursing_hint">Inicia una toma y toca para cambiar de lado sobre la marcha.</string>
+    <string name="feeding_resume">Reanudar la toma · %1$s</string>
     <string name="feeding_start_left">Empezar izquierdo</string>
     <string name="feeding_start_right">Empezar derecho</string>
     <string name="feeding_on_left">En el pecho izquierdo</string>

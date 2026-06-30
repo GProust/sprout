@@ -116,9 +116,15 @@
     <string name="screen_feeding">Feeding</string>
     <string name="feeding_empty">No feedings logged yet. Add your first above.</string>
     <string name="feeding_log_title">Log a feeding</string>
+    <string name="feeding_edit_title">Edit feeding</string>
     <string name="feeding_add">Add feeding</string>
+    <string name="feeding_length">How long?</string>
+    <string name="feeding_length_end">End time</string>
     <string name="field_side">Side</string>
     <string name="field_amount">Amount</string>
+    <string name="field_duration">Duration</string>
+    <string name="feeding_duration_minutes">Duration (minutes)</string>
+    <string name="unit_min">min</string>
     <string name="feed_type_breast">Breast</string>
     <string name="feed_type_bottle">Bottle</string>
     <string name="feed_type_solid">Solids</string>
@@ -131,7 +137,7 @@
 
     <!-- Breastfeeding live timer -->
     <string name="feeding_breastfeeding">Breastfeeding</string>
-    <string name="feeding_nursing_hint">Start a feed and tap to switch sides as you go.</string>
+    <string name="feeding_resume">Resume feeding · %1$s</string>
     <string name="feeding_start_left">Start left</string>
     <string name="feeding_start_right">Start right</string>
     <string name="feeding_on_left">On the left breast</string>
