@@ -93,6 +93,7 @@
     <string name="feeding_edit_title">Editar toma</string>
     <string name="feeding_length">¿Cuánto tiempo?</string>
     <string name="feeding_length_end">Hora de fin</string>
+    <string name="feeding_add_side">Añadir un lado</string>
     <string name="field_duration">Duración</string>
     <string name="feeding_duration_minutes">Duración (minutos)</string>
     <string name="unit_min">min</string>

@@ -99,6 +99,7 @@
     <string name="feeding_edit_title">Edytuj karmienie</string>
     <string name="feeding_length">Jak długo?</string>
     <string name="feeding_length_end">Godzina zakończenia</string>
+    <string name="feeding_add_side">Dodaj stronę</string>
     <string name="field_duration">Czas trwania</string>
     <string name="feeding_duration_minutes">Czas trwania (minuty)</string>
     <string name="unit_min">min</string>

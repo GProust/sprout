@@ -93,6 +93,7 @@
     <string name="feeding_edit_title">Mahlzeit bearbeiten</string>
     <string name="feeding_length">Wie lange?</string>
     <string name="feeding_length_end">Endzeit</string>
+    <string name="feeding_add_side">Seite hinzufügen</string>
     <string name="field_duration">Dauer</string>
     <string name="feeding_duration_minutes">Dauer (Minuten)</string>
     <string name="unit_min">Min.</string>

@@ -120,6 +120,7 @@
     <string name="feeding_add">Add feeding</string>
     <string name="feeding_length">How long?</string>
     <string name="feeding_length_end">End time</string>
+    <string name="feeding_add_side">Add a side</string>
     <string name="field_side">Side</string>
     <string name="field_amount">Amount</string>
     <string name="field_duration">Duration</string>

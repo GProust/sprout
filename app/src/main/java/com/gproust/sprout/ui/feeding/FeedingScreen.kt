@@ -26,8 +26,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -522,64 +524,59 @@ private fun FeedingForm(
     val context = LocalContext.current
     val now = System.currentTimeMillis()
 
-    // The recorded length of an existing breastfeed: the summed segments, else
-    // the end time, else (older entries) the sum of the per-side durations.
-    val initialLengthMs = initial?.let { e ->
-        e.segments.takeIf { it.isNotEmpty() }?.sumOf { it.endTime - it.startTime }
-            ?: e.endTime?.let { (it - e.startTime).takeIf { d -> d > 0 } }
-            ?: ((e.leftDurationMs ?: 0L) + (e.rightDurationMs ?: 0L)).takeIf { it > 0 }
-    }
-
     var type by remember(initial) { mutableStateOf(initial?.type ?: FeedType.BREAST) }
-    var side by remember(initial) { mutableStateOf(initial?.side ?: BreastSide.LEFT) }
     var amount by remember(initial) { mutableStateOf(initial?.amountMl?.toString() ?: "") }
     var start by remember(initial) { mutableLongStateOf(initial?.startTime ?: now) }
-    // Whether the breastfeed's length is entered as an end time or a duration.
+    // Whether each breast's length is entered as an end time or a duration.
     var byEnd by remember(initial) { mutableStateOf(initial?.endTime != null) }
-    var end by remember(initial) {
-        mutableLongStateOf(initial?.endTime ?: (initial?.startTime ?: now))
-    }
-    var durationMin by remember(initial) {
-        mutableStateOf(initialLengthMs?.let { (it / 60_000L).toString() } ?: "")
-    }
+    // One row per breast stretch (left/right + length); "both" isn't an option —
+    // you list the actual sides instead.
+    var segs by remember(initial) { mutableStateOf(initialSegInputs(initial, now)) }
     var notes by remember(initial) { mutableStateOf(initial?.notes ?: "") }
 
     fun reset() {
         type = FeedType.BREAST
-        side = BreastSide.LEFT
         amount = ""
         start = System.currentTimeMillis()
         byEnd = false
-        end = System.currentTimeMillis()
-        durationMin = ""
+        segs = listOf(SegInput(BreastSide.LEFT, "", System.currentTimeMillis()))
         notes = ""
     }
 
     fun build(): FeedingEntity {
-        // Length only applies to breastfeeds; from an end time or a duration.
-        val lengthMs = when {
-            type != FeedType.BREAST -> null
-            byEnd -> (end - start).takeIf { it > 0 }
-            else -> durationMin.toLongOrNull()?.times(60_000L)?.takeIf { it > 0 }
-        }
         val breast = type == FeedType.BREAST
-        // A single-sided manual length becomes one timed segment; a both-sides
-        // length can't be split here, so it's kept only as the total (end time).
-        val segments = if (breast && lengthMs != null && side != BreastSide.BOTH) {
-            listOf(NursingSegment(side, start, start + lengthMs))
-        } else {
-            emptyList()
+        // Chain the rows into timed segments: each starts where the previous
+        // ended (the first at [start]); its length comes from an end time or a
+        // duration. Empty/invalid rows are skipped.
+        val built = mutableListOf<NursingSegment>()
+        if (breast) {
+            var cursor = start
+            for (seg in segs) {
+                val segEnd = if (byEnd) seg.end else seg.durationMin.toLongOrNull()?.let { cursor + it * 60_000L }
+                if (segEnd != null && segEnd > cursor) {
+                    built += NursingSegment(seg.side, cursor, segEnd)
+                    cursor = segEnd
+                }
+            }
+        }
+        val left = built.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
+        val right = built.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
+        val breastSide = when {
+            left > 0 && right > 0 -> BreastSide.BOTH
+            right > 0 -> BreastSide.RIGHT
+            left > 0 -> BreastSide.LEFT
+            else -> segs.firstOrNull()?.side ?: BreastSide.LEFT
         }
         return FeedingEntity(
             id = initial?.id ?: 0L,
             type = type,
-            side = if (breast) side else null,
+            side = if (breast) breastSide else null,
             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
             startTime = start,
-            endTime = if (breast) lengthMs?.let { start + it } else null,
-            leftDurationMs = if (breast && side == BreastSide.LEFT) lengthMs else null,
-            rightDurationMs = if (breast && side == BreastSide.RIGHT) lengthMs else null,
-            segments = segments,
+            endTime = if (breast) built.lastOrNull()?.endTime else null,
+            leftDurationMs = left.takeIf { breast && it > 0 },
+            rightDurationMs = right.takeIf { breast && it > 0 },
+            segments = built,
             notes = notes.ifBlank { null },
         )
     }
@@ -592,26 +589,14 @@ private fun FeedingForm(
         labelOf = { it.label(context) },
     )
 
-    when (type) {
-        FeedType.BREAST -> {
-            FieldLabel(stringResource(R.string.field_side))
-            ChoiceChips(
-                options = BreastSide.entries,
-                selected = side,
-                onSelect = { side = it },
-                labelOf = { it.label(context) },
-            )
-        }
-        FeedType.BOTTLE -> {
-            FieldLabel(stringResource(R.string.field_amount))
-            NumberField(
-                label = stringResource(R.string.field_amount),
-                value = amount,
-                onChange = { amount = it },
-                suffix = stringResource(R.string.unit_ml),
-            )
-        }
-        FeedType.SOLID -> Unit
+    if (type == FeedType.BOTTLE) {
+        FieldLabel(stringResource(R.string.field_amount))
+        NumberField(
+            label = stringResource(R.string.field_amount),
+            value = amount,
+            onChange = { amount = it },
+            suffix = stringResource(R.string.unit_ml),
+        )
     }
 
     FieldLabel(stringResource(R.string.field_time))
@@ -627,16 +612,29 @@ private fun FeedingForm(
             onSelect = { byEnd = it },
             labelOf = { if (it) endLabel else durationLabel },
         )
-        Spacer(Modifier.height(4.dp))
-        if (byEnd) {
-            TimePickerField(label = stringResource(R.string.picker_to), millis = end, onChange = { end = it })
-        } else {
-            NumberField(
-                label = stringResource(R.string.feeding_duration_minutes),
-                value = durationMin,
-                onChange = { durationMin = it },
-                suffix = stringResource(R.string.unit_min),
+
+        // One row per side; each its own duration or end time, in order.
+        segs.forEachIndexed { i, seg ->
+            SegmentInputRow(
+                seg = seg,
+                byEnd = byEnd,
+                canRemove = segs.size > 1,
+                onSide = { s -> segs = segs.mapIndexed { j, x -> if (j == i) x.copy(side = s) else x } },
+                onDuration = { v -> segs = segs.mapIndexed { j, x -> if (j == i) x.copy(durationMin = v) else x } },
+                onEnd = { v -> segs = segs.mapIndexed { j, x -> if (j == i) x.copy(end = v) else x } },
+                onRemove = { segs = segs.filterIndexed { j, _ -> j != i } },
             )
+        }
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = {
+                val last = segs.lastOrNull()
+                val nextSide = if (last?.side == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
+                segs = segs + SegInput(nextSide, "", last?.end ?: start)
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(stringResource(R.string.feeding_add_side))
         }
     }
 
@@ -662,6 +660,80 @@ private fun FeedingForm(
         }) {
             Text(submitLabel)
         }
+    }
+}
+
+/** A single editable breast stretch in the manual log form. */
+private data class SegInput(
+    val side: BreastSide,
+    val durationMin: String,
+    val end: Long,
+)
+
+/** Pre-fills the segment rows when editing (or one empty Left row when adding). */
+private fun initialSegInputs(initial: FeedingEntity?, now: Long): List<SegInput> {
+    if (initial == null || initial.type != FeedType.BREAST) {
+        return listOf(SegInput(BreastSide.LEFT, "", now))
+    }
+    if (initial.segments.isNotEmpty()) {
+        return initial.segments.map {
+            SegInput(it.side, ((it.endTime - it.startTime) / 60_000L).toString(), it.endTime)
+        }
+    }
+    // Older entry without per-segment timing: rebuild rows from the per-side
+    // totals, or from the overall length, anchored at the start time.
+    val rows = mutableListOf<SegInput>()
+    var cursor = initial.startTime
+    initial.leftDurationMs?.let { cursor += it; rows += SegInput(BreastSide.LEFT, (it / 60_000L).toString(), cursor) }
+    initial.rightDurationMs?.let { cursor += it; rows += SegInput(BreastSide.RIGHT, (it / 60_000L).toString(), cursor) }
+    if (rows.isEmpty()) {
+        val dur = initial.endTime?.let { it - initial.startTime }?.takeIf { it > 0 }
+        val side = initial.side?.takeIf { it != BreastSide.BOTH } ?: BreastSide.LEFT
+        rows += SegInput(side, dur?.let { (it / 60_000L).toString() } ?: "", initial.endTime ?: now)
+    }
+    return rows
+}
+
+@Composable
+private fun SegmentInputRow(
+    seg: SegInput,
+    byEnd: Boolean,
+    canRemove: Boolean,
+    onSide: (BreastSide) -> Unit,
+    onDuration: (String) -> Unit,
+    onEnd: (Long) -> Unit,
+    onRemove: () -> Unit,
+) {
+    val context = LocalContext.current
+    Spacer(Modifier.height(8.dp))
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.weight(1f)) {
+            ChoiceChips(
+                options = listOf(BreastSide.LEFT, BreastSide.RIGHT),
+                selected = seg.side,
+                onSelect = onSide,
+                labelOf = { it.label(context) },
+            )
+        }
+        if (canRemove) {
+            IconButton(onClick = onRemove) {
+                Icon(
+                    Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.action_delete),
+                    tint = MaterialTheme.colorScheme.outline,
+                )
+            }
+        }
+    }
+    if (byEnd) {
+        TimePickerField(label = stringResource(R.string.picker_to), millis = seg.end, onChange = onEnd)
+    } else {
+        NumberField(
+            label = stringResource(R.string.feeding_duration_minutes),
+            value = seg.durationMin,
+            onChange = onDuration,
+            suffix = stringResource(R.string.unit_min),
+        )
     }
 }
 
