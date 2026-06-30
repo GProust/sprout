@@ -94,6 +94,7 @@
     <string name="feeding_length">¿Cuánto tiempo?</string>
     <string name="feeding_length_end">Hora de fin</string>
     <string name="field_duration">Duración</string>
+    <string name="feeding_duration_minutes">Duración (minutos)</string>
     <string name="unit_min">min</string>
     <string name="field_side">Lado</string>
     <string name="field_amount">Cantidad</string>

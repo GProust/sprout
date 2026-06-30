@@ -123,6 +123,7 @@
     <string name="field_side">Side</string>
     <string name="field_amount">Amount</string>
     <string name="field_duration">Duration</string>
+    <string name="feeding_duration_minutes">Duration (minutes)</string>
     <string name="unit_min">min</string>
     <string name="feed_type_breast">Breast</string>
     <string name="feed_type_bottle">Bottle</string>
