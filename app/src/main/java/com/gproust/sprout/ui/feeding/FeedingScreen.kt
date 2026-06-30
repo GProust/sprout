@@ -56,6 +56,7 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.EmptyHint
@@ -78,18 +79,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * A breastfeeding session being timed live but not yet saved. The accumulated
- * [leftMs] / [rightMs] hold only *completed* segments; the time on the breast
- * currently nursing is derived from [segmentStart] as the clock ticks.
+ * A breastfeeding session being timed live but not yet saved. [segments] holds
+ * the *completed* back-and-forth stretches; the breast currently nursing runs
+ * from [segmentStart] until the next switch or stop, ticking off the clock.
  */
 data class NursingSession(
     val sessionStart: Long,
     val currentSide: BreastSide,
     val segmentStart: Long,
-    val leftMs: Long = 0L,
-    val rightMs: Long = 0L,
-    /** Epoch millis of the most recent side switch, if any. */
-    val lastSwitch: Long? = null,
+    val segments: List<NursingSegment> = emptyList(),
 )
 
 class FeedingViewModel(
@@ -119,35 +117,26 @@ class FeedingViewModel(
         _nursing.value = NursingSession(sessionStart = now, currentSide = side, segmentStart = now)
     }
 
-    /** Bank the time on the current breast and switch to the other one. */
+    /** Bank the current breast as a completed segment and switch to the other. */
     fun switchBreast() {
         val s = _nursing.value ?: return
         val now = System.currentTimeMillis()
-        val segment = now - s.segmentStart
-        _nursing.value = if (s.currentSide == BreastSide.LEFT) {
-            s.copy(
-                currentSide = BreastSide.RIGHT,
-                segmentStart = now,
-                leftMs = s.leftMs + segment,
-                lastSwitch = now,
-            )
-        } else {
-            s.copy(
-                currentSide = BreastSide.LEFT,
-                segmentStart = now,
-                rightMs = s.rightMs + segment,
-                lastSwitch = now,
-            )
-        }
+        val completed = NursingSegment(s.currentSide, s.segmentStart, now)
+        val next = if (s.currentSide == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
+        _nursing.value = s.copy(
+            currentSide = next,
+            segmentStart = now,
+            segments = s.segments + completed,
+        )
     }
 
     /** Finish the session, persist it as a feeding, and clear the timer. */
     fun stopNursing(notes: String = "") {
         val s = _nursing.value ?: return
         val now = System.currentTimeMillis()
-        val segment = now - s.segmentStart
-        val leftMs = s.leftMs + if (s.currentSide == BreastSide.LEFT) segment else 0L
-        val rightMs = s.rightMs + if (s.currentSide == BreastSide.RIGHT) segment else 0L
+        val all = s.segments + NursingSegment(s.currentSide, s.segmentStart, now)
+        val leftMs = all.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
+        val rightMs = all.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
         val side = when {
             leftMs > 0 && rightMs > 0 -> BreastSide.BOTH
             rightMs > 0 -> BreastSide.RIGHT
@@ -162,6 +151,7 @@ class FeedingViewModel(
                 endTime = now,
                 leftDurationMs = leftMs.takeIf { it > 0 },
                 rightDurationMs = rightMs.takeIf { it > 0 },
+                segments = all,
                 notes = notes.ifBlank { null },
             ),
         )
@@ -269,8 +259,8 @@ private fun NursingBar(
                         delay(1000)
                     }
                 }
-                val totalMs = (session.leftMs + session.rightMs +
-                    (now - session.segmentStart)).coerceAtLeast(0L)
+                val completed = session.segments.sumOf { it.endTime - it.startTime }
+                val totalMs = (completed + (now - session.segmentStart)).coerceAtLeast(0L)
                 Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.feeding_resume, formatClock(totalMs)))
                 }
@@ -329,6 +319,7 @@ private fun NursingRunning(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
@@ -341,10 +332,14 @@ private fun NursingRunning(
     }
 
     val currentSegment = (now - session.segmentStart).coerceAtLeast(0L)
-    val leftMs = session.leftMs + if (session.currentSide == BreastSide.LEFT) currentSegment else 0L
-    val rightMs = session.rightMs + if (session.currentSide == BreastSide.RIGHT) currentSegment else 0L
-    val totalMs = leftMs + rightMs
     val onLeft = session.currentSide == BreastSide.LEFT
+    val completedLeft = session.segments.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
+    val completedRight = session.segments.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
+    val leftMs = completedLeft + if (onLeft) currentSegment else 0L
+    val rightMs = completedRight + if (!onLeft) currentSegment else 0L
+    val totalMs = leftMs + rightMs
+    // Every stretch so far, including the one in progress (ends at `now`).
+    val liveSegments = session.segments + NursingSegment(session.currentSide, session.segmentStart, now)
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
@@ -367,12 +362,16 @@ private fun NursingRunning(
             SideTotal(label = stringResource(R.string.side_left), value = formatClock(leftMs), active = onLeft)
             SideTotal(label = stringResource(R.string.side_right), value = formatClock(rightMs), active = !onLeft)
         }
-        session.lastSwitch?.let {
-            Text(
-                stringResource(R.string.feeding_last_switch, formatTime(it)),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp),
+
+        // Each back-and-forth stretch with its own time range and duration.
+        Spacer(Modifier.height(20.dp))
+        FieldLabel(stringResource(R.string.feeding_segments))
+        liveSegments.forEachIndexed { i, seg ->
+            SegmentRow(
+                side = seg.side.label(context),
+                range = segmentRange(seg),
+                duration = formatDuration(context, (seg.endTime - seg.startTime).coerceAtLeast(0L)),
+                active = i == liveSegments.lastIndex,
             )
         }
 
@@ -409,6 +408,36 @@ private fun NursingRunning(
                 Text(stringResource(R.string.feeding_stop_save))
             }
         }
+    }
+}
+
+@Composable
+private fun SegmentRow(side: String, range: String, duration: String, active: Boolean) {
+    val color = if (active) MaterialTheme.colorScheme.primary
+    else MaterialTheme.colorScheme.onSurface
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            side,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+            color = color,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            range,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            duration,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+            color = color,
+        )
     }
 }
 
@@ -493,10 +522,11 @@ private fun FeedingForm(
     val context = LocalContext.current
     val now = System.currentTimeMillis()
 
-    // The recorded length of an existing breastfeed, derived from its end time
-    // or, for older timer entries, the sum of the per-side durations.
+    // The recorded length of an existing breastfeed: the summed segments, else
+    // the end time, else (older entries) the sum of the per-side durations.
     val initialLengthMs = initial?.let { e ->
-        e.endTime?.let { (it - e.startTime).takeIf { d -> d > 0 } }
+        e.segments.takeIf { it.isNotEmpty() }?.sumOf { it.endTime - it.startTime }
+            ?: e.endTime?.let { (it - e.startTime).takeIf { d -> d > 0 } }
             ?: ((e.leftDurationMs ?: 0L) + (e.rightDurationMs ?: 0L)).takeIf { it > 0 }
     }
 
@@ -533,6 +563,13 @@ private fun FeedingForm(
             else -> durationMin.toLongOrNull()?.times(60_000L)?.takeIf { it > 0 }
         }
         val breast = type == FeedType.BREAST
+        // A single-sided manual length becomes one timed segment; a both-sides
+        // length can't be split here, so it's kept only as the total (end time).
+        val segments = if (breast && lengthMs != null && side != BreastSide.BOTH) {
+            listOf(NursingSegment(side, start, start + lengthMs))
+        } else {
+            emptyList()
+        }
         return FeedingEntity(
             id = initial?.id ?: 0L,
             type = type,
@@ -540,10 +577,9 @@ private fun FeedingForm(
             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
             startTime = start,
             endTime = if (breast) lengthMs?.let { start + it } else null,
-            // Attribute a single-sided length to that side so the history shows
-            // it; a both-sides length is kept only as the total (end time).
             leftDurationMs = if (breast && side == BreastSide.LEFT) lengthMs else null,
             rightDurationMs = if (breast && side == BreastSide.RIGHT) lengthMs else null,
+            segments = segments,
             notes = notes.ifBlank { null },
         )
     }
@@ -640,7 +676,25 @@ private fun feedingTitle(context: Context, entry: FeedingEntity): String {
     }
 }
 
+/** "10:00–10:08" — the clock range a segment covers. */
+private fun segmentRange(seg: NursingSegment): String =
+    "${formatTime(seg.startTime)}–${formatTime(seg.endTime)}"
+
+/** "Left 8m · 10:00–10:08" for one nursing segment. */
+private fun segmentLine(context: Context, seg: NursingSegment): String = context.getString(
+    R.string.feeding_segment_line,
+    seg.side.label(context),
+    formatDuration(context, (seg.endTime - seg.startTime).coerceAtLeast(0L)),
+    segmentRange(seg),
+)
+
 private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
+    // A timed breastfeed lists each back-and-forth stretch, one per line.
+    if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
+        val lines = entry.segments.map { segmentLine(context, it) }.toMutableList()
+        entry.notes?.takeIf { it.isNotBlank() }?.let { lines += it }
+        return lines.joinToString("\n")
+    }
     val sep = context.getString(R.string.feeding_detail_separator)
     val parts = mutableListOf<String>()
     if (entry.type == FeedType.BREAST) {

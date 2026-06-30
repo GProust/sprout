@@ -23,6 +23,7 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
@@ -93,15 +94,23 @@ class ScreenshotTest {
         )
         // Logs are stamped with the active baby (Léa).
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
-        // A completed breastfeed that switched sides — shows the per-side breakdown.
+        // A completed breastfeed that switched sides twice (left → right → left)
+        // — shows the per-stretch breakdown with a time range for each.
+        val nurseStart = now - 4 * hour
+        val min = 60_000L
         repo.addFeeding(
             FeedingEntity(
                 type = FeedType.BREAST,
                 side = BreastSide.BOTH,
-                startTime = now - 4 * hour,
-                endTime = now - 4 * hour + 13 * 60_000L,
-                leftDurationMs = 8 * 60_000L,
-                rightDurationMs = 5 * 60_000L,
+                startTime = nurseStart,
+                endTime = nurseStart + 13 * min,
+                leftDurationMs = 9 * min,
+                rightDurationMs = 4 * min,
+                segments = listOf(
+                    NursingSegment(BreastSide.LEFT, nurseStart, nurseStart + 6 * min),
+                    NursingSegment(BreastSide.RIGHT, nurseStart + 6 * min, nurseStart + 10 * min),
+                    NursingSegment(BreastSide.LEFT, nurseStart + 10 * min, nurseStart + 13 * min),
+                ),
             ),
         )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))

@@ -118,6 +118,8 @@
     <string name="feeding_last_switch">Ultimo cambio alle %1$s</string>
     <string name="feeding_stop_save">Ferma &amp; salva</string>
     <string name="feeding_side_time">%1$s %2$s</string>
+    <string name="feeding_segments">Questa poppata</string>
+    <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
     <string name="screen_sleep">Sonno</string>
     <string name="sleep_empty">Nessun sonno registrato finora.</string>
     <string name="sleep_log_title">Registra il sonno</string>

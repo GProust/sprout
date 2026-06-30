@@ -148,6 +148,10 @@
     <string name="feeding_stop_save">Stop &amp; save</string>
     <!-- Side + duration, e.g. "Left 8m" -->
     <string name="feeding_side_time">%1$s %2$s</string>
+    <!-- Per-stretch breakdown of a breastfeed -->
+    <string name="feeding_segments">This session</string>
+    <!-- Side, duration, time range — e.g. "Left 8m · 10:00–10:08" -->
+    <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
 
     <!-- Sleep -->
     <string name="screen_sleep">Sleep</string>
