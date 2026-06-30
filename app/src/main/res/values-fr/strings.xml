@@ -165,9 +165,22 @@
     <string name="diaper_empty">Aucun change enregistré pour le moment.</string>
     <string name="diaper_log_title">Enregistrer un change</string>
     <string name="diaper_add">Ajouter le change</string>
-    <string name="diaper_wet">Mouillée</string>
-    <string name="diaper_dirty">Souillée</string>
-    <string name="diaper_mixed">Mixte</string>
+    <string name="diaper_contents">Que contient la couche ?</string>
+    <string name="diaper_urine">Urines</string>
+    <string name="diaper_stool">Selles</string>
+    <string name="diaper_both">Urines + selles</string>
+    <string name="diaper_stool_color">Couleur des selles</string>
+    <!-- Sépare les détails d\'un historique, p. ex. « Jaune · molles » -->
+    <string name="diaper_separator"> · </string>
+    <!-- Couleurs de selles prédéfinies -->
+    <string name="stool_color_yellow">Jaune</string>
+    <string name="stool_color_green">Vert</string>
+    <string name="stool_color_brown">Marron</string>
+    <string name="stool_color_pale">Jaune pâle</string>
+    <string name="stool_color_clay">Mastic / gris</string>
+    <string name="stool_color_white">Blanc / décoloré</string>
+    <string name="stool_color_black">Noir</string>
+    <string name="stool_color_red">Rouge</string>
 
     <!-- Growth -->
     <string name="screen_growth">Croissance</string>
