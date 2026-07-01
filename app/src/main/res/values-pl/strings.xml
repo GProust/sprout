@@ -5,6 +5,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Anuluj</string>
     <string name="action_save">Zapisz</string>
+    <string name="action_details">Szczegóły</string>
     <string name="history">Historia</string>
     <string name="cd_back">Wstecz</string>
     <string name="cd_delete">Usuń</string>
@@ -99,6 +100,7 @@
     <string name="feeding_edit_title">Edytuj karmienie</string>
     <string name="feeding_length">Jak długo?</string>
     <string name="feeding_length_end">Godzina zakończenia</string>
+    <string name="feeding_add_side">Dodaj stronę</string>
     <string name="field_duration">Czas trwania</string>
     <string name="feeding_duration_minutes">Czas trwania (minuty)</string>
     <string name="unit_min">min</string>
@@ -124,6 +126,9 @@
     <string name="feeding_last_switch">Ostatnia zmiana o %1$s</string>
     <string name="feeding_stop_save">Zatrzymaj &amp; zapisz</string>
     <string name="feeding_side_time">%1$s %2$s</string>
+    <string name="feeding_total">Razem %1$s</string>
+    <string name="feeding_segments">Ta sesja</string>
+    <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
     <string name="screen_sleep">Sen</string>
     <string name="sleep_empty">Brak zapisanego snu.</string>
     <string name="sleep_log_title">Zapisz sen</string>

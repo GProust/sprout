@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -194,6 +194,17 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v9 -> v10: record a breastfeed's individual back-and-forth segments
+         * (each a "SIDE,start,end" triple). Existing rows default to an empty
+         * list and keep falling back to their per-side totals for display.
+         */
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `segments` TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -202,7 +213,7 @@ abstract class SproutDatabase : RoomDatabase() {
                     "sprout.db",
                 ).addMigrations(
                     MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-                    MIGRATION_7_8, MIGRATION_8_9,
+                    MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
                 ).build().also { instance = it }
             }
     }

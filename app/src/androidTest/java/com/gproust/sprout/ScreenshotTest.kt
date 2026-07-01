@@ -7,11 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -23,6 +26,7 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
@@ -93,15 +97,23 @@ class ScreenshotTest {
         )
         // Logs are stamped with the active baby (Léa).
         repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
-        // A completed breastfeed that switched sides — shows the per-side breakdown.
+        // A completed breastfeed that switched sides twice (left → right → left)
+        // — shows the per-stretch breakdown with a time range for each.
+        val nurseStart = now - 4 * hour
+        val min = 60_000L
         repo.addFeeding(
             FeedingEntity(
                 type = FeedType.BREAST,
                 side = BreastSide.BOTH,
-                startTime = now - 4 * hour,
-                endTime = now - 4 * hour + 13 * 60_000L,
-                leftDurationMs = 8 * 60_000L,
-                rightDurationMs = 5 * 60_000L,
+                startTime = nurseStart,
+                endTime = nurseStart + 13 * min,
+                leftDurationMs = 9 * min,
+                rightDurationMs = 4 * min,
+                segments = listOf(
+                    NursingSegment(BreastSide.LEFT, nurseStart, nurseStart + 6 * min),
+                    NursingSegment(BreastSide.RIGHT, nurseStart + 6 * min, nurseStart + 10 * min),
+                    NursingSegment(BreastSide.LEFT, nurseStart + 10 * min, nurseStart + 13 * min),
+                ),
             ),
         )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
@@ -232,6 +244,26 @@ class ScreenshotTest {
         save("04-home")
         show { FeedingScreen() }
         save("05-feeding")
+        // Manual log: add two more sides so the form shows a left → right → left
+        // entry. Scroll to the button before each tap so it stays on-screen.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
+        tap("Add a side")
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
+        tap("Add a side")
+        // Scroll back to the card's top so all three side rows are in view.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Log a feeding"))
+        settle()
+        save("05-feeding-5-manual-lrl")
+        // History: scroll to the completed switched breastfeed (left → right →
+        // left). The card shows a light preview (per-side + total); "Details"
+        // expands the per-stretch breakdown. Captured before any live session so
+        // the list is idle for waitForIdle.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Both", substring = true))
+        settle()
+        save("05-feeding-2-history")
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
+        tap("Details")
+        save("05-feeding-6-history-details")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and
@@ -247,7 +279,15 @@ class ScreenshotTest {
         Thread.sleep(1500)
         rule.mainClock.advanceTimeBy(1000)
         save("05-feeding-3-switched")
+        // Switch back to the left, so the session lists two left stretches and one
+        // right — the per-stretch breakdown building up live.
+        rule.onNodeWithText("Switch to left").performClick()
+        rule.mainClock.advanceTimeByFrame()
+        Thread.sleep(1500)
+        rule.mainClock.advanceTimeBy(1000)
+        save("05-feeding-4-two-left-one-right")
         rule.mainClock.autoAdvance = true
+
         show { SleepScreen() }
         save("06-sleep")
         show { DiaperScreen() }

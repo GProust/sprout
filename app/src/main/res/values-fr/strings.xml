@@ -7,6 +7,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Enregistrer</string>
+    <string name="action_details">Détails</string>
     <string name="history">Historique</string>
 
     <!-- Content descriptions (accessibility) -->
@@ -119,6 +120,7 @@
     <string name="feeding_edit_title">Modifier la tétée</string>
     <string name="feeding_length">Combien de temps ?</string>
     <string name="feeding_length_end">Heure de fin</string>
+    <string name="feeding_add_side">Ajouter un côté</string>
     <string name="field_duration">Durée</string>
     <string name="feeding_duration_minutes">Durée (minutes)</string>
     <string name="unit_min">min</string>
@@ -147,6 +149,9 @@
     <string name="feeding_stop_save">Arrêter et enregistrer</string>
     <!-- Côté + durée, p. ex. « Gauche 8m » -->
     <string name="feeding_side_time">%1$s %2$s</string>
+    <string name="feeding_total">Total %1$s</string>
+    <string name="feeding_segments">Cette tétée</string>
+    <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
 
     <!-- Sleep -->
     <string name="screen_sleep">Sommeil</string>

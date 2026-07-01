@@ -53,4 +53,19 @@ class Converters {
     @TypeConverter
     fun stringToIntList(value: String?): List<Int>? =
         value?.split(",")?.filter { it.isNotBlank() }?.map { it.toInt() }
+
+    /**
+     * Stores breastfeeding segments as "SIDE,start,end" triples joined by ";".
+     * Non-null (the column is NOT NULL, defaulting to an empty string).
+     */
+    @TypeConverter
+    fun nursingSegmentsToString(value: List<NursingSegment>?): String =
+        value.orEmpty().joinToString(";") { "${it.side.name},${it.startTime},${it.endTime}" }
+
+    @TypeConverter
+    fun stringToNursingSegments(value: String?): List<NursingSegment> =
+        value?.split(";")?.filter { it.isNotBlank() }?.map { triple ->
+            val (side, start, end) = triple.split(",")
+            NursingSegment(BreastSide.valueOf(side), start.toLong(), end.toLong())
+        } ?: emptyList()
 }

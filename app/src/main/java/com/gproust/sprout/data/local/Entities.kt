@@ -54,6 +54,16 @@ data class BabyEntity(
     val feedingReminderIntervalMinutes: Int? = null,
 )
 
+/**
+ * One uninterrupted stretch on a single breast within a breastfeeding session —
+ * the unit a live timer records between switches. [side] is only LEFT or RIGHT.
+ */
+data class NursingSegment(
+    val side: BreastSide,
+    val startTime: Long,
+    val endTime: Long,
+)
+
 @Entity(tableName = "feeding", indices = [Index("babyId")])
 data class FeedingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
@@ -69,6 +79,13 @@ data class FeedingEntity(
     val leftDurationMs: Long? = null,
     /** Time spent on the right breast, in millis (breastfeeding sessions only). */
     val rightDurationMs: Long? = null,
+    /**
+     * The ordered back-and-forth segments of a breastfeed — each an uninterrupted
+     * stretch on one breast, with its own start/end. Empty for non-breast feeds
+     * and for entries logged before per-segment timing was tracked (those fall
+     * back to [leftDurationMs] / [rightDurationMs]).
+     */
+    @ColumnInfo(defaultValue = "''") val segments: List<NursingSegment> = emptyList(),
     val notes: String? = null,
 )
 
