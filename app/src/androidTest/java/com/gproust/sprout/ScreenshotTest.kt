@@ -7,11 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -241,6 +244,12 @@ class ScreenshotTest {
         save("04-home")
         show { FeedingScreen() }
         save("05-feeding")
+        // History: scroll to the completed switched breastfeed (left → right →
+        // left) to show its per-stretch breakdown in the log list. Captured here,
+        // before any live session, so the list is idle for waitForIdle.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Both", substring = true))
+        settle()
+        save("05-feeding-2-history")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and
@@ -256,7 +265,15 @@ class ScreenshotTest {
         Thread.sleep(1500)
         rule.mainClock.advanceTimeBy(1000)
         save("05-feeding-3-switched")
+        // Switch back to the left, so the session lists two left stretches and one
+        // right — the per-stretch breakdown building up live.
+        rule.onNodeWithText("Switch to left").performClick()
+        rule.mainClock.advanceTimeByFrame()
+        Thread.sleep(1500)
+        rule.mainClock.advanceTimeBy(1000)
+        save("05-feeding-4-two-left-one-right")
         rule.mainClock.autoAdvance = true
+
         show { SleepScreen() }
         save("06-sleep")
         show { DiaperScreen() }
