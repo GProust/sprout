@@ -220,6 +220,11 @@ fun FeedingScreen(
                     icon = Icons.Filled.LocalDrink,
                     onDelete = { vm.delete(entry) },
                     onClick = { editing = entry },
+                    details = if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
+                        { FeedingSegmentDetails(entry.segments) }
+                    } else {
+                        null
+                    },
                 )
             }
         }
@@ -761,34 +766,36 @@ private fun segmentLine(context: Context, seg: NursingSegment): String = context
     segmentRange(seg),
 )
 
+/**
+ * The light history preview: per-side totals and the overall total for a
+ * breastfeed (the per-stretch detail lives behind the card's "Details" button).
+ */
 private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
-    // A timed breastfeed lists each back-and-forth stretch, one per line.
-    if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
-        val lines = entry.segments.map { segmentLine(context, it) }.toMutableList()
-        entry.notes?.takeIf { it.isNotBlank() }?.let { lines += it }
-        return lines.joinToString("\n")
-    }
     val sep = context.getString(R.string.feeding_detail_separator)
     val parts = mutableListOf<String>()
     if (entry.type == FeedType.BREAST) {
-        val hasPerSide = entry.leftDurationMs != null || entry.rightDurationMs != null
-        if (hasPerSide) {
-            entry.leftDurationMs?.let {
+        val left = entry.leftDurationMs
+        val right = entry.rightDurationMs
+        if (left != null || right != null) {
+            left?.let {
                 parts += context.getString(
                     R.string.feeding_side_time,
                     context.getString(R.string.side_left),
                     formatDuration(context, it),
                 )
             }
-            entry.rightDurationMs?.let {
+            right?.let {
                 parts += context.getString(
                     R.string.feeding_side_time,
                     context.getString(R.string.side_right),
                     formatDuration(context, it),
                 )
             }
+            if (left != null && right != null) {
+                parts += context.getString(R.string.feeding_total, formatDuration(context, left + right))
+            }
         } else {
-            // A both-sides or quick breastfeed: show the total length only.
+            // A quick breastfeed with only an overall length.
             entry.endTime?.takeIf { it > entry.startTime }?.let {
                 parts += formatDuration(context, it - entry.startTime)
             }
@@ -796,6 +803,21 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
     }
     entry.notes?.takeIf { it.isNotBlank() }?.let { parts += it }
     return parts.joinToString(sep)
+}
+
+/** The per-stretch breakdown shown when a breastfeed card is expanded. */
+@Composable
+private fun FeedingSegmentDetails(segments: List<NursingSegment>) {
+    val context = LocalContext.current
+    Column {
+        segments.forEach { seg ->
+            Text(
+                segmentLine(context, seg),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 private fun BreastSide.label(context: Context): String = context.getString(

@@ -244,12 +244,26 @@ class ScreenshotTest {
         save("04-home")
         show { FeedingScreen() }
         save("05-feeding")
+        // Manual log: add two more sides so the form shows a left → right → left
+        // entry. Scroll to the button before each tap so it stays on-screen.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
+        tap("Add a side")
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
+        tap("Add a side")
+        // Scroll back to the card's top so all three side rows are in view.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Log a feeding"))
+        settle()
+        save("05-feeding-5-manual-lrl")
         // History: scroll to the completed switched breastfeed (left → right →
-        // left) to show its per-stretch breakdown in the log list. Captured here,
-        // before any live session, so the list is idle for waitForIdle.
+        // left). The card shows a light preview (per-side + total); "Details"
+        // expands the per-stretch breakdown. Captured before any live session so
+        // the list is idle for waitForIdle.
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Both", substring = true))
         settle()
         save("05-feeding-2-history")
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
+        tap("Details")
+        save("05-feeding-6-history-details")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and

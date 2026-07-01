@@ -7,6 +7,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Enregistrer</string>
+    <string name="action_details">Détails</string>
     <string name="history">Historique</string>
 
     <!-- Content descriptions (accessibility) -->
@@ -148,6 +149,7 @@
     <string name="feeding_stop_save">Arrêter et enregistrer</string>
     <!-- Côté + durée, p. ex. « Gauche 8m » -->
     <string name="feeding_side_time">%1$s %2$s</string>
+    <string name="feeding_total">Total %1$s</string>
     <string name="feeding_segments">Cette tétée</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
 

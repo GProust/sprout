@@ -5,6 +5,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Abbrechen</string>
     <string name="action_save">Speichern</string>
+    <string name="action_details">Details</string>
     <string name="history">Verlauf</string>
     <string name="cd_back">Zurück</string>
     <string name="cd_delete">Löschen</string>
@@ -119,6 +120,7 @@
     <string name="feeding_last_switch">Letzter Wechsel um %1$s</string>
     <string name="feeding_stop_save">Stoppen &amp; speichern</string>
     <string name="feeding_side_time">%1$s %2$s</string>
+    <string name="feeding_total">Gesamt %1$s</string>
     <string name="feeding_segments">Diese Sitzung</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
     <string name="screen_sleep">Schlaf</string>
