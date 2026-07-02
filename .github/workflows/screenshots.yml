@@ -6,19 +6,56 @@ on:
   workflow_dispatch:
 
 # Allow the job to push the generated screenshots back to the PR branch.
+# pull-requests: read lets the detect job list the PR's changed files.
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: screenshots-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Cheap gate (seconds): capture screenshots only when the PR changes
+  # something that can affect the rendered UI. PRs touching only docs,
+  # fastlane metadata, committed screenshots, or workflows skip the emulator
+  # (~15 min) — the capture job then reports "skipped" and the workflow still
+  # concludes success. Workflow edits don't re-capture either; validate those
+  # with a manual run (workflow_dispatch always captures).
+  changes:
+    name: Detect UI changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      ui: ${{ steps.filter.outputs.ui }}
+    steps:
+      - name: Check the PR's changed files
+        id: filter
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # UI-relevant: app code/resources and Gradle build files, except JVM
+        # unit tests (app/src/test/**), which can't change what is rendered.
+        run: |
+          CHANGED=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename')
+          printf 'Changed files:\n%s\n' "$CHANGED"
+          if printf '%s\n' "$CHANGED" | grep -v '^app/src/test/' | grep -qE '^(app/|gradle/|(build|settings)\.gradle\.kts$|gradle\.properties$)'; then
+            echo "ui=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ui=false" >> "$GITHUB_OUTPUT"
+          fi
+
   screenshots:
     name: Capture UI screenshots
     runs-on: ubuntu-latest
+    needs: changes
+    # !cancelled() lets this run on workflow_dispatch, where `changes` is
+    # skipped (a skipped need would otherwise auto-skip this job too).
     # Don't run on forks (no write access / no secrets).
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      !cancelled() &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.changes.outputs.ui == 'true' &&
+        github.event.pull_request.head.repo.full_name == github.repository))
 
     steps:
       - name: Checkout PR branch
