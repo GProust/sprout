@@ -124,7 +124,7 @@ Sprout collects nothing — all data stays on your device. See [PRIVACY.md](PRIV
 An **opt-in** way to back up and share a baby's data via **Google Drive** — so two
 caregivers can keep the same log in step — is being built. It stays **off by
 default**, keeping the app offline-first. The architecture (per-device files merged
-by a last-write-wins reconciler) and its privacy/F-Droid implications are in
+by a last-write-wins reconciler) and its privacy implications are in
 **[docs/SYNC.md](docs/SYNC.md)**.
 
 ## License

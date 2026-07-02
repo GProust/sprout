@@ -80,7 +80,7 @@ row, which is the intuitive behaviour for shared baby logs.
   backing off in the background. Drive's *changes* API can later replace polling
   to cut bandwidth.
 
-## 4. Privacy & F-Droid impact (opt-in)
+## 4. Privacy impact (opt-in)
 
 - **Default: unchanged.** Sync is **off** until the user explicitly connects a
   Google account. With it off, Sprout makes **no network calls** and stores
@@ -88,12 +88,12 @@ row, which is the intuitive behaviour for shared baby logs.
 - **When enabled:** the user's baby data is stored in **their own Google Drive**
   (and Drive's own privacy terms then apply). Sharing is done with Drive's
   native folder sharing, so the partner's copy lives in *their* Drive too.
-- **F-Droid:** the Drive transport needs Google's proprietary sign-in / API
-  client, which is **not FOSS**. To keep the F-Droid build clean, the Drive code
-  will live behind the [`SyncBackend`](../app/src/main/java/com/gproust/sprout/sync/SyncBackend.kt)
-  interface in a **separate, optional build flavor / module**, so the default
-  (F-Droid) build ships **without** any Google dependency. This preserves the
-  GPLv3 + F-Droid eligibility we set up in [`docs/RELEASING.md`](RELEASING.md).
+- **Distribution:** Sprout is distributed **only via the Google Play Store**, so
+  the Drive transport (Google's sign-in / API client) can be integrated
+  **directly into the app** — no separate build flavor is needed. It still lives
+  behind the [`SyncBackend`](../app/src/main/java/com/gproust/sprout/sync/SyncBackend.kt)
+  interface, purely for testability and to keep the door open for other storage
+  connectors (see §6a).
 
 ## 5. Roadmap
 
@@ -104,8 +104,8 @@ row, which is the intuitive behaviour for shared baby logs.
       implementation usable for tests and offline export/import).
 - [ ] Schema: add `syncId` / `updatedAt` / `deleted` to syncable entities.
 - [ ] Map Room entities ⇆ `SyncRecord` and apply merged state back to Room.
-- [ ] Google Drive `SyncBackend` (Google Sign-In + Drive REST), in an optional
-      flavor so the F-Droid build stays Google-free.
+- [ ] Google Drive `SyncBackend` (Google Sign-In + Drive REST), integrated
+      directly into the app (Play-only distribution — no flavor split needed).
 - [ ] Settings: opt-in toggle, account connect, shared-folder picker, status.
 - [ ] Background sync scheduling (WorkManager) + foreground polling.
 
@@ -115,7 +115,7 @@ The Drive backend will need a Google Cloud project with:
 - the **Drive API** enabled,
 - an **OAuth 2.0 client** for Android (package `com.gproust.sprout` + signing
   SHA-1), using the `drive.file` scope (access only to files the app creates),
-- Google Sign-In configured in the optional flavor.
+- Google Sign-In configured in the app.
 
 No secrets are committed; the OAuth client id is configured per build.
 
@@ -135,8 +135,8 @@ provider is **one new class** — no change to the snapshot format or the reconc
 | Connector | Notes |
 |-----------|-------|
 | Local folder | ✅ implemented (`FolderSyncBackend`); also powers plain export/import |
-| Google Drive | first cloud target; proprietary → optional Google-only flavor |
-| **WebDAV / Nextcloud** | FOSS-friendly → can ship in the default/F-Droid build |
+| Google Drive | first cloud target; ships in the app directly (Play-only distribution) |
+| **WebDAV / Nextcloud** | self-hosted option for users who prefer their own server |
 | Dropbox / OneDrive / S3 | further proprietary options behind the same seam |
 
 Because the merge is provider-agnostic, a user could even mix connectors (e.g.

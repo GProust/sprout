@@ -12,8 +12,7 @@ import java.io.File
  * - A device writes **only its own** file ([ownFileName]); it reads everyone's.
  * - File names follow `device-<deviceId>.json`; see [fileNameFor] / [deviceIdOf].
  *
- * The Google Drive implementation will live behind this interface in an optional,
- * Google-dependent build flavor, so the default (F-Droid) build stays FOSS — see
+ * The Google Drive implementation will live behind this interface — see
  * `docs/SYNC.md`.
  */
 interface SyncBackend {
