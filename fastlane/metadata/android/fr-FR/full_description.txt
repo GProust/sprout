@@ -1,0 +1,19 @@
+Sprout est un carnet de suivi simple et privé pour les premières semaines et les premiers mois de votre nouveau-né — et pour garder un œil sur la récupération post-partum de la maman.
+
+Tout reste sur votre appareil. Pas de compte, pas de cloud, pas de publicité, pas de pistage. Sprout ne demande même pas l'accès à Internet.
+
+FONCTIONNALITÉS
+
+• Repas — sein (gauche/droite/les deux), biberon (ml) et solides, avec horodatage.
+• Sommeil — siestes et nuits avec heures de début/fin et durées automatiques.
+• Couches — changes mouillées, souillées ou mixtes.
+• Croissance — poids, taille et périmètre crânien, avec courbe d'évolution du poids.
+• Santé de la maman — bilans post-partum : humeur, saignements (lochies), confort des seins et notes.
+• Tableau de bord — repas du jour, total de sommeil et nombre de couches en un coup d'œil.
+• Pensé pour deux parents — un tableau de bien-être partagé avec droits de modification par parent.
+
+LA VIE PRIVÉE D'ABORD
+
+Toutes les données sont stockées localement sur votre appareil (SQLite). Rien n'est envoyé, vendu ou partagé. Désinstaller l'application supprime vos données.
+
+Sprout est un logiciel libre et open source, sous licence GNU GPLv3.
