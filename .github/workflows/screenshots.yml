@@ -4,6 +4,12 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      device:
+        description: 'Device to capture on. Tablet captures land in screenshots/tablet-{7,10}/ (for the Play listing''s tablet sections).'
+        type: choice
+        options: [phone, tablet-7, tablet-10]
+        default: phone
 
 # Allow the job to push the generated screenshots back to the PR branch.
 # pull-requests: read lets the detect job list the PR's changed files.
@@ -12,7 +18,9 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: screenshots-${{ github.head_ref || github.ref }}
+  # Include the device so a manual tablet run doesn't cancel (or get
+  # cancelled by) the phone run a PR push triggers on the same branch.
+  group: screenshots-${{ github.head_ref || github.ref }}-${{ inputs.device || 'phone' }}
   cancel-in-progress: true
 
 jobs:
@@ -56,6 +64,13 @@ jobs:
       (github.event_name == 'workflow_dispatch' ||
        (needs.changes.outputs.ui == 'true' &&
         github.event.pull_request.head.repo.full_name == github.repository))
+    env:
+      # Device profiles: pixel_3 is 1080x2160 (2:1) — Play needs >=1080px
+      # phone screenshots with an aspect ratio no taller than 2:1. The
+      # tablets match Play's 7-inch and 10-inch listing sections; their
+      # captures go to their own directory and never overwrite the phone set.
+      PROFILE: ${{ inputs.device == 'tablet-7' && 'Nexus 7' || inputs.device == 'tablet-10' && 'Nexus 10' || 'pixel_3' }}
+      OUTDIR: ${{ inputs.device == 'tablet-7' && 'screenshots/tablet-7' || inputs.device == 'tablet-10' && 'screenshots/tablet-10' || 'screenshots' }}
 
     steps:
       - name: Checkout PR branch
@@ -91,9 +106,7 @@ jobs:
           api-level: 30
           target: default
           arch: x86_64
-          # 1080x2160 (2:1) — Play Store listing needs >=1080px screenshots
-          # with an aspect ratio no taller than 2:1.
-          profile: pixel_3
+          profile: ${{ env.PROFILE }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
@@ -106,15 +119,15 @@ jobs:
             adb install -r -t app/build/outputs/apk/debug/app-debug.apk
             adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner
-            mkdir -p screenshots
-            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "screenshots/$n"; done
-            ls -1 screenshots || true
+            mkdir -p "$OUTDIR"
+            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "$OUTDIR/$n"; done
+            ls -1 "$OUTDIR" || true
 
       - name: Upload screenshots artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ui-screenshots
-          path: screenshots/*.png
+          name: ui-screenshots-${{ inputs.device || 'phone' }}
+          path: ${{ env.OUTDIR }}/*.png
           if-no-files-found: warn
 
       - name: Commit screenshots to the PR branch
