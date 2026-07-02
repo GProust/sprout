@@ -107,13 +107,13 @@ a debug APK build. The APK is uploaded as a build artifact. A second workflow re
 on an emulator and attaches the screenshots to the pull request.
 
 The [release workflow](.github/workflows/release.yml) is **manual** — run it from
-**Actions → Release → Run workflow** to build the signed `.aab`/`.apk`; pass a tag (e.g. `v1.0`) to
-also publish a GitHub Release with the APK attached.
+**Actions → Release → Run workflow** with a version (e.g. `1.3.0`) to bump the app version, build
+the signed `.aab`/`.apk`, and publish a GitHub Release with the APK attached.
 
 ## Releasing & publishing
 
 See **[docs/RELEASING.md](docs/RELEASING.md)** for the full step-by-step process for publishing to
-the Google Play Store (plus the GitHub Release / F-Droid routes).
+the Google Play Store (plus the GitHub Release route).
 
 ## Privacy
 

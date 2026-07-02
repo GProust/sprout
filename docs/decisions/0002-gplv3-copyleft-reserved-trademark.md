@@ -36,7 +36,7 @@ ships a `PRIVACY.md` stating that it collects nothing.
 - Forks can exist and be improved freely; only a **published** version that could
   be confused with the official app needs its own name and icon. This protects
   users from impersonation without discouraging good-faith contributors.
-- Distribution channels (e.g. Google Play, F-Droid) must be handled in a way
+- Distribution channels (e.g. Google Play) must be handled in a way
   compatible with GPLv3 and the reserved-trademark terms — see
   [docs/RELEASING.md](../RELEASING.md).
 
