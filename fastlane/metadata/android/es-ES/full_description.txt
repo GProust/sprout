@@ -1,0 +1,19 @@
+Sprout es un registro sencillo y privado para las primeras semanas y meses de tu recién nacido — y para seguir también la recuperación posparto de la madre.
+
+Todo se queda en tu dispositivo. Sin cuentas, sin nube, sin anuncios y sin rastreo. Sprout ni siquiera pide acceso a Internet.
+
+FUNCIONES
+
+• Tomas — pecho (izquierdo/derecho/ambos), biberón (ml) y sólidos, con hora.
+• Sueño — registra siestas y noches con inicio/fin y duración automática.
+• Pañales — cambios mojados, sucios o mixtos.
+• Crecimiento — peso, talla y perímetro craneal, con gráfica de la evolución del peso.
+• Salud de la madre — controles posparto: ánimo, sangrado (loquios), comodidad del pecho y notas.
+• Panel — tomas de hoy, total de sueño y número de pañales de un vistazo.
+• Para dos progenitores — un tablero de bienestar compartido con permisos de edición por persona.
+
+PRIVACIDAD ANTE TODO
+
+Todos los datos se guardan localmente en tu dispositivo (SQLite). Nada se sube, se vende ni se comparte. Al desinstalar la aplicación se eliminan tus datos.
+
+Sprout es software libre y de código abierto, con licencia GNU GPLv3.

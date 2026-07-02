@@ -1,0 +1,1 @@
+Erste Version auf Google Play — erfasse Mahlzeiten (mit Live-Still-Timer), Schlaf, Windeln und Wachstum, plus tägliche Wochenbett-Check-ins. Komplett offline; deine Daten verlassen nie das Gerät.

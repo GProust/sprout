@@ -1,0 +1,19 @@
+Sprout ist ein einfacher, privater Begleiter für die ersten Wochen und Monate deines Neugeborenen — und behält auch die Wochenbett-Erholung der Mutter im Blick.
+
+Alles bleibt auf deinem Gerät. Keine Konten, keine Cloud, keine Werbung, kein Tracking. Sprout fragt nicht einmal nach Internetzugriff.
+
+FUNKTIONEN
+
+• Mahlzeiten — Stillen (links/rechts/beide), Fläschchen (ml) und Beikost, mit Zeitstempel.
+• Schlaf — Nickerchen und Nächte mit Start/Ende und automatischer Dauer.
+• Windeln — nass, voll oder gemischt.
+• Wachstum — Gewicht, Größe und Kopfumfang, mit Diagramm des Gewichtsverlaufs.
+• Gesundheit der Mutter — Wochenbett-Check-ins zu Stimmung, Blutungen (Lochien), Brustkomfort und Notizen.
+• Übersicht — heutige Mahlzeiten, Schlafsumme und Windelanzahl auf einen Blick.
+• Für zwei Eltern — ein gemeinsames Wohlbefinden-Board mit Bearbeitungsrechten pro Elternteil.
+
+PRIVATSPHÄRE ZUERST
+
+Alle Daten liegen lokal auf deinem Gerät (SQLite). Nichts wird hochgeladen, verkauft oder geteilt. Beim Deinstallieren der App werden deine Daten entfernt.
+
+Sprout ist freie Open-Source-Software unter der GNU GPLv3.

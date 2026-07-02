@@ -1,0 +1,19 @@
+O Sprout é um registo simples e privado para as primeiras semanas e meses do seu recém-nascido — e para acompanhar também a recuperação pós-parto da mãe.
+
+Tudo fica no seu dispositivo. Sem contas, sem nuvem, sem anúncios e sem rastreio. O Sprout nem sequer pede acesso à Internet.
+
+FUNCIONALIDADES
+
+• Refeições — mama (esquerda/direita/ambas), biberão (ml) e sólidos, com horas.
+• Sono — registe sestas e noites com início/fim e durações automáticas.
+• Fraldas — mudas molhadas, sujas ou mistas.
+• Crescimento — peso, altura e perímetro cefálico, com gráfico da evolução do peso.
+• Saúde da mãe — check-ins pós-parto: humor, sangramento (lóquios), conforto mamário e notas.
+• Painel — refeições de hoje, total de sono e número de fraldas num relance.
+• Para dois pais — um quadro de bem-estar partilhado com permissões de edição por progenitor.
+
+PRIVACIDADE PRIMEIRO
+
+Todos os dados ficam guardados localmente no seu dispositivo (SQLite). Nada é enviado, vendido ou partilhado. Desinstalar a aplicação apaga os seus dados.
+
+O Sprout é software livre e de código aberto, sob a licença GNU GPLv3.

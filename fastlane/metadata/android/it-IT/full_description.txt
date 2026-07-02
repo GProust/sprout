@@ -1,0 +1,19 @@
+Sprout è un tracker semplice e privato per le prime settimane e i primi mesi del tuo neonato — e per seguire anche il recupero post parto della mamma.
+
+Tutto resta sul tuo dispositivo. Niente account, niente cloud, niente pubblicità né tracciamento. Sprout non chiede nemmeno l'accesso a Internet.
+
+FUNZIONALITÀ
+
+• Pasti — seno (sinistro/destro/entrambi), biberon (ml) e solidi, con orari.
+• Sonno — registra pisolini e notti con inizio/fine e durate automatiche.
+• Pannolini — cambi bagnati, sporchi o misti.
+• Crescita — peso, altezza e circonferenza cranica, con grafico dell'andamento del peso.
+• Salute della mamma — check-in post parto: umore, perdite (lochiazioni), comfort del seno e note.
+• Panoramica — poppate di oggi, totale del sonno e numero di pannolini a colpo d'occhio.
+• Per due genitori — una bacheca del benessere condivisa con permessi di modifica per genitore.
+
+PRIVACY PRIMA DI TUTTO
+
+Tutti i dati sono salvati localmente sul dispositivo (SQLite). Nulla viene caricato, venduto o condiviso. Disinstallando l'app i dati vengono eliminati.
+
+Sprout è software libero e open source, con licenza GNU GPLv3.

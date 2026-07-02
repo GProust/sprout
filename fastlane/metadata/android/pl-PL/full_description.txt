@@ -1,0 +1,19 @@
+Sprout to prosty, prywatny dziennik pierwszych tygodni i miesięcy Twojego noworodka — pomaga też śledzić rekonwalescencję mamy po porodzie.
+
+Wszystko zostaje na Twoim urządzeniu. Bez kont, bez chmury, bez reklam i bez śledzenia. Sprout nie prosi nawet o dostęp do internetu.
+
+FUNKCJE
+
+• Karmienia — pierś (lewa/prawa/obie), butelka (ml) i pokarmy stałe, z godzinami.
+• Sen — drzemki i noce z czasem rozpoczęcia/zakończenia i automatycznym czasem trwania.
+• Pieluchy — mokre, brudne lub mieszane.
+• Wzrost — waga, wzrost i obwód główki, z wykresem trendu wagi.
+• Zdrowie mamy — codzienne połogowe podsumowania: nastrój, krwawienie (odchody połogowe), komfort piersi i notatki.
+• Pulpit — dzisiejsze karmienia, łączny sen i liczba pieluch w jednym miejscu.
+• Dla dwojga rodziców — wspólna tablica samopoczucia z uprawnieniami do edycji dla każdego z rodziców.
+
+PRYWATNOŚĆ PRZEDE WSZYSTKIM
+
+Wszystkie dane są przechowywane lokalnie na urządzeniu (SQLite). Nic nie jest wysyłane, sprzedawane ani udostępniane. Odinstalowanie aplikacji usuwa dane.
+
+Sprout to wolne oprogramowanie open source na licencji GNU GPLv3.
