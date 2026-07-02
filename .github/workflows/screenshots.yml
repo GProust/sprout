@@ -91,6 +91,9 @@ jobs:
           api-level: 30
           target: default
           arch: x86_64
+          # 1080x2160 (2:1) — Play Store listing needs >=1080px screenshots
+          # with an aspect ratio no taller than 2:1.
+          profile: pixel_3
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           disable-animations: true
