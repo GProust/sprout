@@ -52,13 +52,20 @@ android {
 
     buildTypes {
         release {
-            // Kept off so an untested R8 pass can't ship a broken release build.
-            // See docs/RELEASING.md for how to enable and validate minification.
-            isMinifyEnabled = false
+            // R8 shrinks the app; the mapping file is embedded in the AAB so
+            // Play can deobfuscate crash reports. Validate each release on the
+            // internal testing track before production (docs/RELEASING.md).
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Package the symbol tables of dependencies' native libs into the
+            // AAB so Play can symbolicate native crashes/ANRs.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             // Only attach the signing config when a keystore is actually configured.
             signingConfigs.getByName("release").takeIf { it.storeFile != null }
                 ?.let { signingConfig = it }
