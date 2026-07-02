@@ -17,6 +17,12 @@ name: Release
 #   KEY_ALIAS            key alias
 #   KEY_PASSWORD         key password
 # Without these the job still runs but produces an UNSIGNED build.
+#
+#   RELEASE_DEPLOY_KEY   private half of the repo's write deploy key; the
+#                        version-bump commit is pushed to main over SSH with
+#                        it because deploy keys are on the "Protect main"
+#                        ruleset bypass list (GITHUB_TOKEN pushes are blocked
+#                        by the changes-through-PRs rule).
 
 on:
   workflow_dispatch:
@@ -41,6 +47,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Configures the origin remote over SSH, so the version-bump push
+          # authenticates with the deploy key (ruleset bypass) instead of
+          # GITHUB_TOKEN.
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
       - name: Bump version if requested
         id: bump
