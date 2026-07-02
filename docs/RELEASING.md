@@ -104,13 +104,17 @@ Before publishing, sanity-check the build:
 ./gradlew lintRelease testReleaseUnitTest
 ```
 
-> **Optional — shrink the app with R8.** Minification is currently **off** in
-> `app/build.gradle.kts` so an untested R8 pass can't ship a broken build. To
-> enable it: set `isMinifyEnabled = true` (and optionally
-> `isShrinkResources = true`), then **install and fully exercise a release
-> build on a device** — open every screen, add/edit/delete records — to confirm
-> Room and Compose still behave before uploading. Add keep rules to
+> **R8 minification is ON** for release builds (`isMinifyEnabled` +
+> `isShrinkResources` in `app/build.gradle.kts`), so **exercise the release
+> build on a device before promoting to production** — open every screen,
+> add/edit/delete records — to confirm Room and Compose still behave. The
+> internal testing track is the natural place for this. Add keep rules to
 > `app/proguard-rules.pro` if anything misbehaves.
+>
+> Because Play gets an **AAB**, the R8 mapping file and the symbol tables of
+> dependencies' native libraries (`ndk.debugSymbolLevel = "SYMBOL_TABLE"`) are
+> embedded in the bundle automatically — Play uses them to deobfuscate crash
+> reports and ANRs. Nothing extra to upload.
 
 ---
 
