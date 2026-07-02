@@ -33,10 +33,14 @@ versionCode = 1      // integer, MUST increase with every Play upload
 versionName = "1.0"  // human-readable, shown to users
 ```
 
-For each release: bump `versionName` (e.g. `1.1`) and **always** increment
-`versionCode` by 1 (Play rejects re-uploads with an existing code). Record the
-change in [`CHANGELOG.md`](../CHANGELOG.md) and in
-`fastlane/metadata/android/en-US/changelogs/<versionCode>.txt`.
+You normally don't edit these by hand: the [release workflow](../.github/workflows/release.yml)
+takes a **version** input (e.g. `1.3.0`) and, when it differs from the current
+`versionName`, commits a bump that sets `versionName` to it and increments
+`versionCode` by 1 (Play rejects re-uploads with an existing code) before
+building.
+
+What stays manual: record the changes in [`CHANGELOG.md`](../CHANGELOG.md) and
+in `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt`.
 
 ---
 
@@ -165,10 +169,11 @@ binary openly:
 
 ### GitHub Releases
 The [release workflow](../.github/workflows/release.yml) is **manual**. In the
-GitHub UI go to **Actions → Release → Run workflow**, and enter the tag to
-publish (e.g. `v1.0`). It builds the signed `.aab`/`.apk`, uploads them as run
-artifacts, and — because you supplied a tag — creates that tag and a GitHub
-Release with the APK attached. Leave the tag empty to only build the artifacts.
+GitHub UI go to **Actions → Release → Run workflow**, and enter the version to
+publish (e.g. `1.3.0`). It bumps `versionName`/`versionCode` and commits if
+needed (see §1), builds the signed `.aab`/`.apk` from that commit, uploads
+them as run artifacts, and creates a `1.3.0` tag plus a GitHub Release with
+the APK attached. Leave the version empty to only build the artifacts.
 
 ### F-Droid (free, FOSS-only store)
 F-Droid is a natural home for a GPL app, and Sprout already meets F-Droid's
@@ -205,12 +210,11 @@ F-Droid auto-detects the new tag (`UpdateCheckMode: Tags`).
 
 ## 7. Release checklist
 
-- [ ] `versionCode` incremented, `versionName` bumped
+- [ ] New version picked (the Release workflow bumps `versionCode`/`versionName` itself)
 - [ ] `CHANGELOG.md` + `changelogs/<versionCode>.txt` updated
 - [ ] `./gradlew lintRelease testReleaseUnitTest` pass
-- [ ] `./gradlew bundleRelease` produces a **signed** `.aab`
-- [ ] Installed and smoke-tested a release build on a device
 - [ ] Store listing text + screenshots current
 - [ ] Privacy policy URL reachable; Data safety form matches it
-- [ ] Release workflow run (Actions → Release) with the `vX.Y` tag
+- [ ] Release workflow run (Actions → Release) with the new version — builds the signed `.aab`, tags, publishes the GitHub Release
+- [ ] Installed and smoke-tested the release APK on a device
 - [ ] Production rollout started in Play Console
