@@ -42,6 +42,23 @@ app.
 
 Sprout requests no sensitive runtime permissions and no internet permission.
 
+## Optional cloud sync (planned — opt-in)
+
+A future version will let you **optionally** back up and share your data via
+**Google Drive**, so two caregivers can keep the same baby's log in step. This
+will be **off by default** and strictly opt-in:
+
+- With sync **off** (the default), everything above still holds — Sprout makes
+  **no network requests** and stores nothing remotely.
+- If you **turn sync on**, your baby data is stored in **your own Google Drive**
+  and, if you choose to share it, in your partner's Drive. Google's own privacy
+  terms then apply to those copies. We still operate **no server** and receive
+  **none** of your data.
+
+The design is documented in
+[`docs/SYNC.md`](docs/SYNC.md). This policy will be updated, with a new date,
+before any sync feature ships.
+
 ## Changes to this policy
 
 If this policy changes, the updated version will be published in the app's
