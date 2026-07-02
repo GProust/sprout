@@ -1,8 +1,8 @@
 # Releasing & Publishing Sprout
 
 This guide is the end-to-end process for shipping Sprout to users. It covers
-**Google Play** (the main Android "app store") and **open distribution**
-routes (GitHub Releases and F-Droid) that fit Sprout's GPLv3 license well.
+**Google Play** (the main Android "app store") and **GitHub Releases** for
+direct APK downloads.
 
 > **Note on the iOS App Store:** Sprout is a native Android app (Kotlin +
 > Jetpack Compose). It cannot be published to Apple's App Store without being
@@ -162,45 +162,17 @@ upload a new production release.
 
 ---
 
-## 6. Open distribution (fits the GPLv3 license)
+## 6. GitHub Releases (direct APK download)
 
-Because Sprout is GPLv3, the source is public and you can also distribute the
-binary openly:
+Because Sprout is GPLv3, the source is public and the signed APK is also
+published on GitHub for anyone who prefers to sideload.
 
-### GitHub Releases
 The [release workflow](../.github/workflows/release.yml) is **manual**. In the
 GitHub UI go to **Actions → Release → Run workflow**, and enter the version to
 publish (e.g. `1.3.0`). It bumps `versionName`/`versionCode` and commits if
 needed (see §1), builds the signed `.aab`/`.apk` from that commit, uploads
 them as run artifacts, and creates a `1.3.0` tag plus a GitHub Release with
 the APK attached. Leave the version empty to only build the artifacts.
-
-### F-Droid (free, FOSS-only store)
-F-Droid is a natural home for a GPL app, and Sprout already meets F-Droid's
-inclusion requirements:
-
-- ✅ **FOSS license** — GPL-3.0-only.
-- ✅ **No proprietary dependencies** — only AndroidX / Jetpack Compose / Room /
-  Kotlin / KSP, all Apache-2.0. No Google Play Services, Firebase or ads.
-- ✅ **No anti-features** — the app declares **no permissions** (no `INTERNET`),
-  has no trackers, and is fully offline.
-- ✅ **Listing metadata** — `fastlane/metadata/android/en-US/` (title,
-  descriptions, changelogs, and `images/phoneScreenshots/`).
-- ✅ **Tag-based versioning** — releases are tagged `vX.Y` matching `versionName`.
-
-**To submit (one-time):**
-
-1. Tag the release so F-Droid has a commit to build: `git tag v1.0 && git push origin v1.0`.
-2. Fork <https://gitlab.com/fdroid/fdroiddata>.
-3. Copy [`docs/fdroid/com.gproust.sprout.yml`](fdroid/com.gproust.sprout.yml)
-   into the fork as `metadata/com.gproust.sprout.yml`.
-4. Test the recipe locally with `fdroid build -v -l com.gproust.sprout`
-   (via `fdroidserver`), then open a merge request.
-
-F-Droid builds from source on its own server and **signs with its own key**, so
-none of the `SPROUT_*` signing secrets are involved — the recipe is all that's
-needed. For each new release, bump `versionCode`/`versionName`, tag it, and
-F-Droid auto-detects the new tag (`UpdateCheckMode: Tags`).
 
 > **Trademark note:** the GPL covers the *code*, not the *name and icon* (see
 > [`TRADEMARK.md`](../TRADEMARK.md)). Anyone publishing a **fork** to a store
