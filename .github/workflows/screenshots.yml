@@ -69,7 +69,9 @@ jobs:
       # phone screenshots with an aspect ratio no taller than 2:1. The
       # tablets match Play's 7-inch and 10-inch listing sections; their
       # captures go to their own directory and never overwrite the phone set.
-      PROFILE: ${{ inputs.device == 'tablet-7' && 'Nexus 7' || inputs.device == 'tablet-10' && 'Nexus 10' || 'pixel_3' }}
+      # tablet-7 uses Nexus 9 (2048x1536): the "Nexus 7" AVD profile is the
+      # 2012 model (800x1280), below Play's 1080px minimum.
+      PROFILE: ${{ inputs.device == 'tablet-7' && 'Nexus 9' || inputs.device == 'tablet-10' && 'Nexus 10' || 'pixel_3' }}
       OUTDIR: ${{ inputs.device == 'tablet-7' && 'screenshots/tablet-7' || inputs.device == 'tablet-10' && 'screenshots/tablet-10' || 'screenshots' }}
 
     steps:
