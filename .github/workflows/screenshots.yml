@@ -76,19 +76,19 @@ jobs:
 
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # head_ref is set for pull_request; fall back to ref_name for manual runs.
           ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.6.0
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Make gradlew executable
         run: chmod +x gradlew
@@ -126,7 +126,7 @@ jobs:
             ls -1 "$OUTDIR" || true
 
       - name: Upload screenshots artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ui-screenshots-${{ inputs.device || 'phone' }}
           path: ${{ env.OUTDIR }}/*.png
