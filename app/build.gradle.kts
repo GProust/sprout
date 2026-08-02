@@ -22,7 +22,7 @@ fun signingValue(propKey: String, envKey: String): String? =
 
 android {
     namespace = "com.gproust.sprout"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.gproust.sprout"
