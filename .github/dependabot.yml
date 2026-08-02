@@ -1,6 +1,6 @@
 # Dependabot policy: awareness + low-noise routine bumps.
 #
-# - Routine minor/patch updates arrive once a month as grouped PRs; CI and the
+# - Routine minor/patch updates arrive weekly as grouped PRs; CI and the
 #   screenshot workflow are the verifiers.
 # - The Android toolchain (AGP, KSP) is grouped separately from libraries so a
 #   toolchain failure doesn't block the safe library group.
@@ -18,7 +18,7 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     open-pull-requests-limit: 5
     groups:
       android-toolchain:
@@ -42,7 +42,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     groups:
       actions:
         patterns:
