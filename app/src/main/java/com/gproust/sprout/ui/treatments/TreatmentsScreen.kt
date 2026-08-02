@@ -230,8 +230,6 @@ private fun TreatmentEditor(
     var endDate by remember { mutableStateOf(initial.endDate ?: plusOneYear(initial.startDate)) }
     var reminders by remember { mutableStateOf(initial.remindersEnabled) }
     var notes by remember { mutableStateOf(initial.notes.orEmpty()) }
-    val context = LocalContext.current
-
     val isNew = initial.id == 0L
     Scaffold(
         topBar = {
@@ -265,11 +263,12 @@ private fun TreatmentEditor(
             )
 
             FieldLabel(stringResource(R.string.treatment_frequency))
+            val freqLabels = FreqMode.entries.associateWith { stringResource(it.labelRes) }
             ChoiceChips(
                 options = FreqMode.entries,
                 selected = mode,
                 onSelect = { mode = it },
-                labelOf = { context.getString(it.labelRes) },
+                labelOf = { freqLabels.getValue(it) },
             )
             if (mode == FreqMode.EVERY_N) {
                 NumberField(
