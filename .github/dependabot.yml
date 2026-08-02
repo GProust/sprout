@@ -1,0 +1,49 @@
+# Dependabot policy: awareness + low-noise routine bumps.
+#
+# - Routine minor/patch updates arrive once a month as grouped PRs; CI and the
+#   screenshot workflow are the verifiers.
+# - The Android toolchain (AGP, KSP) is grouped separately from libraries so a
+#   toolchain failure doesn't block the safe library group.
+# - Major updates are NOT grouped: they arrive as individual PRs and act as
+#   notifications — expect them to need manual work (coupled version
+#   constraints, compileSdk bumps, lint fallout).
+# - The Kotlin Compose compiler plugin is fully ignored: its version must match
+#   the Kotlin compiler bundled with AGP's built-in Kotlin, never the latest
+#   Kotlin release (see the comment in gradle/libs.versions.toml).
+# - Dependabot does not manage the Gradle wrapper; it is bumped by hand when
+#   AGP raises its minimum.
+
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      android-toolchain:
+        patterns:
+          - "com.android.*"
+          - "com.google.devtools.ksp"
+        update-types: ["minor", "patch"]
+      libraries:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "com.android.*"
+          - "com.google.devtools.ksp"
+          - "org.jetbrains.kotlin*"
+        update-types: ["minor", "patch"]
+    ignore:
+      # Tied to AGP's built-in Kotlin compiler version — bumped manually
+      # together with AGP, never independently.
+      - dependency-name: "org.jetbrains.kotlin*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      actions:
+        patterns:
+          - "*"
