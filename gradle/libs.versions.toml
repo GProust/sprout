@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.13.2"
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
 coreKtx = "1.15.0"
@@ -11,7 +11,7 @@ room = "2.6.1"
 junit = "4.13.2"
 androidxJunit = "1.2.1"
 espresso = "3.6.1"
-robolectric = "4.14.1"
+robolectric = "4.16.1"
 androidxTestCore = "1.6.1"
 
 [libraries]
