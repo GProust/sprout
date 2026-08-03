@@ -87,6 +87,7 @@ class ScreenshotTest {
     private fun seed() = runBlocking {
         val repo = app.repository
         val now = System.currentTimeMillis()
+        val min = 60_000L
         val hour = 3_600_000L
         val day = 24L * hour
         // Twins, to show the baby switcher and the babies manager.
@@ -104,12 +105,12 @@ class ScreenshotTest {
                 activeBabyId = lea,
             ),
         )
-        // Logs are stamped with the active baby (Léa).
-        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
+        // Logs are stamped with the active baby (Léa). The odd 2 h 15 min age
+        // lets the widget capture show both units of its elapsed-time line.
+        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour - 15 * min))
         // A completed breastfeed that switched sides twice (left → right → left)
         // — shows the per-stretch breakdown with a time range for each.
         val nurseStart = now - 4 * hour
-        val min = 60_000L
         repo.addFeeding(
             FeedingEntity(
                 type = FeedType.BREAST,

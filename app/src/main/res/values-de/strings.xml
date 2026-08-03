@@ -285,4 +285,7 @@
     <string name="widget_label">Letztes Stillen</string>
     <string name="widget_description">Seite und Uhrzeit des letzten Stillens auf einen Blick.</string>
     <string name="widget_no_breastfeed">Noch kein Stillen erfasst</string>
+    <string name="widget_ago_minutes">vor %1$d Min.</string>
+    <string name="widget_ago_hours">vor %1$d Std.</string>
+    <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
 </resources>

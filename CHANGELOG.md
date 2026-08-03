@@ -5,9 +5,10 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
-- 📟 New **home-screen widget** showing the side and time of the last
-  breastfeed (the side of the last stretch when a session switched sides).
-  Refreshes whenever a feed is logged; tapping it opens the app.
+- 📟 New **home-screen widget** showing the side of the last breastfeed (the
+  side of the last stretch when a session switched sides) and how long ago it
+  was ("2 h 15 min ago"). Refreshes whenever a feed is logged, and every
+  30 minutes in between; tapping it opens the app.
 
 ## [1.3.0] — 2026-07-02
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Last-breastfeed widget (2x1 by default, resizable). The hourly
-  updatePeriodMillis only keeps the "today vs earlier" time format honest;
-  real refreshes happen when a feed is logged (see SproutRepository).
+  Last-breastfeed widget (2x1 by default, resizable). The widget shows
+  elapsed time, so it refreshes on Android's fastest allowed schedule
+  (30 min); exact refreshes happen when a feed is logged (SproutRepository).
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_description"
@@ -12,5 +12,5 @@
     android:targetCellWidth="2"
     android:targetCellHeight="1"
     android:resizeMode="horizontal|vertical"
-    android:updatePeriodMillis="3600000"
+    android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen" />

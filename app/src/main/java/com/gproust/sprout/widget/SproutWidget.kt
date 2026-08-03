@@ -28,8 +28,6 @@ import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.ui.common.formatDateTime
-import com.gproust.sprout.ui.common.formatTime
-import com.gproust.sprout.ui.common.isSameDay
 
 /**
  * The breast to offer first at the next feed alternates, so what a nursing
@@ -41,10 +39,29 @@ fun lastNursedSide(feed: FeedingEntity): BreastSide? =
     feed.segments.lastOrNull()?.side ?: feed.side
 
 /**
- * Home-screen widget showing the side and start time of the active baby's
- * last breastfeed. Re-rendered by the repository after every relevant write
- * (plus an hourly system refresh so "today vs earlier" stays honest), and
- * opens the app when tapped.
+ * The widget's time line: elapsed time since the feed with explicit units
+ * ("2 h 15 min ago"). Once the last feed is over two days old an hour count
+ * stops being readable, so it falls back to the absolute date + time.
+ */
+internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): String {
+    val totalMin = (now - epochMillis) / 60_000L
+    val hours = totalMin / 60
+    val minutes = totalMin % 60
+    return when {
+        totalMin < 1 -> context.getString(R.string.relative_just_now)
+        hours < 1 -> context.getString(R.string.widget_ago_minutes, minutes.toInt())
+        hours >= 48 -> formatDateTime(context, epochMillis)
+        minutes == 0L -> context.getString(R.string.widget_ago_hours, hours.toInt())
+        else -> context.getString(R.string.widget_ago_hours_minutes, hours.toInt(), minutes.toInt())
+    }
+}
+
+/**
+ * Home-screen widget showing the side of the active baby's last breastfeed
+ * and how long ago it was. Re-rendered by the repository after every
+ * relevant write, plus a half-hourly system refresh (Android's minimum) so
+ * the elapsed time doesn't drift too far between feeds. Opens the app when
+ * tapped.
  */
 class SproutWidget : GlanceAppWidget() {
 
@@ -99,13 +116,8 @@ internal fun WidgetContent(feed: FeedingEntity?) {
                     ),
                 )
             }
-            val now = System.currentTimeMillis()
             Text(
-                text = if (isSameDay(feed.startTime, now)) {
-                    formatTime(feed.startTime)
-                } else {
-                    formatDateTime(context, feed.startTime)
-                },
+                text = widgetTimeAgo(context, feed.startTime, System.currentTimeMillis()),
                 style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
             )
         }
