@@ -606,7 +606,10 @@ private fun FeedingForm(
     }
 
     FieldLabel(stringResource(R.string.field_time))
-    TimePickerField(label = stringResource(R.string.picker_at), millis = start, onChange = { start = it })
+    // Breast feeds pair the start with per-side end times, so "From"/"To" reads
+    // better than "At" (in French both picker_at and picker_to are "À").
+    val startLabel = if (type == FeedType.BREAST) R.string.picker_from else R.string.picker_at
+    TimePickerField(label = stringResource(startLabel), millis = start, onChange = { start = it })
 
     if (type == FeedType.BREAST) {
         val durationLabel = stringResource(R.string.field_duration)
