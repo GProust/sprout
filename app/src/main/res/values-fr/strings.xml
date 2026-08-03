@@ -337,4 +337,9 @@
     <string name="feeding_notif_title">C\'est l\'heure du repas ?</string>
     <string name="feeding_notif_title_baby">C\'est l\'heure du repas de %1$s ?</string>
     <string name="feeding_notif_text">Cela fait %1$s depuis le dernier repas.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Dernière tétée</string>
+    <string name="widget_description">Le côté et l\'heure de la dernière tétée, en un coup d\'œil.</string>
+    <string name="widget_no_breastfeed">Aucune tétée pour l\'instant</string>
 </resources>

@@ -280,4 +280,9 @@
     <string name="feeding_notif_title">Ora di un pasto?</string>
     <string name="feeding_notif_title_baby">Ora di nutrire %1$s?</string>
     <string name="feeding_notif_text">È passato %1$s dall\'ultimo pasto.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Ultima poppata</string>
+    <string name="widget_description">Il lato e l\'ora dell\'ultima poppata, a colpo d\'occhio.</string>
+    <string name="widget_no_breastfeed">Ancora nessuna poppata</string>
 </resources>

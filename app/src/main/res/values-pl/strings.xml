@@ -286,4 +286,9 @@
     <string name="feeding_notif_title">Czas na karmienie?</string>
     <string name="feeding_notif_title_baby">Czas nakarmić %1$s?</string>
     <string name="feeding_notif_text">Od ostatniego karmienia minęło %1$s.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Ostatnie karmienie piersią</string>
+    <string name="widget_description">Strona i godzina ostatniego karmienia piersią w skrócie.</string>
+    <string name="widget_no_breastfeed">Brak karmień piersią</string>
 </resources>
