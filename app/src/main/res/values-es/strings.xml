@@ -7,6 +7,8 @@
     <string name="action_save">Guardar</string>
     <string name="action_details">Detalles</string>
     <string name="history">Historial</string>
+    <string name="day_today">Hoy</string>
+    <string name="day_yesterday">Ayer</string>
     <string name="cd_back">Atrás</string>
     <string name="cd_delete">Eliminar</string>
     <string name="cd_wellbeing">Bienestar</string>

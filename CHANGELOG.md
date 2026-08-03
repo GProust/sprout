@@ -3,6 +3,15 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🗂️ Tracking screens (Feeding, Sleep, Diapers, Growth) are now
+  **history-first**: the log list fills the screen — newest entry on top,
+  grouped under Today/Yesterday/date headers — and the log form opens in a
+  bottom sheet from a "+" button, so recent entries stay visible while
+  logging. The Growth screen keeps its weight-trend chart on top; the live
+  breastfeeding bar is unchanged.
+
 ## [1.3.0] — 2026-07-02
 
 First version published on **Google Play**.

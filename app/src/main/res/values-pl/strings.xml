@@ -7,6 +7,8 @@
     <string name="action_save">Zapisz</string>
     <string name="action_details">Szczegóły</string>
     <string name="history">Historia</string>
+    <string name="day_today">Dziś</string>
+    <string name="day_yesterday">Wczoraj</string>
     <string name="cd_back">Wstecz</string>
     <string name="cd_delete">Usuń</string>
     <string name="cd_wellbeing">Samopoczucie</string>
