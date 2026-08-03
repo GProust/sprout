@@ -280,4 +280,25 @@
     <string name="feeding_notif_title">Zeit für eine Mahlzeit?</string>
     <string name="feeding_notif_title_baby">Zeit, %1$s zu füttern?</string>
     <string name="feeding_notif_text">Die letzte Mahlzeit war vor %1$s.</string>
+
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">etwa mit %1$d Woche</item>
+        <item quantity="other">etwa mit %1$d Wochen</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">etwa mit %1$d Monat</item>
+        <item quantity="other">etwa mit %1$d Monaten</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Wachstumsschub-Zeit</string>
+    <string name="growth_spurt_now_body">Viele Babys machen %1$s einen Wachstumsschub durch. Mehr Hunger, häufigeres Aufwachen und Quengeln sind normal — meist ist es nach ein paar Tagen vorbei.</string>
+    <string name="growth_spurt_soon_title">Wachstumsschub in Sicht</string>
+    <string name="growth_spurt_soon_body">Ein Wachstumsschub ist %1$s häufig — er kann in den nächsten Tagen beginnen.</string>
+    <string name="settings_growth_spurts">Wachstumsschub-Hinweise</string>
+    <string name="settings_growth_spurts_desc">Sag mir Bescheid, wenn eine typische Wachstumsschub-Phase beginnt.</string>
+    <string name="growth_spurt_channel_name">Wachstumsschub-Hinweise</string>
+    <string name="growth_spurt_channel_desc">Ein Hinweis, wenn eine typische Wachstumsschub-Phase beginnt</string>
+    <string name="growth_spurt_notif_title">Vielleicht beginnt gerade ein Wachstumsschub</string>
+    <string name="growth_spurt_notif_title_baby">Bei %1$s könnte ein Wachstumsschub beginnen</string>
+    <string name="growth_spurt_notif_text">Wachstumsschübe sind %1$s häufig. Mehr Mahlzeiten und Quengeln sind normal — meist ist es nach ein paar Tagen vorbei.</string>
 </resources>

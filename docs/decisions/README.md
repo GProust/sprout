@@ -28,5 +28,6 @@ ADR log and are cross-linked from here.
 | [0002](0002-gplv3-copyleft-reserved-trademark.md) | GPLv3 copyleft with a reserved trademark | Business / Legal | Accepted |
 | [0003](0003-multiple-babies.md) | Support multiple babies | Product / Domain | Accepted |
 | [0004](0004-default-to-system-language.md) | Default to the device's system language | Product / UX | Accepted |
+| [0005](0005-growth-spurt-guidance.md) | Growth spurt periods: gentle guidance, opt-in alerts | Product / Domain | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

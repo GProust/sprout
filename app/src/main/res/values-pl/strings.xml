@@ -286,4 +286,30 @@
     <string name="feeding_notif_title">Czas na karmienie?</string>
     <string name="feeding_notif_title_baby">Czas nakarmić %1$s?</string>
     <string name="feeding_notif_text">Od ostatniego karmienia minęło %1$s.</string>
+
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <!-- Ordinal phrasing ("w okolicach 3. tygodnia życia") declines the same for every count. -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">w okolicach %1$d. tygodnia życia</item>
+        <item quantity="few">w okolicach %1$d. tygodnia życia</item>
+        <item quantity="many">w okolicach %1$d. tygodnia życia</item>
+        <item quantity="other">w okolicach %1$d. tygodnia życia</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">w okolicach %1$d. miesiąca życia</item>
+        <item quantity="few">w okolicach %1$d. miesiąca życia</item>
+        <item quantity="many">w okolicach %1$d. miesiąca życia</item>
+        <item quantity="other">w okolicach %1$d. miesiąca życia</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Okres skoku rozwojowego</string>
+    <string name="growth_spurt_now_body">Wiele niemowląt przechodzi skok rozwojowy %1$s. Większy głód, częstsze pobudki i marudzenie są normalne — zwykle mija po kilku dniach.</string>
+    <string name="growth_spurt_soon_title">Zbliża się skok rozwojowy</string>
+    <string name="growth_spurt_soon_body">Skok rozwojowy często pojawia się %1$s — może zacząć się w najbliższych dniach.</string>
+    <string name="settings_growth_spurts">Powiadomienia o skokach rozwojowych</string>
+    <string name="settings_growth_spurts_desc">Daj mi znać, gdy zaczyna się typowy okres skoku rozwojowego.</string>
+    <string name="growth_spurt_channel_name">Powiadomienia o skokach rozwojowych</string>
+    <string name="growth_spurt_channel_desc">Powiadomienie, gdy zaczyna się typowy okres skoku rozwojowego</string>
+    <string name="growth_spurt_notif_title">Być może zaczyna się skok rozwojowy</string>
+    <string name="growth_spurt_notif_title_baby">%1$s może właśnie zaczynać skok rozwojowy</string>
+    <string name="growth_spurt_notif_text">Skoki rozwojowe są częste %1$s. Więcej karmień i marudzenia to nic niepokojącego — zwykle mija po kilku dniach.</string>
 </resources>

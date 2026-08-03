@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.notifications.FeedingReminders
+import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
@@ -87,6 +88,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     var remindersEnabled by remember { mutableStateOf(FeedingReminderSettings.isEnabled(context)) }
     var intervalMinutes by remember { mutableIntStateOf(FeedingReminderSettings.intervalMinutes(context)) }
+    var growthSpurtsEnabled by remember { mutableStateOf(GrowthSpurtSettings.isEnabled(context)) }
 
     fun reschedule() {
         scope.launch(Dispatchers.IO) { FeedingReminders.rescheduleAll(context, repository) }
@@ -135,7 +137,42 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                 )
             }
+
+            item { Spacer(Modifier.height(24.dp)) }
+            item {
+                GrowthSpurtSection(
+                    enabled = growthSpurtsEnabled,
+                    onToggle = { on ->
+                        growthSpurtsEnabled = on
+                        GrowthSpurtSettings.setEnabled(context, on)
+                        if (on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        scope.launch(Dispatchers.IO) {
+                            GrowthSpurtReminders.rescheduleAll(context, repository)
+                        }
+                    },
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun GrowthSpurtSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(
+                stringResource(R.string.settings_growth_spurts),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                stringResource(R.string.settings_growth_spurts_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = enabled, onCheckedChange = onToggle)
     }
 }
 

@@ -54,6 +54,7 @@ import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.notifications.FeedingReminders
+import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.notifications.effectiveFeedingReminder
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.DatePickerField
@@ -81,10 +82,17 @@ class ProfileViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun addBaby(name: String, birthDate: Long) =
-        viewModelScope.launch { repository.addBaby(name, birthDate) }
+        viewModelScope.launch {
+            repository.addBaby(name, birthDate)
+            GrowthSpurtReminders.rescheduleAll(context, repository)
+        }
 
     fun updateBaby(baby: BabyEntity) =
-        viewModelScope.launch { repository.updateBaby(baby) }
+        viewModelScope.launch {
+            repository.updateBaby(baby)
+            // The birth date may have changed, which moves the spurt windows.
+            GrowthSpurtReminders.rescheduleAll(context, repository)
+        }
 
     fun setActive(id: Long) = viewModelScope.launch { repository.setActiveBaby(id) }
     fun archive(id: Long) = viewModelScope.launch { repository.archiveBaby(id) }

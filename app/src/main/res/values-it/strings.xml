@@ -280,4 +280,25 @@
     <string name="feeding_notif_title">Ora di un pasto?</string>
     <string name="feeding_notif_title_baby">Ora di nutrire %1$s?</string>
     <string name="feeding_notif_text">È passato %1$s dall\'ultimo pasto.</string>
+
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">intorno a %1$d settimana</item>
+        <item quantity="other">intorno alle %1$d settimane</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">intorno a %1$d mese</item>
+        <item quantity="other">intorno ai %1$d mesi</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Periodo di scatto di crescita</string>
+    <string name="growth_spurt_now_body">Molti bimbi attraversano uno scatto di crescita %1$s. Più fame, più risvegli e irritabilità sono normali: di solito passa in pochi giorni.</string>
+    <string name="growth_spurt_soon_title">Scatto di crescita in arrivo</string>
+    <string name="growth_spurt_soon_body">Uno scatto di crescita è frequente %1$s: potrebbe iniziare nei prossimi giorni.</string>
+    <string name="settings_growth_spurts">Avvisi scatti di crescita</string>
+    <string name="settings_growth_spurts_desc">Avvisami quando inizia un tipico periodo di scatto di crescita.</string>
+    <string name="growth_spurt_channel_name">Avvisi scatti di crescita</string>
+    <string name="growth_spurt_channel_desc">Un avviso quando inizia un tipico periodo di scatto di crescita</string>
+    <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>
+    <string name="growth_spurt_notif_title_baby">Forse %1$s sta iniziando uno scatto di crescita</string>
+    <string name="growth_spurt_notif_text">Gli scatti di crescita sono frequenti %1$s. Più pasti e irritabilità sono normali: di solito passa in pochi giorni.</string>
 </resources>
