@@ -54,8 +54,9 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
+import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
-import com.gproust.sprout.widget.WidgetContent
+import com.gproust.sprout.widget.SproutWidgetUi
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -194,15 +195,17 @@ class ScreenshotTest {
     /**
      * Renders the home-screen widget's Glance content to RemoteViews (the same
      * path the launcher uses), inflates them off-screen at a 2x1-ish widget
-     * size, and saves the result — no launcher automation needed.
+     * size, and saves the result — no launcher automation needed. Shows the
+     * live nursing session when one is in the store, like the real widget.
      */
     @OptIn(ExperimentalGlanceRemoteViewsApi::class)
     private fun saveWidget(name: String) {
         val context = instrumentation.targetContext
+        val session = NursingSessionStore.load(context)
         val feed = runBlocking { app.repository.lastBreastFeedForActiveBaby() }
         val size = DpSize(180.dp, 110.dp)
         val remoteViews = runBlocking {
-            GlanceRemoteViews().compose(context, size) { GlanceTheme { WidgetContent(feed) } }.remoteViews
+            GlanceRemoteViews().compose(context, size) { GlanceTheme { SproutWidgetUi(session, feed) } }.remoteViews
         }
         val density = context.resources.displayMetrics.density
         val w = (size.width.value * density).toInt()
@@ -303,6 +306,9 @@ class ScreenshotTest {
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
         tap("Details")
         save("05-feeding-6-history-details")
+        // Widget (idle): captured before any live session starts, so it shows
+        // the last logged breastfeed. Named 13-* to sort with the widget shots.
+        saveWidget("13-widget-last-breastfeed")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and
@@ -368,7 +374,9 @@ class ScreenshotTest {
         show { TreatmentsScreen {} }
         save("12-treatments")
 
-        // Home-screen widget: the seeded data's last breastfeed (left, 2h ago).
-        saveWidget("13-widget-last-breastfeed")
+        // Widget (live): the nursing session started for the timer captures is
+        // still running (back on the left), so the widget shows the ongoing
+        // side with its ticking chronometer.
+        saveWidget("14-widget-nursing")
     }
 }

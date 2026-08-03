@@ -283,7 +283,7 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Última mamada</string>
-    <string name="widget_description">O lado e a hora da última mamada, num relance.</string>
+    <string name="widget_description">A última mamada (lado, há quanto tempo) — ou a mamada em curso com o cronómetro.</string>
     <string name="widget_no_breastfeed">Ainda sem mamadas</string>
     <string name="widget_ago_minutes">há %1$d min</string>
     <string name="widget_ago_hours">há %1$d h</string>

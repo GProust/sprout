@@ -283,7 +283,7 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Ultima poppata</string>
-    <string name="widget_description">Il lato e l\'ora dell\'ultima poppata, a colpo d\'occhio.</string>
+    <string name="widget_description">L\'ultima poppata (lato, quanto tempo fa) — o la poppata in corso con il timer.</string>
     <string name="widget_no_breastfeed">Ancora nessuna poppata</string>
     <string name="widget_ago_minutes">%1$d min fa</string>
     <string name="widget_ago_hours">%1$d h fa</string>

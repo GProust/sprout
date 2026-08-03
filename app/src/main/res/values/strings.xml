@@ -352,7 +352,7 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Last breastfeed</string>
-    <string name="widget_description">The side and time of the last breastfeed, at a glance.</string>
+    <string name="widget_description">The last breastfeed (side, how long ago) — or the session in progress with its live timer.</string>
     <string name="widget_no_breastfeed">No breastfeed yet</string>
     <string name="widget_ago_minutes">%1$d min ago</string>
     <string name="widget_ago_hours">%1$d h ago</string>
