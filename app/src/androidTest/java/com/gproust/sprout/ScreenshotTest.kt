@@ -1,6 +1,9 @@
 package com.gproust.sprout
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +20,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.glance.GlanceTheme
+import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
+import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.gproust.sprout.data.local.Bleeding
@@ -47,7 +55,9 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
+import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
+import com.gproust.sprout.widget.SproutWidgetUi
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -79,6 +89,7 @@ class ScreenshotTest {
     private fun seed() = runBlocking {
         val repo = app.repository
         val now = System.currentTimeMillis()
+        val min = 60_000L
         val hour = 3_600_000L
         val day = 24L * hour
         // Twins, to show the baby switcher and the babies manager.
@@ -96,12 +107,12 @@ class ScreenshotTest {
                 activeBabyId = lea,
             ),
         )
-        // Logs are stamped with the active baby (Léa).
-        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
+        // Logs are stamped with the active baby (Léa). The odd 2 h 15 min age
+        // lets the widget capture show both units of its elapsed-time line.
+        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour - 15 * min))
         // A completed breastfeed that switched sides twice (left → right → left)
         // — shows the per-stretch breakdown with a time range for each.
         val nurseStart = now - 4 * hour
-        val min = 60_000L
         repo.addFeeding(
             FeedingEntity(
                 type = FeedType.BREAST,
@@ -192,6 +203,37 @@ class ScreenshotTest {
         File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
+    /**
+     * Renders the home-screen widget's Glance content to RemoteViews (the same
+     * path the launcher uses), inflates them off-screen at a 2x1-ish widget
+     * size, and saves the result — no launcher automation needed. Shows the
+     * live nursing session when one is in the store, like the real widget.
+     */
+    @OptIn(ExperimentalGlanceRemoteViewsApi::class)
+    private fun saveWidget(name: String) {
+        val context = instrumentation.targetContext
+        val session = NursingSessionStore.load(context)
+        val feed = runBlocking { app.repository.lastBreastFeedForActiveBaby() }
+        val size = DpSize(180.dp, 110.dp)
+        val remoteViews = runBlocking {
+            GlanceRemoteViews().compose(context, size) { GlanceTheme { SproutWidgetUi(session, feed) } }.remoteViews
+        }
+        val density = context.resources.displayMetrics.density
+        val w = (size.width.value * density).toInt()
+        val h = (size.height.value * density).toInt()
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        instrumentation.runOnMainSync {
+            val view = remoteViews.apply(context, FrameLayout(context))
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY),
+            )
+            view.layout(0, 0, w, h)
+            view.draw(Canvas(bmp))
+        }
+        File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
     @Test
     fun captureScreens() {
         seed()
@@ -263,6 +305,9 @@ class ScreenshotTest {
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
         tap("Details")
         save("05-feeding-6-history-details")
+        // Widget (idle): captured before any live session starts, so it shows
+        // the last logged breastfeed. Named 13-* to sort with the widget shots.
+        saveWidget("13-widget-last-breastfeed")
         // Manual log: open the sheet and add two more sides so the form shows a
         // left → right → left entry. The sheet is its own window, so captures go
         // through the full-screen path.
@@ -338,5 +383,10 @@ class ScreenshotTest {
         save("11-settings-2-feeding-on")
         show { TreatmentsScreen {} }
         save("12-treatments")
+
+        // Widget (live): the nursing session started for the timer captures is
+        // still running (back on the left), so the widget shows the ongoing
+        // side with its ticking chronometer.
+        saveWidget("14-widget-nursing")
     }
 }

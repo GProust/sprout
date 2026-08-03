@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#4CAF7D</color>
+    <!-- Widget chronometer text on GlanceTheme's widgetBackground (values-night overrides). -->
+    <color name="widget_on_background">#1C1B1F</color>
 </resources>
