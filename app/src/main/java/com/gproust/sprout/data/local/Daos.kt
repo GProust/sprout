@@ -76,6 +76,10 @@ interface FeedingDao {
     @Query("SELECT MAX(startTime) FROM feeding WHERE babyId = :babyId")
     suspend fun lastFeedTime(babyId: Long): Long?
 
+    /** The most recent breastfeed for a baby, or null if none yet (for the widget). */
+    @Query("SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' ORDER BY startTime DESC LIMIT 1")
+    suspend fun lastBreastFeed(babyId: Long): FeedingEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 

@@ -73,6 +73,7 @@ import com.gproust.sprout.ui.common.formatClock
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -100,8 +101,21 @@ class FeedingViewModel(
     val feedings = repository.feedings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _nursing = MutableStateFlow<NursingSession?>(null)
+    // Restored from the store so a live session survives process death and
+    // stays visible to the home-screen widget.
+    private val _nursing = MutableStateFlow<NursingSession?>(NursingSessionStore.load(context))
     val nursing: StateFlow<NursingSession?> = _nursing.asStateFlow()
+
+    /** Single point of truth: updates the state, the store, and the widget. */
+    private fun setNursing(session: NursingSession?) {
+        _nursing.value = session
+        if (session == null) {
+            NursingSessionStore.clear(context)
+        } else {
+            NursingSessionStore.save(context, session)
+        }
+        viewModelScope.launch { updateSproutWidget(context) }
+    }
 
     fun add(entity: FeedingEntity) = viewModelScope.launch {
         repository.addFeeding(entity)
@@ -117,7 +131,7 @@ class FeedingViewModel(
     /** Begin timing a breastfeeding session on [side] (left or right). */
     fun startNursing(side: BreastSide) {
         val now = System.currentTimeMillis()
-        _nursing.value = NursingSession(sessionStart = now, currentSide = side, segmentStart = now)
+        setNursing(NursingSession(sessionStart = now, currentSide = side, segmentStart = now))
     }
 
     /** Bank the current breast as a completed segment and switch to the other. */
@@ -126,10 +140,12 @@ class FeedingViewModel(
         val now = System.currentTimeMillis()
         val completed = NursingSegment(s.currentSide, s.segmentStart, now)
         val next = if (s.currentSide == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
-        _nursing.value = s.copy(
-            currentSide = next,
-            segmentStart = now,
-            segments = s.segments + completed,
+        setNursing(
+            s.copy(
+                currentSide = next,
+                segmentStart = now,
+                segments = s.segments + completed,
+            ),
         )
     }
 
@@ -158,12 +174,12 @@ class FeedingViewModel(
                 notes = notes.ifBlank { null },
             ),
         )
-        _nursing.value = null
+        setNursing(null)
     }
 
     /** Discard the running session without saving it. */
     fun cancelNursing() {
-        _nursing.value = null
+        setNursing(null)
     }
 }
 

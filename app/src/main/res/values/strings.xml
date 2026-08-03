@@ -349,4 +349,12 @@
     <string name="feeding_notif_title">Time for a feed?</string>
     <string name="feeding_notif_title_baby">Time to feed %1$s?</string>
     <string name="feeding_notif_text">It\'s been %1$s since the last feed.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Last breastfeed</string>
+    <string name="widget_description">The last breastfeed (side, how long ago) — or the session in progress with its live timer.</string>
+    <string name="widget_no_breastfeed">No breastfeed yet</string>
+    <string name="widget_ago_minutes">%1$d min ago</string>
+    <string name="widget_ago_hours">%1$d h ago</string>
+    <string name="widget_ago_hours_minutes">%1$d h %2$d min ago</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -104,10 +105,12 @@ private fun isBottomDestination(route: String) = bottomDestinations.any { it.rou
 
 /**
  * Root composable: chooses between onboarding, the daily check-in, and the main app
- * based on the startup stage.
+ * based on the startup stage. [routeRequest] is a bottom-bar route the launching
+ * intent asked to open (e.g. the widget landing on Feeding); it is honoured once
+ * the main scaffold is up and acknowledged via [onRouteConsumed].
  */
 @Composable
-fun SproutApp() {
+fun SproutApp(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
     val startupVm: StartupViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val stage by startupVm.startup.collectAsState()
 
@@ -122,7 +125,7 @@ fun SproutApp() {
             onSubmit = startupVm::submitCheckIn,
             onSkip = startupVm::markCheckedIn,
         )
-        Startup.Main -> MainScaffold()
+        Startup.Main -> MainScaffold(routeRequest, onRouteConsumed)
     }
 }
 
@@ -134,12 +137,23 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun MainScaffold() {
+private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = currentRoute in bottomDestinations.map { it.route }
+
+    // Honour a route the launching intent asked for (widget tap → Feeding),
+    // then consume it so it doesn't re-fire on recomposition or rotation.
+    LaunchedEffect(routeRequest) {
+        if (routeRequest != null) {
+            if (isBottomDestination(routeRequest)) {
+                navController.navigateToBottomDestination(routeRequest)
+            }
+            onRouteConsumed()
+        }
+    }
 
     Scaffold(
         bottomBar = {
