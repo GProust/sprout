@@ -286,4 +286,12 @@
     <string name="feeding_notif_title">Horas de uma refeição?</string>
     <string name="feeding_notif_title_baby">Horas de alimentar %1$s?</string>
     <string name="feeding_notif_text">Já passaram %1$s desde a última refeição.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Última mamada</string>
+    <string name="widget_description">A última mamada (lado, há quanto tempo) — ou a mamada em curso com o cronómetro.</string>
+    <string name="widget_no_breastfeed">Ainda sem mamadas</string>
+    <string name="widget_ago_minutes">há %1$d min</string>
+    <string name="widget_ago_hours">há %1$d h</string>
+    <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>
 </resources>

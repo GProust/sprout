@@ -286,4 +286,12 @@
     <string name="feeding_notif_title">Zeit für eine Mahlzeit?</string>
     <string name="feeding_notif_title_baby">Zeit, %1$s zu füttern?</string>
     <string name="feeding_notif_text">Die letzte Mahlzeit war vor %1$s.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Letztes Stillen</string>
+    <string name="widget_description">Das letzte Stillen (Seite, wie lange her) — oder die laufende Sitzung mit Live-Timer.</string>
+    <string name="widget_no_breastfeed">Noch kein Stillen erfasst</string>
+    <string name="widget_ago_minutes">vor %1$d Min.</string>
+    <string name="widget_ago_hours">vor %1$d Std.</string>
+    <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
 </resources>

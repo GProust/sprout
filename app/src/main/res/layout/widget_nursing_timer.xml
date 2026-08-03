@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Live session timer embedded in the Glance widget via AndroidRemoteViews:
+  Glance has no chronometer element, but the classic RemoteViews one ticks
+  every second for free (no widget refreshes, no battery cost).
+-->
+<Chronometer xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetNursingTimer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:textColor="@color/widget_on_background"
+    android:textSize="16sp" />
