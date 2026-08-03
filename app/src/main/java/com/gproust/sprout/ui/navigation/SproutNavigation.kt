@@ -119,8 +119,10 @@ fun SproutApp() {
             gaveBirth = s.gaveBirth,
             breastfeeding = s.breastfeeding,
             deliveryType = s.deliveryType,
+            askHealing = s.askHealing,
             onSubmit = startupVm::submitCheckIn,
             onSkip = startupVm::markCheckedIn,
+            onOptOutHealing = startupVm::optOutHealing,
         )
         Startup.Main -> MainScaffold()
     }

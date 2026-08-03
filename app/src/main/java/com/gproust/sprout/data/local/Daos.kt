@@ -65,6 +65,9 @@ interface ParentProfileDao {
 
     @Query("UPDATE parent_profile SET activeBabyId = :babyId WHERE id = 1")
     suspend fun updateActiveBaby(babyId: Long?)
+
+    @Query("UPDATE parent_profile SET askHealing = :ask WHERE id = 1")
+    suspend fun updateAskHealing(ask: Boolean)
 }
 
 @Dao

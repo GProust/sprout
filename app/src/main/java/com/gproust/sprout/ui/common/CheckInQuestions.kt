@@ -7,13 +7,19 @@ enum class CheckInQuestion { MOOD, HEALING, BLEEDING, BREASTS, NOTES }
  * The ordered questions for a parent, based on their capabilities. Mood and
  * notes are always asked; the postpartum questions (healing, bleeding) appear
  * only if they gave birth, and the breast question only if they're
- * breastfeeding — so the same flow fits every kind of parent.
+ * breastfeeding — so the same flow fits every kind of parent. A birthing
+ * parent can also opt out of the healing question ([askHealing] false) once
+ * their scar/healing no longer needs a daily look.
  */
-fun checkInQuestions(gaveBirth: Boolean, breastfeeding: Boolean): List<CheckInQuestion> =
+fun checkInQuestions(
+    gaveBirth: Boolean,
+    breastfeeding: Boolean,
+    askHealing: Boolean = true,
+): List<CheckInQuestion> =
     buildList {
         add(CheckInQuestion.MOOD)
         if (gaveBirth) {
-            add(CheckInQuestion.HEALING)
+            if (askHealing) add(CheckInQuestion.HEALING)
             add(CheckInQuestion.BLEEDING)
         }
         if (breastfeeding) {

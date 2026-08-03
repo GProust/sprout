@@ -207,6 +207,7 @@
     <string name="checkin_q_bleeding">Hai avuto sanguinamenti oggi?</string>
     <string name="checkin_q_breasts">Come senti il seno?</string>
     <string name="checkin_q_notes">C\'è qualcosa che vuoi annotare?</string>
+    <string name="checkin_healing_opt_out">Non farmi più questa domanda</string>
     <string name="screen_baby_profile">Profilo del bambino</string>
     <string name="profile_age">Età: %1$s</string>
     <string name="profile_enter_name">Inserisci un nome</string>
@@ -274,6 +275,8 @@
     <!-- Promemoria pasti -->
     <string name="settings_feeding_reminders">Promemoria pasti</string>
     <string name="settings_feeding_reminders_desc">Avvisami quando è passato troppo tempo dall\'ultimo pasto.</string>
+    <string name="settings_healing_question">Domanda sulla guarigione</string>
+    <string name="settings_healing_question_desc">Chiedimi della mia guarigione post parto nel check-in quotidiano.</string>
     <string name="settings_feeding_interval_label">Ricordami se un pasto supera</string>
     <string name="feeding_channel_name">Promemoria pasti</string>
     <string name="feeding_channel_desc">Promemoria quando è passato un po\' dall\'ultimo pasto</string>

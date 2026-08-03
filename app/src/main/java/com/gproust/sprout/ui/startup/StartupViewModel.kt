@@ -21,6 +21,7 @@ sealed interface Startup {
         val gaveBirth: Boolean,
         val breastfeeding: Boolean,
         val deliveryType: DeliveryType?,
+        val askHealing: Boolean,
     ) : Startup
     data object Main : Startup
 }
@@ -36,7 +37,13 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         when {
             profile == null -> Startup.Onboarding
             needsCheckIn(profile.lastCheckIn, now) ->
-                Startup.CheckIn(profile.name, profile.gaveBirth, profile.breastfeeding, profile.deliveryType)
+                Startup.CheckIn(
+                    profile.name,
+                    profile.gaveBirth,
+                    profile.breastfeeding,
+                    profile.deliveryType,
+                    profile.askHealing,
+                )
             else -> Startup.Main
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Startup.Loading)
@@ -79,6 +86,13 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
     fun markCheckedIn() {
         viewModelScope.launch {
             repository.updateParentLastCheckIn(System.currentTimeMillis())
+        }
+    }
+
+    /** Stop asking the healing question; the check-in flow moves on without it. */
+    fun optOutHealing() {
+        viewModelScope.launch {
+            repository.setAskHealing(false)
         }
     }
 }

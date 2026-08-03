@@ -205,8 +205,10 @@ class ScreenshotTest {
                 gaveBirth = true,
                 breastfeeding = true,
                 deliveryType = DeliveryType.CESAREAN,
+                askHealing = true,
                 onSubmit = {},
                 onSkip = {},
+                onOptOutHealing = {},
             )
         }
         save("02-checkin-birthing-1-intro")
@@ -228,8 +230,10 @@ class ScreenshotTest {
                 gaveBirth = false,
                 breastfeeding = false,
                 deliveryType = null,
+                askHealing = true,
                 onSubmit = {},
                 onSkip = {},
+                onOptOutHealing = {},
             )
         }
         save("03-checkin-partner-1-intro")

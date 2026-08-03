@@ -62,6 +62,20 @@ class CheckInLogicTest {
     }
 
     @Test
+    fun checkInQuestions_healingCanBeOptedOut() {
+        // Opting out drops only the healing question; the rest stays.
+        assertEquals(
+            listOf(MOOD, BLEEDING, NOTES),
+            checkInQuestions(gaveBirth = true, breastfeeding = false, askHealing = false),
+        )
+        // The flag is irrelevant for a parent who didn't give birth.
+        assertEquals(
+            listOf(MOOD, NOTES),
+            checkInQuestions(gaveBirth = false, breastfeeding = false, askHealing = false),
+        )
+    }
+
+    @Test
     fun healingQuestion_tailoredToDeliveryType() {
         assertEquals("How is your healing coming along?", healingQuestion(context, null))
         assertEquals("How is your perineal healing?", healingQuestion(context, DeliveryType.VAGINAL))

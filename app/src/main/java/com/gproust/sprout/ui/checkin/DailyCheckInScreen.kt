@@ -52,13 +52,17 @@ fun DailyCheckInScreen(
     gaveBirth: Boolean,
     breastfeeding: Boolean,
     deliveryType: DeliveryType?,
+    askHealing: Boolean,
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
+    onOptOutHealing: () -> Unit,
 ) {
     val context = LocalContext.current
     val now = remember { System.currentTimeMillis() }
     val greeting = stringResource(R.string.checkin_greeting, greetingFor(context, now), name)
-    val questions = remember(gaveBirth, breastfeeding) { checkInQuestions(gaveBirth, breastfeeding) }
+    val questions = remember(gaveBirth, breastfeeding, askHealing) {
+        checkInQuestions(gaveBirth, breastfeeding, askHealing)
+    }
 
     Surface(Modifier.fillMaxSize()) {
         CheckInFlow(
@@ -68,6 +72,7 @@ fun DailyCheckInScreen(
             deliveryType = deliveryType,
             onSubmit = onSubmit,
             onSkip = onSkip,
+            onOptOutHealing = onOptOutHealing,
         )
     }
 }
@@ -80,6 +85,7 @@ private fun CheckInFlow(
     deliveryType: DeliveryType?,
     onSubmit: (WellbeingEntity) -> Unit,
     onSkip: () -> Unit,
+    onOptOutHealing: () -> Unit,
 ) {
     val context = LocalContext.current
     // step 0 = intro, steps 1..N = the questions.
@@ -127,12 +133,20 @@ private fun CheckInFlow(
                 onSelect = { mood = it },
                 labelOf = { "${moodEmoji(it)} $it" },
             )
-            CheckInQuestion.HEALING -> ChoiceChips(
-                options = Recovery.entries,
-                selected = recovery,
-                onSelect = { recovery = if (recovery == it) null else it },
-                labelOf = { it.label(context) },
-            )
+            CheckInQuestion.HEALING -> Column {
+                ChoiceChips(
+                    options = Recovery.entries,
+                    selected = recovery,
+                    onSelect = { recovery = if (recovery == it) null else it },
+                    labelOf = { it.label(context) },
+                )
+                Spacer(Modifier.height(12.dp))
+                // Opting out removes HEALING from the question list, so this
+                // same step lands on the next question; nothing else moves.
+                TextButton(onClick = { recovery = null; onOptOutHealing() }) {
+                    Text(stringResource(R.string.checkin_healing_opt_out))
+                }
+            }
             CheckInQuestion.BLEEDING -> ChoiceChips(
                 options = Bleeding.entries,
                 selected = bleeding,

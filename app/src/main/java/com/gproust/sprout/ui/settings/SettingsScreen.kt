@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -87,6 +88,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     var remindersEnabled by remember { mutableStateOf(FeedingReminderSettings.isEnabled(context)) }
     var intervalMinutes by remember { mutableIntStateOf(FeedingReminderSettings.intervalMinutes(context)) }
+    val profile by repository.parentProfile.collectAsState(initial = null)
 
     fun reschedule() {
         scope.launch(Dispatchers.IO) { FeedingReminders.rescheduleAll(context, repository) }
@@ -135,7 +137,36 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                 )
             }
+
+            // Only a birthing parent has the healing question to opt in/out of.
+            profile?.takeIf { it.gaveBirth }?.let { p ->
+                item { Spacer(Modifier.height(24.dp)) }
+                item {
+                    HealingQuestionSection(
+                        askHealing = p.askHealing,
+                        onToggle = { on -> scope.launch { repository.setAskHealing(on) } },
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun HealingQuestionSection(askHealing: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(
+                stringResource(R.string.settings_healing_question),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                stringResource(R.string.settings_healing_question_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = askHealing, onCheckedChange = onToggle)
     }
 }
 
