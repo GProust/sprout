@@ -1,6 +1,9 @@
 package com.gproust.sprout
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +19,11 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.glance.GlanceTheme
+import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
+import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.gproust.sprout.data.local.Bleeding
@@ -47,6 +55,7 @@ import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.theme.SproutTheme
+import com.gproust.sprout.widget.WidgetContent
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -178,6 +187,35 @@ class ScreenshotTest {
 
     private fun save(name: String) {
         val bmp = rule.onRoot().captureToImage().asAndroidBitmap()
+        File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    /**
+     * Renders the home-screen widget's Glance content to RemoteViews (the same
+     * path the launcher uses), inflates them off-screen at a 2x1-ish widget
+     * size, and saves the result — no launcher automation needed.
+     */
+    @OptIn(ExperimentalGlanceRemoteViewsApi::class)
+    private fun saveWidget(name: String) {
+        val context = instrumentation.targetContext
+        val feed = runBlocking { app.repository.lastBreastFeedForActiveBaby() }
+        val size = DpSize(180.dp, 110.dp)
+        val remoteViews = runBlocking {
+            GlanceRemoteViews().compose(context, size) { GlanceTheme { WidgetContent(feed) } }.remoteViews
+        }
+        val density = context.resources.displayMetrics.density
+        val w = (size.width.value * density).toInt()
+        val h = (size.height.value * density).toInt()
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        instrumentation.runOnMainSync {
+            val view = remoteViews.apply(context, FrameLayout(context))
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY),
+            )
+            view.layout(0, 0, w, h)
+            view.draw(Canvas(bmp))
+        }
         File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
@@ -328,5 +366,8 @@ class ScreenshotTest {
         save("11-settings-2-feeding-on")
         show { TreatmentsScreen {} }
         save("12-treatments")
+
+        // Home-screen widget: the seeded data's last breastfeed (left, 2h ago).
+        saveWidget("13-widget-last-breastfeed")
     }
 }

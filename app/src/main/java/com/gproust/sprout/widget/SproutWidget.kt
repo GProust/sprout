@@ -59,8 +59,9 @@ class SproutWidget : GlanceAppWidget() {
     }
 }
 
+// Internal so the screenshot test can render the widget UI off-launcher.
 @Composable
-private fun WidgetContent(feed: FeedingEntity?) {
+internal fun WidgetContent(feed: FeedingEntity?) {
     val context = LocalContext.current
     Column(
         modifier = GlanceModifier
