@@ -7,6 +7,8 @@
     <string name="action_save">Guardar</string>
     <string name="action_details">Detalles</string>
     <string name="history">Historial</string>
+    <string name="day_today">Hoy</string>
+    <string name="day_yesterday">Ayer</string>
     <string name="cd_back">Atrás</string>
     <string name="cd_delete">Eliminar</string>
     <string name="cd_wellbeing">Bienestar</string>
@@ -207,6 +209,7 @@
     <string name="checkin_q_bleeding">¿Algún sangrado hoy?</string>
     <string name="checkin_q_breasts">¿Cómo notas los pechos?</string>
     <string name="checkin_q_notes">¿Hay algo que quieras anotar?</string>
+    <string name="checkin_opt_out">No volver a preguntarme esto</string>
     <string name="screen_baby_profile">Perfil del bebé</string>
     <string name="profile_age">Edad: %1$s</string>
     <string name="profile_enter_name">Introduce un nombre</string>
@@ -274,10 +277,23 @@
     <!-- Recordatorios de tomas -->
     <string name="settings_feeding_reminders">Recordatorios de tomas</string>
     <string name="settings_feeding_reminders_desc">Avísame cuando haya pasado demasiado tiempo desde la última toma.</string>
+    <string name="settings_checkin_section">Chequeo diario</string>
+    <string name="settings_checkin_section_desc">Elige qué preguntas hace tu chequeo. Una pregunta desactivada deja de hacerse; puedes reactivarla aquí cuando quieras.</string>
+    <string name="settings_healing_question">Recuperación</string>
+    <string name="settings_bleeding_question">Sangrado</string>
+    <string name="settings_breasts_question">Comodidad de los pechos</string>
     <string name="settings_feeding_interval_label">Recordarme si una toma supera</string>
     <string name="feeding_channel_name">Recordatorios de tomas</string>
     <string name="feeding_channel_desc">Recordatorios cuando ha pasado un rato desde la última toma</string>
     <string name="feeding_notif_title">¿Hora de una toma?</string>
     <string name="feeding_notif_title_baby">¿Hora de alimentar a %1$s?</string>
     <string name="feeding_notif_text">Han pasado %1$s desde la última toma.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Última toma de pecho</string>
+    <string name="widget_description">La última toma de pecho (lado, hace cuánto) — o la toma en curso con su cronómetro.</string>
+    <string name="widget_no_breastfeed">Aún no hay tomas de pecho</string>
+    <string name="widget_ago_minutes">hace %1$d min</string>
+    <string name="widget_ago_hours">hace %1$d h</string>
+    <string name="widget_ago_hours_minutes">hace %1$d h %2$d min</string>
 </resources>

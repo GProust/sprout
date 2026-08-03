@@ -3,6 +3,23 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🗂️ Tracking screens (Feeding, Sleep, Diapers, Growth) are now
+  **history-first**: the log list fills the screen — newest entry on top,
+  grouped under Today/Yesterday/date headers — and the log form opens in a
+  bottom sheet from a "+" button, so recent entries stay visible while
+  logging. The Growth screen keeps its weight-trend chart on top; the live
+  breastfeeding bar is unchanged.
+- 📟 New **home-screen widget** showing the side of the last breastfeed (the
+  side of the last stretch when a session switched sides) and how long ago it
+  was ("2 h 15 min ago"). While a session is being timed it switches to the
+  current side with a live ticking timer. Refreshes whenever a feed is
+  logged, and every 30 minutes in between; tapping it opens the app straight
+  on the Feeding screen.
+- ⏱️ A live breastfeeding session now **survives the app being killed**
+  (restored from disk when the app reopens).
+
 ## [1.3.0] — 2026-07-02
 
 First version published on **Google Play**.

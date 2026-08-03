@@ -26,12 +26,23 @@ import kotlinx.coroutines.flow.map
  * so screens never have to thread a baby id around.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class SproutRepository(private val db: SproutDatabase) {
+class SproutRepository(
+    private val db: SproutDatabase,
+    /**
+     * Invoked after any write that can change what the home-screen widget
+     * shows (feeding logs, or which baby is active). Wired by the
+     * application to refresh the widget; a no-op in tests.
+     */
+    private val onWidgetDataChanged: suspend () -> Unit = {},
+) {
 
     // Parent profile (the owner of this device)
     val parentProfile: Flow<ParentProfileEntity?> = db.parentProfileDao().observeProfile()
     suspend fun saveParentProfile(profile: ParentProfileEntity) = db.parentProfileDao().upsert(profile)
     suspend fun updateParentLastCheckIn(time: Long) = db.parentProfileDao().updateLastCheckIn(time)
+    suspend fun setAskHealing(ask: Boolean) = db.parentProfileDao().updateAskHealing(ask)
+    suspend fun setAskBleeding(ask: Boolean) = db.parentProfileDao().updateAskBleeding(ask)
+    suspend fun setAskBreasts(ask: Boolean) = db.parentProfileDao().updateAskBreasts(ask)
 
     private val activeBabyId: Flow<Long?> = parentProfile
         .map { it?.activeBabyId }
@@ -54,6 +65,7 @@ class SproutRepository(private val db: SproutDatabase) {
         val id = db.babyDao().insert(BabyEntity(name = name.trim(), birthDate = birthDate))
         if (db.parentProfileDao().profileOnce()?.activeBabyId == null) {
             db.parentProfileDao().updateActiveBaby(id)
+            onWidgetDataChanged()
         }
         return id
     }
@@ -72,7 +84,10 @@ class SproutRepository(private val db: SproutDatabase) {
     /** The name of a baby by id (for notifications); null if it no longer exists. */
     suspend fun babyName(id: Long): String? = db.babyDao().nameById(id)
 
-    suspend fun setActiveBaby(babyId: Long) = db.parentProfileDao().updateActiveBaby(babyId)
+    suspend fun setActiveBaby(babyId: Long) {
+        db.parentProfileDao().updateActiveBaby(babyId)
+        onWidgetDataChanged()
+    }
 
     /** Stop tracking a baby: keep its data but take it out of the active rotation. */
     suspend fun archiveBaby(babyId: Long) {
@@ -100,6 +115,7 @@ class SproutRepository(private val db: SproutDatabase) {
         val profile = db.parentProfileDao().profileOnce() ?: return
         if (profile.activeBabyId == removedId) {
             db.parentProfileDao().updateActiveBaby(db.babyDao().firstActiveBaby()?.id)
+            onWidgetDataChanged()
         }
     }
 
@@ -110,11 +126,21 @@ class SproutRepository(private val db: SproutDatabase) {
     suspend fun addFeeding(entity: FeedingEntity) {
         val id = activeBabyId.first() ?: return
         db.feedingDao().insert(entity.copy(babyId = id))
+        onWidgetDataChanged()
     }
-    suspend fun deleteFeeding(entity: FeedingEntity) = db.feedingDao().delete(entity)
+    suspend fun deleteFeeding(entity: FeedingEntity) {
+        db.feedingDao().delete(entity)
+        onWidgetDataChanged()
+    }
 
     /** Epoch millis of a baby's most recent feed, or null if none yet. */
     suspend fun lastFeedTime(babyId: Long): Long? = db.feedingDao().lastFeedTime(babyId)
+
+    /** The active baby's most recent breastfeed, or null if none (for the widget). */
+    suspend fun lastBreastFeedForActiveBaby(): FeedingEntity? {
+        val id = activeBabyIdNow() ?: return null
+        return db.feedingDao().lastBreastFeed(id)
+    }
 
     // Sleep
     val sleeps: Flow<List<SleepEntity>> = activeBabyId.flatMapLatest { id ->

@@ -33,6 +33,17 @@ fun startOfDay(epochMillis: Long): Long =
     Instant.ofEpochMilli(epochMillis).atZone(zone()).toLocalDate()
         .atStartOfDay(zone()).toInstant().toEpochMilli()
 
+/** "Today", "Yesterday", or the formatted date of the day containing [epochMillis]. */
+fun dayLabel(context: Context, epochMillis: Long, now: Long): String {
+    val day = Instant.ofEpochMilli(epochMillis).atZone(zone()).toLocalDate()
+    val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
+    return when (day) {
+        today -> context.getString(R.string.day_today)
+        today.minusDays(1) -> context.getString(R.string.day_yesterday)
+        else -> formatDate(context, epochMillis)
+    }
+}
+
 /** True when both timestamps fall on the same calendar day (local time). */
 fun isSameDay(a: Long, b: Long): Boolean {
     val dayA = Instant.ofEpochMilli(a).atZone(zone()).toLocalDate()

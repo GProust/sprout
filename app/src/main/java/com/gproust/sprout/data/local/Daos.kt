@@ -65,6 +65,15 @@ interface ParentProfileDao {
 
     @Query("UPDATE parent_profile SET activeBabyId = :babyId WHERE id = 1")
     suspend fun updateActiveBaby(babyId: Long?)
+
+    @Query("UPDATE parent_profile SET askHealing = :ask WHERE id = 1")
+    suspend fun updateAskHealing(ask: Boolean)
+
+    @Query("UPDATE parent_profile SET askBleeding = :ask WHERE id = 1")
+    suspend fun updateAskBleeding(ask: Boolean)
+
+    @Query("UPDATE parent_profile SET askBreasts = :ask WHERE id = 1")
+    suspend fun updateAskBreasts(ask: Boolean)
 }
 
 @Dao
@@ -75,6 +84,10 @@ interface FeedingDao {
     /** Epoch millis of the most recent feed for a baby, or null if none yet. */
     @Query("SELECT MAX(startTime) FROM feeding WHERE babyId = :babyId")
     suspend fun lastFeedTime(babyId: Long): Long?
+
+    /** The most recent breastfeed for a baby, or null if none yet (for the widget). */
+    @Query("SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' ORDER BY startTime DESC LIMIT 1")
+    suspend fun lastBreastFeed(babyId: Long): FeedingEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)

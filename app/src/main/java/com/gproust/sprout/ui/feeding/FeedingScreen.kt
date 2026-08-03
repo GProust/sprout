@@ -61,7 +61,10 @@ import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.notifications.FeedingReminders
+import com.gproust.sprout.ui.common.AddEntryFab
+import com.gproust.sprout.ui.common.AddEntrySheet
 import com.gproust.sprout.ui.common.ChoiceChips
+import com.gproust.sprout.ui.common.DayHeader
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
 import com.gproust.sprout.ui.common.FieldLabel
@@ -72,7 +75,9 @@ import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatClock
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
+import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -100,8 +105,21 @@ class FeedingViewModel(
     val feedings = repository.feedings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _nursing = MutableStateFlow<NursingSession?>(null)
+    // Restored from the store so a live session survives process death and
+    // stays visible to the home-screen widget.
+    private val _nursing = MutableStateFlow<NursingSession?>(NursingSessionStore.load(context))
     val nursing: StateFlow<NursingSession?> = _nursing.asStateFlow()
+
+    /** Single point of truth: updates the state, the store, and the widget. */
+    private fun setNursing(session: NursingSession?) {
+        _nursing.value = session
+        if (session == null) {
+            NursingSessionStore.clear(context)
+        } else {
+            NursingSessionStore.save(context, session)
+        }
+        viewModelScope.launch { updateSproutWidget(context) }
+    }
 
     fun add(entity: FeedingEntity) = viewModelScope.launch {
         repository.addFeeding(entity)
@@ -117,7 +135,7 @@ class FeedingViewModel(
     /** Begin timing a breastfeeding session on [side] (left or right). */
     fun startNursing(side: BreastSide) {
         val now = System.currentTimeMillis()
-        _nursing.value = NursingSession(sessionStart = now, currentSide = side, segmentStart = now)
+        setNursing(NursingSession(sessionStart = now, currentSide = side, segmentStart = now))
     }
 
     /** Bank the current breast as a completed segment and switch to the other. */
@@ -126,10 +144,12 @@ class FeedingViewModel(
         val now = System.currentTimeMillis()
         val completed = NursingSegment(s.currentSide, s.segmentStart, now)
         val next = if (s.currentSide == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
-        _nursing.value = s.copy(
-            currentSide = next,
-            segmentStart = now,
-            segments = s.segments + completed,
+        setNursing(
+            s.copy(
+                currentSide = next,
+                segmentStart = now,
+                segments = s.segments + completed,
+            ),
         )
     }
 
@@ -158,12 +178,12 @@ class FeedingViewModel(
                 notes = notes.ifBlank { null },
             ),
         )
-        _nursing.value = null
+        setNursing(null)
     }
 
     /** Discard the running session without saving it. */
     fun cancelNursing() {
-        _nursing.value = null
+        setNursing(null)
     }
 }
 
@@ -176,6 +196,7 @@ fun FeedingScreen(
     val nursing by vm.nursing.collectAsState()
     val context = LocalContext.current
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
+    var adding by remember { mutableStateOf(false) }
 
     editing?.let { entry ->
         EditFeedingDialog(
@@ -186,8 +207,29 @@ fun FeedingScreen(
         )
     }
 
+    if (adding) {
+        AddEntrySheet(
+            title = stringResource(R.string.feeding_log_title),
+            onDismiss = { adding = false },
+        ) {
+            FeedingForm(
+                initial = null,
+                submitLabel = stringResource(R.string.feeding_add),
+                onSubmit = { vm.add(it); adding = false },
+            )
+        }
+    }
+
+    // The history is the screen: newest feed on top, grouped by day. Logging
+    // happens in a bottom sheet behind the "+" button, so the last feed is
+    // always visible at a glance.
+    val byDay = remember(feedings) { feedings.groupBy { startOfDay(it.startTime) } }
+
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) },
+        floatingActionButton = {
+            AddEntryFab(stringResource(R.string.feeding_log_title)) { adding = true }
+        },
         bottomBar = {
             NursingBar(
                 session = nursing,
@@ -201,31 +243,26 @@ fun FeedingScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { ManualFeedCard(onAdd = vm::add) }
-            item {
-                Text(
-                    stringResource(R.string.history),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
             if (feedings.isEmpty()) {
                 item { EmptyHint(stringResource(R.string.feeding_empty)) }
             }
-            items(feedings, key = { it.id }) { entry ->
-                EntryCard(
-                    title = feedingTitle(context, entry),
-                    subtitle = feedingSubtitle(context, entry),
-                    meta = formatTime(entry.startTime),
-                    icon = Icons.Filled.LocalDrink,
-                    onDelete = { vm.delete(entry) },
-                    onClick = { editing = entry },
-                    details = if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
-                        { FeedingSegmentDetails(entry.segments) }
-                    } else {
-                        null
-                    },
-                )
+            byDay.forEach { (day, entries) ->
+                item(key = "day-$day") { DayHeader(day) }
+                items(entries, key = { it.id }) { entry ->
+                    EntryCard(
+                        title = feedingTitle(context, entry),
+                        subtitle = feedingSubtitle(context, entry),
+                        meta = formatTime(entry.startTime),
+                        icon = Icons.Filled.LocalDrink,
+                        onDelete = { vm.delete(entry) },
+                        onClick = { editing = entry },
+                        details = if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
+                            { FeedingSegmentDetails(entry.segments) }
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
         }
     }
@@ -463,25 +500,6 @@ private fun SideTotal(label: String, value: String, active: Boolean) {
             style = MaterialTheme.typography.titleMedium,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
         )
-    }
-}
-
-/**
- * Manual entry for any feed — including a past breastfeed — without using the
- * live timer. A breastfeed can record its length as an end time or a duration;
- * bottle and solids just need a time.
- */
-@Composable
-private fun ManualFeedCard(onAdd: (FeedingEntity) -> Unit) {
-    Card {
-        Column(Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.feeding_log_title), style = MaterialTheme.typography.titleMedium)
-            FeedingForm(
-                initial = null,
-                submitLabel = stringResource(R.string.feeding_add),
-                onSubmit = onAdd,
-            )
-        }
     }
 }
 

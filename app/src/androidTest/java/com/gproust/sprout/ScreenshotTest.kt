@@ -1,6 +1,9 @@
 package com.gproust.sprout
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -14,8 +17,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.glance.GlanceTheme
+import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
+import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.gproust.sprout.data.local.Bleeding
@@ -46,7 +55,9 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
+import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
+import com.gproust.sprout.widget.SproutWidgetUi
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -78,6 +89,7 @@ class ScreenshotTest {
     private fun seed() = runBlocking {
         val repo = app.repository
         val now = System.currentTimeMillis()
+        val min = 60_000L
         val hour = 3_600_000L
         val day = 24L * hour
         // Twins, to show the baby switcher and the babies manager.
@@ -95,12 +107,12 @@ class ScreenshotTest {
                 activeBabyId = lea,
             ),
         )
-        // Logs are stamped with the active baby (Léa).
-        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour))
+        // Logs are stamped with the active baby (Léa). The odd 2 h 15 min age
+        // lets the widget capture show both units of its elapsed-time line.
+        repo.addFeeding(FeedingEntity(type = FeedType.BREAST, side = BreastSide.LEFT, startTime = now - 2 * hour - 15 * min))
         // A completed breastfeed that switched sides twice (left → right → left)
         // — shows the per-stretch breakdown with a time range for each.
         val nurseStart = now - 4 * hour
-        val min = 60_000L
         repo.addFeeding(
             FeedingEntity(
                 type = FeedType.BREAST,
@@ -181,6 +193,47 @@ class ScreenshotTest {
         File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
+    /**
+     * Full-screen capture via UiAutomation. Needed when a modal bottom sheet is
+     * open: the sheet lives in its own window, which [save]'s onRoot() capture
+     * can't see (and with two compose roots onRoot() isn't even unique).
+     */
+    private fun saveScreen(name: String) {
+        val bmp = instrumentation.uiAutomation.takeScreenshot()
+        File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    /**
+     * Renders the home-screen widget's Glance content to RemoteViews (the same
+     * path the launcher uses), inflates them off-screen at a 2x1-ish widget
+     * size, and saves the result — no launcher automation needed. Shows the
+     * live nursing session when one is in the store, like the real widget.
+     */
+    @OptIn(ExperimentalGlanceRemoteViewsApi::class)
+    private fun saveWidget(name: String) {
+        val context = instrumentation.targetContext
+        val session = NursingSessionStore.load(context)
+        val feed = runBlocking { app.repository.lastBreastFeedForActiveBaby() }
+        val size = DpSize(180.dp, 110.dp)
+        val remoteViews = runBlocking {
+            GlanceRemoteViews().compose(context, size) { GlanceTheme { SproutWidgetUi(session, feed) } }.remoteViews
+        }
+        val density = context.resources.displayMetrics.density
+        val w = (size.width.value * density).toInt()
+        val h = (size.height.value * density).toInt()
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        instrumentation.runOnMainSync {
+            val view = remoteViews.apply(context, FrameLayout(context))
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY),
+            )
+            view.layout(0, 0, w, h)
+            view.draw(Canvas(bmp))
+        }
+        File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
     @Test
     fun captureScreens() {
         seed()
@@ -201,12 +254,16 @@ class ScreenshotTest {
         // Daily check-in for a birthing, breastfeeding parent (all questions).
         show {
             DailyCheckInScreen(
-                "Marise",
-                gaveBirth = true,
-                breastfeeding = true,
-                deliveryType = DeliveryType.CESAREAN,
+                profile = ParentProfileEntity(
+                    1L,
+                    "Marise",
+                    gaveBirth = true,
+                    breastfeeding = true,
+                    deliveryType = DeliveryType.CESAREAN,
+                ),
                 onSubmit = {},
                 onSkip = {},
+                onOptOut = {},
             )
         }
         save("02-checkin-birthing-1-intro")
@@ -224,12 +281,16 @@ class ScreenshotTest {
         // Daily check-in for a non-birthing parent (just mood + notes).
         show {
             DailyCheckInScreen(
-                "Tom",
-                gaveBirth = false,
-                breastfeeding = false,
-                deliveryType = null,
+                profile = ParentProfileEntity(
+                    1L,
+                    "Tom",
+                    gaveBirth = false,
+                    breastfeeding = false,
+                    deliveryType = null,
+                ),
                 onSubmit = {},
                 onSkip = {},
+                onOptOut = {},
             )
         }
         save("03-checkin-partner-1-intro")
@@ -242,28 +303,28 @@ class ScreenshotTest {
         // the switcher affordance, since two babies are seeded.
         show { HomeScreen {} }
         save("04-home")
+        // The feeding history now fills the screen, newest first with day
+        // headers; the log form lives in a bottom sheet behind the "+" button.
         show { FeedingScreen() }
         save("05-feeding")
-        // Manual log: add two more sides so the form shows a left → right → left
-        // entry. Scroll to the button before each tap so it stays on-screen.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
-        tap("Add a side")
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
-        tap("Add a side")
-        // Scroll back to the card's top so all three side rows are in view.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Log a feeding"))
-        settle()
-        save("05-feeding-5-manual-lrl")
-        // History: scroll to the completed switched breastfeed (left → right →
-        // left). The card shows a light preview (per-side + total); "Details"
-        // expands the per-stretch breakdown. Captured before any live session so
-        // the list is idle for waitForIdle.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Both", substring = true))
-        settle()
-        save("05-feeding-2-history")
+        // The completed switched breastfeed (left → right → left) shows a light
+        // preview (per-side + total); "Details" expands the per-stretch
+        // breakdown. Captured before any live session so the list is idle.
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
         tap("Details")
         save("05-feeding-6-history-details")
+        // Widget (idle): captured before any live session starts, so it shows
+        // the last logged breastfeed. Named 13-* to sort with the widget shots.
+        saveWidget("13-widget-last-breastfeed")
+        // Manual log: open the sheet and add two more sides so the form shows a
+        // left → right → left entry. The sheet is its own window, so captures go
+        // through the full-screen path.
+        tapDesc("Log a feeding")
+        rule.onNodeWithText("Add a side").performScrollTo().performClick()
+        settle()
+        rule.onNodeWithText("Add a side").performScrollTo().performClick()
+        settle()
+        saveScreen("05-feeding-5-manual-lrl")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and
@@ -292,11 +353,13 @@ class ScreenshotTest {
         save("06-sleep")
         show { DiaperScreen() }
         save("07-diaper")
-        // Tick "Stool" to reveal the predefined stool-colour scale, then pick one.
+        // The change form opens in a bottom sheet: tick "Stool" to reveal the
+        // predefined stool-colour scale, then pick one.
+        tapDesc("Log a change")
         tap("Stool")
-        save("07-diaper-2-stool-colour")
+        saveScreen("07-diaper-2-stool-colour")
         tapDesc("Brown")
-        save("07-diaper-3-colour-picked")
+        saveScreen("07-diaper-3-colour-picked")
         show { GrowthScreen() }
         save("08-growth")
         show { HealthScreen {} }
@@ -328,5 +391,10 @@ class ScreenshotTest {
         save("11-settings-2-feeding-on")
         show { TreatmentsScreen {} }
         save("12-treatments")
+
+        // Widget (live): the nursing session started for the timer captures is
+        // still running (back on the left), so the widget shows the ongoing
+        // side with its ticking chronometer.
+        saveWidget("14-widget-nursing")
     }
 }

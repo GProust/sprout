@@ -9,7 +9,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BabyChangingStation
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +46,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,6 +54,9 @@ import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.StoolColor
+import com.gproust.sprout.ui.common.AddEntryFab
+import com.gproust.sprout.ui.common.AddEntrySheet
+import com.gproust.sprout.ui.common.DayHeader
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
 import com.gproust.sprout.ui.common.FieldLabel
@@ -64,6 +64,7 @@ import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatTime
+import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -83,31 +84,44 @@ fun DiaperScreen() {
     val diapers by vm.diapers.collectAsState()
     val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_diapers)) }) { padding ->
+    var adding by remember { mutableStateOf(false) }
+
+    if (adding) {
+        AddEntrySheet(
+            title = stringResource(R.string.diaper_log_title),
+            onDismiss = { adding = false },
+        ) {
+            DiaperForm(onAdd = { vm.add(it); adding = false })
+        }
+    }
+
+    val byDay = remember(diapers) { diapers.groupBy { startOfDay(it.time) } }
+
+    Scaffold(
+        topBar = { SproutTopBar(stringResource(R.string.screen_diapers)) },
+        floatingActionButton = {
+            AddEntryFab(stringResource(R.string.diaper_log_title)) { adding = true }
+        },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { DiaperAddCard(onAdd = vm::add) }
-            item {
-                Text(
-                    stringResource(R.string.history),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
             if (diapers.isEmpty()) {
                 item { EmptyHint(stringResource(R.string.diaper_empty)) }
             }
-            items(diapers, key = { it.id }) { entry ->
-                EntryCard(
-                    title = diaperTitle(context, entry),
-                    subtitle = diaperSubtitle(context, entry),
-                    meta = formatTime(entry.time),
-                    icon = Icons.Filled.BabyChangingStation,
-                    onDelete = { vm.delete(entry) },
-                )
+            byDay.forEach { (day, entries) ->
+                item(key = "day-$day") { DayHeader(day) }
+                items(entries, key = { it.id }) { entry ->
+                    EntryCard(
+                        title = diaperTitle(context, entry),
+                        subtitle = diaperSubtitle(context, entry),
+                        meta = formatTime(entry.time),
+                        icon = Icons.Filled.BabyChangingStation,
+                        onDelete = { vm.delete(entry) },
+                    )
+                }
             }
         }
     }
@@ -164,70 +178,58 @@ private fun diaperSubtitle(context: Context, entry: DiaperEntity): String {
 }
 
 @Composable
-private fun DiaperAddCard(onAdd: (DiaperEntity) -> Unit) {
-    val context = LocalContext.current
+private fun DiaperForm(onAdd: (DiaperEntity) -> Unit) {
     var wet by remember { mutableStateOf(true) }
     var dirty by remember { mutableStateOf(false) }
     var stoolColor by remember { mutableStateOf<StoolColor?>(null) }
     var time by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
-    Card {
-        Column(Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.diaper_log_title), style = MaterialTheme.typography.titleMedium)
+    FieldLabel(stringResource(R.string.diaper_contents))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        CheckChip(
+            label = stringResource(R.string.diaper_urine),
+            selected = wet,
+            onClick = { wet = !wet },
+        )
+        CheckChip(
+            label = stringResource(R.string.diaper_stool),
+            selected = dirty,
+            onClick = {
+                dirty = !dirty
+                if (!dirty) stoolColor = null
+            },
+        )
+    }
 
-            FieldLabel(stringResource(R.string.diaper_contents))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CheckChip(
-                    label = stringResource(R.string.diaper_urine),
-                    selected = wet,
-                    onClick = { wet = !wet },
+    if (dirty) {
+        FieldLabel(stringResource(R.string.diaper_stool_color))
+        StoolColorPicker(selected = stoolColor, onSelect = { stoolColor = it })
+    }
+
+    FieldLabel(stringResource(R.string.field_time))
+    TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })
+
+    Spacer(Modifier.height(8.dp))
+    NotesField(value = notes, onChange = { notes = it })
+
+    Spacer(Modifier.height(12.dp))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Button(
+            enabled = wet || dirty,
+            onClick = {
+                onAdd(
+                    DiaperEntity(
+                        time = time,
+                        wet = wet,
+                        dirty = dirty,
+                        stoolColor = if (dirty) stoolColor else null,
+                        notes = notes.ifBlank { null },
+                    ),
                 )
-                CheckChip(
-                    label = stringResource(R.string.diaper_stool),
-                    selected = dirty,
-                    onClick = {
-                        dirty = !dirty
-                        if (!dirty) stoolColor = null
-                    },
-                )
-            }
-
-            if (dirty) {
-                FieldLabel(stringResource(R.string.diaper_stool_color))
-                StoolColorPicker(selected = stoolColor, onSelect = { stoolColor = it })
-            }
-
-            FieldLabel(stringResource(R.string.field_time))
-            TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })
-
-            Spacer(Modifier.height(8.dp))
-            NotesField(value = notes, onChange = { notes = it })
-
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Button(
-                    enabled = wet || dirty,
-                    onClick = {
-                        onAdd(
-                            DiaperEntity(
-                                time = time,
-                                wet = wet,
-                                dirty = dirty,
-                                stoolColor = if (dirty) stoolColor else null,
-                                notes = notes.ifBlank { null },
-                            ),
-                        )
-                        wet = true
-                        dirty = false
-                        stoolColor = null
-                        notes = ""
-                        time = System.currentTimeMillis()
-                    },
-                ) {
-                    Text(stringResource(R.string.diaper_add))
-                }
-            }
+            },
+        ) {
+            Text(stringResource(R.string.diaper_add))
         }
     }
 }

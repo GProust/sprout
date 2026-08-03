@@ -7,6 +7,8 @@
     <string name="action_save">Speichern</string>
     <string name="action_details">Details</string>
     <string name="history">Verlauf</string>
+    <string name="day_today">Heute</string>
+    <string name="day_yesterday">Gestern</string>
     <string name="cd_back">Zurück</string>
     <string name="cd_delete">Löschen</string>
     <string name="cd_wellbeing">Wohlbefinden</string>
@@ -207,6 +209,7 @@
     <string name="checkin_q_bleeding">Heute Blutung?</string>
     <string name="checkin_q_breasts">Wie fühlen sich deine Brüste an?</string>
     <string name="checkin_q_notes">Möchtest du etwas notieren?</string>
+    <string name="checkin_opt_out">Diese Frage nicht mehr stellen</string>
     <string name="screen_baby_profile">Babyprofil</string>
     <string name="profile_age">Alter: %1$s</string>
     <string name="profile_enter_name">Bitte gib einen Namen ein</string>
@@ -274,10 +277,23 @@
     <!-- Mahlzeit-Erinnerungen -->
     <string name="settings_feeding_reminders">Mahlzeit-Erinnerungen</string>
     <string name="settings_feeding_reminders_desc">Erinnere mich, wenn die letzte Mahlzeit zu lange her ist.</string>
+    <string name="settings_checkin_section">Täglicher Check-in</string>
+    <string name="settings_checkin_section_desc">Wähle, welche Fragen dein Check-in stellt. Eine abgewählte Frage wird nicht mehr gestellt; du kannst sie hier jederzeit wieder aktivieren.</string>
+    <string name="settings_healing_question">Heilung</string>
+    <string name="settings_bleeding_question">Blutung</string>
+    <string name="settings_breasts_question">Brustkomfort</string>
     <string name="settings_feeding_interval_label">Erinnern, wenn eine Mahlzeit länger her ist als</string>
     <string name="feeding_channel_name">Mahlzeit-Erinnerungen</string>
     <string name="feeding_channel_desc">Erinnerungen, wenn die letzte Mahlzeit eine Weile her ist</string>
     <string name="feeding_notif_title">Zeit für eine Mahlzeit?</string>
     <string name="feeding_notif_title_baby">Zeit, %1$s zu füttern?</string>
     <string name="feeding_notif_text">Die letzte Mahlzeit war vor %1$s.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Letztes Stillen</string>
+    <string name="widget_description">Das letzte Stillen (Seite, wie lange her) — oder die laufende Sitzung mit Live-Timer.</string>
+    <string name="widget_no_breastfeed">Noch kein Stillen erfasst</string>
+    <string name="widget_ago_minutes">vor %1$d Min.</string>
+    <string name="widget_ago_hours">vor %1$d Std.</string>
+    <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
 </resources>
