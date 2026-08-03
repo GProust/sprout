@@ -26,8 +26,7 @@ erode trust — and could worry parents whose baby doesn't follow the script.
 Show the **typical growth spurt periods** and offer an **opt-in heads-up**:
 
 - The windows used are the commonly cited ones over the first year: around
-  1 week, 3 weeks, 6 weeks, 3 months, 6 months and 9 months, each spanning a
-  few days.
+  1, 3, 6 and 9 weeks, then 3, 6 and 9 months, each spanning a few days.
 - The **home dashboard** shows a gentle note while the baby's age is inside a
   window, and a "one may be coming" note in the few days before one. It
   disappears on its own; there is nothing to configure, log or dismiss.

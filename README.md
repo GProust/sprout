@@ -18,7 +18,7 @@ speaks 7 languages and can gently remind you about feeds and treatments.
 - **🧷 Diapers** — wet / dirty / mixed changes.
 - **📏 Growth** — weight, height and head circumference, with a weight-trend chart.
 - **🌱 Growth spurts** — the dashboard gently flags the typical growth-spurt periods
-  (around 1 and 3 weeks, 6 weeks, 3, 6 and 9 months) while your baby is in or near one,
+  (around 1, 3, 6 and 9 weeks, then 3, 6 and 9 months) while your baby is in or near one,
   and an opt-in alert can give you a heads-up when such a period begins.
 - **💊 Treatments & medication reminders** — recurring treatments (e.g. *Vitamin D, 1 drop, every
   day for a year*): name, optional dose, frequency (daily / every N days / weekly) and one or more

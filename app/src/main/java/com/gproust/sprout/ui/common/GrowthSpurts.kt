@@ -27,6 +27,7 @@ val GROWTH_SPURT_WINDOWS = listOf(
     GrowthSpurtWindow(7, 10, approxWeeks = 1),
     GrowthSpurtWindow(14, 21, approxWeeks = 3),
     GrowthSpurtWindow(40, 48, approxWeeks = 6),
+    GrowthSpurtWindow(60, 68, approxWeeks = 9),
     GrowthSpurtWindow(85, 95, approxMonths = 3),
     GrowthSpurtWindow(175, 186, approxMonths = 6),
     GrowthSpurtWindow(265, 277, approxMonths = 9),

@@ -46,6 +46,7 @@ class GrowthSpurtLogicTest {
         assertEquals(7, currentGrowthSpurt(7)?.startDay)
         assertEquals(7, currentGrowthSpurt(10)?.startDay)
         assertNull(currentGrowthSpurt(11))
+        assertEquals(9, currentGrowthSpurt(63)?.approxWeeks)
         assertEquals(3, currentGrowthSpurt(90)?.approxMonths)
     }
 
