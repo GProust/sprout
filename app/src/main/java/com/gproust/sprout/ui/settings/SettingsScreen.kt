@@ -54,6 +54,7 @@ import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDuration
+import com.gproust.sprout.ui.common.healingQuestion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -138,14 +139,50 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            // Only a birthing parent has the healing question to opt in/out of.
-            profile?.takeIf { it.gaveBirth }?.let { p ->
+            // Each body question of the daily check-in can be toggled here;
+            // only the ones this parent's capabilities surface are listed.
+            profile?.takeIf { it.gaveBirth || it.breastfeeding }?.let { p ->
                 item { Spacer(Modifier.height(24.dp)) }
                 item {
-                    HealingQuestionSection(
-                        askHealing = p.askHealing,
-                        onToggle = { on -> scope.launch { repository.setAskHealing(on) } },
-                    )
+                    Column {
+                        Text(
+                            stringResource(R.string.settings_checkin_section),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            stringResource(R.string.settings_checkin_section_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                if (p.gaveBirth) {
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_healing_question),
+                            question = healingQuestion(context, p.deliveryType),
+                            checked = p.askHealing,
+                            onToggle = { on -> scope.launch { repository.setAskHealing(on) } },
+                        )
+                    }
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_bleeding_question),
+                            question = stringResource(R.string.checkin_q_bleeding),
+                            checked = p.askBleeding,
+                            onToggle = { on -> scope.launch { repository.setAskBleeding(on) } },
+                        )
+                    }
+                }
+                if (p.breastfeeding) {
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_breasts_question),
+                            question = stringResource(R.string.checkin_q_breasts),
+                            checked = p.askBreasts,
+                            onToggle = { on -> scope.launch { repository.setAskBreasts(on) } },
+                        )
+                    }
                 }
             }
         }
@@ -153,20 +190,25 @@ fun SettingsScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun HealingQuestionSection(askHealing: Boolean, onToggle: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+private fun CheckInQuestionRow(
+    title: String,
+    question: String,
+    checked: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
             Text(
-                stringResource(R.string.settings_healing_question),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                stringResource(R.string.settings_healing_question_desc),
-                style = MaterialTheme.typography.bodyMedium,
+                question,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Switch(checked = askHealing, onCheckedChange = onToggle)
+        Switch(checked = checked, onCheckedChange = onToggle)
     }
 }
 

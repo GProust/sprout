@@ -115,14 +115,10 @@ fun SproutApp() {
         Startup.Loading -> LoadingScreen()
         Startup.Onboarding -> OnboardingScreen(onFinish = startupVm::completeOnboarding)
         is Startup.CheckIn -> DailyCheckInScreen(
-            name = s.name,
-            gaveBirth = s.gaveBirth,
-            breastfeeding = s.breastfeeding,
-            deliveryType = s.deliveryType,
-            askHealing = s.askHealing,
+            profile = s.profile,
             onSubmit = startupVm::submitCheckIn,
             onSkip = startupVm::markCheckedIn,
-            onOptOutHealing = startupVm::optOutHealing,
+            onOptOut = startupVm::optOut,
         )
         Startup.Main -> MainScaffold()
     }

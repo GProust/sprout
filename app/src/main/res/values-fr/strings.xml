@@ -252,7 +252,7 @@
     <string name="checkin_q_bleeding">Des saignements aujourd\'hui ?</string>
     <string name="checkin_q_breasts">Comment se sentent vos seins ?</string>
     <string name="checkin_q_notes">Quelque chose à noter ?</string>
-    <string name="checkin_healing_opt_out">Ne plus me poser cette question</string>
+    <string name="checkin_opt_out">Ne plus me poser cette question</string>
 
     <!-- Profile -->
     <string name="screen_baby_profile">Profil du bébé</string>
@@ -332,8 +332,11 @@
     <!-- Rappels de repas -->
     <string name="settings_feeding_reminders">Rappels de repas</string>
     <string name="settings_feeding_reminders_desc">Me prévenir quand le dernier repas remonte à trop longtemps.</string>
-    <string name="settings_healing_question">Question sur la cicatrisation</string>
-    <string name="settings_healing_question_desc">Me demander où en est ma cicatrisation lors du bilan quotidien.</string>
+    <string name="settings_checkin_section">Bilan du jour</string>
+    <string name="settings_checkin_section_desc">Choisissez les questions posées lors de votre bilan. Une question désactivée n\'est plus posée ; vous pouvez la réactiver ici à tout moment.</string>
+    <string name="settings_healing_question">Cicatrisation</string>
+    <string name="settings_bleeding_question">Saignements</string>
+    <string name="settings_breasts_question">Confort des seins</string>
     <string name="settings_feeding_interval_label">Me rappeler si un repas dépasse</string>
     <string name="feeding_channel_name">Rappels de repas</string>
     <string name="feeding_channel_desc">Rappels quand le dernier repas remonte à un moment</string>

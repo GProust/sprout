@@ -62,13 +62,32 @@ class CheckInLogicTest {
     }
 
     @Test
-    fun checkInQuestions_healingCanBeOptedOut() {
-        // Opting out drops only the healing question; the rest stays.
+    fun checkInQuestions_bodyQuestionsCanBeOptedOut() {
+        // Opting out drops only that question; the rest stays.
         assertEquals(
             listOf(MOOD, BLEEDING, NOTES),
             checkInQuestions(gaveBirth = true, breastfeeding = false, askHealing = false),
         )
-        // The flag is irrelevant for a parent who didn't give birth.
+        assertEquals(
+            listOf(MOOD, HEALING, NOTES),
+            checkInQuestions(gaveBirth = true, breastfeeding = false, askBleeding = false),
+        )
+        assertEquals(
+            listOf(MOOD, NOTES),
+            checkInQuestions(gaveBirth = false, breastfeeding = true, askBreasts = false),
+        )
+        // Opting out of everything still leaves the check-in's core.
+        assertEquals(
+            listOf(MOOD, NOTES),
+            checkInQuestions(
+                gaveBirth = true,
+                breastfeeding = true,
+                askHealing = false,
+                askBleeding = false,
+                askBreasts = false,
+            ),
+        )
+        // The flags are irrelevant for a parent without those capabilities.
         assertEquals(
             listOf(MOOD, NOTES),
             checkInQuestions(gaveBirth = false, breastfeeding = false, askHealing = false),

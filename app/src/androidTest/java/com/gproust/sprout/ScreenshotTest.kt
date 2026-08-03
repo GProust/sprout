@@ -201,14 +201,16 @@ class ScreenshotTest {
         // Daily check-in for a birthing, breastfeeding parent (all questions).
         show {
             DailyCheckInScreen(
-                "Marise",
-                gaveBirth = true,
-                breastfeeding = true,
-                deliveryType = DeliveryType.CESAREAN,
-                askHealing = true,
+                profile = ParentProfileEntity(
+                    1L,
+                    "Marise",
+                    gaveBirth = true,
+                    breastfeeding = true,
+                    deliveryType = DeliveryType.CESAREAN,
+                ),
                 onSubmit = {},
                 onSkip = {},
-                onOptOutHealing = {},
+                onOptOut = {},
             )
         }
         save("02-checkin-birthing-1-intro")
@@ -226,14 +228,16 @@ class ScreenshotTest {
         // Daily check-in for a non-birthing parent (just mood + notes).
         show {
             DailyCheckInScreen(
-                "Tom",
-                gaveBirth = false,
-                breastfeeding = false,
-                deliveryType = null,
-                askHealing = true,
+                profile = ParentProfileEntity(
+                    1L,
+                    "Tom",
+                    gaveBirth = false,
+                    breastfeeding = false,
+                    deliveryType = null,
+                ),
                 onSubmit = {},
                 onSkip = {},
-                onOptOutHealing = {},
+                onOptOut = {},
             )
         }
         save("03-checkin-partner-1-intro")

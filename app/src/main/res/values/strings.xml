@@ -256,7 +256,7 @@
     <string name="checkin_q_bleeding">Any bleeding today?</string>
     <string name="checkin_q_breasts">How do your breasts feel?</string>
     <string name="checkin_q_notes">Anything you\'d like to note?</string>
-    <string name="checkin_healing_opt_out">Don\'t ask me this anymore</string>
+    <string name="checkin_opt_out">Don\'t ask me this anymore</string>
 
     <!-- Profile -->
     <string name="screen_baby_profile">Baby profile</string>
@@ -344,8 +344,11 @@
     <!-- Feeding reminders -->
     <string name="settings_feeding_reminders">Feeding reminders</string>
     <string name="settings_feeding_reminders_desc">Nudge me when it\'s been too long since a feed.</string>
-    <string name="settings_healing_question">Healing question</string>
-    <string name="settings_healing_question_desc">Ask about your postpartum healing in the daily check-in.</string>
+    <string name="settings_checkin_section">Daily check-in</string>
+    <string name="settings_checkin_section_desc">Choose which questions your check-in asks. Opting out of a question skips it every day; you can bring it back here anytime.</string>
+    <string name="settings_healing_question">Healing</string>
+    <string name="settings_bleeding_question">Bleeding</string>
+    <string name="settings_breasts_question">Breast comfort</string>
     <string name="settings_feeding_interval_label">Remind me if a feed is more than</string>
     <string name="feeding_channel_name">Feeding reminders</string>
     <string name="feeding_channel_desc">Reminders when it\'s been a while since the last feed</string>

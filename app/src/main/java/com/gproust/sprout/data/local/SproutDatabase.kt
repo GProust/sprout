@@ -206,12 +206,15 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
-         * v10 -> v11: let a birthing parent opt out of the daily healing
-         * question. Defaults to 1 (keep asking) for every existing profile.
+         * v10 -> v11: let a parent opt out of each of the check-in's body
+         * questions (healing, bleeding, breast comfort). All default to 1
+         * (keep asking) for every existing profile.
          */
         private val MIGRATION_10_11 = object : Migration(10, 11) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `parent_profile` ADD COLUMN `askHealing` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `parent_profile` ADD COLUMN `askBleeding` INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE `parent_profile` ADD COLUMN `askBreasts` INTEGER NOT NULL DEFAULT 1")
             }
         }
 
