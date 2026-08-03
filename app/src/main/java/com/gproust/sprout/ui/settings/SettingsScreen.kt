@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,7 @@ import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDuration
+import com.gproust.sprout.ui.common.healingQuestion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -89,6 +91,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var remindersEnabled by remember { mutableStateOf(FeedingReminderSettings.isEnabled(context)) }
     var intervalMinutes by remember { mutableIntStateOf(FeedingReminderSettings.intervalMinutes(context)) }
     var growthSpurtsEnabled by remember { mutableStateOf(GrowthSpurtSettings.isEnabled(context)) }
+    val profile by repository.parentProfile.collectAsState(initial = null)
 
     fun reschedule() {
         scope.launch(Dispatchers.IO) { FeedingReminders.rescheduleAll(context, repository) }
@@ -154,6 +157,53 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                 )
             }
+
+            // Each body question of the daily check-in can be toggled here;
+            // only the ones this parent's capabilities surface are listed.
+            profile?.takeIf { it.gaveBirth || it.breastfeeding }?.let { p ->
+                item { Spacer(Modifier.height(24.dp)) }
+                item {
+                    Column {
+                        Text(
+                            stringResource(R.string.settings_checkin_section),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            stringResource(R.string.settings_checkin_section_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                if (p.gaveBirth) {
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_healing_question),
+                            question = healingQuestion(context, p.deliveryType),
+                            checked = p.askHealing,
+                            onToggle = { on -> scope.launch { repository.setAskHealing(on) } },
+                        )
+                    }
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_bleeding_question),
+                            question = stringResource(R.string.checkin_q_bleeding),
+                            checked = p.askBleeding,
+                            onToggle = { on -> scope.launch { repository.setAskBleeding(on) } },
+                        )
+                    }
+                }
+                if (p.breastfeeding) {
+                    item {
+                        CheckInQuestionRow(
+                            title = stringResource(R.string.settings_breasts_question),
+                            question = stringResource(R.string.checkin_q_breasts),
+                            checked = p.askBreasts,
+                            onToggle = { on -> scope.launch { repository.setAskBreasts(on) } },
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -173,6 +223,29 @@ private fun GrowthSpurtSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
             )
         }
         Switch(checked = enabled, onCheckedChange = onToggle)
+    }
+}
+
+@Composable
+private fun CheckInQuestionRow(
+    title: String,
+    question: String,
+    checked: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                question,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onToggle)
     }
 }
 

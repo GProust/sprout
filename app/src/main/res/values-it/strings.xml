@@ -7,6 +7,8 @@
     <string name="action_save">Salva</string>
     <string name="action_details">Dettagli</string>
     <string name="history">Cronologia</string>
+    <string name="day_today">Oggi</string>
+    <string name="day_yesterday">Ieri</string>
     <string name="cd_back">Indietro</string>
     <string name="cd_delete">Elimina</string>
     <string name="cd_wellbeing">Benessere</string>
@@ -207,6 +209,7 @@
     <string name="checkin_q_bleeding">Hai avuto sanguinamenti oggi?</string>
     <string name="checkin_q_breasts">Come senti il seno?</string>
     <string name="checkin_q_notes">C\'è qualcosa che vuoi annotare?</string>
+    <string name="checkin_opt_out">Non farmi più questa domanda</string>
     <string name="screen_baby_profile">Profilo del bambino</string>
     <string name="profile_age">Età: %1$s</string>
     <string name="profile_enter_name">Inserisci un nome</string>
@@ -274,6 +277,11 @@
     <!-- Promemoria pasti -->
     <string name="settings_feeding_reminders">Promemoria pasti</string>
     <string name="settings_feeding_reminders_desc">Avvisami quando è passato troppo tempo dall\'ultimo pasto.</string>
+    <string name="settings_checkin_section">Check-in quotidiano</string>
+    <string name="settings_checkin_section_desc">Scegli quali domande fa il tuo check-in. Una domanda disattivata non viene più posta; puoi riattivarla qui in qualsiasi momento.</string>
+    <string name="settings_healing_question">Guarigione</string>
+    <string name="settings_bleeding_question">Sanguinamento</string>
+    <string name="settings_breasts_question">Comfort del seno</string>
     <string name="settings_feeding_interval_label">Ricordami se un pasto supera</string>
     <string name="feeding_channel_name">Promemoria pasti</string>
     <string name="feeding_channel_desc">Promemoria quando è passato un po\' dall\'ultimo pasto</string>
@@ -301,4 +309,12 @@
     <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>
     <string name="growth_spurt_notif_title_baby">Forse %1$s sta iniziando uno scatto di crescita</string>
     <string name="growth_spurt_notif_text">Gli scatti di crescita sono frequenti %1$s. Più pasti e irritabilità sono normali: di solito passa in pochi giorni.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_label">Ultima poppata</string>
+    <string name="widget_description">L\'ultima poppata (lato, quanto tempo fa) — o la poppata in corso con il timer.</string>
+    <string name="widget_no_breastfeed">Ancora nessuna poppata</string>
+    <string name="widget_ago_minutes">%1$d min fa</string>
+    <string name="widget_ago_hours">%1$d h fa</string>
+    <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
 </resources>

@@ -6,6 +6,7 @@ import com.gproust.sprout.data.local.SproutDatabase
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.notifications.TreatmentReminders
+import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,9 @@ import kotlinx.coroutines.launch
 class SproutApplication : Application() {
 
     val repository: SproutRepository by lazy {
-        SproutRepository(SproutDatabase.getInstance(this))
+        SproutRepository(SproutDatabase.getInstance(this)) {
+            updateSproutWidget(this)
+        }
     }
 
     override fun onCreate() {
