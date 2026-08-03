@@ -5,6 +5,12 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🗂️ Tracking screens (Feeding, Sleep, Diapers, Growth) are now
+  **history-first**: the log list fills the screen — newest entry on top,
+  grouped under Today/Yesterday/date headers — and the log form opens in a
+  bottom sheet from a "+" button, so recent entries stay visible while
+  logging. The Growth screen keeps its weight-trend chart on top; the live
+  breastfeeding bar is unchanged.
 - 📟 New **home-screen widget** showing the side of the last breastfeed (the
   side of the last stretch when a session switched sides) and how long ago it
   was ("2 h 15 min ago"). While a session is being timed it switches to the

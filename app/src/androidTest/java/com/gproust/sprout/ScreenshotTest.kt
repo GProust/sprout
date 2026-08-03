@@ -17,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.DpSize
@@ -193,6 +194,16 @@ class ScreenshotTest {
     }
 
     /**
+     * Full-screen capture via UiAutomation. Needed when a modal bottom sheet is
+     * open: the sheet lives in its own window, which [save]'s onRoot() capture
+     * can't see (and with two compose roots onRoot() isn't even unique).
+     */
+    private fun saveScreen(name: String) {
+        val bmp = instrumentation.uiAutomation.takeScreenshot()
+        File(outputDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    /**
      * Renders the home-screen widget's Glance content to RemoteViews (the same
      * path the launcher uses), inflates them off-screen at a 2x1-ish widget
      * size, and saves the result — no launcher automation needed. Shows the
@@ -292,31 +303,28 @@ class ScreenshotTest {
         // the switcher affordance, since two babies are seeded.
         show { HomeScreen {} }
         save("04-home")
+        // The feeding history now fills the screen, newest first with day
+        // headers; the log form lives in a bottom sheet behind the "+" button.
         show { FeedingScreen() }
         save("05-feeding")
-        // Manual log: add two more sides so the form shows a left → right → left
-        // entry. Scroll to the button before each tap so it stays on-screen.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
-        tap("Add a side")
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Add a side"))
-        tap("Add a side")
-        // Scroll back to the card's top so all three side rows are in view.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Log a feeding"))
-        settle()
-        save("05-feeding-5-manual-lrl")
-        // History: scroll to the completed switched breastfeed (left → right →
-        // left). The card shows a light preview (per-side + total); "Details"
-        // expands the per-stretch breakdown. Captured before any live session so
-        // the list is idle for waitForIdle.
-        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Both", substring = true))
-        settle()
-        save("05-feeding-2-history")
+        // The completed switched breastfeed (left → right → left) shows a light
+        // preview (per-side + total); "Details" expands the per-stretch
+        // breakdown. Captured before any live session so the list is idle.
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
         tap("Details")
         save("05-feeding-6-history-details")
         // Widget (idle): captured before any live session starts, so it shows
         // the last logged breastfeed. Named 13-* to sort with the widget shots.
         saveWidget("13-widget-last-breastfeed")
+        // Manual log: open the sheet and add two more sides so the form shows a
+        // left → right → left entry. The sheet is its own window, so captures go
+        // through the full-screen path.
+        tapDesc("Log a feeding")
+        rule.onNodeWithText("Add a side").performScrollTo().performClick()
+        settle()
+        rule.onNodeWithText("Add a side").performScrollTo().performClick()
+        settle()
+        saveScreen("05-feeding-5-manual-lrl")
         // Live breastfeeding timer, now its own screen: start on the left, let it
         // run, then switch sides. The ticking LaunchedEffect never completes, so we
         // stop the test clock auto-advancing (which would spin waitForIdle) and
@@ -345,11 +353,13 @@ class ScreenshotTest {
         save("06-sleep")
         show { DiaperScreen() }
         save("07-diaper")
-        // Tick "Stool" to reveal the predefined stool-colour scale, then pick one.
+        // The change form opens in a bottom sheet: tick "Stool" to reveal the
+        // predefined stool-colour scale, then pick one.
+        tapDesc("Log a change")
         tap("Stool")
-        save("07-diaper-2-stool-colour")
+        saveScreen("07-diaper-2-stool-colour")
         tapDesc("Brown")
-        save("07-diaper-3-colour-picked")
+        saveScreen("07-diaper-3-colour-picked")
         show { GrowthScreen() }
         save("08-growth")
         show { HealthScreen {} }

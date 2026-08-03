@@ -42,6 +42,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.ui.common.AddEntryFab
+import com.gproust.sprout.ui.common.AddEntrySheet
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -70,14 +72,28 @@ fun GrowthScreen() {
     val lineColor = MaterialTheme.colorScheme.primary
     val context = LocalContext.current
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_growth)) }) { padding ->
+    var adding by remember { mutableStateOf(false) }
+
+    if (adding) {
+        AddEntrySheet(
+            title = stringResource(R.string.growth_log_title),
+            onDismiss = { adding = false },
+        ) {
+            GrowthForm(onAdd = { vm.add(it); adding = false })
+        }
+    }
+
+    Scaffold(
+        topBar = { SproutTopBar(stringResource(R.string.screen_growth)) },
+        floatingActionButton = {
+            AddEntryFab(stringResource(R.string.growth_log_title)) { adding = true }
+        },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { GrowthAddCard(onAdd = vm::add) }
-
             val weighed = growth.filter { it.weightGrams != null }.sortedBy { it.time }
             if (weighed.size >= 2) {
                 item {
@@ -170,69 +186,58 @@ private fun WeightChart(
 }
 
 @Composable
-private fun GrowthAddCard(onAdd: (GrowthEntity) -> Unit) {
+private fun GrowthForm(onAdd: (GrowthEntity) -> Unit) {
     var weight by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var head by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var notes by remember { mutableStateOf("") }
 
-    Card {
-        Column(Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.growth_log_title), style = MaterialTheme.typography.titleMedium)
+    FieldLabel(stringResource(R.string.field_weight))
+    NumberField(
+        label = stringResource(R.string.field_weight),
+        value = weight,
+        onChange = { weight = it },
+        suffix = stringResource(R.string.unit_g),
+    )
+    FieldLabel(stringResource(R.string.field_height))
+    NumberField(
+        label = stringResource(R.string.field_height),
+        value = height,
+        onChange = { height = it },
+        suffix = stringResource(R.string.unit_cm),
+    )
+    FieldLabel(stringResource(R.string.field_head))
+    NumberField(
+        label = stringResource(R.string.field_head_short),
+        value = head,
+        onChange = { head = it },
+        suffix = stringResource(R.string.unit_cm),
+    )
 
-            FieldLabel(stringResource(R.string.field_weight))
-            NumberField(
-                label = stringResource(R.string.field_weight),
-                value = weight,
-                onChange = { weight = it },
-                suffix = stringResource(R.string.unit_g),
-            )
-            FieldLabel(stringResource(R.string.field_height))
-            NumberField(
-                label = stringResource(R.string.field_height),
-                value = height,
-                onChange = { height = it },
-                suffix = stringResource(R.string.unit_cm),
-            )
-            FieldLabel(stringResource(R.string.field_head))
-            NumberField(
-                label = stringResource(R.string.field_head_short),
-                value = head,
-                onChange = { head = it },
-                suffix = stringResource(R.string.unit_cm),
-            )
+    FieldLabel(stringResource(R.string.field_date))
+    DatePickerField(label = stringResource(R.string.picker_on), millis = date, onChange = { date = it })
 
-            FieldLabel(stringResource(R.string.field_date))
-            DatePickerField(label = stringResource(R.string.picker_on), millis = date, onChange = { date = it })
+    Spacer(Modifier.height(8.dp))
+    NotesField(value = notes, onChange = { notes = it })
 
-            Spacer(Modifier.height(8.dp))
-            NotesField(value = notes, onChange = { notes = it })
-
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Button(
-                    enabled = weight.isNotBlank() || height.isNotBlank() || head.isNotBlank(),
-                    onClick = {
-                        onAdd(
-                            GrowthEntity(
-                                time = date,
-                                weightGrams = weight.toIntOrNull(),
-                                heightMm = height.toIntOrNull()?.let { it * 10 },
-                                headMm = head.toIntOrNull()?.let { it * 10 },
-                                notes = notes.ifBlank { null },
-                            ),
-                        )
-                        weight = ""
-                        height = ""
-                        head = ""
-                        notes = ""
-                        date = System.currentTimeMillis()
-                    },
-                ) {
-                    Text(stringResource(R.string.growth_add))
-                }
-            }
+    Spacer(Modifier.height(12.dp))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Button(
+            enabled = weight.isNotBlank() || height.isNotBlank() || head.isNotBlank(),
+            onClick = {
+                onAdd(
+                    GrowthEntity(
+                        time = date,
+                        weightGrams = weight.toIntOrNull(),
+                        heightMm = height.toIntOrNull()?.let { it * 10 },
+                        headMm = head.toIntOrNull()?.let { it * 10 },
+                        notes = notes.ifBlank { null },
+                    ),
+                )
+            },
+        ) {
+            Text(stringResource(R.string.growth_add))
         }
     }
 }
