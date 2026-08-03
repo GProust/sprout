@@ -40,6 +40,9 @@ class SproutRepository(
     val parentProfile: Flow<ParentProfileEntity?> = db.parentProfileDao().observeProfile()
     suspend fun saveParentProfile(profile: ParentProfileEntity) = db.parentProfileDao().upsert(profile)
     suspend fun updateParentLastCheckIn(time: Long) = db.parentProfileDao().updateLastCheckIn(time)
+    suspend fun setAskHealing(ask: Boolean) = db.parentProfileDao().updateAskHealing(ask)
+    suspend fun setAskBleeding(ask: Boolean) = db.parentProfileDao().updateAskBleeding(ask)
+    suspend fun setAskBreasts(ask: Boolean) = db.parentProfileDao().updateAskBreasts(ask)
 
     private val activeBabyId: Flow<Long?> = parentProfile
         .map { it?.activeBabyId }

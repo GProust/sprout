@@ -215,6 +215,7 @@
     <string name="checkin_q_bleeding">Czy wystąpiło dziś krwawienie?</string>
     <string name="checkin_q_breasts">Jak się czują Twoje piersi?</string>
     <string name="checkin_q_notes">Czy chcesz coś zanotować?</string>
+    <string name="checkin_opt_out">Nie zadawaj mi więcej tego pytania</string>
     <string name="screen_baby_profile">Profil dziecka</string>
     <string name="profile_age">Wiek: %1$s</string>
     <string name="profile_enter_name">Podaj imię</string>
@@ -282,6 +283,11 @@
     <!-- Przypomnienia o karmieniu -->
     <string name="settings_feeding_reminders">Przypomnienia o karmieniu</string>
     <string name="settings_feeding_reminders_desc">Przypomnij, gdy od ostatniego karmienia minęło zbyt dużo czasu.</string>
+    <string name="settings_checkin_section">Codzienny wpis</string>
+    <string name="settings_checkin_section_desc">Wybierz, o co pyta Twój codzienny wpis. Wyłączone pytanie nie będzie już zadawane; możesz je tu w każdej chwili włączyć ponownie.</string>
+    <string name="settings_healing_question">Gojenie</string>
+    <string name="settings_bleeding_question">Krwawienie</string>
+    <string name="settings_breasts_question">Komfort piersi</string>
     <string name="settings_feeding_interval_label">Przypomnij, jeśli od karmienia minie więcej niż</string>
     <string name="feeding_channel_name">Przypomnienia o karmieniu</string>
     <string name="feeding_channel_desc">Przypomnienia, gdy od ostatniego karmienia minęło trochę czasu</string>

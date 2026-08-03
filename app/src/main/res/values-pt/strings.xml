@@ -209,6 +209,7 @@
     <string name="checkin_q_bleeding">Algum sangramento hoje?</string>
     <string name="checkin_q_breasts">Como sente as suas mamas?</string>
     <string name="checkin_q_notes">Há algo que queira anotar?</string>
+    <string name="checkin_opt_out">Não voltar a fazer-me esta pergunta</string>
     <string name="screen_baby_profile">Perfil do bebé</string>
     <string name="profile_age">Idade: %1$s</string>
     <string name="profile_enter_name">Introduza um nome, por favor</string>
@@ -276,6 +277,11 @@
     <!-- Lembretes de refeições -->
     <string name="settings_feeding_reminders">Lembretes de refeições</string>
     <string name="settings_feeding_reminders_desc">Avisar-me quando passar demasiado tempo desde a última refeição.</string>
+    <string name="settings_checkin_section">Verificação diária</string>
+    <string name="settings_checkin_section_desc">Escolha as perguntas da sua verificação. Uma pergunta desativada deixa de ser feita; pode reativá-la aqui a qualquer momento.</string>
+    <string name="settings_healing_question">Recuperação</string>
+    <string name="settings_bleeding_question">Sangramento</string>
+    <string name="settings_breasts_question">Conforto dos seios</string>
     <string name="settings_feeding_interval_label">Lembrar-me se uma refeição passar de</string>
     <string name="feeding_channel_name">Lembretes de refeições</string>
     <string name="feeding_channel_desc">Lembretes quando já passou algum tempo desde a última refeição</string>

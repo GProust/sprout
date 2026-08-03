@@ -118,12 +118,10 @@ fun SproutApp(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
         Startup.Loading -> LoadingScreen()
         Startup.Onboarding -> OnboardingScreen(onFinish = startupVm::completeOnboarding)
         is Startup.CheckIn -> DailyCheckInScreen(
-            name = s.name,
-            gaveBirth = s.gaveBirth,
-            breastfeeding = s.breastfeeding,
-            deliveryType = s.deliveryType,
+            profile = s.profile,
             onSubmit = startupVm::submitCheckIn,
             onSkip = startupVm::markCheckedIn,
+            onOptOut = startupVm::optOut,
         )
         Startup.Main -> MainScaffold(routeRequest, onRouteConsumed)
     }
