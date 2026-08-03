@@ -190,6 +190,16 @@ data class ParentProfileEntity(
     val breastfeeding: Boolean = false,
     /** Only meaningful when [gaveBirth] is true; tailors the healing question. */
     val deliveryType: DeliveryType? = null,
+    /**
+     * Whether the daily check-in still asks each body question. [askHealing]
+     * and [askBleeding] only matter when [gaveBirth] is true, [askBreasts]
+     * when [breastfeeding] is true. The parent can opt out of any of them once
+     * it no longer needs a daily look — right from the check-in, or with the
+     * Settings toggles that also turn them back on.
+     */
+    @ColumnInfo(defaultValue = "1") val askHealing: Boolean = true,
+    @ColumnInfo(defaultValue = "1") val askBleeding: Boolean = true,
+    @ColumnInfo(defaultValue = "1") val askBreasts: Boolean = true,
     /** Epoch millis of the last completed/dismissed daily check-in. */
     val lastCheckIn: Long? = null,
     /** Which baby is currently selected for viewing/logging; null if none yet. */

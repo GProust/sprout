@@ -207,6 +207,7 @@
     <string name="checkin_q_bleeding">¿Algún sangrado hoy?</string>
     <string name="checkin_q_breasts">¿Cómo notas los pechos?</string>
     <string name="checkin_q_notes">¿Hay algo que quieras anotar?</string>
+    <string name="checkin_opt_out">No volver a preguntarme esto</string>
     <string name="screen_baby_profile">Perfil del bebé</string>
     <string name="profile_age">Edad: %1$s</string>
     <string name="profile_enter_name">Introduce un nombre</string>
@@ -274,6 +275,11 @@
     <!-- Recordatorios de tomas -->
     <string name="settings_feeding_reminders">Recordatorios de tomas</string>
     <string name="settings_feeding_reminders_desc">Avísame cuando haya pasado demasiado tiempo desde la última toma.</string>
+    <string name="settings_checkin_section">Chequeo diario</string>
+    <string name="settings_checkin_section_desc">Elige qué preguntas hace tu chequeo. Una pregunta desactivada deja de hacerse; puedes reactivarla aquí cuando quieras.</string>
+    <string name="settings_healing_question">Recuperación</string>
+    <string name="settings_bleeding_question">Sangrado</string>
+    <string name="settings_breasts_question">Comodidad de los pechos</string>
     <string name="settings_feeding_interval_label">Recordarme si una toma supera</string>
     <string name="feeding_channel_name">Recordatorios de tomas</string>
     <string name="feeding_channel_desc">Recordatorios cuando ha pasado un rato desde la última toma</string>
