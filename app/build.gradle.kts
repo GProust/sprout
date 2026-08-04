@@ -71,6 +71,10 @@ android {
         }
     }
     compileOptions {
+        // The *app's* language level and bytecode, constrained by Android (D8
+        // desugaring + ART) — deliberately independent of the JDK that runs the
+        // build (see the `java.toolchain` block below). Bumping this changes the
+        // bytecode we ship, so it stays at 17.
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -88,6 +92,23 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+// The JDK used to *run* the build (compile Kotlin/Java, run unit tests). Pinned
+// here rather than only in the three CI workflows, so every build — CI, release
+// or local — uses the same toolchain instead of whatever JDK the machine happens
+// to default to. Separate from `compileOptions` above, which fixes the bytecode
+// we actually ship.
+//
+// 17 is AGP's minimum *and* default, and is all this project needs. Raising it
+// only becomes worthwhile if the Robolectric tests should run against the SDK we
+// ship: Robolectric defaults to `targetSdk`, and the SDK 36 `android.jar` is
+// Java 21 bytecode that a JDK 17 build cannot read. The tests pin
+// `@Config(sdk = [34])` instead, so that trade-off isn't being paid today.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
