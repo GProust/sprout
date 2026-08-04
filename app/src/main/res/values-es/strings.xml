@@ -89,6 +89,10 @@
     <string name="quick_diaper">🧷  Pañal</string>
     <string name="quick_growth">📏  Crecimiento</string>
     <string name="quick_wellbeing">💚  Bienestar</string>
+    <string name="home_checkin_title">Tu chequeo diario</string>
+    <string name="home_checkin_body">Un momento de calma para ti, cuando quieras.</string>
+    <string name="home_checkin_action">Hacer el chequeo</string>
+    <string name="home_checkin_dismiss">Hoy no</string>
     <string name="screen_feeding">Tomas</string>
     <string name="feeding_empty">Aún no hay tomas registradas. Añade la primera arriba.</string>
     <string name="feeding_log_title">Registrar una toma</string>
@@ -278,6 +282,8 @@
     <string name="settings_feeding_reminders">Recordatorios de tomas</string>
     <string name="settings_feeding_reminders_desc">Avísame cuando haya pasado demasiado tiempo desde la última toma.</string>
     <string name="settings_checkin_section">Chequeo diario</string>
+    <string name="settings_checkin_track_desc">Una tarjeta en tu panel para ver cómo estás; Sprout nunca te interrumpe por ello. Si lo desactivas, el chequeo desaparece; tus entradas anteriores se conservan.</string>
+    <string name="settings_checkin_questions">Preguntas</string>
     <string name="settings_checkin_section_desc">Elige qué preguntas hace tu chequeo. Una pregunta desactivada deja de hacerse; puedes reactivarla aquí cuando quieras.</string>
     <string name="settings_healing_question">Recuperación</string>
     <string name="settings_bleeding_question">Sangrado</string>

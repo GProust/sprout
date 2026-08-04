@@ -35,3 +35,16 @@ fun CheckInQuestion.isOptional(): Boolean = when (this) {
     CheckInQuestion.HEALING, CheckInQuestion.BLEEDING, CheckInQuestion.BREASTS -> true
     CheckInQuestion.MOOD, CheckInQuestion.NOTES -> false
 }
+
+/** True when a daily check-in hasn't happened yet today. */
+fun needsCheckIn(lastCheckIn: Long?, now: Long): Boolean =
+    lastCheckIn == null || !isSameDay(lastCheckIn, now)
+
+/**
+ * Whether the dashboard should offer today's check-in. It waits there rather
+ * than interrupting at launch — a 3 a.m. feed is no moment to answer questions
+ * about yourself — and disappears for the day once the check-in is saved or set
+ * aside. A parent who stopped tracking their wellbeing is never offered it.
+ */
+fun shouldOfferCheckIn(trackWellbeing: Boolean, lastCheckIn: Long?, now: Long): Boolean =
+    trackWellbeing && needsCheckIn(lastCheckIn, now)

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,6 +65,7 @@ import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.currentGrowthSpurt
 import com.gproust.sprout.ui.common.greetingFor
 import com.gproust.sprout.ui.common.growthSpurtAgeLabel
+import com.gproust.sprout.ui.common.shouldOfferCheckIn
 import com.gproust.sprout.ui.common.upcomingGrowthSpurt
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
@@ -85,6 +88,10 @@ data class HomeUiState(
     val sleepTodayText: String = "0m",
     val lastFeedText: String? = null,
     val growthSpurt: GrowthSpurtUi? = null,
+    /** Whether this parent tracks their own wellbeing at all (Settings). */
+    val tracksWellbeing: Boolean = true,
+    /** Whether today's check-in is still waiting to be filled in. */
+    val checkInPending: Boolean = false,
 )
 
 /** The growth spurt note to show on the dashboard, when one is relevant. */
@@ -101,6 +108,11 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun setActiveBaby(id: Long) = viewModelScope.launch { repository.setActiveBaby(id) }
+
+    /** "Not today" on the check-in card: put it away until tomorrow, nothing saved. */
+    fun dismissCheckIn() = viewModelScope.launch {
+        repository.updateParentLastCheckIn(System.currentTimeMillis())
+    }
 
     val uiState = combine(
         repository.parentProfile,
@@ -133,6 +145,11 @@ class HomeViewModel(
             lastFeedText = feedings.maxByOrNull { it.startTime }
                 ?.let { formatRelative(context, it.startTime, now) },
             growthSpurt = growthSpurt,
+            // Defaults to on before the profile has loaded, so the shortcut
+            // doesn't blink in; only an explicit "off" hides it.
+            tracksWellbeing = parent?.trackWellbeing != false,
+            checkInPending = parent != null &&
+                shouldOfferCheckIn(parent.trackWellbeing, parent.lastCheckIn, now),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 }
@@ -233,6 +250,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
+            if (state.checkInPending) {
+                Spacer(Modifier.height(12.dp))
+                CheckInCard(
+                    onCheckIn = { onNavigate(Routes.CHECKIN) },
+                    onDismiss = vm::dismissCheckIn,
+                )
+            }
+
             state.growthSpurt?.let { spurt ->
                 Spacer(Modifier.height(12.dp))
                 GrowthSpurtCard(spurt)
@@ -278,7 +303,56 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             QuickAction(stringResource(R.string.quick_diaper), onClick = { onNavigate(Routes.DIAPER) })
             QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })
             QuickAction(stringResource(R.string.quick_treatments), onClick = { onNavigate(Routes.TREATMENTS) })
-            QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
+            // Dropped for a parent who stopped tracking their wellbeing; the
+            // heart in the top bar still opens their history.
+            if (state.tracksWellbeing) {
+                QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
+            }
+        }
+    }
+}
+
+/**
+ * Today's wellbeing check-in, waiting on the dashboard. It sits here rather than
+ * opening at launch so a parent reaching for the app mid-feed never has to get
+ * past it; "Not today" puts it away until tomorrow without saving anything.
+ */
+@Composable
+private fun CheckInCard(onCheckIn: () -> Unit, onDismiss: () -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Favorite, contentDescription = null)
+                Column(Modifier.padding(start = 12.dp)) {
+                    Text(
+                        stringResource(R.string.home_checkin_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        stringResource(R.string.home_checkin_body),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+            }
+            Row(
+                Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.home_checkin_dismiss))
+                }
+                Button(onClick = onCheckIn, modifier = Modifier.padding(start = 8.dp)) {
+                    Text(stringResource(R.string.home_checkin_action))
+                }
+            }
         }
     }
 }

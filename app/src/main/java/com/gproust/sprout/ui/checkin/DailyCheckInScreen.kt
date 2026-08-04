@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
+import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
@@ -47,6 +52,68 @@ import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.isOptional
 import com.gproust.sprout.ui.common.label
 import com.gproust.sprout.ui.common.moodEmoji
+import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class CheckInViewModel(private val repository: SproutRepository) : ViewModel() {
+
+    val profile = repository.parentProfile
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /**
+     * Save today's check-in; the dashboard stops offering it until tomorrow.
+     * Saving also closes the screen, which clears this ViewModel and cancels
+     * its scope — so the write is made non-cancellable to outlive that.
+     */
+    fun submit(entity: WellbeingEntity) {
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                repository.addWellbeing(entity)
+                repository.updateParentLastCheckIn(System.currentTimeMillis())
+            }
+        }
+    }
+
+    /** Stop asking [question]; the check-in flow moves on without it. */
+    fun optOut(question: CheckInQuestion) {
+        viewModelScope.launch {
+            when (question) {
+                CheckInQuestion.HEALING -> repository.setAskHealing(false)
+                CheckInQuestion.BLEEDING -> repository.setAskBleeding(false)
+                CheckInQuestion.BREASTS -> repository.setAskBreasts(false)
+                // Mood and notes are the check-in's core; they can't be opted out.
+                CheckInQuestion.MOOD, CheckInQuestion.NOTES -> Unit
+            }
+        }
+    }
+}
+
+/**
+ * The check-in as a destination reached from the dashboard card. Leaving
+ * without saving ("Not now") simply closes it — the card stays on the
+ * dashboard, since coming back later is the whole point.
+ */
+@Composable
+fun CheckInRoute(onDone: () -> Unit) {
+    val vm: CheckInViewModel = viewModel(factory = rememberSproutViewModelFactory())
+    val profile by vm.profile.collectAsState()
+
+    profile?.let {
+        DailyCheckInScreen(
+            profile = it,
+            onSubmit = { entity ->
+                vm.submit(entity)
+                onDone()
+            },
+            onSkip = onDone,
+            onOptOut = vm::optOut,
+        )
+    }
+}
 
 @Composable
 fun DailyCheckInScreen(

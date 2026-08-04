@@ -89,6 +89,10 @@
     <string name="quick_diaper">🧷  Windel</string>
     <string name="quick_growth">📏  Wachstum</string>
     <string name="quick_wellbeing">💚  Wohlbefinden</string>
+    <string name="home_checkin_title">Dein täglicher Check-in</string>
+    <string name="home_checkin_body">Ein ruhiger Moment für dich — wann immer du magst.</string>
+    <string name="home_checkin_action">Check-in machen</string>
+    <string name="home_checkin_dismiss">Heute nicht</string>
     <string name="screen_feeding">Mahlzeiten</string>
     <string name="feeding_empty">Noch keine Mahlzeiten eingetragen. Füge oben deine erste hinzu.</string>
     <string name="feeding_log_title">Mahlzeit eintragen</string>
@@ -278,6 +282,8 @@
     <string name="settings_feeding_reminders">Mahlzeit-Erinnerungen</string>
     <string name="settings_feeding_reminders_desc">Erinnere mich, wenn die letzte Mahlzeit zu lange her ist.</string>
     <string name="settings_checkin_section">Täglicher Check-in</string>
+    <string name="settings_checkin_track_desc">Eine Karte auf deinem Dashboard für dein Befinden — Sprout unterbricht dich dafür nie. Schaltest du sie aus, verschwindet der Check-in; deine bisherigen Einträge bleiben erhalten.</string>
+    <string name="settings_checkin_questions">Fragen</string>
     <string name="settings_checkin_section_desc">Wähle, welche Fragen dein Check-in stellt. Eine abgewählte Frage wird nicht mehr gestellt; du kannst sie hier jederzeit wieder aktivieren.</string>
     <string name="settings_healing_question">Heilung</string>
     <string name="settings_bleeding_question">Blutung</string>

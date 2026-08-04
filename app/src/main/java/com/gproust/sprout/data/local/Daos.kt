@@ -74,6 +74,9 @@ interface ParentProfileDao {
 
     @Query("UPDATE parent_profile SET askBreasts = :ask WHERE id = 1")
     suspend fun updateAskBreasts(ask: Boolean)
+
+    @Query("UPDATE parent_profile SET trackWellbeing = :track WHERE id = 1")
+    suspend fun updateTrackWellbeing(track: Boolean)
 }
 
 @Dao

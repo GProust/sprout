@@ -95,6 +95,10 @@
     <string name="quick_diaper">🧷  Pielucha</string>
     <string name="quick_growth">📏  Wzrost</string>
     <string name="quick_wellbeing">💚  Samopoczucie</string>
+    <string name="home_checkin_title">Twój codzienny wpis</string>
+    <string name="home_checkin_body">Spokojna chwila dla Ciebie — kiedy tylko zechcesz.</string>
+    <string name="home_checkin_action">Dodaj wpis</string>
+    <string name="home_checkin_dismiss">Nie dzisiaj</string>
     <string name="screen_feeding">Karmienie</string>
     <string name="feeding_empty">Brak zapisanych karmień. Dodaj pierwsze powyżej.</string>
     <string name="feeding_log_title">Zapisz karmienie</string>
@@ -284,6 +288,8 @@
     <string name="settings_feeding_reminders">Przypomnienia o karmieniu</string>
     <string name="settings_feeding_reminders_desc">Przypomnij, gdy od ostatniego karmienia minęło zbyt dużo czasu.</string>
     <string name="settings_checkin_section">Codzienny wpis</string>
+    <string name="settings_checkin_track_desc">Karta na pulpicie, by zapisać, jak się czujesz — Sprout nigdy Ci dla niej nie przerywa. Po wyłączeniu wpis znika; dotychczasowe zapisy pozostają.</string>
+    <string name="settings_checkin_questions">Pytania</string>
     <string name="settings_checkin_section_desc">Wybierz, o co pyta Twój codzienny wpis. Wyłączone pytanie nie będzie już zadawane; możesz je tu w każdej chwili włączyć ponownie.</string>
     <string name="settings_healing_question">Gojenie</string>
     <string name="settings_bleeding_question">Krwawienie</string>

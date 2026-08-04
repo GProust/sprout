@@ -89,6 +89,10 @@
     <string name="quick_diaper">🧷  Fralda</string>
     <string name="quick_growth">📏  Crescimento</string>
     <string name="quick_wellbeing">💚  Bem-estar</string>
+    <string name="home_checkin_title">A sua verificação diária</string>
+    <string name="home_checkin_body">Um momento de calma para si, quando quiser.</string>
+    <string name="home_checkin_action">Fazer a verificação</string>
+    <string name="home_checkin_dismiss">Hoje não</string>
     <string name="screen_feeding">Alimentação</string>
     <string name="feeding_empty">Ainda não há refeições registadas. Adicione a primeira acima.</string>
     <string name="feeding_log_title">Registar uma refeição</string>
@@ -278,6 +282,8 @@
     <string name="settings_feeding_reminders">Lembretes de refeições</string>
     <string name="settings_feeding_reminders_desc">Avisar-me quando passar demasiado tempo desde a última refeição.</string>
     <string name="settings_checkin_section">Verificação diária</string>
+    <string name="settings_checkin_track_desc">Um cartão no seu painel para registar como está — o Sprout nunca o interrompe por causa disso. Se desativar, a verificação desaparece; os registos anteriores são mantidos.</string>
+    <string name="settings_checkin_questions">Perguntas</string>
     <string name="settings_checkin_section_desc">Escolha as perguntas da sua verificação. Uma pergunta desativada deixa de ser feita; pode reativá-la aqui a qualquer momento.</string>
     <string name="settings_healing_question">Recuperação</string>
     <string name="settings_bleeding_question">Sangramento</string>

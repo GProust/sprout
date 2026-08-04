@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.ui.checkin.CheckInViewModel
 import com.gproust.sprout.ui.diaper.DiaperViewModel
 import com.gproust.sprout.ui.feeding.FeedingViewModel
 import com.gproust.sprout.ui.growth.GrowthViewModel
@@ -31,6 +32,7 @@ class SproutViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when {
             modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository)
+            modelClass.isAssignableFrom(CheckInViewModel::class.java) -> CheckInViewModel(repository)
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository, context)
             modelClass.isAssignableFrom(FeedingViewModel::class.java) -> FeedingViewModel(repository, context)
             modelClass.isAssignableFrom(SleepViewModel::class.java) -> SleepViewModel(repository)

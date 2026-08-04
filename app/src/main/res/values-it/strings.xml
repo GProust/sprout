@@ -89,6 +89,10 @@
     <string name="quick_diaper">🧷  Pannolino</string>
     <string name="quick_growth">📏  Crescita</string>
     <string name="quick_wellbeing">💚  Benessere</string>
+    <string name="home_checkin_title">Il tuo check-in quotidiano</string>
+    <string name="home_checkin_body">Un momento di calma per te, quando vuoi.</string>
+    <string name="home_checkin_action">Fai il check-in</string>
+    <string name="home_checkin_dismiss">Non oggi</string>
     <string name="screen_feeding">Pasti</string>
     <string name="feeding_empty">Nessun pasto registrato finora. Aggiungi il primo qui sopra.</string>
     <string name="feeding_log_title">Registra un pasto</string>
@@ -278,6 +282,8 @@
     <string name="settings_feeding_reminders">Promemoria pasti</string>
     <string name="settings_feeding_reminders_desc">Avvisami quando è passato troppo tempo dall\'ultimo pasto.</string>
     <string name="settings_checkin_section">Check-in quotidiano</string>
+    <string name="settings_checkin_track_desc">Una scheda sulla tua dashboard per come stai: Sprout non ti interrompe mai per questo. Se lo disattivi, il check-in sparisce; le voci già registrate restano.</string>
+    <string name="settings_checkin_questions">Domande</string>
     <string name="settings_checkin_section_desc">Scegli quali domande fa il tuo check-in. Una domanda disattivata non viene più posta; puoi riattivarla qui in qualsiasi momento.</string>
     <string name="settings_healing_question">Guarigione</string>
     <string name="settings_bleeding_question">Sanguinamento</string>
