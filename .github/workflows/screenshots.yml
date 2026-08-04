@@ -227,6 +227,13 @@ jobs:
             # minutes the emulator takes, or a manual run racing a PR run).
             # This commit only touches PNGs, so replaying it on top is safe and
             # beats failing the job on a rejected push.
-            git pull --rebase origin "$branch"
+            #
+            # --autostash because the build leaves other files modified in the
+            # working tree, which plain --rebase refuses to run with. We only
+            # publish `screenshots`, so whatever else the build touched is not
+            # ours to commit; log it rather than silently discarding it.
+            echo "Working tree state before rebase:"
+            git status --porcelain
+            git pull --rebase --autostash origin "$branch"
             git push origin HEAD:"$branch"
           fi
