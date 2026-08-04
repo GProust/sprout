@@ -3,6 +3,7 @@ package com.gproust.sprout.widget
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.gproust.sprout.ui.common.formatDateTime
 import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
+import kotlin.coroutines.cancellation.CancellationException
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
 suspend fun updateSproutWidget(context: Context) = SproutWidget().updateAll(context)
@@ -79,8 +81,8 @@ class SproutWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val app = context.applicationContext as SproutApplication
-        val session = NursingSessionStore.load(context)
-        val feed = app.repository.lastBreastFeedForActiveBaby()
+        val session = readForWidget("nursing session") { NursingSessionStore.load(context) }
+        val feed = readForWidget("last breastfeed") { app.repository.lastBreastFeedForActiveBaby() }
         provideContent {
             GlanceTheme {
                 SproutWidgetUi(session, feed)
@@ -88,6 +90,24 @@ class SproutWidget : GlanceAppWidget() {
         }
     }
 }
+
+/**
+ * Reads one piece of widget data, degrading to null if it fails. Everything
+ * [SproutWidget.provideGlance] loads happens *before* `provideContent`, so a
+ * throw there means no content is ever emitted and the widget sits on its
+ * initial loading layout for good — no error UI, and no retry until the next
+ * half-hourly refresh. Showing the empty state is recoverable; a permanent
+ * spinner isn't.
+ */
+private suspend fun <T> readForWidget(what: String, read: suspend () -> T): T? =
+    try {
+        read()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Log.e("SproutWidget", "Widget could not read the $what; showing the empty state", e)
+        null
+    }
 
 /** The widget's root content: the live session when one runs, else the last feed. */
 @Composable

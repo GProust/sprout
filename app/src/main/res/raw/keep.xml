@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Glance builds the widget's RemoteViews by inflating layouts that ship inside
+  the glance-appwidget AAR (glance_box_*, glance_text_*, glance_error_layout,
+  …). They are picked at runtime from a generated id lookup table rather than
+  referenced from our code or XML, so the resource shrinker (isShrinkResources
+  in app/build.gradle.kts) sees them as unused and strips them from release
+  builds. The widget then can't render anything and stays on the loading
+  layout named by sprout_widget_info.xml — the one glance_* resource that
+  survives, because that XML does reference it by name.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@layout/glance_*,@drawable/glance_*,@id/glance_*,@dimen/glance_*,@style/glance_*,@color/glance_*" />
