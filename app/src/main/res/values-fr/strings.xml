@@ -346,6 +346,27 @@
     <string name="feeding_notif_title_baby">C\'est l\'heure du repas de %1$s ?</string>
     <string name="feeding_notif_text">Cela fait %1$s depuis le dernier repas.</string>
 
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">vers %1$d semaine</item>
+        <item quantity="other">vers %1$d semaines</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">vers %1$d mois</item>
+        <item quantity="other">vers %1$d mois</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Période de pic de croissance</string>
+    <string name="growth_spurt_now_body">Les bébés traversent souvent un pic de croissance %1$s. Plus de faim, plus de réveils et de grognons — c\'est normal, et ça passe en général en quelques jours.</string>
+    <string name="growth_spurt_soon_title">Pic de croissance à venir</string>
+    <string name="growth_spurt_soon_body">Un pic de croissance est fréquent %1$s — il peut commencer dans les prochains jours.</string>
+    <string name="settings_growth_spurts">Alertes pics de croissance</string>
+    <string name="settings_growth_spurts_desc">Me prévenir quand une période typique de pic de croissance commence.</string>
+    <string name="growth_spurt_channel_name">Alertes pics de croissance</string>
+    <string name="growth_spurt_channel_desc">Un petit signe quand une période typique de pic de croissance commence</string>
+    <string name="growth_spurt_notif_title">Un pic de croissance commence peut-être</string>
+    <string name="growth_spurt_notif_title_baby">%1$s commence peut-être un pic de croissance</string>
+    <string name="growth_spurt_notif_text">Les pics de croissance sont fréquents %1$s. Plus de repas et de grognons — c\'est normal, et ça passe en général en quelques jours.</string>
+
     <!-- Home-screen widget -->
     <string name="widget_label">Dernière tétée</string>
     <string name="widget_description">La dernière tétée (côté, il y a combien de temps) — ou la tétée en cours avec son chronomètre.</string>

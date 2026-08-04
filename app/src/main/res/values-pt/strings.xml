@@ -289,6 +289,27 @@
     <string name="feeding_notif_title_baby">Horas de alimentar %1$s?</string>
     <string name="feeding_notif_text">Já passaram %1$s desde a última refeição.</string>
 
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">por volta de %1$d semana</item>
+        <item quantity="other">por volta das %1$d semanas</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">por volta de %1$d mês</item>
+        <item quantity="other">por volta dos %1$d meses</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Período de salto de crescimento</string>
+    <string name="growth_spurt_now_body">Muitos bebés passam por um salto de crescimento %1$s. Mais fome, mais despertares e irritação são normais — costuma passar em poucos dias.</string>
+    <string name="growth_spurt_soon_title">Salto de crescimento à vista</string>
+    <string name="growth_spurt_soon_body">Um salto de crescimento é comum %1$s — pode começar nos próximos dias.</string>
+    <string name="settings_growth_spurts">Alertas de saltos de crescimento</string>
+    <string name="settings_growth_spurts_desc">Avisar-me quando começar um período típico de salto de crescimento.</string>
+    <string name="growth_spurt_channel_name">Alertas de saltos de crescimento</string>
+    <string name="growth_spurt_channel_desc">Um aviso quando começa um período típico de salto de crescimento</string>
+    <string name="growth_spurt_notif_title">Pode estar a começar um salto de crescimento</string>
+    <string name="growth_spurt_notif_title_baby">%1$s pode estar a começar um salto de crescimento</string>
+    <string name="growth_spurt_notif_text">Os saltos de crescimento são comuns %1$s. Mais refeições e irritação são normais — costuma passar em poucos dias.</string>
+
     <!-- Home-screen widget -->
     <string name="widget_label">Última mamada</string>
     <string name="widget_description">A última mamada (lado, há quanto tempo) — ou a mamada em curso com o cronómetro.</string>

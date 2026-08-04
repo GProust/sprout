@@ -5,6 +5,11 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🌱 **Growth spurt periods**: the dashboard now shows a gentle note while
+  your baby is in — or a few days from — one of the typical growth spurt
+  windows (around 1, 3, 6 and 9 weeks, then 3, 6 and 9 months), reassuring you
+  that extra hunger and fussiness are normal. An **opt-in alert** (Settings,
+  off by default) can also give you a heads-up when such a period begins.
 - 🗂️ Tracking screens (Feeding, Sleep, Diapers, Growth) are now
   **history-first**: the log list fills the screen — newest entry on top,
   grouped under Today/Yesterday/date headers — and the log form opens in a

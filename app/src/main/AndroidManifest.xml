@@ -44,6 +44,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".notifications.GrowthSpurtReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Home-screen widget: last breastfeeding side and time. -->
         <receiver
             android:name=".widget.SproutWidgetReceiver"

@@ -24,6 +24,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -55,8 +58,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.ui.common.StatCard
+import com.gproust.sprout.ui.common.ageInDays
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.common.currentGrowthSpurt
 import com.gproust.sprout.ui.common.greetingFor
+import com.gproust.sprout.ui.common.growthSpurtAgeLabel
+import com.gproust.sprout.ui.common.upcomingGrowthSpurt
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
 import com.gproust.sprout.ui.common.startOfDay
@@ -77,7 +84,11 @@ data class HomeUiState(
     val diapersToday: Int = 0,
     val sleepTodayText: String = "0m",
     val lastFeedText: String? = null,
+    val growthSpurt: GrowthSpurtUi? = null,
 )
+
+/** The growth spurt note to show on the dashboard, when one is relevant. */
+data class GrowthSpurtUi(val ageLabel: String, val startsSoon: Boolean)
 
 class HomeViewModel(
     private val repository: SproutRepository,
@@ -105,6 +116,12 @@ class HomeViewModel(
             .filter { it.startTime >= dayStart }
             .sumOf { (it.endTime ?: now) - it.startTime }
 
+        val growthSpurt = baby?.let {
+            val ageDays = ageInDays(it.birthDate, now)
+            currentGrowthSpurt(ageDays)?.let { w -> GrowthSpurtUi(growthSpurtAgeLabel(context, w), startsSoon = false) }
+                ?: upcomingGrowthSpurt(ageDays)?.let { w -> GrowthSpurtUi(growthSpurtAgeLabel(context, w), startsSoon = true) }
+        }
+
         HomeUiState(
             parentName = parent?.name,
             babyName = baby?.name,
@@ -115,6 +132,7 @@ class HomeViewModel(
             sleepTodayText = formatDuration(context, sleepMillisToday),
             lastFeedText = feedings.maxByOrNull { it.startTime }
                 ?.let { formatRelative(context, it.startTime, now) },
+            growthSpurt = growthSpurt,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 }
@@ -215,6 +233,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
+            state.growthSpurt?.let { spurt ->
+                Spacer(Modifier.height(12.dp))
+                GrowthSpurtCard(spurt)
+            }
+
             Spacer(Modifier.height(16.dp))
             Text(
                 stringResource(R.string.home_today),
@@ -256,6 +279,44 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })
             QuickAction(stringResource(R.string.quick_treatments), onClick = { onNavigate(Routes.TREATMENTS) })
             QuickAction(stringResource(R.string.quick_wellbeing), onClick = { onNavigate(Routes.HEALTH) })
+        }
+    }
+}
+
+/**
+ * A gentle note shown while the baby is in — or a few days from — one of the
+ * typical growth spurt periods. Informational only; every baby is different.
+ */
+@Composable
+private fun GrowthSpurtCard(spurt: GrowthSpurtUi) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.TrendingUp, contentDescription = null)
+            Column(Modifier.padding(start = 12.dp)) {
+                Text(
+                    stringResource(
+                        if (spurt.startsSoon) R.string.growth_spurt_soon_title
+                        else R.string.growth_spurt_now_title,
+                    ),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    stringResource(
+                        if (spurt.startsSoon) R.string.growth_spurt_soon_body
+                        else R.string.growth_spurt_now_body,
+                        spurt.ageLabel,
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
+            }
         }
     }
 }

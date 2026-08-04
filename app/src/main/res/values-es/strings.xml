@@ -289,6 +289,27 @@
     <string name="feeding_notif_title_baby">¿Hora de alimentar a %1$s?</string>
     <string name="feeding_notif_text">Han pasado %1$s desde la última toma.</string>
 
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">alrededor de la semana %1$d</item>
+        <item quantity="other">alrededor de las %1$d semanas</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">alrededor del mes %1$d</item>
+        <item quantity="other">alrededor de los %1$d meses</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Época de estirón</string>
+    <string name="growth_spurt_now_body">Muchos bebés dan un estirón de crecimiento %1$s. Más hambre, más despertares e irritabilidad son normales; suele pasar en unos días.</string>
+    <string name="growth_spurt_soon_title">Estirón a la vista</string>
+    <string name="growth_spurt_soon_body">Es habitual un estirón de crecimiento %1$s; puede empezar en los próximos días.</string>
+    <string name="settings_growth_spurts">Avisos de estirones</string>
+    <string name="settings_growth_spurts_desc">Avísame cuando empiece una época típica de estirón de crecimiento.</string>
+    <string name="growth_spurt_channel_name">Avisos de estirones</string>
+    <string name="growth_spurt_channel_desc">Un aviso cuando empieza una época típica de estirón de crecimiento</string>
+    <string name="growth_spurt_notif_title">Puede que empiece un estirón de crecimiento</string>
+    <string name="growth_spurt_notif_title_baby">Puede que %1$s esté empezando un estirón</string>
+    <string name="growth_spurt_notif_text">Los estirones de crecimiento son habituales %1$s. Más tomas e irritabilidad son normales; suele pasar en unos días.</string>
+
     <!-- Home-screen widget -->
     <string name="widget_label">Última toma de pecho</string>
     <string name="widget_description">La última toma de pecho (lado, hace cuánto) — o la toma en curso con su cronómetro.</string>

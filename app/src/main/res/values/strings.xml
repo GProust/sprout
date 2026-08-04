@@ -358,6 +358,28 @@
     <string name="feeding_notif_title_baby">Time to feed %1$s?</string>
     <string name="feeding_notif_text">It\'s been %1$s since the last feed.</string>
 
+    <!-- Growth spurts (typical periods; worded gently — every baby is different) -->
+    <!-- "around N weeks/months" of age; inserted into the sentences below -->
+    <plurals name="growth_spurt_weeks">
+        <item quantity="one">around %1$d week</item>
+        <item quantity="other">around %1$d weeks</item>
+    </plurals>
+    <plurals name="growth_spurt_months">
+        <item quantity="one">around %1$d month</item>
+        <item quantity="other">around %1$d months</item>
+    </plurals>
+    <string name="growth_spurt_now_title">Growth spurt time</string>
+    <string name="growth_spurt_now_body">Babies often go through a growth spurt %1$s. Extra hunger, more waking and fussiness are normal — it usually passes in a few days.</string>
+    <string name="growth_spurt_soon_title">Growth spurt ahead</string>
+    <string name="growth_spurt_soon_body">A growth spurt is common %1$s — it may start in the next few days.</string>
+    <string name="settings_growth_spurts">Growth spurt alerts</string>
+    <string name="settings_growth_spurts_desc">Give me a heads-up when a typical growth spurt period begins.</string>
+    <string name="growth_spurt_channel_name">Growth spurt alerts</string>
+    <string name="growth_spurt_channel_desc">A heads-up when a typical growth spurt period begins</string>
+    <string name="growth_spurt_notif_title">A growth spurt may be starting</string>
+    <string name="growth_spurt_notif_title_baby">%1$s may be starting a growth spurt</string>
+    <string name="growth_spurt_notif_text">Growth spurts are common %1$s. Extra feeds and fussiness are normal — it usually passes in a few days.</string>
+
     <!-- Home-screen widget -->
     <string name="widget_label">Last breastfeed</string>
     <string name="widget_description">The last breastfeed (side, how long ago) — or the session in progress with its live timer.</string>
