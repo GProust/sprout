@@ -3,7 +3,13 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.1] — 2026-08-04
+
+- 📟 Fixed the **home-screen widget never loading**: it sat on its loading
+  spinner instead of ever showing the last breastfeed. Release builds were
+  shrinking away the layouts Glance inflates to draw the widget.
+
+## [1.4.0] — 2026-08-04
 
 - 💚 The **daily wellbeing check-in no longer opens at launch**. It waits as a
   card on the dashboard ("Your daily check-in") until you feel like it — so
