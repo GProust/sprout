@@ -393,4 +393,15 @@
     <string name="widget_ago_minutes">%1$d min ago</string>
     <string name="widget_ago_hours">%1$d h ago</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min ago</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Widget diagnostics</string>
+    <string name="settings_troubleshooting">Troubleshooting</string>
+    <string name="settings_widget_diagnostics_hint">Check why the home-screen widget isn\'t working, and share a report.</string>
+    <string name="widget_diagnostics_intro">This tests the home-screen widget right now and lists what it did recently. Share it if the widget isn\'t working — nothing is sent unless you choose to.</string>
+    <string name="widget_diagnostics_share">Share report</string>
+    <string name="widget_diagnostics_copy">Copy</string>
+    <string name="widget_diagnostics_rerun">Run again</string>
+    <string name="widget_diagnostics_clear">Clear history</string>
+    <string name="widget_error">Widget error — see Settings → Widget diagnostics</string>
 </resources>

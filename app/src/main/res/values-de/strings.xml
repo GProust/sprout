@@ -323,4 +323,15 @@
     <string name="widget_ago_minutes">vor %1$d Min.</string>
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Widget-Diagnose</string>
+    <string name="settings_troubleshooting">Fehlersuche</string>
+    <string name="settings_widget_diagnostics_hint">Prüfen, warum das Homescreen-Widget nicht funktioniert, und einen Bericht teilen.</string>
+    <string name="widget_diagnostics_intro">Dies testet das Homescreen-Widget jetzt und listet auf, was es zuletzt getan hat. Teile den Bericht, wenn das Widget nicht funktioniert – nichts wird ohne dein Zutun gesendet.</string>
+    <string name="widget_diagnostics_share">Bericht teilen</string>
+    <string name="widget_diagnostics_copy">Kopieren</string>
+    <string name="widget_diagnostics_rerun">Erneut ausführen</string>
+    <string name="widget_diagnostics_clear">Verlauf löschen</string>
+    <string name="widget_error">Widget-Fehler – siehe Einstellungen → Widget-Diagnose</string>
 </resources>

@@ -49,6 +49,7 @@ import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
+import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.startup.Startup
@@ -66,6 +67,7 @@ object Routes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
+    const val WIDGET_DIAGNOSTICS = "settings/widget-diagnostics"
 }
 
 private data class BottomDestination(
@@ -218,7 +220,13 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
                 ProfileScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.SETTINGS) {
-                SettingsScreen(onBack = { navController.popBackStack() })
+                SettingsScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenWidgetDiagnostics = { navController.navigate(Routes.WIDGET_DIAGNOSTICS) },
+                )
+            }
+            composable(Routes.WIDGET_DIAGNOSTICS) {
+                WidgetDiagnosticsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.TREATMENTS) {
                 TreatmentsScreen(onBack = { navController.popBackStack() })

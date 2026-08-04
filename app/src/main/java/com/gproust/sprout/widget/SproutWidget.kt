@@ -2,8 +2,8 @@ package com.gproust.sprout.widget
 
 import android.content.Context
 import android.content.Intent
+import android.appwidget.AppWidgetManager
 import android.os.SystemClock
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -40,7 +40,10 @@ import com.gproust.sprout.ui.navigation.Routes
 import kotlin.coroutines.cancellation.CancellationException
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
-suspend fun updateSproutWidget(context: Context) = SproutWidget().updateAll(context)
+suspend fun updateSproutWidget(context: Context) {
+    WidgetDiagnostics.record(context, "app asked the widget to refresh")
+    SproutWidget().updateAll(context)
+}
 
 /**
  * The breast to offer first at the next feed alternates, so what a nursing
@@ -77,17 +80,32 @@ internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): Stri
  * system refresh (Android's minimum) so the elapsed time doesn't drift too
  * far between feeds. Tapping it opens the app on the Feeding screen.
  */
-class SproutWidget : GlanceAppWidget() {
+class SproutWidget : GlanceAppWidget(errorUiLayout = R.layout.widget_error) {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val app = context.applicationContext as SproutApplication
-        val session = readForWidget("nursing session") { NursingSessionStore.load(context) }
-        val feed = readForWidget("last breastfeed") { app.repository.lastBreastFeedForActiveBaby() }
+        WidgetDiagnostics.record(context, "provideGlance started")
+        val app = readForWidget(context, "app container") {
+            context.applicationContext as SproutApplication
+        }
+        val session = readForWidget(context, "nursing session") {
+            NursingSessionStore.load(context)
+        }
+        val feed = readForWidget(context, "last breastfeed") {
+            app?.repository?.lastBreastFeedForActiveBaby()
+        }
+        WidgetDiagnostics.record(
+            context,
+            "data read: session=${if (session != null) "running" else "none"}, " +
+                "lastFeed=${if (feed != null) "found" else "none"}",
+        )
         provideContent {
             GlanceTheme {
                 SproutWidgetUi(session, feed)
             }
         }
+        // provideContent suspends until the composition closes, so reaching
+        // here means the launcher tore the widget down, not that we failed.
+        WidgetDiagnostics.record(context, "composition closed")
     }
 }
 
@@ -99,13 +117,17 @@ class SproutWidget : GlanceAppWidget() {
  * half-hourly refresh. Showing the empty state is recoverable; a permanent
  * spinner isn't.
  */
-private suspend fun <T> readForWidget(what: String, read: suspend () -> T): T? =
+private suspend fun <T> readForWidget(
+    context: Context,
+    what: String,
+    read: suspend () -> T,
+): T? =
     try {
         read()
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Log.e("SproutWidget", "Widget could not read the $what; showing the empty state", e)
+        WidgetDiagnostics.record(context, "could not read the $what; showing the empty state", e)
         null
     }
 
@@ -205,4 +227,26 @@ private fun SideText(side: BreastSide) {
 /** Entry point declared in the manifest; the system talks to the widget through this. */
 class SproutWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = SproutWidget()
+
+    // Recorded so a diagnostics report can distinguish "the launcher never
+    // asked us to update" from "it asked and we failed" — those point at
+    // completely different causes.
+    override fun onEnabled(context: Context) {
+        WidgetDiagnostics.record(context, "receiver: first widget added")
+        super.onEnabled(context)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+    ) {
+        WidgetDiagnostics.record(context, "receiver: onUpdate for ${appWidgetIds.size} widget(s)")
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetDiagnostics.record(context, "receiver: ${appWidgetIds.size} widget(s) removed")
+        super.onDeleted(context, appWidgetIds)
+    }
 }

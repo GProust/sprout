@@ -323,4 +323,15 @@
     <string name="widget_ago_minutes">hace %1$d min</string>
     <string name="widget_ago_hours">hace %1$d h</string>
     <string name="widget_ago_hours_minutes">hace %1$d h %2$d min</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnóstico del widget</string>
+    <string name="settings_troubleshooting">Resolución de problemas</string>
+    <string name="settings_widget_diagnostics_hint">Comprueba por qué el widget de la pantalla de inicio no funciona y comparte un informe.</string>
+    <string name="widget_diagnostics_intro">Esto prueba el widget de la pantalla de inicio ahora mismo y muestra lo que ha hecho últimamente. Compártelo si el widget no funciona: no se envía nada salvo que tú lo decidas.</string>
+    <string name="widget_diagnostics_share">Compartir informe</string>
+    <string name="widget_diagnostics_copy">Copiar</string>
+    <string name="widget_diagnostics_rerun">Ejecutar de nuevo</string>
+    <string name="widget_diagnostics_clear">Borrar historial</string>
+    <string name="widget_error">Error del widget: consulta Ajustes → Diagnóstico del widget</string>
 </resources>

@@ -334,4 +334,15 @@
     <string name="widget_ago_minutes">%1$d min temu</string>
     <string name="widget_ago_hours">%1$d godz. temu</string>
     <string name="widget_ago_hours_minutes">%1$d godz. %2$d min temu</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnostyka widżetu</string>
+    <string name="settings_troubleshooting">Rozwiązywanie problemów</string>
+    <string name="settings_widget_diagnostics_hint">Sprawdź, dlaczego widżet na ekranie głównym nie działa, i udostępnij raport.</string>
+    <string name="widget_diagnostics_intro">To testuje widżet na ekranie głównym teraz i pokazuje, co ostatnio robił. Udostępnij raport, jeśli widżet nie działa — nic nie jest wysyłane bez Twojej zgody.</string>
+    <string name="widget_diagnostics_share">Udostępnij raport</string>
+    <string name="widget_diagnostics_copy">Kopiuj</string>
+    <string name="widget_diagnostics_rerun">Uruchom ponownie</string>
+    <string name="widget_diagnostics_clear">Wyczyść historię</string>
+    <string name="widget_error">Błąd widżetu — zobacz Ustawienia → Diagnostyka widżetu</string>
 </resources>

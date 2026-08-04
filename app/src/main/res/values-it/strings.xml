@@ -323,4 +323,15 @@
     <string name="widget_ago_minutes">%1$d min fa</string>
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnostica del widget</string>
+    <string name="settings_troubleshooting">Risoluzione dei problemi</string>
+    <string name="settings_widget_diagnostics_hint">Verifica perché il widget della schermata Home non funziona e condividi un report.</string>
+    <string name="widget_diagnostics_intro">Questo testa il widget della schermata Home adesso ed elenca cosa ha fatto di recente. Condividilo se il widget non funziona: non viene inviato nulla senza il tuo consenso.</string>
+    <string name="widget_diagnostics_share">Condividi report</string>
+    <string name="widget_diagnostics_copy">Copia</string>
+    <string name="widget_diagnostics_rerun">Esegui di nuovo</string>
+    <string name="widget_diagnostics_clear">Cancella cronologia</string>
+    <string name="widget_error">Errore del widget — vedi Impostazioni → Diagnostica del widget</string>
 </resources>

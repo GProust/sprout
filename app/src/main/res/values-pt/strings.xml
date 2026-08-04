@@ -323,4 +323,15 @@
     <string name="widget_ago_minutes">há %1$d min</string>
     <string name="widget_ago_hours">há %1$d h</string>
     <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnóstico do widget</string>
+    <string name="settings_troubleshooting">Resolução de problemas</string>
+    <string name="settings_widget_diagnostics_hint">Veja porque o widget do ecrã principal não está a funcionar e partilhe um relatório.</string>
+    <string name="widget_diagnostics_intro">Isto testa o widget do ecrã principal agora e lista o que fez recentemente. Partilhe se o widget não estiver a funcionar — nada é enviado sem a sua escolha.</string>
+    <string name="widget_diagnostics_share">Partilhar relatório</string>
+    <string name="widget_diagnostics_copy">Copiar</string>
+    <string name="widget_diagnostics_rerun">Executar de novo</string>
+    <string name="widget_diagnostics_clear">Limpar histórico</string>
+    <string name="widget_error">Erro do widget — ver Definições → Diagnóstico do widget</string>
 </resources>
