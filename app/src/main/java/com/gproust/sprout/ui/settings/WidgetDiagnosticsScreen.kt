@@ -90,20 +90,19 @@ fun WidgetDiagnosticsScreen(onBack: () -> Unit) {
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Read in composition, not inside onClick: a Context read
+                    // there doesn't re-run when the configuration changes, so
+                    // the chooser title could go stale after a locale switch.
+                    val shareTitle = stringResource(R.string.widget_diagnostics_share)
                     Button(onClick = {
                         val send = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                             putExtra(Intent.EXTRA_SUBJECT, "Sprout widget diagnostics")
                             putExtra(Intent.EXTRA_TEXT, text)
                         }
-                        context.startActivity(
-                            Intent.createChooser(
-                                send,
-                                context.getString(R.string.widget_diagnostics_share),
-                            ),
-                        )
+                        context.startActivity(Intent.createChooser(send, shareTitle))
                     }) {
-                        Text(stringResource(R.string.widget_diagnostics_share))
+                        Text(shareTitle)
                     }
                     OutlinedButton(onClick = { clipboard.setText(AnnotatedString(text)) }) {
                         Text(stringResource(R.string.widget_diagnostics_copy))

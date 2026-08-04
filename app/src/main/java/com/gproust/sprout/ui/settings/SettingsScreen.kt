@@ -69,7 +69,10 @@ private data class LanguageChoice(
 )
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenWidgetDiagnostics: () -> Unit) {
+// onBack stays last so `SettingsScreen {}` keeps reading like its siblings
+// (ProfileScreen, TreatmentsScreen); the diagnostics hop defaults to a no-op
+// for previews and screenshot captures, which only render the screen.
+fun SettingsScreen(onOpenWidgetDiagnostics: () -> Unit = {}, onBack: () -> Unit) {
     val context = LocalContext.current
     val current = AppLocale.currentTag(context)
 
