@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -180,6 +181,15 @@ class ScreenshotTest {
 
     private fun tapDesc(description: String) {
         rule.onNodeWithContentDescription(description).performClick()
+        settle()
+    }
+
+    /**
+     * Scrolls the Settings list down to the daily check-in section, which sits
+     * below the eight language rows and so never fits on a first screenful.
+     */
+    private fun scrollToCheckInSection() {
+        rule.onNode(hasScrollAction()).performScrollToNode(hasText("Daily check-in"))
         settle()
     }
 
@@ -389,11 +399,18 @@ class ScreenshotTest {
         FeedingReminderSettings.setIntervalMinutes(app, 180)
         show { SettingsScreen {} }
         save("11-settings-2-feeding-on")
-        // Wellbeing tracking switched off: the check-in leaves the dashboard
-        // and its per-question toggles fold away with it. Restored afterwards.
+        // The daily check-in section lives below the language list, so scroll
+        // down to it: the master switch on, with a toggle per body question.
+        show { SettingsScreen {} }
+        scrollToCheckInSection()
+        save("11-settings-3-checkin")
+        // Same section with wellbeing tracking switched off — the check-in
+        // leaves the dashboard and the per-question toggles fold away with it.
+        // Restored afterwards so later captures see the normal state.
         runBlocking { app.repository.setTrackWellbeing(false) }
         show { SettingsScreen {} }
-        save("11-settings-3-checkin-off")
+        scrollToCheckInSection()
+        save("11-settings-4-checkin-off")
         runBlocking { app.repository.setTrackWellbeing(true) }
         show { TreatmentsScreen {} }
         save("12-treatments")
