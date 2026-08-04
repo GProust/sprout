@@ -94,8 +94,18 @@ jobs:
       # toybox `date` format: MMDDhhmmYYYY.ss (here 2026-06-15 09:00:00 UTC).
       FAKE_CLOCK: "061509002026.00"
       # A file is treated as changed when more than this share of its pixels
-      # differ (after DIFF_FUZZ absorbs antialiasing/GPU colour jitter). Raise
-      # if unrelated PNGs still churn; lower if a real change slips through.
+      # differ (after DIFF_FUZZ absorbs antialiasing/GPU colour jitter).
+      #
+      # Measured on a back-to-back run with the clock pinned: 23 of 35 captures
+      # came out at exactly 0.0000% — including the dashboard, which renders a
+      # relative "time since last feed" and used to change on every run. The
+      # remaining 12 are the scrolling history screens (feeding, sleep, diaper,
+      # growth) at 0.07%-0.66%.
+      #
+      # Resist raising this to swallow that 0.66%: a changed word in a list row
+      # is itself well under 1% of the screen, so a threshold loose enough to
+      # hide the residue is loose enough to hide a real regression. The residue
+      # wants fixing at the source (deterministic list rendering), not masking.
       DIFF_THRESHOLD_PCT: "0.05"
       DIFF_FUZZ: "3%"
 
@@ -196,6 +206,9 @@ jobs:
         with:
           name: ui-screenshots-${{ inputs.device || 'phone' }}
           path: ${{ env.STAGEDIR }}/*.png
+          # STAGEDIR is dot-prefixed, so it counts as hidden and would be
+          # silently skipped without this.
+          include-hidden-files: true
           if-no-files-found: warn
 
       - name: Commit screenshots to the PR branch
@@ -208,6 +221,12 @@ jobs:
           if git diff --cached --quiet; then
             echo "No screenshot changes to commit."
           else
+            branch="${{ github.head_ref || github.ref_name }}"
             git commit -m "ci: update UI screenshots"
-            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+            # The branch can have moved since checkout (a push during the ~15
+            # minutes the emulator takes, or a manual run racing a PR run).
+            # This commit only touches PNGs, so replaying it on top is safe and
+            # beats failing the job on a rejected push.
+            git pull --rebase origin "$branch"
+            git push origin HEAD:"$branch"
           fi
