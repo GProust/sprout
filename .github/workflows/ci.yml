@@ -25,9 +25,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.2.0
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
       - name: Run lint
         run: ./gradlew lintDebug
 
@@ -43,3 +40,25 @@ jobs:
           name: sprout-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      # Room writes the schema JSON during the build, into the working tree. If
+      # it differs from what's committed, the schema changed — and a schema
+      # change without its migration and its updated JSON is exactly the kind of
+      # thing that only shows up on a user's phone, after the update.
+      - name: Check the committed Room schema matches the build
+        run: |
+          if ! git diff --exit-code --stat -- app/schemas; then
+            echo "::error::The exported Room schema differs from the committed one."
+            echo "Commit app/schemas together with the migration that produced the change."
+            git diff -- app/schemas
+            exit 1
+          fi
+          echo "Committed Room schema is up to date."
+
+      - name: Upload exported Room schema
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: room-schemas
+          path: app/schemas/**/*.json
+          if-no-files-found: warn

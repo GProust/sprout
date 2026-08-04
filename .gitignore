@@ -14,3 +14,6 @@ local.properties
 *.keystore
 *.jks
 keystore.properties
+
+# Fresh screenshot capture staging dir (see .github/workflows/screenshots.yml)
+.screenshots-new/
