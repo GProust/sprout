@@ -37,7 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gproust.sprout.data.local.BreastSide
-import com.gproust.sprout.ui.checkin.DailyCheckInScreen
+import com.gproust.sprout.ui.checkin.CheckInRoute
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.FeedingViewModel
@@ -62,6 +62,7 @@ object Routes {
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
     const val HEALTH = "health"
+    const val CHECKIN = "checkin"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
@@ -104,25 +105,21 @@ private fun NavController.navigateToBottomDestination(route: String) {
 private fun isBottomDestination(route: String) = bottomDestinations.any { it.route == route }
 
 /**
- * Root composable: chooses between onboarding, the daily check-in, and the main app
- * based on the startup stage. [routeRequest] is a bottom-bar route the launching
- * intent asked to open (e.g. the widget landing on Feeding); it is honoured once
- * the main scaffold is up and acknowledged via [onRouteConsumed].
+ * Root composable: chooses between onboarding and the main app based on the
+ * startup stage. The daily check-in is *not* one of the stages — it waits on the
+ * dashboard instead of standing between a parent and the app. [routeRequest] is
+ * a bottom-bar route the launching intent asked to open (e.g. the widget landing
+ * on Feeding); it is honoured once the main scaffold is up and acknowledged via
+ * [onRouteConsumed].
  */
 @Composable
 fun SproutApp(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
     val startupVm: StartupViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val stage by startupVm.startup.collectAsState()
 
-    when (val s = stage) {
+    when (stage) {
         Startup.Loading -> LoadingScreen()
         Startup.Onboarding -> OnboardingScreen(onFinish = startupVm::completeOnboarding)
-        is Startup.CheckIn -> DailyCheckInScreen(
-            profile = s.profile,
-            onSubmit = startupVm::submitCheckIn,
-            onSkip = startupVm::markCheckedIn,
-            onOptOut = startupVm::optOut,
-        )
         Startup.Main -> MainScaffold(routeRequest, onRouteConsumed)
     }
 }
@@ -213,6 +210,9 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
             composable(Routes.GROWTH) { GrowthScreen() }
             composable(Routes.HEALTH) {
                 HealthScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.CHECKIN) {
+                CheckInRoute(onDone = { navController.popBackStack() })
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(onBack = { navController.popBackStack() })

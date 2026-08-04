@@ -113,6 +113,10 @@
     <string name="quick_diaper">🧷  Couche</string>
     <string name="quick_growth">📏  Croissance</string>
     <string name="quick_wellbeing">💚  Bien-être</string>
+    <string name="home_checkin_title">Votre bilan du jour</string>
+    <string name="home_checkin_body">Un moment pour vous, quand vous le souhaitez.</string>
+    <string name="home_checkin_action">Faire le bilan</string>
+    <string name="home_checkin_dismiss">Pas aujourd\'hui</string>
 
     <!-- Feeding -->
     <string name="screen_feeding">Repas</string>
@@ -335,6 +339,8 @@
     <string name="settings_feeding_reminders">Rappels de repas</string>
     <string name="settings_feeding_reminders_desc">Me prévenir quand le dernier repas remonte à trop longtemps.</string>
     <string name="settings_checkin_section">Bilan du jour</string>
+    <string name="settings_checkin_track_desc">Une carte sur votre tableau de bord pour prendre de vos nouvelles — Sprout ne vous interrompt jamais pour cela. Désactivez-le et le bilan disparaît ; vos entrées passées sont conservées.</string>
+    <string name="settings_checkin_questions">Questions</string>
     <string name="settings_checkin_section_desc">Choisissez les questions posées lors de votre bilan. Une question désactivée n\'est plus posée ; vous pouvez la réactiver ici à tout moment.</string>
     <string name="settings_healing_question">Cicatrisation</string>
     <string name="settings_bleeding_question">Saignements</string>

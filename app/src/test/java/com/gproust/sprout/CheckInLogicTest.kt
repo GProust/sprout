@@ -12,7 +12,8 @@ import com.gproust.sprout.ui.common.checkInQuestions
 import com.gproust.sprout.ui.common.greetingForHour
 import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.isSameDay
-import com.gproust.sprout.ui.startup.needsCheckIn
+import com.gproust.sprout.ui.common.needsCheckIn
+import com.gproust.sprout.ui.common.shouldOfferCheckIn
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -41,6 +42,17 @@ class CheckInLogicTest {
         assertTrue("never checked in", needsCheckIn(null, t))
         assertTrue("checked in two days ago", needsCheckIn(t, t + twoDays))
         assertFalse("already checked in today", needsCheckIn(t, t))
+    }
+
+    @Test
+    fun offerCheckIn_onlyWhileTrackingAndNotDoneToday() {
+        // The dashboard offers it exactly when a check-in is still due...
+        assertTrue("never checked in", shouldOfferCheckIn(true, null, t))
+        assertTrue("checked in two days ago", shouldOfferCheckIn(true, t, t + twoDays))
+        assertFalse("already checked in today", shouldOfferCheckIn(true, t, t))
+        // ...and never once the parent has stopped tracking their wellbeing.
+        assertFalse("tracking off, never checked in", shouldOfferCheckIn(false, null, t))
+        assertFalse("tracking off, check-in due", shouldOfferCheckIn(false, t, t + twoDays))
     }
 
     @Test

@@ -158,15 +158,26 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            // Each body question of the daily check-in can be toggled here;
-            // only the ones this parent's capabilities surface are listed.
-            profile?.takeIf { it.gaveBirth || it.breastfeeding }?.let { p ->
+            // The daily check-in: a master switch for tracking one's own
+            // wellbeing at all, then — while it's on — a toggle per body
+            // question, listing only the ones this parent's capabilities
+            // surface.
+            profile?.let { p ->
                 item { Spacer(Modifier.height(24.dp)) }
+                item {
+                    CheckInSection(
+                        enabled = p.trackWellbeing,
+                        onToggle = { on -> scope.launch { repository.setTrackWellbeing(on) } },
+                    )
+                }
+            }
+            profile?.takeIf { it.trackWellbeing && (it.gaveBirth || it.breastfeeding) }?.let { p ->
+                item { Spacer(Modifier.height(16.dp)) }
                 item {
                     Column {
                         Text(
-                            stringResource(R.string.settings_checkin_section),
-                            style = MaterialTheme.typography.titleMedium,
+                            stringResource(R.string.settings_checkin_questions),
+                            style = MaterialTheme.typography.titleSmall,
                         )
                         Text(
                             stringResource(R.string.settings_checkin_section_desc),
@@ -218,6 +229,29 @@ private fun GrowthSpurtSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
             )
             Text(
                 stringResource(R.string.settings_growth_spurts_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = enabled, onCheckedChange = onToggle)
+    }
+}
+
+/**
+ * Master switch for tracking one's own wellbeing. Off means the dashboard stops
+ * offering the check-in and drops its shortcut — nothing is deleted, and the
+ * history stays one tap away under the heart.
+ */
+@Composable
+private fun CheckInSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(
+                stringResource(R.string.settings_checkin_section),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                stringResource(R.string.settings_checkin_track_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

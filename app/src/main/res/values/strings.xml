@@ -114,6 +114,10 @@
     <string name="quick_diaper">🧷  Diaper</string>
     <string name="quick_growth">📏  Growth</string>
     <string name="quick_wellbeing">💚  Wellbeing</string>
+    <string name="home_checkin_title">Your daily check-in</string>
+    <string name="home_checkin_body">A quiet moment for you, whenever you\'re ready.</string>
+    <string name="home_checkin_action">Check in</string>
+    <string name="home_checkin_dismiss">Not today</string>
 
     <!-- Feeding -->
     <string name="screen_feeding">Feeding</string>
@@ -347,6 +351,8 @@
     <string name="settings_feeding_reminders">Feeding reminders</string>
     <string name="settings_feeding_reminders_desc">Nudge me when it\'s been too long since a feed.</string>
     <string name="settings_checkin_section">Daily check-in</string>
+    <string name="settings_checkin_track_desc">A card on your dashboard for how you\'re doing — Sprout never interrupts you for it. Turn it off and the check-in disappears; your past entries are kept.</string>
+    <string name="settings_checkin_questions">Questions</string>
     <string name="settings_checkin_section_desc">Choose which questions your check-in asks. Opting out of a question skips it every day; you can bring it back here anytime.</string>
     <string name="settings_healing_question">Healing</string>
     <string name="settings_bleeding_question">Bleeding</string>

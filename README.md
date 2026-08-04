@@ -28,7 +28,9 @@ speaks 7 languages and can gently remind you about feeds and treatments.
 - **💚 Parent wellbeing** — a gentle daily check-in tailored to *you*, by capability rather than
   role: mood and notes for everyone; healing and bleeding (lochia) if you gave birth (worded for a
   vaginal or C-section delivery); breast comfort if you're breastfeeding. Covers every kind of
-  family — co-nursing, adoptive, single parents.
+  family — co-nursing, adoptive, single parents. It **waits on the dashboard** instead of opening
+  at launch — nothing to dismiss during a 3 a.m. feed — and can be **turned off entirely**, whole
+  check-in or question by question, without losing what you've already logged.
 - **🏠 Dashboard** — baby's age, today's feeds, sleep total and diaper count, and time since the
   last feed, at a glance.
 - **🌍 7 languages** — English, French, German, Spanish, Italian, Polish and Portuguese. Sprout

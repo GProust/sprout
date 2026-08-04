@@ -5,6 +5,13 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 💚 The **daily wellbeing check-in no longer opens at launch**. It waits as a
+  card on the dashboard ("Your daily check-in") until you feel like it — so
+  opening Sprout for a 3 a.m. feed never means getting past questions about
+  yourself first. "Not today" puts the card away until tomorrow.
+- 🔕 Wellbeing tracking can now be **switched off entirely** (Settings → Daily
+  check-in): no card, no shortcut, nothing asked. Past check-ins are kept and
+  come back if you turn it on again — as do the per-question toggles.
 - 🌱 **Growth spurt periods**: the dashboard now shows a gentle note while
   your baby is in — or a few days from — one of the typical growth spurt
   windows (around 1, 3, 6 and 9 weeks, then 3, 6 and 9 months), reassuring you

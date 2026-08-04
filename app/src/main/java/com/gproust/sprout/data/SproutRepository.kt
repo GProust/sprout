@@ -44,6 +44,9 @@ class SproutRepository(
     suspend fun setAskBleeding(ask: Boolean) = db.parentProfileDao().updateAskBleeding(ask)
     suspend fun setAskBreasts(ask: Boolean) = db.parentProfileDao().updateAskBreasts(ask)
 
+    /** Turn the parent's own wellbeing tracking on or off; kept history is untouched. */
+    suspend fun setTrackWellbeing(track: Boolean) = db.parentProfileDao().updateTrackWellbeing(track)
+
     private val activeBabyId: Flow<Long?> = parentProfile
         .map { it?.activeBabyId }
         .distinctUntilChanged()

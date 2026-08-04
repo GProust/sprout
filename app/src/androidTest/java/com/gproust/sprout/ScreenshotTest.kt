@@ -389,6 +389,12 @@ class ScreenshotTest {
         FeedingReminderSettings.setIntervalMinutes(app, 180)
         show { SettingsScreen {} }
         save("11-settings-2-feeding-on")
+        // Wellbeing tracking switched off: the check-in leaves the dashboard
+        // and its per-question toggles fold away with it. Restored afterwards.
+        runBlocking { app.repository.setTrackWellbeing(false) }
+        show { SettingsScreen {} }
+        save("11-settings-3-checkin-off")
+        runBlocking { app.repository.setTrackWellbeing(true) }
         show { TreatmentsScreen {} }
         save("12-treatments")
 

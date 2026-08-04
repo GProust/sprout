@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 11,
+    version = 12,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -218,6 +218,16 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v11 -> v12: let a parent stop tracking their own wellbeing entirely.
+         * Defaults to 1 (keep offering the check-in) for every existing profile.
+         */
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `parent_profile` ADD COLUMN `trackWellbeing` INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -226,7 +236,7 @@ abstract class SproutDatabase : RoomDatabase() {
                     "sprout.db",
                 ).addMigrations(
                     MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-                    MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11,
+                    MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
                 ).build().also { instance = it }
             }
     }
