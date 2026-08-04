@@ -95,6 +95,13 @@ android {
     }
 }
 
+// Where Room writes the exported schema JSON (see `exportSchema` on
+// SproutDatabase). These are committed, so a schema change is visible in review
+// rather than only at runtime on a user's device.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 // The JDK used to *run* the build (compile Kotlin/Java, run unit tests). Pinned
 // here rather than only in the three CI workflows, so every build — CI, release
 // or local — uses the same toolchain instead of whatever JDK the machine happens

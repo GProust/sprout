@@ -43,3 +43,23 @@ jobs:
           name: sprout-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      # Room writes the schema JSON during the build. Printing it means a schema
+      # change is inspectable straight from the run, and the file can be picked
+      # up and committed without an Android SDK to hand.
+      - name: Show exported Room schema
+        if: always()
+        run: |
+          for f in app/schemas/*/*.json; do
+            [ -e "$f" ] || continue
+            echo "===== $f ====="
+            cat "$f"
+          done
+
+      - name: Upload exported Room schema
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: room-schemas
+          path: app/schemas/**/*.json
+          if-no-files-found: warn
