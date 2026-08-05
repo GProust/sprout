@@ -1,0 +1,1 @@
+Poprawka widżetu na ekranie głównym, który po aktualizacji Sprout zatrzymywał się na wskaźniku ładowania — pomagała dopiero ponowna instalacja aplikacji. Aktualizacja nie gubi już widżetu: nadal pokazuje ostatnie karmienie.

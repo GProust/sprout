@@ -1,0 +1,1 @@
+Corregge il widget della schermata Home che restava bloccato sull'indicatore di caricamento dopo un aggiornamento di Sprout — si sbloccava solo reinstallando l'app. Ora un aggiornamento non fa più perdere il filo al widget: continua a mostrare l'ultimo pasto.

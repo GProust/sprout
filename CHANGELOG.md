@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.3] — 2026-08-05
 
 - 📟 Fixed the **widget staying on its loading spinner after an app update**,
   until the app was uninstalled and reinstalled. Release builds renamed the

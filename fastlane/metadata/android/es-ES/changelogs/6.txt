@@ -1,0 +1,1 @@
+Corrige el widget de la pantalla de inicio, que se quedaba en el indicador de carga tras actualizar Sprout — y solo se arreglaba reinstalando la app. Actualizar ya no hace que el widget se pierda: sigue mostrando la última toma sin interrupción.

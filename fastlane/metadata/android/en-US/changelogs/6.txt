@@ -1,0 +1,1 @@
+Fixes the home-screen widget getting stuck on its loading spinner after Sprout updated — it stayed that way until the app was reinstalled. Updating no longer makes the widget lose track of itself, so it keeps showing your last feed straight through.
