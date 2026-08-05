@@ -16,6 +16,23 @@ All notable changes to Sprout are documented here. This project follows
   (Feeding, Sleep, Diapers, Growth, Wellbeing, Treatments). The bin sits right
   next to the rest of the card and entries are gone for good — one mis-tap
   while holding a baby shouldn't cost you the log.
+- 📟 The widget now covers **every kind of feed, not just breastfeeds**, and
+  names the baby it belongs to — so with twins you can tell at a glance whose
+  feed you're looking at. Each entry is labelled by kind (Breast, Bottle,
+  Solids) and shows the one detail that kind carries: which breast it ended
+  on, or how much came out of the bottle.
+- 📟 Fixed the **widget never updating after it was placed**: feeds logged
+  afterwards still showed "No breastfeed yet", and a breastfeeding session
+  stayed on screen as "in progress" after it had ended. The widget now
+  follows the data live instead of showing whatever it read when it was
+  first drawn.
+- 🩺 **Widget diagnostics** (Settings → Troubleshooting): tests the
+  home-screen widget on the spot, shows what it did recently, and offers the
+  result as text to copy or share. Added because the widget still isn't
+  loading for some devices and it runs where nothing is visible — no screen,
+  no error, and no practical way to read logs from a Play build.
+- 📟 When the widget can't render it now **says so on the home screen**
+  instead of sitting on a loading spinner for ever.
 
 ## [1.4.1] — 2026-08-04
 

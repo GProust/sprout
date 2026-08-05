@@ -223,10 +223,13 @@ class ScreenshotTest {
     private fun saveWidget(name: String) {
         val context = instrumentation.targetContext
         val session = NursingSessionStore.load(context)
-        val feed = runBlocking { app.repository.lastBreastFeedForActiveBaby() }
+        val feed = runBlocking { app.repository.lastFeedForActiveBaby() }
+        val babyName = runBlocking { app.repository.activeBabyName() }
         val size = DpSize(180.dp, 110.dp)
         val remoteViews = runBlocking {
-            GlanceRemoteViews().compose(context, size) { GlanceTheme { SproutWidgetUi(session, feed) } }.remoteViews
+            GlanceRemoteViews().compose(context, size) {
+                GlanceTheme { SproutWidgetUi(session, feed, babyName) }
+            }.remoteViews
         }
         val density = context.resources.displayMetrics.density
         val w = (size.width.value * density).toInt()

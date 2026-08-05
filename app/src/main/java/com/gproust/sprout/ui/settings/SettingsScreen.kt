@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +69,10 @@ private data class LanguageChoice(
 )
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+// onBack stays last so `SettingsScreen {}` keeps reading like its siblings
+// (ProfileScreen, TreatmentsScreen); the diagnostics hop defaults to a no-op
+// for previews and screenshot captures, which only render the screen.
+fun SettingsScreen(onOpenWidgetDiagnostics: () -> Unit = {}, onBack: () -> Unit) {
     val context = LocalContext.current
     val current = AppLocale.currentTag(context)
 
@@ -215,6 +220,35 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                 }
             }
+
+            item { Spacer(Modifier.height(24.dp)) }
+            item { TroubleshootingSection(onOpenWidgetDiagnostics = onOpenWidgetDiagnostics) }
+        }
+    }
+}
+
+/** A way in to the widget report when the home-screen widget misbehaves. */
+@Composable
+private fun TroubleshootingSection(onOpenWidgetDiagnostics: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_troubleshooting),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onOpenWidgetDiagnostics).padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.screen_widget_diagnostics))
+                Text(
+                    stringResource(R.string.settings_widget_diagnostics_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
         }
     }
 }

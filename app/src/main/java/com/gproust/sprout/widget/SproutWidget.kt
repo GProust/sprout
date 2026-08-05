@@ -2,10 +2,13 @@ package com.gproust.sprout.widget
 
 import android.content.Context
 import android.content.Intent
+import android.appwidget.AppWidgetManager
 import android.os.SystemClock
-import android.util.Log
 import android.widget.RemoteViews
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -32,15 +35,20 @@ import com.gproust.sprout.MainActivity
 import com.gproust.sprout.R
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.ui.common.formatDateTime
 import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.flow.flowOf
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
-suspend fun updateSproutWidget(context: Context) = SproutWidget().updateAll(context)
+suspend fun updateSproutWidget(context: Context) {
+    WidgetDiagnostics.record(context, "app asked the widget to refresh")
+    SproutWidget().updateAll(context)
+}
 
 /**
  * The breast to offer first at the next feed alternates, so what a nursing
@@ -70,24 +78,61 @@ internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): Stri
 }
 
 /**
- * Home-screen widget for breastfeeding. Idle, it shows the side of the active
- * baby's last breastfeed and how long ago it was; while a session is being
- * timed it shows the current side with a live ticking timer. Re-rendered by
- * the repository/ViewModel after every relevant change, plus a half-hourly
- * system refresh (Android's minimum) so the elapsed time doesn't drift too
- * far between feeds. Tapping it opens the app on the Feeding screen.
+ * Home-screen widget for feeding. Idle, it shows the active baby's name, the
+ * kind of their last feed and how long ago it was, plus the one detail that
+ * kind carries - which breast it ended on, or how much came out of the
+ * bottle. While a breastfeed is being timed it shows the current side with a
+ * live ticking timer. Re-rendered by the repository/ViewModel after every
+ * relevant change, plus a half-hourly system refresh (Android's minimum) so
+ * the elapsed time doesn't drift too far between feeds. Tapping it opens the
+ * app on the Feeding screen.
  */
-class SproutWidget : GlanceAppWidget() {
+class SproutWidget : GlanceAppWidget(errorUiLayout = R.layout.widget_error) {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val app = context.applicationContext as SproutApplication
-        val session = readForWidget("nursing session") { NursingSessionStore.load(context) }
-        val feed = readForWidget("last breastfeed") { app.repository.lastBreastFeedForActiveBaby() }
+        WidgetDiagnostics.record(context, "provideGlance started")
+        val app = readForWidget(context, "app container") {
+            context.applicationContext as SproutApplication
+        }
+        // Initial values, so the first frame is right even before the flows
+        // below have emitted.
+        val initialSession = readForWidget(context, "nursing session") {
+            NursingSessionStore.load(context)
+        }
+        val initialFeed = readForWidget(context, "last feed") {
+            app?.repository?.lastFeedForActiveBaby()
+        }
+        val initialBabyName = readForWidget(context, "active baby name") {
+            app?.repository?.activeBabyName()
+        }
+        WidgetDiagnostics.record(
+            context,
+            "data read: session=${if (initialSession != null) "running" else "none"}, " +
+                "lastFeed=${initialFeed?.type?.name?.lowercase() ?: "none"}, " +
+                "baby=${if (initialBabyName != null) "named" else "unknown"}",
+        )
         provideContent {
+            // Observed *inside* the composition on purpose. update()/updateAll()
+            // don't restart provideGlance while it is still running, so reading
+            // once above and closing over the result meant every later refresh
+            // just redrew the same stale values — feeds logged after the widget
+            // was placed never showed, and a session that ended stayed on
+            // screen. Once the composition is torn down the next refresh does
+            // restart provideGlance, which re-reads the initial values above,
+            // so the two together cover both windows.
+            val session by NursingSessionStore.observe(context)
+                .collectAsState(initial = initialSession)
+            val feed by (app?.repository?.lastFeedForActiveBabyFlow ?: flowOf(initialFeed))
+                .collectAsState(initial = initialFeed)
+            val babyName by (app?.repository?.activeBabyNameFlow ?: flowOf(initialBabyName))
+                .collectAsState(initial = initialBabyName)
             GlanceTheme {
-                SproutWidgetUi(session, feed)
+                SproutWidgetUi(session, feed, babyName)
             }
         }
+        // provideContent suspends until the composition closes, so reaching
+        // here means the launcher tore the widget down, not that we failed.
+        WidgetDiagnostics.record(context, "composition closed")
     }
 }
 
@@ -99,19 +144,27 @@ class SproutWidget : GlanceAppWidget() {
  * half-hourly refresh. Showing the empty state is recoverable; a permanent
  * spinner isn't.
  */
-private suspend fun <T> readForWidget(what: String, read: suspend () -> T): T? =
+private suspend fun <T> readForWidget(
+    context: Context,
+    what: String,
+    read: suspend () -> T,
+): T? =
     try {
         read()
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Log.e("SproutWidget", "Widget could not read the $what; showing the empty state", e)
+        WidgetDiagnostics.record(context, "could not read the $what; showing the empty state", e)
         null
     }
 
 /** The widget's root content: the live session when one runs, else the last feed. */
 @Composable
-internal fun SproutWidgetUi(session: NursingSession?, feed: FeedingEntity?) {
+internal fun SproutWidgetUi(
+    session: NursingSession?,
+    feed: FeedingEntity?,
+    babyName: String?,
+) {
     val context = LocalContext.current
     Column(
         modifier = GlanceModifier
@@ -124,11 +177,27 @@ internal fun SproutWidgetUi(session: NursingSession?, feed: FeedingEntity?) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (session != null) {
-            NursingLines(session)
+            NursingLines(session, babyName)
         } else {
-            LastFeedLines(feed)
+            LastFeedLines(feed, babyName)
         }
     }
+}
+
+/**
+ * The small top line: who, then what — "Lea - Bottle". The baby comes first
+ * because with twins that is the thing you are squinting at the widget to
+ * find out. Falls back to the detail alone when no baby name is known.
+ */
+@Composable
+private fun CaptionText(babyName: String?, detail: String) {
+    val context = LocalContext.current
+    val separator = context.getString(R.string.feeding_detail_separator)
+    val text = listOfNotNull(babyName?.takeIf { it.isNotBlank() }, detail).joinToString(separator)
+    Text(
+        text = text,
+        style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
+    )
 }
 
 /** Tapping the widget lands directly on the Feeding screen. */
@@ -141,12 +210,9 @@ private fun openFeedingScreen(context: Context) = actionStartActivity(
 
 /** A breastfeed being timed right now: current side + live chronometer. */
 @Composable
-private fun NursingLines(session: NursingSession) {
+private fun NursingLines(session: NursingSession, babyName: String?) {
     val context = LocalContext.current
-    Text(
-        text = context.getString(R.string.feeding_breastfeeding),
-        style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
-    )
+    CaptionText(babyName, context.getString(R.string.feeding_breastfeeding))
     SideText(session.currentSide)
     // Glance has no chronometer, so embed classic RemoteViews: the launcher
     // ticks it every second with no widget refreshes at all.
@@ -161,39 +227,63 @@ private fun NursingLines(session: NursingSession) {
     AndroidRemoteViews(remoteViews = timer)
 }
 
-/** The finished-feed summary: last side + elapsed time with h/min units. */
+/** The finished-feed summary: what kind of feed, its one detail, and how long ago. */
 @Composable
-private fun LastFeedLines(feed: FeedingEntity?) {
+private fun LastFeedLines(feed: FeedingEntity?, babyName: String?) {
     val context = LocalContext.current
-    Text(
-        text = context.getString(R.string.widget_label),
-        style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
-    )
     if (feed == null) {
+        CaptionText(babyName, context.getString(R.string.widget_label))
         Text(
-            text = context.getString(R.string.widget_no_breastfeed),
+            text = context.getString(R.string.widget_no_feed),
             style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp),
         )
-    } else {
-        lastNursedSide(feed)?.let { SideText(it) }
-        Text(
-            text = widgetTimeAgo(context, feed.startTime, System.currentTimeMillis()),
-            style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
-        )
+        return
     }
+    CaptionText(babyName, context.getString(feedTypeLabel(feed.type)))
+    // Solids have no one number worth shouting, so they simply skip the big
+    // line and leave the widget with a caption and a time.
+    feedHeadline(context, feed)?.let { HeadlineText(it) }
+    Text(
+        text = widgetTimeAgo(context, feed.startTime, System.currentTimeMillis()),
+        style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
+    )
+}
+
+@StringRes
+private fun feedTypeLabel(type: FeedType): Int = when (type) {
+    FeedType.BREAST -> R.string.feed_type_breast
+    FeedType.BOTTLE -> R.string.feed_type_bottle
+    FeedType.SOLID -> R.string.feed_type_solid
+}
+
+/**
+ * The single detail worth the widget's big line, which differs by feed type:
+ * which breast it ended on, or how much came out of the bottle. Null when the
+ * feed has nothing of the sort to say.
+ */
+private fun feedHeadline(context: Context, feed: FeedingEntity): String? = when (feed.type) {
+    FeedType.BREAST -> lastNursedSide(feed)?.let { context.getString(sideLabel(it)) }
+    FeedType.BOTTLE -> feed.amountMl?.let { context.getString(R.string.feeding_amount_ml, it) }
+    FeedType.SOLID -> null
+}
+
+@StringRes
+private fun sideLabel(side: BreastSide): Int = when (side) {
+    BreastSide.LEFT -> R.string.side_left
+    BreastSide.RIGHT -> R.string.side_right
+    BreastSide.BOTH -> R.string.side_both
 }
 
 @Composable
 private fun SideText(side: BreastSide) {
-    val context = LocalContext.current
+    HeadlineText(LocalContext.current.getString(sideLabel(side)))
+}
+
+/** The widget's one big line, whatever it happens to be saying. */
+@Composable
+private fun HeadlineText(text: String) {
     Text(
-        text = context.getString(
-            when (side) {
-                BreastSide.LEFT -> R.string.side_left
-                BreastSide.RIGHT -> R.string.side_right
-                BreastSide.BOTH -> R.string.side_both
-            },
-        ),
+        text = text,
         style = TextStyle(
             color = GlanceTheme.colors.primary,
             fontSize = 24.sp,
@@ -205,4 +295,26 @@ private fun SideText(side: BreastSide) {
 /** Entry point declared in the manifest; the system talks to the widget through this. */
 class SproutWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = SproutWidget()
+
+    // Recorded so a diagnostics report can distinguish "the launcher never
+    // asked us to update" from "it asked and we failed" — those point at
+    // completely different causes.
+    override fun onEnabled(context: Context) {
+        WidgetDiagnostics.record(context, "receiver: first widget added")
+        super.onEnabled(context)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+    ) {
+        WidgetDiagnostics.record(context, "receiver: onUpdate for ${appWidgetIds.size} widget(s)")
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetDiagnostics.record(context, "receiver: ${appWidgetIds.size} widget(s) removed")
+        super.onDeleted(context, appWidgetIds)
+    }
 }
