@@ -36,6 +36,8 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
+import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.DayHeader
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -45,6 +47,7 @@ import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
+import com.gproust.sprout.ui.common.nextDay
 import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
@@ -66,6 +69,7 @@ fun SleepScreen() {
     val context = LocalContext.current
 
     var adding by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf<SleepEntity?>(null) }
 
     if (adding) {
         AddEntrySheet(
@@ -74,6 +78,13 @@ fun SleepScreen() {
         ) {
             SleepForm(onAdd = { vm.add(it); adding = false })
         }
+    }
+
+    deleting?.let { entry ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(entry); deleting = null },
+            onDismiss = { deleting = null },
+        )
     }
 
     val byDay = remember(sleeps) { sleeps.groupBy { startOfDay(it.startTime) } }
@@ -108,7 +119,7 @@ fun SleepScreen() {
                         subtitle = if (entry.notes.isNullOrBlank()) subtitle else "$subtitle\n${entry.notes}",
                         meta = formatTime(entry.startTime),
                         icon = Icons.Filled.Bedtime,
-                        onDelete = { vm.delete(entry) },
+                        onDelete = { deleting = entry },
                     )
                 }
             }
@@ -122,6 +133,23 @@ private fun SleepForm(onAdd: (SleepEntity) -> Unit) {
     var end by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var hasEnded by remember { mutableStateOf(true) }
     var notes by remember { mutableStateOf("") }
+
+    // The night a sleep started. Naps and nights alike are often logged later,
+    // so the date is pickable, starting on today; a future one can't have
+    // happened yet.
+    FieldLabel(stringResource(R.string.field_date))
+    DatePickerField(
+        label = stringResource(R.string.picker_on),
+        millis = start,
+        allowFuture = false,
+        onChange = { picked ->
+            // Keep the wake time on the same day as the bedtime it was entered
+            // against, so only the day moves.
+            val shift = picked - start
+            start = picked
+            end += shift
+        },
+    )
 
     FieldLabel(stringResource(R.string.field_start))
     TimePickerField(label = stringResource(R.string.picker_from), millis = start, onChange = { start = it })
@@ -149,7 +177,9 @@ private fun SleepForm(onAdd: (SleepEntity) -> Unit) {
             onAdd(
                 SleepEntity(
                     startTime = start,
-                    endTime = if (hasEnded) end else null,
+                    // Both times are picked on the start's day, so a wake time
+                    // before the bedtime means the sleep ran past midnight.
+                    endTime = if (hasEnded) (if (end < start) nextDay(end) else end) else null,
                     notes = notes.ifBlank { null },
                 ),
             )

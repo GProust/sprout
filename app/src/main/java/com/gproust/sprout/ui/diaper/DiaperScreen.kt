@@ -56,6 +56,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
+import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.DayHeader
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -85,6 +87,7 @@ fun DiaperScreen() {
     val context = LocalContext.current
 
     var adding by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf<DiaperEntity?>(null) }
 
     if (adding) {
         AddEntrySheet(
@@ -93,6 +96,13 @@ fun DiaperScreen() {
         ) {
             DiaperForm(onAdd = { vm.add(it); adding = false })
         }
+    }
+
+    deleting?.let { entry ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(entry); deleting = null },
+            onDismiss = { deleting = null },
+        )
     }
 
     val byDay = remember(diapers) { diapers.groupBy { startOfDay(it.time) } }
@@ -119,7 +129,7 @@ fun DiaperScreen() {
                         subtitle = diaperSubtitle(context, entry),
                         meta = formatTime(entry.time),
                         icon = Icons.Filled.BabyChangingStation,
-                        onDelete = { vm.delete(entry) },
+                        onDelete = { deleting = entry },
                     )
                 }
             }
@@ -206,6 +216,15 @@ private fun DiaperForm(onAdd: (DiaperEntity) -> Unit) {
         FieldLabel(stringResource(R.string.diaper_stool_color))
         StoolColorPicker(selected = stoolColor, onSelect = { stoolColor = it })
     }
+
+    // Catching up on the day's changes shouldn't file them all on today.
+    FieldLabel(stringResource(R.string.field_date))
+    DatePickerField(
+        label = stringResource(R.string.picker_on),
+        millis = time,
+        allowFuture = false,
+        onChange = { time = it },
+    )
 
     FieldLabel(stringResource(R.string.field_time))
     TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })

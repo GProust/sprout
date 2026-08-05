@@ -44,6 +44,7 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -73,6 +74,7 @@ fun GrowthScreen() {
     val context = LocalContext.current
 
     var adding by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf<GrowthEntity?>(null) }
 
     if (adding) {
         AddEntrySheet(
@@ -81,6 +83,13 @@ fun GrowthScreen() {
         ) {
             GrowthForm(onAdd = { vm.add(it); adding = false })
         }
+    }
+
+    deleting?.let { entry ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(entry); deleting = null },
+            onDismiss = { deleting = null },
+        )
     }
 
     Scaffold(
@@ -137,7 +146,7 @@ fun GrowthScreen() {
                     subtitle = entry.notes.orEmpty(),
                     meta = formatDate(context, entry.time),
                     icon = Icons.Filled.Monitor,
-                    onDelete = { vm.delete(entry) },
+                    onDelete = { deleting = entry },
                 )
             }
         }
@@ -216,7 +225,12 @@ private fun GrowthForm(onAdd: (GrowthEntity) -> Unit) {
     )
 
     FieldLabel(stringResource(R.string.field_date))
-    DatePickerField(label = stringResource(R.string.picker_on), millis = date, onChange = { date = it })
+    DatePickerField(
+        label = stringResource(R.string.picker_on),
+        millis = date,
+        allowFuture = false,
+        onChange = { date = it },
+    )
 
     Spacer(Modifier.height(8.dp))
     NotesField(value = notes, onChange = { notes = it })

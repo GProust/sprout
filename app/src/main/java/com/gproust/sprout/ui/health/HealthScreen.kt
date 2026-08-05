@@ -43,6 +43,8 @@ import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.ui.common.ChoiceChips
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
+import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
 import com.gproust.sprout.ui.common.FieldLabel
@@ -85,6 +87,14 @@ fun HealthScreen(onBack: () -> Unit) {
     val deliveryType by vm.deliveryType.collectAsState()
     val entries by vm.entries.collectAsState()
     val context = LocalContext.current
+    var deleting by remember { mutableStateOf<WellbeingEntity?>(null) }
+
+    deleting?.let { entry ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(entry); deleting = null },
+            onDismiss = { deleting = null },
+        )
+    }
 
     Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_wellbeing), onBack = onBack) }) { padding ->
         LazyColumn(
@@ -116,7 +126,7 @@ fun HealthScreen(onBack: () -> Unit) {
                     subtitle = wellbeingSubtitle(context, entry),
                     meta = formatDateTime(context, entry.time),
                     icon = Icons.Filled.Favorite,
-                    onDelete = { vm.delete(entry) },
+                    onDelete = { deleting = entry },
                 )
             }
         }
@@ -187,6 +197,15 @@ private fun WellbeingAddCard(
                     labelOf = { it.label(context) },
                 )
             }
+
+            // Yesterday's rough night is worth recording today.
+            FieldLabel(stringResource(R.string.field_date))
+            DatePickerField(
+                label = stringResource(R.string.picker_on),
+                millis = time,
+                allowFuture = false,
+                onChange = { time = it },
+            )
 
             FieldLabel(stringResource(R.string.field_time))
             TimePickerField(label = stringResource(R.string.picker_at), millis = time, onChange = { time = it })

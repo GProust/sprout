@@ -255,6 +255,8 @@
     <string name="quick_treatments">💊  Tratamentos</string>
     <string name="treatment_empty">Ainda não há tratamentos. Adicione um com o botão + — por exemplo, Vitamina D todos os dias.</string>
     <string name="treatment_add">Adicionar tratamento</string>
+    <string name="treatment_delete_title">Eliminar %1$s?</string>
+    <string name="treatment_delete_body">Os lembretes param e o tratamento é removido definitivamente. Esta ação não pode ser anulada.</string>
     <string name="treatment_new">Novo tratamento</string>
     <string name="treatment_edit">Editar tratamento</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
