@@ -336,6 +336,7 @@
     <string name="widget_diagnostics_share">Bericht teilen</string>
     <string name="widget_diagnostics_copy">Kopieren</string>
     <string name="widget_diagnostics_rerun">Erneut ausführen</string>
+    <string name="widget_diagnostics_force_refresh">Aktualisierung erzwingen</string>
     <string name="widget_diagnostics_clear">Verlauf löschen</string>
     <string name="widget_error">Widget-Fehler – siehe Einstellungen → Widget-Diagnose</string>
 </resources>

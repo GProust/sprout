@@ -347,6 +347,7 @@
     <string name="widget_diagnostics_share">Udostępnij raport</string>
     <string name="widget_diagnostics_copy">Kopiuj</string>
     <string name="widget_diagnostics_rerun">Uruchom ponownie</string>
+    <string name="widget_diagnostics_force_refresh">Wymuś odświeżenie</string>
     <string name="widget_diagnostics_clear">Wyczyść historię</string>
     <string name="widget_error">Błąd widżetu — zobacz Ustawienia → Diagnostyka widżetu</string>
 </resources>

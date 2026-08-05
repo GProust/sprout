@@ -336,6 +336,7 @@
     <string name="widget_diagnostics_share">Condividi report</string>
     <string name="widget_diagnostics_copy">Copia</string>
     <string name="widget_diagnostics_rerun">Esegui di nuovo</string>
+    <string name="widget_diagnostics_force_refresh">Forza aggiornamento</string>
     <string name="widget_diagnostics_clear">Cancella cronologia</string>
     <string name="widget_error">Errore del widget — vedi Impostazioni → Diagnostica del widget</string>
 </resources>

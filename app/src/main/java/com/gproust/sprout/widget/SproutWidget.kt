@@ -47,7 +47,17 @@ import kotlinx.coroutines.flow.flowOf
 /** One-stop widget refresh, called wherever widget-visible data changes. */
 suspend fun updateSproutWidget(context: Context) {
     WidgetDiagnostics.record(context, "app asked the widget to refresh")
-    SproutWidget().updateAll(context)
+    // Catches Throwable, not Exception: if shrinking removed something Glance
+    // needs, that surfaces as an Error, and swallowing it is how this stayed
+    // invisible for four rounds.
+    try {
+        SproutWidget().updateAll(context)
+        WidgetDiagnostics.record(context, "updateAll returned")
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        WidgetDiagnostics.record(context, "updateAll threw", e)
+    }
 }
 
 /**
@@ -88,6 +98,16 @@ internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): Stri
  * app on the Feeding screen.
  */
 class SproutWidget : GlanceAppWidget(errorUiLayout = R.layout.widget_error) {
+
+    override fun onCompositionError(
+        context: Context,
+        glanceId: GlanceId,
+        appWidgetId: Int,
+        throwable: Throwable,
+    ) {
+        WidgetDiagnostics.record(context, "composition failed for widget $appWidgetId", throwable)
+        super.onCompositionError(context, glanceId, appWidgetId, throwable)
+    }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         WidgetDiagnostics.record(context, "provideGlance started")
@@ -153,7 +173,7 @@ private suspend fun <T> readForWidget(
         read()
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         WidgetDiagnostics.record(context, "could not read the $what; showing the empty state", e)
         null
     }
