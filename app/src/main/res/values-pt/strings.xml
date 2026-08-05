@@ -224,6 +224,8 @@
     <string name="settings_language_system">Predefinição do sistema</string>
     <string name="action_add">Adicionar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="entry_delete_title">Eliminar esta entrada?</string>
+    <string name="entry_delete_body">Será removida definitivamente. Esta ação não pode ser anulada.</string>
     <string name="screen_babies">Bebés</string>
     <string name="babies_empty">Ainda não há bebés — adicione o seu pequenino para começar a acompanhar.</string>
     <string name="baby_active">Ativo</string>

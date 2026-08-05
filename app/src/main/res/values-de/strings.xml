@@ -224,6 +224,8 @@
     <string name="settings_language_system">Systemstandard</string>
     <string name="action_add">Hinzufügen</string>
     <string name="action_delete">Löschen</string>
+    <string name="entry_delete_title">Diesen Eintrag löschen?</string>
+    <string name="entry_delete_body">Er wird endgültig entfernt. Das lässt sich nicht rückgängig machen.</string>
     <string name="screen_babies">Babys</string>
     <string name="babies_empty">Noch keine Babys — füge dein Kleines hinzu, um mit dem Tracken zu beginnen.</string>
     <string name="baby_active">Aktiv</string>

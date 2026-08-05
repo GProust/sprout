@@ -224,6 +224,8 @@
     <string name="settings_language_system">Predeterminado del sistema</string>
     <string name="action_add">Añadir</string>
     <string name="action_delete">Eliminar</string>
+    <string name="entry_delete_title">¿Eliminar esta entrada?</string>
+    <string name="entry_delete_body">Se eliminará definitivamente. Esta acción no se puede deshacer.</string>
     <string name="screen_babies">Bebés</string>
     <string name="babies_empty">Aún no hay bebés. Añade a tu peque para empezar a registrar.</string>
     <string name="baby_active">Activo</string>

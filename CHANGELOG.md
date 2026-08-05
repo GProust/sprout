@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📅 A feed logged by hand can now be **put on a past date**, not just a time:
+  the log form has a date field (starting on today), so a feed remembered the
+  next morning lands on the day it actually happened. Editing an existing feed
+  can move it to another day the same way.
+- 🛟 Deleting a feed now **asks first**. The bin sits right next to the rest of
+  the card, and entries are gone for good — one mis-tap while holding a baby
+  shouldn't cost you the log.
+
 ## [1.4.1] — 2026-08-04
 
 - 📟 Fixed the **home-screen widget never loading**: it sat on its loading

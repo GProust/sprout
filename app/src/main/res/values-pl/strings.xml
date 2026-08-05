@@ -230,6 +230,8 @@
     <string name="settings_language_system">Domyślny systemowy</string>
     <string name="action_add">Dodaj</string>
     <string name="action_delete">Usuń</string>
+    <string name="entry_delete_title">Usunąć ten wpis?</string>
+    <string name="entry_delete_body">Zostanie trwale usunięty. Tej operacji nie można cofnąć.</string>
     <string name="screen_babies">Dzieci</string>
     <string name="babies_empty">Brak dzieci — dodaj swojego maluszka, aby zacząć śledzenie.</string>
     <string name="baby_active">Aktywne</string>

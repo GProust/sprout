@@ -64,6 +64,8 @@ import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
 import com.gproust.sprout.ui.common.ChoiceChips
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
+import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.DayHeader
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
@@ -197,13 +199,24 @@ fun FeedingScreen(
     val context = LocalContext.current
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
     var adding by remember { mutableStateOf(false) }
+    // The feed awaiting a "yes, delete it" — deletes are permanent.
+    var deleting by remember { mutableStateOf<FeedingEntity?>(null) }
 
     editing?.let { entry ->
         EditFeedingDialog(
             entry = entry,
             onDismiss = { editing = null },
             onSave = { vm.add(it); editing = null },
-            onDelete = { vm.delete(entry); editing = null },
+            onDelete = { deleting = entry },
+        )
+    }
+
+    // Sits on top of the editor when the delete came from there, so backing out
+    // of the confirmation leaves you where you were.
+    deleting?.let { entry ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(entry); deleting = null; editing = null },
+            onDismiss = { deleting = null },
         )
     }
 
@@ -254,7 +267,7 @@ fun FeedingScreen(
                         subtitle = feedingSubtitle(context, entry),
                         meta = formatTime(entry.startTime),
                         icon = Icons.Filled.LocalDrink,
-                        onDelete = { vm.delete(entry) },
+                        onDelete = { deleting = entry },
                         onClick = { editing = entry },
                         details = if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
                             { FeedingSegmentDetails(entry.segments) }
@@ -624,6 +637,21 @@ private fun FeedingForm(
     }
 
     FieldLabel(stringResource(R.string.field_time))
+    // A feed often gets logged after the fact, sometimes not until the next day,
+    // so the date is pickable and starts on today. Future dates are blocked — a
+    // feed can't have happened yet.
+    DatePickerField(
+        label = stringResource(R.string.picker_on),
+        millis = start,
+        allowFuture = false,
+        onChange = { picked ->
+            // Carry the segment end times along by the same offset, so a session
+            // entered as end times keeps its shape (even across midnight).
+            val shift = picked - start
+            start = picked
+            segs = segs.map { it.copy(end = it.end + shift) }
+        },
+    )
     // Breast feeds pair the start with per-side end times, so "From"/"To" reads
     // better than "At" (in French both picker_at and picker_to are "À").
     val startLabel = if (type == FeedType.BREAST) R.string.picker_from else R.string.picker_at

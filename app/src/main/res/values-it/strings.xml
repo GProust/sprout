@@ -224,6 +224,8 @@
     <string name="settings_language_system">Predefinita di sistema</string>
     <string name="action_add">Aggiungi</string>
     <string name="action_delete">Elimina</string>
+    <string name="entry_delete_title">Eliminare questa voce?</string>
+    <string name="entry_delete_body">Verrà rimossa definitivamente. L\'operazione non può essere annullata.</string>
     <string name="screen_babies">Bambini</string>
     <string name="babies_empty">Nessun bambino ancora — aggiungi il tuo piccolo per iniziare a tenere traccia.</string>
     <string name="baby_active">Attivo</string>

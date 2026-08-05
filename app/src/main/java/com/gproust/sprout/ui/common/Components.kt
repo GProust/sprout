@@ -22,9 +22,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -35,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -57,8 +60,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.window.Dialog
 import com.gproust.sprout.R
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 @Composable
 fun SproutTopBar(title: String, onBack: (() -> Unit)? = null) {
@@ -284,17 +289,71 @@ fun NotesField(value: String, onChange: (String) -> Unit, modifier: Modifier = M
     )
 }
 
+/**
+ * The confirmation shown before a destructive tap. Entries go for good and the
+ * delete button sits within a thumb's width of the rest of a card, so a mis-tap
+ * while holding a baby shouldn't cost you the log.
+ */
+@Composable
+fun ConfirmDeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    title: String = stringResource(R.string.entry_delete_title),
+    body: String = stringResource(R.string.entry_delete_body),
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(body) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    stringResource(R.string.action_delete),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
 private fun zone(): ZoneId = ZoneId.systemDefault()
 
+/**
+ * Blocks days after today, for dates that record something that has already
+ * happened. [DatePicker] works in UTC-midnight millis, so today's *local* date
+ * is pinned at UTC midnight to compare against.
+ */
+private object PastOrToday : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+        utcTimeMillis <= LocalDate.now(zone()).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+
+    override fun isSelectableYear(year: Int): Boolean = year <= LocalDate.now(zone()).year
+}
+
+/**
+ * A date field rendered as "label: date", opening the Material date picker.
+ * Set [allowFuture] to false for a date that can only be in the past.
+ */
 @Composable
-fun DatePickerField(label: String, millis: Long, onChange: (Long) -> Unit) {
+fun DatePickerField(
+    label: String,
+    millis: Long,
+    onChange: (Long) -> Unit,
+    allowFuture: Boolean = true,
+) {
     var open by remember { mutableStateOf(false) }
     val context = LocalContext.current
     OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) {
         Text("$label: ${formatDate(context, millis)}")
     }
     if (open) {
-        val state = rememberDatePickerState(initialSelectedDateMillis = millis)
+        val state = rememberDatePickerState(
+            initialSelectedDateMillis = millis,
+            selectableDates = if (allowFuture) DatePickerDefaults.AllDates else PastOrToday,
+        )
         DatePickerDialog(
             onDismissRequest = { open = false },
             confirmButton = {
