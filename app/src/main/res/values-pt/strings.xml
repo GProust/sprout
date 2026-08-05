@@ -317,9 +317,9 @@
     <string name="growth_spurt_notif_text">Os saltos de crescimento são comuns %1$s. Mais refeições e irritação são normais — costuma passar em poucos dias.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Última mamada</string>
-    <string name="widget_description">A última mamada (lado, há quanto tempo) — ou a mamada em curso com o cronómetro.</string>
-    <string name="widget_no_breastfeed">Ainda sem mamadas</string>
+    <string name="widget_label">Última refeição</string>
+    <string name="widget_description">A última refeição — que bebé, de que tipo e há quanto tempo — ou a mamada em curso com temporizador em direto.</string>
+    <string name="widget_no_feed">Ainda sem refeições</string>
     <string name="widget_ago_minutes">há %1$d min</string>
     <string name="widget_ago_hours">há %1$d h</string>
     <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>

@@ -317,9 +317,9 @@
     <string name="growth_spurt_notif_text">Gli scatti di crescita sono frequenti %1$s. Più pasti e irritabilità sono normali: di solito passa in pochi giorni.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Ultima poppata</string>
-    <string name="widget_description">L\'ultima poppata (lato, quanto tempo fa) — o la poppata in corso con il timer.</string>
-    <string name="widget_no_breastfeed">Ancora nessuna poppata</string>
+    <string name="widget_label">Ultimo pasto</string>
+    <string name="widget_description">L\'ultimo pasto: quale bambino, di che tipo e quanto tempo fa, o la poppata in corso con il timer dal vivo.</string>
+    <string name="widget_no_feed">Ancora nessun pasto</string>
     <string name="widget_ago_minutes">%1$d min fa</string>
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>

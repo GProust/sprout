@@ -5,6 +5,11 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 📟 The widget now covers **every kind of feed, not just breastfeeds**, and
+  names the baby it belongs to — so with twins you can tell at a glance whose
+  feed you're looking at. Each entry is labelled by kind (Breast, Bottle,
+  Solids) and shows the one detail that kind carries: which breast it ended
+  on, or how much came out of the bottle.
 - 📟 Fixed the **widget never updating after it was placed**: feeds logged
   afterwards still showed "No breastfeed yet", and a breastfeeding session
   stayed on screen as "in progress" after it had ended. The widget now

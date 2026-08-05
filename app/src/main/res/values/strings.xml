@@ -387,9 +387,9 @@
     <string name="growth_spurt_notif_text">Growth spurts are common %1$s. Extra feeds and fussiness are normal — it usually passes in a few days.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Last breastfeed</string>
-    <string name="widget_description">The last breastfeed (side, how long ago) — or the session in progress with its live timer.</string>
-    <string name="widget_no_breastfeed">No breastfeed yet</string>
+    <string name="widget_label">Last feed</string>
+    <string name="widget_description">The last feed — which baby, what kind, and how long ago — or the breastfeeding session in progress with its live timer.</string>
+    <string name="widget_no_feed">No feed yet</string>
     <string name="widget_ago_minutes">%1$d min ago</string>
     <string name="widget_ago_hours">%1$d h ago</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min ago</string>

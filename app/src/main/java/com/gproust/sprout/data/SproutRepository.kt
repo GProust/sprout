@@ -139,19 +139,28 @@ class SproutRepository(
     /** Epoch millis of a baby's most recent feed, or null if none yet. */
     suspend fun lastFeedTime(babyId: Long): Long? = db.feedingDao().lastFeedTime(babyId)
 
-    /** The active baby's most recent breastfeed, or null if none (for the widget). */
-    suspend fun lastBreastFeedForActiveBaby(): FeedingEntity? {
+    /** The active baby's most recent feed of any kind, or null if none (for the widget). */
+    suspend fun lastFeedForActiveBaby(): FeedingEntity? {
         val id = activeBabyIdNow() ?: return null
-        return db.feedingDao().lastBreastFeed(id)
+        return db.feedingDao().lastFeed(id)
     }
 
     /**
      * The same as a stream, so the widget can keep up while its composition is
-     * alive — see [observeLastBreastFeed]. Follows the active baby, so
-     * switching babies re-points it.
+     * alive. Follows the active baby, so switching babies re-points it.
      */
-    val lastBreastFeedForActiveBabyFlow: Flow<FeedingEntity?> = activeBabyId.flatMapLatest { id ->
-        if (id == null) flowOf(null) else db.feedingDao().observeLastBreastFeed(id)
+    val lastFeedForActiveBabyFlow: Flow<FeedingEntity?> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(null) else db.feedingDao().observeLastFeed(id)
+    }
+
+    /**
+     * The active baby's name, and a stream of it. The widget shows it so that
+     * with twins you can tell whose feed you're looking at.
+     */
+    suspend fun activeBabyName(): String? = activeBabyIdNow()?.let { db.babyDao().nameById(it) }
+
+    val activeBabyNameFlow: Flow<String?> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(null) else db.babyDao().observeBaby(id).map { it?.name }
     }
 
     // Sleep

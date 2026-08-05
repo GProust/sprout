@@ -317,9 +317,9 @@
     <string name="growth_spurt_notif_text">Wachstumsschübe sind %1$s häufig. Mehr Mahlzeiten und Quengeln sind normal — meist ist es nach ein paar Tagen vorbei.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Letztes Stillen</string>
-    <string name="widget_description">Das letzte Stillen (Seite, wie lange her) — oder die laufende Sitzung mit Live-Timer.</string>
-    <string name="widget_no_breastfeed">Noch kein Stillen erfasst</string>
+    <string name="widget_label">Letzte Mahlzeit</string>
+    <string name="widget_description">Die letzte Mahlzeit – welches Baby, welche Art und wie lange her – oder die laufende Stillzeit mit Live-Timer.</string>
+    <string name="widget_no_feed">Noch keine Mahlzeit</string>
     <string name="widget_ago_minutes">vor %1$d Min.</string>
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
