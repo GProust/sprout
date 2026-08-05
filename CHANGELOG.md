@@ -3,6 +3,13 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📟 The widget is now **drawn by Sprout itself** instead of through the
+  widget library's update mechanism, which on Play builds accepted every
+  refresh and then quietly did nothing — the cause of the spinner that four
+  previous attempts didn't shift. Nothing about how the widget looks changes.
+
 ## [1.4.4] — 2026-08-05
 
 - 📟 Another go at the **widget stuck on its loading spinner** in installs from

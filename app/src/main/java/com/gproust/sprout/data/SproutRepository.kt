@@ -146,22 +146,10 @@ class SproutRepository(
     }
 
     /**
-     * The same as a stream, so the widget can keep up while its composition is
-     * alive. Follows the active baby, so switching babies re-points it.
-     */
-    val lastFeedForActiveBabyFlow: Flow<FeedingEntity?> = activeBabyId.flatMapLatest { id ->
-        if (id == null) flowOf(null) else db.feedingDao().observeLastFeed(id)
-    }
-
-    /**
-     * The active baby's name, and a stream of it. The widget shows it so that
-     * with twins you can tell whose feed you're looking at.
+     * The active baby's name. The widget shows it so that with twins you can
+     * tell whose feed you're looking at.
      */
     suspend fun activeBabyName(): String? = activeBabyIdNow()?.let { db.babyDao().nameById(it) }
-
-    val activeBabyNameFlow: Flow<String?> = activeBabyId.flatMapLatest { id ->
-        if (id == null) flowOf(null) else db.babyDao().observeBaby(id).map { it?.name }
-    }
 
     // Sleep
     val sleeps: Flow<List<SleepEntity>> = activeBabyId.flatMapLatest { id ->
