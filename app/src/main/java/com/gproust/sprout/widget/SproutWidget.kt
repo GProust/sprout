@@ -6,6 +6,8 @@ import android.appwidget.AppWidgetManager
 import android.os.SystemClock
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -38,6 +40,7 @@ import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.flow.flowOf
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
 suspend fun updateSproutWidget(context: Context) {
@@ -87,18 +90,32 @@ class SproutWidget : GlanceAppWidget(errorUiLayout = R.layout.widget_error) {
         val app = readForWidget(context, "app container") {
             context.applicationContext as SproutApplication
         }
-        val session = readForWidget(context, "nursing session") {
+        // Initial values, so the first frame is right even before the flows
+        // below have emitted.
+        val initialSession = readForWidget(context, "nursing session") {
             NursingSessionStore.load(context)
         }
-        val feed = readForWidget(context, "last breastfeed") {
+        val initialFeed = readForWidget(context, "last breastfeed") {
             app?.repository?.lastBreastFeedForActiveBaby()
         }
         WidgetDiagnostics.record(
             context,
-            "data read: session=${if (session != null) "running" else "none"}, " +
-                "lastFeed=${if (feed != null) "found" else "none"}",
+            "data read: session=${if (initialSession != null) "running" else "none"}, " +
+                "lastFeed=${if (initialFeed != null) "found" else "none"}",
         )
         provideContent {
+            // Observed *inside* the composition on purpose. update()/updateAll()
+            // don't restart provideGlance while it is still running, so reading
+            // once above and closing over the result meant every later refresh
+            // just redrew the same stale values — feeds logged after the widget
+            // was placed never showed, and a session that ended stayed on
+            // screen. Once the composition is torn down the next refresh does
+            // restart provideGlance, which re-reads the initial values above,
+            // so the two together cover both windows.
+            val session by NursingSessionStore.observe(context)
+                .collectAsState(initial = initialSession)
+            val feed by (app?.repository?.lastBreastFeedForActiveBabyFlow ?: flowOf(initialFeed))
+                .collectAsState(initial = initialFeed)
             GlanceTheme {
                 SproutWidgetUi(session, feed)
             }

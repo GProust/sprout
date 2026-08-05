@@ -92,6 +92,14 @@ interface FeedingDao {
     @Query("SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' ORDER BY startTime DESC LIMIT 1")
     suspend fun lastBreastFeed(babyId: Long): FeedingEntity?
 
+    /**
+     * The same, as a stream. The widget observes this inside its composition:
+     * update()/updateAll() don't restart provideGlance while it is still
+     * running, so a one-shot read there can only ever redraw stale data.
+     */
+    @Query("SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' ORDER BY startTime DESC LIMIT 1")
+    fun observeLastBreastFeed(babyId: Long): Flow<FeedingEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 

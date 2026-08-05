@@ -1,8 +1,12 @@
 package com.gproust.sprout.ui.feeding
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.Converters
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 /**
  * Persists the live breastfeeding session (if any) to SharedPreferences, so
@@ -44,4 +48,23 @@ object NursingSessionStore {
     }
 
     fun clear(context: Context) = prefs(context).edit().clear().apply()
+
+    /**
+     * The live session as a stream. The widget observes this inside its
+     * composition, because update()/updateAll() don't restart provideGlance
+     * while it is still running — so a session that starts, switches sides or
+     * ends would otherwise never reach an already-composed widget.
+     */
+    fun observe(context: Context): Flow<NursingSession?> = callbackFlow {
+        val prefs = prefs(context)
+        // Every listener callback re-reads the whole session rather than
+        // tracking single keys: a session is written key by key, and half of
+        // one is worse than a slightly late whole one.
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            trySend(load(context))
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        trySend(load(context))
+        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
 }

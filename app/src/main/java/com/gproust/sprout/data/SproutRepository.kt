@@ -145,6 +145,15 @@ class SproutRepository(
         return db.feedingDao().lastBreastFeed(id)
     }
 
+    /**
+     * The same as a stream, so the widget can keep up while its composition is
+     * alive — see [observeLastBreastFeed]. Follows the active baby, so
+     * switching babies re-points it.
+     */
+    val lastBreastFeedForActiveBabyFlow: Flow<FeedingEntity?> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(null) else db.feedingDao().observeLastBreastFeed(id)
+    }
+
     // Sleep
     val sleeps: Flow<List<SleepEntity>> = activeBabyId.flatMapLatest { id ->
         if (id == null) flowOf(emptyList()) else db.sleepDao().observeForBaby(id)
