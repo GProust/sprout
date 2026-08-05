@@ -1,0 +1,1 @@
+Más trabajo en el widget de la pantalla de inicio que podía quedarse girando en lugar de mostrar la última toma: partes de la biblioteca del widget se eliminaban de las versiones de Play y ahora se conservan. Si sigue sin cargar, Ajustes › Resolución de problemas › Diagnóstico del widget tiene un botón «Forzar actualización» y registra qué ha fallado.

@@ -1,0 +1,1 @@
+Altro lavoro sul widget della schermata Home che poteva restare a girare invece di mostrare l'ultimo pasto: parti della libreria del widget venivano rimosse dalle build di Play e ora vengono mantenute. Se ancora non si carica, in Impostazioni › Risoluzione dei problemi › Diagnostica del widget c'è un pulsante «Forza aggiornamento» e viene registrato l'errore.

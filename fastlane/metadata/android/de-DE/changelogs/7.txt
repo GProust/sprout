@@ -1,0 +1,1 @@
+Weitere Arbeit am Homescreen-Widget, das sich drehen konnte, statt die letzte Mahlzeit zu zeigen: Teile der Widget-Bibliothek wurden aus Play-Builds entfernt und bleiben jetzt erhalten. Lädt es weiterhin nicht, gibt es unter Einstellungen › Fehlersuche › Widget-Diagnose einen Knopf „Aktualisierung erzwingen“, und Fehler werden protokolliert.

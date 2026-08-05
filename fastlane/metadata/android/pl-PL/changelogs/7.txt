@@ -1,0 +1,1 @@
+Dalsze prace nad widżetem na ekranie głównym, który potrafił się kręcić zamiast pokazać ostatnie karmienie: części biblioteki widżetu były usuwane z wersji z Play, a teraz zostają zachowane. Jeśli nadal się nie ładuje, w Ustawienia › Rozwiązywanie problemów › Diagnostyka widżetu jest przycisk „Wymuś odświeżenie” i zapisywany jest błąd.

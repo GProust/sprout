@@ -1,0 +1,1 @@
+More work on the home-screen widget that could sit spinning instead of showing your last feed: parts of the widget library were being stripped out of Play builds, and are now kept intact. If it still won't load, Settings › Troubleshooting › Widget diagnostics has a new "Force a refresh" button and now records what went wrong, so the report can pinpoint it.

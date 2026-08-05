@@ -1,0 +1,1 @@
+Nouvelle avancée sur le widget d'écran d'accueil qui pouvait tourner sans fin au lieu d'afficher votre dernier repas : des parties de la bibliothèque du widget étaient supprimées des versions Play, elles sont désormais conservées. S'il ne se charge toujours pas, Paramètres › Dépannage › Diagnostic du widget propose un bouton « Forcer l'actualisation » et note ce qui a échoué.

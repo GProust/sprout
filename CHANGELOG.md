@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.4] — 2026-08-05
 
 - 📟 Another go at the **widget stuck on its loading spinner** in installs from
   Play. Pinning the widget's class name in 1.4.3 wasn't it — a report showed
