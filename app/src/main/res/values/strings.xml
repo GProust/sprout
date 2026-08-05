@@ -408,6 +408,7 @@
     <string name="widget_diagnostics_share">Share report</string>
     <string name="widget_diagnostics_copy">Copy</string>
     <string name="widget_diagnostics_rerun">Run again</string>
+    <string name="widget_diagnostics_force_refresh">Force a refresh</string>
     <string name="widget_diagnostics_clear">Clear history</string>
     <string name="widget_error">Widget error — see Settings → Widget diagnostics</string>
 </resources>

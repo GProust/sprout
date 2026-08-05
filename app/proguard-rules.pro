@@ -17,3 +17,18 @@
 #
 # Keeping the widget type pins that name across releases.
 -keep class * extends androidx.glance.appwidget.GlanceAppWidget { *; }
+
+# That alone did NOT fix it. With the name pinned, a report still showed Glance
+# aware of the widget ("Glance sees: 1"), onUpdate handing off cleanly, and
+# provideGlance never running — while the in-app self-test composed and inflated
+# the very same UI. So composition is fine and it is Glance's *update session*
+# that dies, silently, and only in minified builds; a debug build of the same
+# commit drives the same widget correctly on the same Android version.
+#
+# Glance starts that session through coroutines and reads the widget's state
+# from DataStore before composing, none of it reachable from our code, so R8
+# sees it as unused. Keep both libraries whole rather than guess which member
+# went missing — the widget is broken in every release build, which is worth
+# more than the handful of kilobytes.
+-keep class androidx.glance.** { *; }
+-keep class androidx.datastore.** { *; }

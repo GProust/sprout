@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -33,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.widget.WidgetDiagnostics
+import com.gproust.sprout.widget.updateSproutWidget
+import kotlinx.coroutines.launch
 
 /**
  * What the home-screen widget did, and what happens when it is asked to render
@@ -51,6 +54,7 @@ fun WidgetDiagnosticsScreen(onBack: () -> Unit) {
     // Bumping this re-runs the self-test, so "Run again" is meaningful after
     // reinstalling or re-adding the widget.
     var run by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(run) {
         report = null
@@ -110,6 +114,18 @@ fun WidgetDiagnosticsScreen(onBack: () -> Unit) {
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Runs the path that actually fails — the launcher's update
+                    // — from the foreground, where anything it throws is caught
+                    // and recorded instead of vanishing into a background
+                    // coroutine. Re-reads the report straight afterwards.
+                    Button(onClick = {
+                        scope.launch {
+                            updateSproutWidget(context)
+                            run++
+                        }
+                    }) {
+                        Text(stringResource(R.string.widget_diagnostics_force_refresh))
+                    }
                     OutlinedButton(onClick = { run++ }) {
                         Text(stringResource(R.string.widget_diagnostics_rerun))
                     }

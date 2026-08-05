@@ -336,6 +336,7 @@
     <string name="widget_diagnostics_share">Compartir informe</string>
     <string name="widget_diagnostics_copy">Copiar</string>
     <string name="widget_diagnostics_rerun">Ejecutar de nuevo</string>
+    <string name="widget_diagnostics_force_refresh">Forzar actualización</string>
     <string name="widget_diagnostics_clear">Borrar historial</string>
     <string name="widget_error">Error del widget: consulta Ajustes → Diagnóstico del widget</string>
 </resources>
