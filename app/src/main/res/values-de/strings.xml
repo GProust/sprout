@@ -317,10 +317,21 @@
     <string name="growth_spurt_notif_text">Wachstumsschübe sind %1$s häufig. Mehr Mahlzeiten und Quengeln sind normal — meist ist es nach ein paar Tagen vorbei.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Letztes Stillen</string>
-    <string name="widget_description">Das letzte Stillen (Seite, wie lange her) — oder die laufende Sitzung mit Live-Timer.</string>
-    <string name="widget_no_breastfeed">Noch kein Stillen erfasst</string>
+    <string name="widget_label">Letzte Mahlzeit</string>
+    <string name="widget_description">Die letzte Mahlzeit – welches Baby, welche Art und wie lange her – oder die laufende Stillzeit mit Live-Timer.</string>
+    <string name="widget_no_feed">Noch keine Mahlzeit</string>
     <string name="widget_ago_minutes">vor %1$d Min.</string>
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Widget-Diagnose</string>
+    <string name="settings_troubleshooting">Fehlersuche</string>
+    <string name="settings_widget_diagnostics_hint">Prüfen, warum das Homescreen-Widget nicht funktioniert, und einen Bericht teilen.</string>
+    <string name="widget_diagnostics_intro">Dies testet das Homescreen-Widget jetzt und listet auf, was es zuletzt getan hat. Teile den Bericht, wenn das Widget nicht funktioniert – nichts wird ohne dein Zutun gesendet.</string>
+    <string name="widget_diagnostics_share">Bericht teilen</string>
+    <string name="widget_diagnostics_copy">Kopieren</string>
+    <string name="widget_diagnostics_rerun">Erneut ausführen</string>
+    <string name="widget_diagnostics_clear">Verlauf löschen</string>
+    <string name="widget_error">Widget-Fehler – siehe Einstellungen → Widget-Diagnose</string>
 </resources>

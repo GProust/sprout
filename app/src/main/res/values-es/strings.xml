@@ -317,10 +317,21 @@
     <string name="growth_spurt_notif_text">Los estirones de crecimiento son habituales %1$s. Más tomas e irritabilidad son normales; suele pasar en unos días.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Última toma de pecho</string>
-    <string name="widget_description">La última toma de pecho (lado, hace cuánto) — o la toma en curso con su cronómetro.</string>
-    <string name="widget_no_breastfeed">Aún no hay tomas de pecho</string>
+    <string name="widget_label">Última toma</string>
+    <string name="widget_description">La última toma: qué bebé, de qué tipo y hace cuánto, o la toma en curso con su cronómetro en directo.</string>
+    <string name="widget_no_feed">Aún no hay tomas</string>
     <string name="widget_ago_minutes">hace %1$d min</string>
     <string name="widget_ago_hours">hace %1$d h</string>
     <string name="widget_ago_hours_minutes">hace %1$d h %2$d min</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnóstico del widget</string>
+    <string name="settings_troubleshooting">Resolución de problemas</string>
+    <string name="settings_widget_diagnostics_hint">Comprueba por qué el widget de la pantalla de inicio no funciona y comparte un informe.</string>
+    <string name="widget_diagnostics_intro">Esto prueba el widget de la pantalla de inicio ahora mismo y muestra lo que ha hecho últimamente. Compártelo si el widget no funciona: no se envía nada salvo que tú lo decidas.</string>
+    <string name="widget_diagnostics_share">Compartir informe</string>
+    <string name="widget_diagnostics_copy">Copiar</string>
+    <string name="widget_diagnostics_rerun">Ejecutar de nuevo</string>
+    <string name="widget_diagnostics_clear">Borrar historial</string>
+    <string name="widget_error">Error del widget: consulta Ajustes → Diagnóstico del widget</string>
 </resources>

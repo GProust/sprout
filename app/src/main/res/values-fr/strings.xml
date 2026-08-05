@@ -374,10 +374,21 @@
     <string name="growth_spurt_notif_text">Les pics de croissance sont fréquents %1$s. Plus de repas et de grognons — c\'est normal, et ça passe en général en quelques jours.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Dernière tétée</string>
-    <string name="widget_description">La dernière tétée (côté, il y a combien de temps) — ou la tétée en cours avec son chronomètre.</string>
-    <string name="widget_no_breastfeed">Aucune tétée pour l\'instant</string>
+    <string name="widget_label">Dernier repas</string>
+    <string name="widget_description">Le dernier repas — quel bébé, de quel type et il y a combien de temps — ou la tétée en cours avec son minuteur en direct.</string>
+    <string name="widget_no_feed">Aucun repas pour l\'instant</string>
     <string name="widget_ago_minutes">il y a %1$d min</string>
     <string name="widget_ago_hours">il y a %1$d h</string>
     <string name="widget_ago_hours_minutes">il y a %1$d h %2$d min</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnostic du widget</string>
+    <string name="settings_troubleshooting">Dépannage</string>
+    <string name="settings_widget_diagnostics_hint">Vérifiez pourquoi le widget d\'écran d\'accueil ne fonctionne pas, et partagez un rapport.</string>
+    <string name="widget_diagnostics_intro">Ceci teste le widget d\'écran d\'accueil maintenant et liste ce qu\'il a fait récemment. Partagez-le si le widget ne fonctionne pas : rien n\'est envoyé sans votre accord.</string>
+    <string name="widget_diagnostics_share">Partager le rapport</string>
+    <string name="widget_diagnostics_copy">Copier</string>
+    <string name="widget_diagnostics_rerun">Relancer</string>
+    <string name="widget_diagnostics_clear">Effacer l\'historique</string>
+    <string name="widget_error">Erreur du widget — voir Paramètres → Diagnostic du widget</string>
 </resources>
