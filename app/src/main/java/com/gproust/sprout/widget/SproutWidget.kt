@@ -146,13 +146,16 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
 }
 
 /**
- * The breast to offer first at the next feed alternates, so what a nursing
- * parent wants at a glance is where the last feed *ended*: the side of the
- * last recorded stretch when per-segment timing exists, otherwise the
- * session-level side (which may be BOTH on older entries).
+ * Which breast the last feed *started* on — the side the next feed alternates
+ * away from, which is the thing being decided at 3 a.m.
+ *
+ * A session that went left, then right, still reads "left": what matters is
+ * where it began, not where it happened to stop. Falls back to the
+ * session-level side when there is no per-segment timing (which may be BOTH on
+ * older entries).
  */
-fun lastNursedSide(feed: FeedingEntity): BreastSide? =
-    feed.segments.lastOrNull()?.side ?: feed.side
+fun firstNursedSide(feed: FeedingEntity): BreastSide? =
+    feed.segments.firstOrNull()?.side ?: feed.side
 
 /**
  * The widget's time line: elapsed time since the feed with explicit units
@@ -296,7 +299,7 @@ private fun feedTypeLabel(type: FeedType): Int = when (type) {
  * feed has nothing of the sort to say.
  */
 private fun feedHeadline(context: Context, feed: FeedingEntity): String? = when (feed.type) {
-    FeedType.BREAST -> lastNursedSide(feed)?.let { context.getString(sideLabel(it)) }
+    FeedType.BREAST -> firstNursedSide(feed)?.let { context.getString(sideLabel(it)) }
     FeedType.BOTTLE -> feed.amountMl?.let { context.getString(R.string.feeding_amount_ml, it) }
     FeedType.SOLID -> null
 }
