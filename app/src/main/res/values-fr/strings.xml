@@ -276,6 +276,10 @@
     <string name="action_add">Ajouter</string>
     <string name="action_delete">Supprimer</string>
 
+    <!-- Confirmation avant de supprimer une entrée -->
+    <string name="entry_delete_title">Supprimer cette entrée ?</string>
+    <string name="entry_delete_body">Elle sera définitivement supprimée. Cette action est irréversible.</string>
+
     <!-- Babies (plusieurs bébés : jumeaux / fratrie) -->
     <string name="screen_babies">Bébés</string>
     <string name="babies_empty">Aucun bébé pour le moment — ajoutez votre petit pour commencer le suivi.</string>
@@ -308,6 +312,8 @@
     <string name="quick_treatments">💊  Traitements</string>
     <string name="treatment_empty">Aucun traitement pour le moment. Ajoutez-en un avec le bouton + — par ex. vitamine D tous les jours.</string>
     <string name="treatment_add">Ajouter un traitement</string>
+    <string name="treatment_delete_title">Supprimer %1$s ?</string>
+    <string name="treatment_delete_body">Ses rappels s\'arrêtent et le traitement est définitivement supprimé. Cette action est irréversible.</string>
     <string name="treatment_new">Nouveau traitement</string>
     <string name="treatment_edit">Modifier le traitement</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>

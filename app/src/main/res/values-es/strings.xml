@@ -224,6 +224,8 @@
     <string name="settings_language_system">Predeterminado del sistema</string>
     <string name="action_add">Añadir</string>
     <string name="action_delete">Eliminar</string>
+    <string name="entry_delete_title">¿Eliminar esta entrada?</string>
+    <string name="entry_delete_body">Se eliminará definitivamente. Esta acción no se puede deshacer.</string>
     <string name="screen_babies">Bebés</string>
     <string name="babies_empty">Aún no hay bebés. Añade a tu peque para empezar a registrar.</string>
     <string name="baby_active">Activo</string>
@@ -253,6 +255,8 @@
     <string name="quick_treatments">💊  Tratamientos</string>
     <string name="treatment_empty">Aún no hay tratamientos. Añade uno con el botón + (p. ej. Vitamina D cada día).</string>
     <string name="treatment_add">Añadir tratamiento</string>
+    <string name="treatment_delete_title">¿Eliminar %1$s?</string>
+    <string name="treatment_delete_body">Sus recordatorios se detienen y el tratamiento se elimina definitivamente. Esta acción no se puede deshacer.</string>
     <string name="treatment_new">Nuevo tratamiento</string>
     <string name="treatment_edit">Editar tratamiento</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>

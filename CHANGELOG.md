@@ -5,6 +5,17 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 📅 Entries logged by hand can now be **put on a past date**, not just a time.
+  Feeding, Sleep, Diapers and Wellbeing each gained a date field in their log
+  form (starting on today), so a feed remembered the next morning lands on the
+  day it actually happened. Editing an existing feed can move it to another day
+  the same way, and dates in the future are no longer selectable.
+- 🌙 A sleep whose wake time is **earlier than its bedtime** is now stored as
+  running past midnight, instead of ending before it started.
+- 🛟 Deleting an entry now **asks first**, on every screen that logs one
+  (Feeding, Sleep, Diapers, Growth, Wellbeing, Treatments). The bin sits right
+  next to the rest of the card and entries are gone for good — one mis-tap
+  while holding a baby shouldn't cost you the log.
 - 📟 The widget now covers **every kind of feed, not just breastfeeds**, and
   names the baby it belongs to — so with twins you can tell at a glance whose
   feed you're looking at. Each entry is labelled by kind (Breast, Bottle,

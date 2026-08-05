@@ -60,6 +60,7 @@ import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.notifications.TreatmentReminders
 import com.gproust.sprout.ui.common.ChoiceChips
+import com.gproust.sprout.ui.common.ConfirmDeleteDialog
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.FieldLabel
@@ -121,6 +122,7 @@ fun TreatmentsScreen(onBack: () -> Unit) {
     }
 
     var editing by remember { mutableStateOf<TreatmentEntity?>(null) }
+    var deleting by remember { mutableStateOf<TreatmentEntity?>(null) }
 
     editing?.let { initial ->
         TreatmentEditor(
@@ -129,6 +131,16 @@ fun TreatmentsScreen(onBack: () -> Unit) {
             onSave = { vm.save(it) { editing = null } },
         )
         return
+    }
+
+    // Deleting a treatment also cancels its reminders — worth a confirmation.
+    deleting?.let { treatment ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.delete(treatment); deleting = null },
+            onDismiss = { deleting = null },
+            title = stringResource(R.string.treatment_delete_title, treatment.name),
+            body = stringResource(R.string.treatment_delete_body),
+        )
     }
 
     Scaffold(
@@ -152,7 +164,7 @@ fun TreatmentsScreen(onBack: () -> Unit) {
                     treatment = treatment,
                     summary = scheduleSummary(context, treatment),
                     onEdit = { editing = treatment },
-                    onDelete = { vm.delete(treatment) },
+                    onDelete = { deleting = treatment },
                 )
             }
         }

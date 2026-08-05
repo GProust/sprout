@@ -288,6 +288,10 @@
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
 
+    <!-- Confirmation before deleting a logged entry -->
+    <string name="entry_delete_title">Delete this entry?</string>
+    <string name="entry_delete_body">It will be removed for good. This can\'t be undone.</string>
+
     <!-- Babies (multiple babies: twins / siblings) -->
     <string name="screen_babies">Babies</string>
     <string name="babies_empty">No babies yet — add your little one to start tracking.</string>
@@ -320,6 +324,8 @@
     <string name="quick_treatments">💊  Treatments</string>
     <string name="treatment_empty">No treatments yet. Add one with the + button — e.g. Vitamin D every day.</string>
     <string name="treatment_add">Add treatment</string>
+    <string name="treatment_delete_title">Delete %1$s?</string>
+    <string name="treatment_delete_body">Its reminders stop and the treatment is removed for good. This can\'t be undone.</string>
     <string name="treatment_new">New treatment</string>
     <string name="treatment_edit">Edit treatment</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>

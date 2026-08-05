@@ -224,6 +224,8 @@
     <string name="settings_language_system">Predefinita di sistema</string>
     <string name="action_add">Aggiungi</string>
     <string name="action_delete">Elimina</string>
+    <string name="entry_delete_title">Eliminare questa voce?</string>
+    <string name="entry_delete_body">Verrà rimossa definitivamente. L\'operazione non può essere annullata.</string>
     <string name="screen_babies">Bambini</string>
     <string name="babies_empty">Nessun bambino ancora — aggiungi il tuo piccolo per iniziare a tenere traccia.</string>
     <string name="baby_active">Attivo</string>
@@ -253,6 +255,8 @@
     <string name="quick_treatments">💊  Trattamenti</string>
     <string name="treatment_empty">Nessun trattamento ancora. Aggiungine uno con il pulsante + — ad es. Vitamina D ogni giorno.</string>
     <string name="treatment_add">Aggiungi trattamento</string>
+    <string name="treatment_delete_title">Eliminare %1$s?</string>
+    <string name="treatment_delete_body">I promemoria si interrompono e il trattamento viene rimosso definitivamente. L\'operazione non può essere annullata.</string>
     <string name="treatment_new">Nuovo trattamento</string>
     <string name="treatment_edit">Modifica trattamento</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
