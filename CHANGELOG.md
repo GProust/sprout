@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.6] — 2026-08-05
 
 - 🌍 Fixed **choosing a language doing nothing** for installs from Play. Play
   only delivers the languages matching the device, so picking any other one
