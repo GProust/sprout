@@ -1,0 +1,1 @@
+Fixes the home-screen widget never loading — it sat on its spinner instead of ever showing the last breastfeed.

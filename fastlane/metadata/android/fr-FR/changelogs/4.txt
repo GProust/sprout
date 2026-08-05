@@ -1,0 +1,1 @@
+Corrige le widget de l'écran d'accueil qui ne chargeait jamais : il restait sur son indicateur au lieu d'afficher la dernière tétée.

@@ -1,0 +1,1 @@
+Corrige el widget de la pantalla de inicio, que nunca cargaba: se quedaba en el indicador de carga en lugar de mostrar la última toma de pecho.

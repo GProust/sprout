@@ -1,0 +1,1 @@
+Corregge il widget della schermata home che non si caricava mai: restava sull'indicatore invece di mostrare l'ultima poppata.
