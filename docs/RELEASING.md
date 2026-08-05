@@ -117,10 +117,11 @@ Before publishing, sanity-check the build:
 > internal testing track is the natural place for this. Add keep rules to
 > `app/proguard-rules.pro` if anything misbehaves.
 >
-> Because Play gets an **AAB**, the R8 mapping file and the symbol tables of
-> dependencies' native libraries (`ndk.debugSymbolLevel = "SYMBOL_TABLE"`) are
-> embedded in the bundle automatically — Play uses them to deobfuscate crash
-> reports and ANRs. Nothing extra to upload.
+> Because Play gets an **AAB**, the R8 mapping file is embedded in the bundle
+> automatically — Play uses it to deobfuscate crash reports and ANRs. Nothing
+> extra to upload. Native debug symbols (`ndk.debugSymbolLevel = "SYMBOL_TABLE"`)
+> are configured the same way but end up empty; see
+> [Play Console warnings you can ignore](#play-console-warnings-you-can-ignore).
 
 ---
 
@@ -172,6 +173,41 @@ Google Play also requires you to complete, in the Console:
 
 For later updates: bump `versionCode`/`versionName` (§1), rebuild (§3), and
 upload a new production release.
+
+### Play Console warnings you can ignore
+
+Every upload gets this one on the release's details page:
+
+> This App Bundle contains native code, and you've not uploaded debug symbols.
+> We recommend you upload a symbol file to make your crashes and ANRs easier to
+> analyze and debug.
+
+Nothing is broken and there is nothing to fix. Sprout has no native code of its
+own — it is Kotlin all the way down. The only `.so` in the bundle is
+`libandroidx.graphics.path.so` (one per ABI), a prebuilt that Compose drags in
+through `androidx.graphics:graphics-path`, and AndroidX publishes it already
+stripped: the shipped library has a `.dynsym` and no symbol table or debug
+sections at all. `ndk.debugSymbolLevel` (§3) therefore has nothing to extract,
+which is what the release build log is saying when it prints
+
+```
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+```
+
+and why the bundle carries no `BUNDLE-METADATA/…/debugsymbols` entry for Play
+to find. Usable symbols for that library only ever existed on the machine where
+Google built it; we cannot generate them.
+
+None of this touches crash reports for our own code — those frames are
+Kotlin/Java and the embedded R8 mapping file already deobfuscates them.
+
+If you want the banner gone anyway, Play takes a symbol file per bundle under
+**Release → App bundle explorer → Downloads → Native debug symbols**. Uploading
+a zip of the (stripped) `.so` files satisfies the check without adding any real
+symbol information, so it buys nothing but silence. The build setting stays in
+place regardless: the day Sprout ships native code of its own, its symbols will
+be packaged automatically.
 
 ---
 
