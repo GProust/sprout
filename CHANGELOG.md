@@ -3,6 +3,17 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [1.4.4] — 2026-08-05
+
+- 📟 Another go at the **widget stuck on its loading spinner** in installs from
+  Play. Pinning the widget's class name in 1.4.3 wasn't it — a report showed
+  the widget rendering fine on demand while the update the launcher asks for
+  quietly did nothing. Release builds were stripping parts of the widget
+  library they only reach indirectly; those are now kept whole.
+- 🩺 Widget diagnostics gained a **"Force a refresh"** button, and now records
+  what the refresh and the drawing step threw, if anything — so a failure that
+  used to disappear silently ends up in the report.
+
 ## [1.4.3] — 2026-08-05
 
 - 📟 Fixed the **widget staying on its loading spinner after an app update**,

@@ -336,6 +336,7 @@
     <string name="widget_diagnostics_share">Partilhar relatório</string>
     <string name="widget_diagnostics_copy">Copiar</string>
     <string name="widget_diagnostics_rerun">Executar de novo</string>
+    <string name="widget_diagnostics_force_refresh">Forçar atualização</string>
     <string name="widget_diagnostics_clear">Limpar histórico</string>
     <string name="widget_error">Erro do widget — ver Definições → Diagnóstico do widget</string>
 </resources>
