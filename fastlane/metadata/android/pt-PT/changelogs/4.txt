@@ -1,0 +1,1 @@
+Corrige o widget do ecrã principal que nunca carregava: ficava no indicador em vez de mostrar a última mamada.
