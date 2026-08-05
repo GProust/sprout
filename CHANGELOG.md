@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.2] — 2026-08-05
 
 - 📅 Entries logged by hand can now be **put on a past date**, not just a time.
   Feeding, Sleep, Diapers and Wellbeing each gained a date field in their log
