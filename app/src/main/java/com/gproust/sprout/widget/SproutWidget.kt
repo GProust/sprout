@@ -146,6 +146,33 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
 }
 
 /**
+ * The breast to offer first at the next feed alternates, so what a nursing
+ * parent wants at a glance is where the last feed *ended*: the side of the
+ * last recorded stretch when per-segment timing exists, otherwise the
+ * session-level side (which may be BOTH on older entries).
+ */
+fun lastNursedSide(feed: FeedingEntity): BreastSide? =
+    feed.segments.lastOrNull()?.side ?: feed.side
+
+/**
+ * The widget's time line: elapsed time since the feed with explicit units
+ * ("2 h 15 min ago"). Once the last feed is over two days old an hour count
+ * stops being readable, so it falls back to the absolute date + time.
+ */
+internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): String {
+    val totalMin = (now - epochMillis) / 60_000L
+    val hours = totalMin / 60
+    val minutes = totalMin % 60
+    return when {
+        totalMin < 1 -> context.getString(R.string.relative_just_now)
+        hours < 1 -> context.getString(R.string.widget_ago_minutes, minutes.toInt())
+        hours >= 48 -> formatDateTime(context, epochMillis)
+        minutes == 0L -> context.getString(R.string.widget_ago_hours, hours.toInt())
+        else -> context.getString(R.string.widget_ago_hours_minutes, hours.toInt(), minutes.toInt())
+    }
+}
+
+/**
  * Reads one piece of widget data, degrading to null if it fails. A widget
  * showing its empty state is recoverable; one that threw on the way to being
  * drawn leaves the launcher on a loading spinner instead. Catches Throwable,
