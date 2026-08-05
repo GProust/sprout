@@ -3,6 +3,20 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🌍 Fixed **choosing a language doing nothing** for installs from Play. Play
+  only delivers the languages matching the device, so picking any other one
+  silently fell back to the device's language — the choice was saved, the app
+  just had no translation to show. Every install now carries all 7.
+- 📟 The widget now shows the side the last breastfeed **started** on, not the
+  one it ended on. A session that went left then right reads "Left", because
+  the side you need at the next feed is the opposite of the one you began with.
+- ⏱️ The widget's **"x min ago" now keeps counting**. It was written once when
+  the widget was drawn and the system only refreshes widgets every half hour,
+  so a feed from a quarter of an hour ago could still read "just now". It ticks
+  each minute while the phone is awake, and refreshes whenever you open Sprout.
+
 ## [1.4.5] — 2026-08-05
 
 - 📟 The widget is now **drawn by Sprout itself** instead of through the

@@ -3,6 +3,8 @@ package com.gproust.sprout.widget
 import android.content.Context
 import android.content.Intent
 import android.appwidget.AppWidgetManager
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.os.Bundle
@@ -90,8 +92,50 @@ suspend fun renderSproutWidgets(context: Context, appWidgetIds: IntArray) {
             }
         }
     }
+    scheduleWidgetTick(context, data)
     WidgetDiagnostics.record(context, "render finished")
 }
+
+/**
+ * Keeps "20 min ago" honest.
+ *
+ * The elapsed time is baked into the RemoteViews when they are drawn, and the
+ * system only refreshes a widget every 30 minutes (its floor), so a feed logged
+ * a quarter of an hour ago still read "just now". This lines up a re-draw on
+ * the next minute boundary, which is exactly when the text can first change.
+ *
+ * Deliberately a non-wakeup alarm: it fires while the phone is awake and is
+ * deferred while it sleeps, which is the right trade for something only worth
+ * updating when somebody might be looking at it.
+ */
+private fun scheduleWidgetTick(context: Context, data: WidgetData) {
+    val alarms = context.getSystemService(AlarmManager::class.java) ?: return
+    val pending = tickIntent(context)
+    // Past two days the widget shows an absolute date, which never goes stale,
+    // so there is nothing left to tick for.
+    val ticking = data.session != null ||
+        data.feed?.startTime?.let { System.currentTimeMillis() - it < RELATIVE_TIME_LIMIT_MS } == true
+    if (!ticking) {
+        alarms.cancel(pending)
+        return
+    }
+    val now = System.currentTimeMillis()
+    alarms.set(AlarmManager.RTC, now - (now % 60_000L) + 60_000L, pending)
+}
+
+internal fun cancelWidgetTick(context: Context) {
+    context.getSystemService(AlarmManager::class.java)?.cancel(tickIntent(context))
+}
+
+private fun tickIntent(context: Context): PendingIntent = PendingIntent.getBroadcast(
+    context,
+    0,
+    Intent(context, SproutWidgetReceiver::class.java).setAction(SproutWidgetReceiver.ACTION_TICK),
+    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+)
+
+/** Beyond this the widget shows a date rather than an elapsed time. */
+private const val RELATIVE_TIME_LIMIT_MS = 48L * 60L * 60L * 1000L
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
 suspend fun updateSproutWidget(context: Context) {
@@ -146,13 +190,16 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
 }
 
 /**
- * The breast to offer first at the next feed alternates, so what a nursing
- * parent wants at a glance is where the last feed *ended*: the side of the
- * last recorded stretch when per-segment timing exists, otherwise the
- * session-level side (which may be BOTH on older entries).
+ * Which breast the last feed *started* on — the side the next feed alternates
+ * away from, which is the thing being decided at 3 a.m.
+ *
+ * A session that went left, then right, still reads "left": what matters is
+ * where it began, not where it happened to stop. Falls back to the
+ * session-level side when there is no per-segment timing (which may be BOTH on
+ * older entries).
  */
-fun lastNursedSide(feed: FeedingEntity): BreastSide? =
-    feed.segments.lastOrNull()?.side ?: feed.side
+fun firstNursedSide(feed: FeedingEntity): BreastSide? =
+    feed.segments.firstOrNull()?.side ?: feed.side
 
 /**
  * The widget's time line: elapsed time since the feed with explicit units
@@ -296,7 +343,7 @@ private fun feedTypeLabel(type: FeedType): Int = when (type) {
  * feed has nothing of the sort to say.
  */
 private fun feedHeadline(context: Context, feed: FeedingEntity): String? = when (feed.type) {
-    FeedType.BREAST -> lastNursedSide(feed)?.let { context.getString(sideLabel(it)) }
+    FeedType.BREAST -> firstNursedSide(feed)?.let { context.getString(sideLabel(it)) }
     FeedType.BOTTLE -> feed.amountMl?.let { context.getString(R.string.feeding_amount_ml, it) }
     FeedType.SOLID -> null
 }
@@ -334,6 +381,11 @@ private fun HeadlineText(text: String) {
  */
 class SproutWidgetReceiver : AppWidgetProvider() {
 
+    companion object {
+        /** Our own minute tick, so the elapsed time doesn't go stale. */
+        const val ACTION_TICK = "com.gproust.sprout.widget.TICK"
+    }
+
     override fun onEnabled(context: Context) {
         WidgetDiagnostics.record(context, "receiver: first widget added")
     }
@@ -360,6 +412,20 @@ class SproutWidgetReceiver : AppWidgetProvider() {
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         WidgetDiagnostics.record(context, "receiver: ${appWidgetIds.size} widget(s) removed")
+    }
+
+    /** Nothing left on the home screen to keep up to date. */
+    override fun onDisabled(context: Context) {
+        WidgetDiagnostics.record(context, "receiver: last widget removed")
+        cancelWidgetTick(context)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == ACTION_TICK) {
+            renderInBackground(context, placedWidgetIds(context))
+            return
+        }
+        super.onReceive(context, intent)
     }
 
     /**
