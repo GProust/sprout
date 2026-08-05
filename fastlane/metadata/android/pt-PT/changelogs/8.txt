@@ -1,0 +1,1 @@
+O widget do ecrã principal passa a ser desenhado pelo próprio Sprout, em vez de ser entregue à biblioteca de widgets. Nas instalações da Play esse passo não fazia nada em silêncio — daí o widget ficar a rodar sem fim em vez de mostrar a última refeição. O aspeto não muda. Se agora falhar, di-lo em vez de rodar.

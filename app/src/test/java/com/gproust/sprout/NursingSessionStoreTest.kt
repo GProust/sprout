@@ -5,9 +5,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -16,9 +13,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-// The widget observes this stream inside its composition, because Glance won't
-// restart provideGlance while one is running. If the stream doesn't start with
-// the session that's already stored, a widget composed mid-feed shows nothing.
+// The widget reads this on every render, so a session that round-trips wrong
+// is a widget that shows the wrong side mid-feed.
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], qualifiers = "en")
 class NursingSessionStoreTest {
@@ -33,23 +29,6 @@ class NursingSessionStoreTest {
 
     @Before
     fun clear() = NursingSessionStore.clear(context)
-
-    @Test
-    fun observeStartsWithTheStoredSession() = runBlocking {
-        NursingSessionStore.save(context, session)
-
-        val first = withTimeout(5_000) { NursingSessionStore.observe(context).first() }
-
-        assertEquals(BreastSide.RIGHT, first?.currentSide)
-        assertEquals(session.sessionStart, first?.sessionStart)
-    }
-
-    @Test
-    fun observeStartsWithNothingWhenNoSessionRuns() = runBlocking {
-        val first = withTimeout(5_000) { NursingSessionStore.observe(context).first() }
-
-        assertNull(first)
-    }
 
     @Test
     fun loadRoundTripsASavedSession() {

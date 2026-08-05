@@ -1,0 +1,1 @@
+Das Homescreen-Widget wird jetzt von Sprout selbst gezeichnet, statt dafür der Widget-Bibliothek überlassen zu werden. Bei Installationen aus Play tat dieser Schritt stillschweigend nichts — daher das Widget, das sich endlos drehte, statt die letzte Mahlzeit zu zeigen. Am Aussehen ändert sich nichts. Schlägt es fehl, sagt es das jetzt, statt sich zu drehen.

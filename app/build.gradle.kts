@@ -28,8 +28,8 @@ android {
         applicationId = "com.gproust.sprout"
         minSdk = 26
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.4.4"
+        versionCode = 9
+        versionName = "1.4.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -73,6 +73,24 @@ android {
                 ?.let { signingConfig = it }
         }
     }
+    // Play splits an app bundle by language and installs only the ones matching
+    // the device, which breaks an in-app language picker: choosing a language
+    // whose resources were never delivered silently falls back to the device's
+    // language instead. Sprout offers all 7 in Settings, so ship all 7 in the
+    // base install.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
+    // Shipping every language in the base install would otherwise also drag in
+    // the ~80 locales our libraries translate into. Keep the 7 Sprout actually
+    // offers; anything else falls back to the English default as before.
+    androidResources {
+        localeFilters += listOf("en", "fr", "de", "es", "it", "pl", "pt")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

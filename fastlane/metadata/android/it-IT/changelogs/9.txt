@@ -1,0 +1,1 @@
+Scegliere una lingua nelle Impostazioni ora cambia davvero l'app. Le installazioni da Play includevano solo la lingua già in uso sul telefono, quindi sceglierne un'altra non faceva nulla: ora ci sono tutte e sette. Nel widget il tempo trascorso continua a scorrere invece di restare fermo, e mostra il seno da cui è iniziata l'ultima poppata, non quello con cui è finita.

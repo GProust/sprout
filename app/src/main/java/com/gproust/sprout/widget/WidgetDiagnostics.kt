@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceRemoteViews
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -143,19 +142,6 @@ object WidgetDiagnostics {
         }
     }.getOrElse { "could not survey (${it.javaClass.simpleName}) — R class likely shrunk away" }
 
-    /**
-     * How many widgets *Glance* can see, next to how many the launcher says are
-     * placed. The two disagreeing is the tell-tale of a broken receiver-to-widget
-     * mapping: the launcher happily shows a widget Glance no longer recognises,
-     * so no session ever starts and provideGlance never runs.
-     */
-    private suspend fun glanceIdSurvey(context: Context): String = try {
-        val ids = GlanceAppWidgetManager(context).getGlanceIds(SproutWidget::class.java)
-        "${ids.size} known to Glance"
-    } catch (e: Exception) {
-        "lookup failed — ${e.javaClass.name}: ${e.message}"
-    }
-
     /** The whole picture, as shareable plain text. */
     suspend fun report(context: Context): String {
         val app = context.applicationContext
@@ -174,10 +160,9 @@ object WidgetDiagnostics {
             appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
             appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
             appendLine("Launcher instances placed: $placed")
-            appendLine("Glance sees: ${glanceIdSurvey(context)}")
-            // If R8 renamed this, the build is obfuscated — and anything Glance
-            // reaches by name is worth suspecting.
-            appendLine("Widget class: ${SproutWidget::class.java.name}")
+            // An obfuscated name here means the build is minified, which is
+            // worth knowing when a report only reproduces on release builds.
+            appendLine("Receiver class: ${SproutWidgetReceiver::class.java.name}")
             appendLine("Glance layouts: ${glanceLayoutSurvey(context)}")
             appendLine()
             appendLine("Self-test: ${selfTest(context)}")

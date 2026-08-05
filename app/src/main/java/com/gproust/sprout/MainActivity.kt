@@ -9,9 +9,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
 import com.gproust.sprout.ui.navigation.SproutApp
 import com.gproust.sprout.ui.settings.AppLocale
 import com.gproust.sprout.ui.theme.SproutTheme
+import com.gproust.sprout.widget.updateSproutWidget
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -39,6 +42,17 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    /**
+     * The widget's elapsed time is fixed when it is drawn, and the system only
+     * refreshes widgets every half hour. Opening the app is both a moment the
+     * widget is likely about to be looked at and a free chance to redraw it, so
+     * take it.
+     */
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch { updateSproutWidget(this@MainActivity) }
     }
 
     // The widget launches with CLEAR_TOP | SINGLE_TOP, so an already-running

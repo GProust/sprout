@@ -1,0 +1,1 @@
+The home-screen widget is now drawn by Sprout itself, rather than handed to the widget library to draw. On installs from Play that step was quietly doing nothing, which is why the widget could sit spinning forever instead of showing your last feed. Nothing about how it looks has changed. If it ever fails now it says so on the home screen instead of spinning.
