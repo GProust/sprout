@@ -3,6 +3,14 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📟 Fixed the **widget staying on its loading spinner after an app update**,
+  until the app was uninstalled and reinstalled. Release builds renamed the
+  widget's class on every build, and Glance identifies a placed widget by that
+  name — so after an update it no longer recognised the widget already on the
+  home screen. The name is now pinned across releases.
+
 ## [1.4.2] — 2026-08-05
 
 - 📅 Entries logged by hand can now be **put on a past date**, not just a time.

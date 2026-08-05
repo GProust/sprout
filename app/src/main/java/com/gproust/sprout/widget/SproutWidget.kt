@@ -310,7 +310,16 @@ class SproutWidgetReceiver : GlanceAppWidgetReceiver() {
         appWidgetIds: IntArray,
     ) {
         WidgetDiagnostics.record(context, "receiver: onUpdate for ${appWidgetIds.size} widget(s)")
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        // The gap between here and provideGlance is where Glance starts its
+        // session, and it was a blind spot: reports showed onUpdate firing over
+        // and over with nothing behind it and no error to explain the silence.
+        try {
+            super.onUpdate(context, appWidgetManager, appWidgetIds)
+            WidgetDiagnostics.record(context, "receiver: handed off to Glance")
+        } catch (e: Throwable) {
+            WidgetDiagnostics.record(context, "receiver: Glance refused the update", e)
+            throw e
+        }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
