@@ -1,0 +1,1 @@
+Il widget della schermata Home ora viene disegnato da Sprout stesso, invece di affidarlo alla libreria dei widget. Nelle installazioni da Play quel passaggio non faceva nulla in silenzio: da qui il widget che restava a girare invece di mostrare l'ultimo pasto. L'aspetto non cambia. Se ora fallisce, lo dice invece di girare.

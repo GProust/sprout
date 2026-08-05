@@ -1,0 +1,1 @@
+El widget de la pantalla de inicio ahora lo dibuja Sprout, en lugar de dejárselo a la biblioteca de widgets. En las instalaciones desde Play ese paso no hacía nada en silencio, y por eso el widget podía quedarse girando en vez de mostrar la última toma. Su aspecto no cambia. Si ahora falla, lo indica en la pantalla de inicio en lugar de girar.

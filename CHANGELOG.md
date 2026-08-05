@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.4.5] — 2026-08-05
 
 - 📟 The widget is now **drawn by Sprout itself** instead of through the
   widget library's update mechanism, which on Play builds accepted every

@@ -1,0 +1,1 @@
+Le widget d'écran d'accueil est désormais dessiné par Sprout lui-même, au lieu d'être confié à la bibliothèque de widgets. Sur les installations depuis Play, cette étape ne faisait discrètement rien : d'où le widget qui tournait sans fin au lieu d'afficher votre dernier repas. Son apparence ne change pas. En cas d'échec, il l'indique désormais au lieu de tourner.
