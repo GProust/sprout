@@ -28,8 +28,8 @@ android {
         applicationId = "com.gproust.sprout"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.4.1"
+        versionCode = 5
+        versionName = "1.4.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
