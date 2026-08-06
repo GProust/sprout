@@ -60,8 +60,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Package the symbol tables of dependencies' native libs into the
-            // AAB so Play can symbolicate native crashes/ANRs.
+            // Package the symbol tables of native libs into the AAB so Play can
+            // symbolicate native crashes/ANRs. It extracts nothing today: the
+            // app's only native library is libandroidx.graphics.path.so, which
+            // AndroidX publishes already stripped — so Play's "no debug symbols"
+            // warning is expected. See docs/RELEASING.md.
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }

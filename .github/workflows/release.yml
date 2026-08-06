@@ -251,6 +251,19 @@ jobs:
           SPROUT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew bundleRelease assembleRelease
 
+      # Play warns on every upload that the bundle has native code without debug
+      # symbols. That is expected — the one native lib comes from an AndroidX
+      # prebuilt that ships stripped (docs/RELEASING.md) — so this step records
+      # what is actually in the bundle instead of leaving it to be re-diagnosed.
+      - name: Report the bundle's native libraries and debug symbols
+        run: |
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          echo "Native libraries:"
+          unzip -l "$AAB" | grep -E '\.so$' || echo "  none"
+          echo "Native debug symbols packaged for Play:"
+          unzip -l "$AAB" | grep 'BUNDLE-METADATA/com.android.tools.build.debugsymbols' \
+            || echo "  none — Play will warn about missing debug symbols (expected)"
+
       - name: Upload artifacts to the workflow run
         uses: actions/upload-artifact@v7
         with:
