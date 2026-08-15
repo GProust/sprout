@@ -70,11 +70,14 @@
     <string name="onboarding_about_title">Trochę o Tobie</string>
     <string name="onboarding_about_subtitle">Abyśmy mogli właściwie witać Cię każdego dnia.</string>
     <string name="onboarding_your_name">Twoje imię</string>
+    <string name="onboarding_checkin_q">Chcesz codzienny wpis o sobie?</string>
+    <string name="onboarding_checkin_help">Karta na pulpicie, by zapisać, jak się czujesz — nigdy powiadomienie. Możesz to zmienić w każdej chwili w ustawieniach.</string>
     <string name="onboarding_baby_title">Twój maluszek</string>
     <string name="onboarding_baby_subtitle">Zawsze możesz to później zmienić w profilu.</string>
     <string name="onboarding_default_baby">Twoje dziecko</string>
     <string name="onboarding_care_title">Opieka nad %1$s</string>
     <string name="onboarding_care_subtitle">To dostosowuje Twoje codzienne pytania. Wszystko jest opcjonalne.</string>
+    <string name="onboarding_care_subtitle_no_checkin">To dostosowuje tylko wpisy o samopoczuciu, które dodajesz sam(a). Wszystko jest opcjonalne.</string>
     <string name="onboarding_gave_birth_q">Czy urodziłaś %1$s?</string>
     <string name="onboarding_gave_birth_help">Dodaje delikatne pytania o Twoje gojenie i krwawienie.</string>
     <string name="onboarding_birth_how">Jak przebiegł poród?</string>

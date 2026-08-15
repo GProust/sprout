@@ -64,11 +64,14 @@
     <string name="onboarding_about_title">Cuéntanos un poco sobre ti</string>
     <string name="onboarding_about_subtitle">Así podremos saludarte como mereces cada día.</string>
     <string name="onboarding_your_name">Tu nombre</string>
+    <string name="onboarding_checkin_q">¿Quieres un chequeo diario?</string>
+    <string name="onboarding_checkin_help">Una tarjeta en tu panel para ver cómo estás; nunca una notificación. Puedes cambiarlo cuando quieras en los ajustes.</string>
     <string name="onboarding_baby_title">Tu peque</string>
     <string name="onboarding_baby_subtitle">Siempre podrás cambiar esto más tarde en el perfil.</string>
     <string name="onboarding_default_baby">tu bebé</string>
     <string name="onboarding_care_title">Cuidando a %1$s</string>
     <string name="onboarding_care_subtitle">Esto solo personaliza tu chequeo diario. Todo es opcional.</string>
+    <string name="onboarding_care_subtitle_no_checkin">Esto solo personaliza las entradas de bienestar que añades tú. Todo es opcional.</string>
     <string name="onboarding_gave_birth_q">¿Diste a luz a %1$s?</string>
     <string name="onboarding_gave_birth_help">Añade preguntas suaves sobre tu recuperación y tu sangrado.</string>
     <string name="onboarding_birth_how">¿Cómo fue el parto?</string>
