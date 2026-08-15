@@ -299,6 +299,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             )
             Spacer(Modifier.height(8.dp))
             QuickAction(stringResource(R.string.quick_feeding), onClick = { onNavigate(Routes.FEEDING) })
+            QuickAction(stringResource(R.string.quick_pumping), onClick = { onNavigate(Routes.PUMPING) })
             QuickAction(stringResource(R.string.quick_sleep), onClick = { onNavigate(Routes.SLEEP) })
             QuickAction(stringResource(R.string.quick_diaper), onClick = { onNavigate(Routes.DIAPER) })
             QuickAction(stringResource(R.string.quick_growth), onClick = { onNavigate(Routes.GROWTH) })

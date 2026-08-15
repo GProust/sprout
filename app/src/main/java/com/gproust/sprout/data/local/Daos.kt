@@ -185,6 +185,19 @@ interface TreatmentDao {
 }
 
 @Dao
+interface PumpingDao {
+    /** Every pumping session, newest first (the parent's, not a baby's). */
+    @Query("SELECT * FROM pumping ORDER BY time DESC")
+    fun observeAll(): Flow<List<PumpingEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: PumpingEntity)
+
+    @Delete
+    suspend fun delete(entity: PumpingEntity)
+}
+
+@Dao
 interface WellbeingDao {
     @Query("SELECT * FROM wellbeing ORDER BY time DESC")
     fun observeAll(): Flow<List<WellbeingEntity>>

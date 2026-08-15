@@ -6,6 +6,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
     <string name="action_details">Detalles</string>
+    <string name="action_undo">Deshacer</string>
     <string name="history">Historial</string>
     <string name="day_today">Hoy</string>
     <string name="day_yesterday">Ayer</string>
@@ -157,6 +158,27 @@
     <string name="stool_color_white">Blanco / decolorado</string>
     <string name="stool_color_black">Negro</string>
     <string name="stool_color_red">Rojo</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Extracción</string>
+    <string name="quick_pumping">🥛  Extracción</string>
+    <string name="pumping_empty">Aún no hay extracciones. Añade la primera con el botón +.</string>
+    <string name="pumping_log_title">Registrar una extracción</string>
+    <string name="pumping_edit_title">Editar extracción</string>
+    <string name="pumping_add">Añadir extracción</string>
+    <string name="pumping_stash">Reserva de leche</string>
+    <string name="pumping_stash_empty">Ahora mismo no hay nada guardado.</string>
+    <string name="pumping_today">Extraído hoy: %1$s</string>
+    <string name="field_storage">¿Dónde se guarda?</string>
+    <string name="storage_fridge">Nevera</string>
+    <string name="storage_freezer">Congelador</string>
+    <string name="storage_room">Ambiente</string>
+    <string name="storage_used">Usada</string>
+    <string name="pumping_guidance">Orientación: unas 4 horas a temperatura ambiente, 4 días en la nevera, 6 meses en el congelador.</string>
+    <string name="pumping_keeps_until">Se conserva hasta el %1$s</string>
+    <string name="pumping_past_keep">Fuera de su fecha de conservación</string>
+    <string name="pumping_mark_used">Marcar como usada</string>
+    <string name="pumping_marked_used">Marcada como usada</string>
     <string name="screen_growth">Crecimiento</string>
     <string name="growth_empty">Aún no hay medidas registradas.</string>
     <string name="growth_log_title">Registrar una medida</string>

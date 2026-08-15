@@ -36,8 +36,10 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.ParentProfileEntity
+import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.StoolColor
@@ -53,6 +55,7 @@ import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
+import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
@@ -131,6 +134,13 @@ class ScreenshotTest {
             ),
         )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
+        // Expressed milk: a bottle in the fridge, two bags in the freezer, and
+        // one already given — so the stash card shows both places and the
+        // history shows a used batch alongside stored ones.
+        repo.addPumping(PumpingEntity(time = now - 3 * hour, amountMl = 120, side = BreastSide.BOTH, storage = MilkStorage.FRIDGE))
+        repo.addPumping(PumpingEntity(time = now - 26 * hour, amountMl = 90, side = BreastSide.LEFT, storage = MilkStorage.FREEZER))
+        repo.addPumping(PumpingEntity(time = now - 30 * hour, amountMl = 110, side = BreastSide.RIGHT, storage = MilkStorage.FREEZER))
+        repo.addPumping(PumpingEntity(time = now - 28 * hour, amountMl = 60, storage = MilkStorage.USED))
         repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
         repo.addDiaper(DiaperEntity(time = now - hour, wet = true))
         repo.addDiaper(DiaperEntity(time = now - 3 * hour, wet = true, dirty = true, stoolColor = StoolColor.YELLOW))
@@ -367,6 +377,13 @@ class ScreenshotTest {
         rule.mainClock.advanceTimeBy(1000)
         save("05-feeding-4-two-left-one-right")
         rule.mainClock.autoAdvance = true
+
+        // Pumping: the milk stash on top of the session history. The log form
+        // opens in a bottom sheet, like the other tracking screens.
+        show { PumpingScreen {} }
+        save("05-pumping")
+        tapDesc("Log a pumping")
+        saveScreen("05-pumping-2-log")
 
         show { SleepScreen() }
         save("06-sleep")

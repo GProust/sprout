@@ -20,6 +20,13 @@ enum class BreastSide { LEFT, RIGHT, BOTH }
  */
 enum class StoolColor { YELLOW, GREEN, BROWN, PALE, CLAY, WHITE, BLACK, RED }
 
+/**
+ * Where a batch of expressed milk went after pumping. [USED] is the milk that
+ * never went into storage (given straight away, or since drunk/discarded) — it
+ * stays in the history but is out of the stash.
+ */
+enum class MilkStorage { FRIDGE, FREEZER, ROOM, USED }
+
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
@@ -155,6 +162,27 @@ data class TreatmentEntity(
     val remindersEnabled: Boolean = true,
     /** False once the treatment is removed/stopped; kept out of the active list. */
     val active: Boolean = true,
+    val notes: String? = null,
+)
+
+/**
+ * One pumping session: when it happened, how much milk came out and where that
+ * milk went (fridge, freezer, room temperature — or straight to the baby).
+ *
+ * Like the wellbeing check-ins, and unlike the feeding/sleep/diaper logs, this
+ * belongs to the *parent* rather than to a baby: the stash is expressed by one
+ * body and, with twins, feeds either of them. So there is no `babyId`, and
+ * deleting a baby leaves the pumping history alone.
+ */
+@Entity(tableName = "pumping")
+data class PumpingEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** When the milk was expressed (epoch millis) — the stash ages from here. */
+    val time: Long,
+    val amountMl: Int,
+    /** Which breast(s) were expressed; null when it wasn't recorded. */
+    val side: BreastSide? = null,
+    val storage: MilkStorage = MilkStorage.FRIDGE,
     val notes: String? = null,
 )
 
