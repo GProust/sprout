@@ -5,6 +5,16 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🥛 **Expressed milk now has a place of its own.** Pumping gets its own screen
+  from the dashboard's log list: the amount, the time (with the date, since it
+  usually gets entered once the bottle is already away), optionally the side,
+  and where the milk went — fridge, freezer, room temperature, or straight to
+  the baby. Above the history sits the **milk stash**: how much is actually
+  available in each place, leaving out what has been used and anything kept
+  past the usual 4 hours / 4 days / 6 months guidance, so the number is what
+  can be given today. Each batch carries its own keep-by date and can be
+  **marked used in one tap**, with an undo. The stash belongs to the parent
+  rather than to a baby — with twins it feeds either of them.
 - 📟 A bottle no longer hides which breast comes next. When the last feed is a
   bottle or some solids, the widget adds a small line — **"Last breast: Left ·
   3 h ago"** — for any breastfeed in the past 24 hours, so the alternation
