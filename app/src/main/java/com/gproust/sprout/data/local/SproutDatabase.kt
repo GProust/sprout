@@ -1,6 +1,7 @@
 package com.gproust.sprout.data.local
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -21,7 +22,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ParentProfileEntity::class,
     ],
     version = 13,
-    exportSchema = false,
+    // Exported to app/schemas/. Committing them makes every schema change show
+    // up as a reviewable diff, and is what lets a migration be tested against
+    // the exact schema a released version shipped.
+    exportSchema = true,
 )
 @TypeConverters(Converters::class)
 abstract class SproutDatabase : RoomDatabase() {
@@ -246,17 +250,28 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * The full migration chain, in order. Exposed so tests can open a
+         * database created by an older release through the very same list the
+         * app ships — a migration that is written but never registered here
+         * would crash on a user's device, so the test has to exercise this
+         * value rather than a copy of it.
+         */
+        @VisibleForTesting
+        internal val MIGRATIONS: Array<Migration> = arrayOf(
+            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+            MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
+            MIGRATION_12_13,
+        )
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     SproutDatabase::class.java,
                     "sprout.db",
-                ).addMigrations(
-                    MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-                    MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
-                    MIGRATION_12_13,
-                ).build().also { instance = it }
+                ).addMigrations(*MIGRATIONS)
+                    .build().also { instance = it }
             }
     }
 }
