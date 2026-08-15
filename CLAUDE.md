@@ -38,7 +38,9 @@ record; this is only the live status.
   *Riskiest phase: it rewrites how every row is deleted.*
 - [ ] **Phase 1 — exchange a replica file by hand.** Versioned encrypted payload,
   QR pairing into the Keystore, export via `ACTION_SEND`, import + idempotent
-  merge, and a summary of what the merge actually did. No new permissions.
+  merge, and a summary of what the merge actually did. Includes the **stash
+  switch** — pumping is the one part of the sync the user can turn off, asked at
+  pairing, device-local, send-side only. No new permissions.
 - [ ] **Phase 2 — automatic exchange on the local network.** Same payload, same
   merge. Needs its own ADR to pick the transport (`NsdManager` + TCP vs Wi-Fi
   Direct; **not** Nearby Connections), and **`PRIVACY.md` + `README.md` must be

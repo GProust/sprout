@@ -92,8 +92,9 @@ clock is used rather than a Lamport/hybrid clock.
 The line is **whose data it is**, not which table it lives in: *the baby's care
 is shared; a parent's own body and their phone's setup are not.*
 
-**Synced** — `baby`, `feeding`, `sleep`, `diaper`, `growth`, `treatment`,
-`pumping`.
+**Synced** — `baby`, `feeding`, `sleep`, `diaper`, `growth`, `treatment`.
+
+**Synced by default, and switchable off** — `pumping`.
 
 `pumping` is shared even though
 [BDR-0007](../decisions/0007-pumping-belongs-to-the-parent.md) established that
@@ -103,9 +104,35 @@ privacy. The milk stash is precisely what the partner needs to see: they are the
 one giving the bottle, and marking it used has to be visible on both phones or
 the stash count is wrong on one of them.
 
+But it is still a log of what one body produced, and how much. Some parents
+will want the stash shared and some won't, and neither is unreasonable — so it
+is **the one part of the sync with a switch**, on by default and offered
+explicitly at pairing rather than buried as a silent default. It is a
+**device-local preference** (SharedPreferences, like
+[`GrowthSpurtSettings`](../../app/src/main/java/com/gproust/sprout/ui/settings/GrowthSpurtSettings.kt)),
+never itself synced, so each parent answers for their own phone.
+
+The switch governs the **send** side — what leaves this device — because that is
+the half a person can actually control. A payload that carries no pumping rows
+merges exactly like one that does; the union is over whatever arrived, so
+**asymmetric sharing is a normal state**, not an error to reconcile. One phone
+sharing its stash while the other doesn't simply means one of the two sees a
+partial stash.
+
+Turning the switch off is **prospective only**: it stops future sends, it does
+not reach into the other phone and retract what is already there. The UI must
+say so plainly at the moment it is switched off — a toggle that implies a recall
+it cannot perform is worse than no toggle.
+
 **Never synced** — `wellbeing` (the parent's own mood, bleeding, recovery and
 breast comfort), `parent_profile`, per-device settings (language, reminder
 defaults, growth-spurt alerts) and `activeBabyId`.
+
+`wellbeing` deliberately gets **no switch**. A setting someone can be asked to
+turn on is a setting they can be pressured into turning on, and the postpartum
+check-in — mood, bleeding, healing — is exactly the data where that pressure
+would be most damaging. "The app doesn't do that" protects a person in a way
+"it's off in my settings" does not.
 
 `parent_profile` is already per-device by construction, as
 [`Entities.kt`](../../app/src/main/java/com/gproust/sprout/data/local/Entities.kt)
@@ -172,16 +199,21 @@ The first working sync. **Zero new permissions, zero network code.**
    schema version), serialized, compressed, then AES-GCM encrypted. Version it
    from the first byte — this format outlives phase 1.
 2. **Pairing UI**: show a QR code on one phone, scan it on the other, store the
-   secret in the Keystore.
-3. **Export**: write the payload to a `.sprout` file in the app's cache and hand
+   secret in the Keystore. Pairing also **asks about the stash** — share
+   expressed milk with the partner, yes or no — so the default is a choice
+   rather than a discovery.
+3. **The stash switch** in Settings, mirroring that answer: device-local, on by
+   default, excluded from the payload when off, with copy at switch-off time
+   saying that what has already been sent stays on the other phone.
+4. **Export**: write the payload to a `.sprout` file in the app's cache and hand
    it to `ACTION_SEND`. The user picks the channel — Quick Share, Bluetooth,
    Signal, whatever they already trust.
-4. **Import**: an intent filter for the file type, plus an in-app picker.
+5. **Import**: an intent filter for the file type, plus an in-app picker.
    Decrypt, verify the household id, refuse payloads from an unpaired household,
    and **merge** with the rules above.
-5. **Show what happened**: how many entries came in, and what was already known.
+6. **Show what happened**: how many entries came in, and what was already known.
    A merge that reports nothing is indistinguishable from a merge that failed.
-6. Refuse gracefully across schema versions: a newer payload on an older app must
+7. Refuse gracefully across schema versions: a newer payload on an older app must
    say so rather than half-apply.
 
 This is a manual, "sneakernet" sync — but because the merge is idempotent and
@@ -228,6 +260,10 @@ other when they are on the same network and exchange replicas.
   filled later.
 - **We own the merge.** Conflict resolution, tombstones and compaction are ours
   to get right, with no server consistency model to lean on.
+- **The two phones can legitimately hold different data.** With the stash switch
+  off on one side, the milk stash is not a single shared number, and the app
+  must never present it as one — no "you and your partner have 320 ml", and no
+  warning that the databases disagree, because disagreeing is the point.
 - **Phase 0 rewrites how rows are deleted** across every DAO — the riskiest
   change the app has taken, on data users cannot re-enter, validated only in CI
   ([ADR-0006](0006-ci-as-build-verifier-and-screenshots.md)).
