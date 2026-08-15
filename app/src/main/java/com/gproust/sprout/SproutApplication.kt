@@ -3,6 +3,7 @@ package com.gproust.sprout
 import android.app.Application
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SproutDatabase
+import com.gproust.sprout.data.sync.DeviceIdentity
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.notifications.TreatmentReminders
@@ -25,6 +26,9 @@ class SproutApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Give this install its own identity before anything writes data, so a
+        // later pairing has something stable to attach to (ADR-0007).
+        DeviceIdentity.id(this)
         TreatmentReminders.ensureChannel(this)
         FeedingReminders.ensureChannel(this)
         GrowthSpurtReminders.ensureChannel(this)
@@ -33,6 +37,9 @@ class SproutApplication : Application() {
             TreatmentReminders.scheduleAll(this@SproutApplication, repository.treatmentsWithReminders())
             FeedingReminders.rescheduleAll(this@SproutApplication, repository)
             GrowthSpurtReminders.rescheduleAll(this@SproutApplication, repository)
+            // Deleted entries are kept a while so the deletion can reach the
+            // partner's phone (ADR-0007); this is where they finally go.
+            repository.compactTombstones()
         }
     }
 }

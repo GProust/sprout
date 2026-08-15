@@ -4,6 +4,31 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.gproust.sprout.data.sync.newUid
+
+/**
+ * A row that partner sync can merge between two phones (ADR-0007).
+ *
+ * The three columns are what make a merge possible at all:
+ *
+ * - [uid] names the row across devices, since the primary key `id` is only a
+ *   local counter. Assigned once, never reused.
+ * - [updatedAt] arbitrates two concurrent edits of the same row: the later
+ *   write wins.
+ * - [deletedAt] is a tombstone. Deleting sets it rather than removing the row,
+ *   so the deletion is something we can *tell* the other phone about; without
+ *   it, the partner's copy would resurrect the row at the next merge, forever.
+ *   Every read filters `deletedAt IS NULL`, and compaction erases tombstones
+ *   older than the retention window.
+ *
+ * The parent's own data ([WellbeingEntity], [ParentProfileEntity]) deliberately
+ * does not implement this: it never leaves the device.
+ */
+interface Syncable {
+    val uid: String
+    val updatedAt: Long
+    val deletedAt: Long?
+}
 
 /** Type of a feeding session. */
 enum class FeedType { BREAST, BOTTLE, SOLID }
@@ -44,7 +69,7 @@ enum class DeliveryType { VAGINAL, CESAREAN }
  * each gets an auto-generated [id]. [archived] babies are kept but hidden from
  * the active rotation ("stop tracking") so their history isn't lost.
  */
-@Entity(tableName = "baby")
+@Entity(tableName = "baby", indices = [Index(value = ["uid"], unique = true)])
 data class BabyEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String,
@@ -59,7 +84,10 @@ data class BabyEntity(
      */
     val feedingReminderEnabled: Boolean? = null,
     val feedingReminderIntervalMinutes: Int? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
 /**
  * One uninterrupted stretch on a single breast within a breastfeeding session —
@@ -71,7 +99,10 @@ data class NursingSegment(
     val endTime: Long,
 )
 
-@Entity(tableName = "feeding", indices = [Index("babyId")])
+@Entity(
+    tableName = "feeding",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
 data class FeedingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     /** Which baby this entry belongs to; stamped by the repository on insert. */
@@ -94,23 +125,35 @@ data class FeedingEntity(
      */
     @ColumnInfo(defaultValue = "''") val segments: List<NursingSegment> = emptyList(),
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
-@Entity(tableName = "sleep", indices = [Index("babyId")])
+@Entity(
+    tableName = "sleep",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
 data class SleepEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val startTime: Long,
     val endTime: Long? = null,
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
 /**
  * A diaper change. Rather than a single mutually-exclusive type, a change is a
  * checklist of what was present: [wet] (urines) and/or [dirty] (selles). When
  * stool is present, [stoolColor] optionally records its colour.
  */
-@Entity(tableName = "diaper", indices = [Index("babyId")])
+@Entity(
+    tableName = "diaper",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
 data class DiaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
@@ -122,9 +165,15 @@ data class DiaperEntity(
     /** Stool colour, when stool is present; null otherwise. */
     val stoolColor: StoolColor? = null,
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
-@Entity(tableName = "growth", indices = [Index("babyId")])
+@Entity(
+    tableName = "growth",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
 data class GrowthEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
@@ -133,7 +182,10 @@ data class GrowthEntity(
     val heightMm: Int? = null,
     val headMm: Int? = null,
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
 /**
  * A recurring treatment/medication for a baby — e.g. "Vitamin D, 1 drop, every
@@ -143,7 +195,10 @@ data class GrowthEntity(
  * The schedule is "every [intervalDays] days, at each time in [timesOfDay]",
  * running from [startDate] through [endDate] (inclusive; null = ongoing).
  */
-@Entity(tableName = "treatment", indices = [Index("babyId")])
+@Entity(
+    tableName = "treatment",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
 data class TreatmentEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     /** Which baby this treatment is for; stamped by the repository on insert. */
@@ -163,7 +218,10 @@ data class TreatmentEntity(
     /** False once the treatment is removed/stopped; kept out of the active list. */
     val active: Boolean = true,
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
 /**
  * One pumping session: when it happened, how much milk came out and where that
@@ -174,7 +232,7 @@ data class TreatmentEntity(
  * body and, with twins, feeds either of them. So there is no `babyId`, and
  * deleting a baby leaves the pumping history alone.
  */
-@Entity(tableName = "pumping")
+@Entity(tableName = "pumping", indices = [Index(value = ["uid"], unique = true)])
 data class PumpingEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     /** When the milk was expressed (epoch millis) — the stash ages from here. */
@@ -184,7 +242,10 @@ data class PumpingEntity(
     val side: BreastSide? = null,
     val storage: MilkStorage = MilkStorage.FRIDGE,
     val notes: String? = null,
-)
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
 
 /**
  * A parent's daily wellbeing check-in. Mood and notes apply to everyone;
@@ -240,4 +301,25 @@ data class ParentProfileEntity(
     val lastCheckIn: Long? = null,
     /** Which baby is currently selected for viewing/logging; null if none yet. */
     val activeBabyId: Long? = null,
+)
+
+/**
+ * The record that a row was deleted, for rows that no longer exist to carry a
+ * `deletedAt` of their own.
+ *
+ * An ordinary delete is soft: the row stays, flagged, and *is* its own
+ * tombstone. But "permanently delete a baby and all of their logs" promises the
+ * data is really gone, and keeping it flagged-but-present would quietly break
+ * that promise. So those rows are erased and only their [uid] is kept here —
+ * enough to tell the partner's phone "this is deleted, don't send it back",
+ * and nothing about what the entry contained.
+ *
+ * Compacted on the same retention window as soft-deleted rows.
+ */
+@Entity(tableName = "tombstone")
+data class TombstoneEntity(
+    @PrimaryKey val uid: String,
+    /** The table the erased row belonged to, e.g. `feeding`. */
+    val entity: String,
+    val deletedAt: Long,
 )
