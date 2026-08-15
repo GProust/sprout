@@ -56,6 +56,14 @@ jobs:
             echo "Commit app/schemas together with the migration that produced the change."
             git status --porcelain -- app/schemas
             git diff -- app/schemas
+            # Print what the build actually produced, so the correct file can be
+            # recovered straight from the run — this repo is built by CI, not on
+            # a machine with an Android SDK to hand (docs/adr/0006).
+            for f in $(git status --porcelain -- app/schemas | awk '{print $2}'); do
+              [ -f "$f" ] || continue
+              echo "===== $f ====="
+              cat "$f"
+            done
             exit 1
           fi
           echo "Committed Room schema is up to date."
