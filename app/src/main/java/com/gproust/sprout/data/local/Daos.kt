@@ -66,6 +66,20 @@ interface BabyDao {
     /** Erase a baby for good — the deletion is carried by a `tombstone` row instead. */
     @Query("DELETE FROM baby WHERE id = :id")
     suspend fun purgeById(id: Long)
+    // --- Partner sync (ADR-0007).
+
+    @Query("SELECT * FROM baby")
+    suspend fun allForSync(): List<BabyEntity>
+
+    @Query("SELECT * FROM baby WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): BabyEntity?
+
+    @Query("SELECT COUNT(*) FROM baby")
+    suspend fun countForSync(): Int
+
+    @Query("DELETE FROM baby WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -139,6 +153,22 @@ interface FeedingDao {
 
     @Query("DELETE FROM feeding WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM feeding")
+    suspend fun allForSync(): List<FeedingEntity>
+
+    @Query("SELECT * FROM feeding WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): FeedingEntity?
+
+    @Update
+    suspend fun update(entity: FeedingEntity)
+
+    @Query("DELETE FROM feeding WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -160,6 +190,22 @@ interface SleepDao {
 
     @Query("DELETE FROM sleep WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM sleep")
+    suspend fun allForSync(): List<SleepEntity>
+
+    @Query("SELECT * FROM sleep WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): SleepEntity?
+
+    @Update
+    suspend fun update(entity: SleepEntity)
+
+    @Query("DELETE FROM sleep WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -181,6 +227,22 @@ interface DiaperDao {
 
     @Query("DELETE FROM diaper WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM diaper")
+    suspend fun allForSync(): List<DiaperEntity>
+
+    @Query("SELECT * FROM diaper WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): DiaperEntity?
+
+    @Update
+    suspend fun update(entity: DiaperEntity)
+
+    @Query("DELETE FROM diaper WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -202,6 +264,22 @@ interface GrowthDao {
 
     @Query("DELETE FROM growth WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM growth")
+    suspend fun allForSync(): List<GrowthEntity>
+
+    @Query("SELECT * FROM growth WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): GrowthEntity?
+
+    @Update
+    suspend fun update(entity: GrowthEntity)
+
+    @Query("DELETE FROM growth WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -237,6 +315,19 @@ interface TreatmentDao {
 
     @Query("DELETE FROM treatment WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM treatment")
+    suspend fun allForSync(): List<TreatmentEntity>
+
+    @Query("SELECT * FROM treatment WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): TreatmentEntity?
+
+    @Query("DELETE FROM treatment WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 @Dao
@@ -253,6 +344,22 @@ interface PumpingDao {
 
     @Query("DELETE FROM pumping WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
     suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM pumping")
+    suspend fun allForSync(): List<PumpingEntity>
+
+    @Query("SELECT * FROM pumping WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): PumpingEntity?
+
+    @Update
+    suspend fun update(entity: PumpingEntity)
+
+    @Query("DELETE FROM pumping WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
 }
 
 /**
