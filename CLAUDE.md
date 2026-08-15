@@ -44,17 +44,23 @@ record; this is only the live status.
     forgotten filter shows deleted entries again.
   - `SproutRepository` is the only place that stamps `uid`/`updatedAt`. Keep it
     that way; a DAO called directly writes an unstamped row.
-- [ ] **Phase 1 — exchange a replica file by hand.** Versioned encrypted payload,
-  QR pairing into the Keystore, export via `ACTION_SEND`, import + idempotent
-  merge, and a summary of what the merge actually did. Includes the **stash
-  switch** — pumping is the one part of the sync the user can turn off, asked at
-  pairing, device-local, send-side only. No new permissions.
-  - **Open question, decide before writing the merge:** two parents who both
-    tracked *before* pairing have no shared uids, so a first merge duplicates
-    every entry they each logged. Options: seed one side from the other at
-    pairing (simple, loses one side's pre-pairing history), match on
-    (kind, timestamp) heuristically (risky), or accept the duplicates and let
-    them be deleted by hand (honest, ugly). Not covered by ADR-0007.
+- [ ] **Phase 1 — exchange a replica file by hand.** Landing in two PRs, because
+  it is too big for one: the engine, then everything the user can see.
+  [ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) settled
+  the two questions this phase couldn't start without — **no QR code** (scanning
+  needs a camera permission the phase promises not to add; pairing travels as an
+  invitation file through the same channel as the data), and the first merge
+  **adopts** rather than duplicates.
+  - [x] **1a — the engine.** Versioned payload, AES-GCM envelope, and the merge
+    itself: idempotent, commutative, tombstone always wins. No UI.
+  - [ ] **1b — what the user sees.** Pairing by invitation + verification code,
+    the Keystore-backed secret, the **stash switch** (pumping is the one part of
+    the sync that can be turned off, asked at pairing, device-local, send-side
+    only), export via `ACTION_SEND`, import, the merge summary — and strings in
+    all 7 locales. No new permissions.
+  - **Known gap for 1b:** adopting a partner's baby doesn't select it as the
+    active one (the merge writes rows, it doesn't touch `activeBabyId`). The
+    import flow has to, or a freshly paired phone shows an empty dashboard.
 - [ ] **Phase 2 — automatic exchange on the local network.** Same payload, same
   merge. Needs its own ADR to pick the transport (`NsdManager` + TCP vs Wi-Fi
   Direct; **not** Nearby Connections), and **`PRIVACY.md` + `README.md` must be
