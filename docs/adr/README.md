@@ -25,10 +25,11 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 |-----|-------|--------|
 | [0001](0001-use-architecture-decision-records.md) | Use decision records (ADRs and BDRs) | Accepted |
 | [0002](0002-local-first-on-device-storage.md) | Local-first, on-device storage | Accepted |
-| [0003](0003-no-first-party-backend-user-owned-sync.md) | No first-party backend; sync through user-owned storage | Accepted (mechanism proposed) |
+| [0003](0003-no-first-party-backend-user-owned-sync.md) | No first-party backend; sync through user-owned storage | Accepted (mechanism finalized in [ADR-0007](0007-partner-sync-by-direct-device-to-device-exchange.md)) |
 | [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted |
 | [0005](0005-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
 | [0006](0006-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
+| [0007](0007-partner-sync-by-direct-device-to-device-exchange.md) | Partner sync by direct device-to-device exchange | Accepted (phase 2 transport open) |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive
