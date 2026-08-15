@@ -37,14 +37,15 @@ import kotlinx.coroutines.flow.map
 @OptIn(ExperimentalCoroutinesApi::class)
 class SproutRepository(
     private val db: SproutDatabase,
+    /** The clock every write is stamped with; swappable in tests. */
+    private val now: () -> Long = System::currentTimeMillis,
     /**
      * Invoked after any write that can change what the home-screen widget
      * shows (feeding logs, or which baby is active). Wired by the
-     * application to refresh the widget; a no-op in tests.
+     * application to refresh the widget; a no-op in tests. Stays last so the
+     * application can keep passing it as a trailing lambda.
      */
     private val onWidgetDataChanged: suspend () -> Unit = {},
-    /** The clock every write is stamped with; swappable in tests. */
-    private val now: () -> Long = System::currentTimeMillis,
 ) {
 
     // Parent profile (the owner of this device)
