@@ -108,7 +108,9 @@ object WidgetDiagnostics {
     suspend fun selfTest(context: Context): String = try {
         val composed = GlanceRemoteViews()
             .compose(context, DpSize(180.dp, 110.dp)) {
-                GlanceTheme { SproutWidgetUi(session = null, feed = null, babyName = null) }
+                GlanceTheme {
+                    SproutWidgetUi(session = null, feed = null, lastBreast = null, babyName = null)
+                }
             }
             .remoteViews
         withContext(Dispatchers.Main) { composed.apply(context, FrameLayout(context)) }

@@ -6,6 +6,7 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
+import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
@@ -146,6 +147,16 @@ class SproutRepository(
     }
 
     /**
+     * The active baby's most recent breastfeed started at or after [since], or
+     * null. The widget asks for this on top of [lastFeedForActiveBaby] so that
+     * a bottle given between two nursings doesn't take the last breast with it.
+     */
+    suspend fun lastBreastFeedForActiveBaby(since: Long): FeedingEntity? {
+        val id = activeBabyIdNow() ?: return null
+        return db.feedingDao().lastBreastFeedSince(id, since)
+    }
+
+    /**
      * The active baby's name. The widget shows it so that with twins you can
      * tell whose feed you're looking at.
      */
@@ -195,6 +206,11 @@ class SproutRepository(
 
     /** All active treatments (across babies) that want reminders — for (re)scheduling alarms. */
     suspend fun treatmentsWithReminders(): List<TreatmentEntity> = db.treatmentDao().activeWithReminders()
+
+    // Pumping (expressed milk — the parent's stash, not a baby's log)
+    val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()
+    suspend fun addPumping(entity: PumpingEntity) = db.pumpingDao().insert(entity)
+    suspend fun deletePumping(entity: PumpingEntity) = db.pumpingDao().delete(entity)
 
     // Wellbeing (parent check-ins — per parent, not per baby)
     val wellbeing: Flow<List<WellbeingEntity>> = db.wellbeingDao().observeAll()
