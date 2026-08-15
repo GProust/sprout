@@ -44,4 +44,5 @@ object NursingSessionStore {
     }
 
     fun clear(context: Context) = prefs(context).edit().clear().apply()
+
 }

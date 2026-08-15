@@ -1,0 +1,1 @@
+Corrige le widget d'écran d'accueil qui restait bloqué sur son indicateur de chargement après une mise à jour de Sprout — il fallait réinstaller l'application pour le débloquer. Une mise à jour ne fait plus perdre le fil au widget : il continue d'afficher votre dernier repas.

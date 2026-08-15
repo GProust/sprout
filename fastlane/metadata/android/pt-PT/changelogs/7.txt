@@ -1,0 +1,1 @@
+Mais trabalho no widget do ecrã principal que podia ficar a rodar em vez de mostrar a última refeição: partes da biblioteca do widget eram removidas das versões da Play e passam a ser mantidas. Se continuar sem carregar, em Definições › Resolução de problemas › Diagnóstico do widget há um botão «Forçar atualização» e o erro fica registado.

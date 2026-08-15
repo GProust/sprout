@@ -28,8 +28,8 @@ android {
         applicationId = "com.gproust.sprout"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.3.0"
+        versionCode = 10
+        versionName = "1.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -60,8 +60,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Package the symbol tables of dependencies' native libs into the
-            // AAB so Play can symbolicate native crashes/ANRs.
+            // Package the symbol tables of native libs into the AAB so Play can
+            // symbolicate native crashes/ANRs. It extracts nothing today: the
+            // app's only native library is libandroidx.graphics.path.so, which
+            // AndroidX publishes already stripped — so Play's "no debug symbols"
+            // warning is expected. See docs/RELEASING.md.
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
@@ -70,6 +73,24 @@ android {
                 ?.let { signingConfig = it }
         }
     }
+    // Play splits an app bundle by language and installs only the ones matching
+    // the device, which breaks an in-app language picker: choosing a language
+    // whose resources were never delivered silently falls back to the device's
+    // language instead. Sprout offers all 7 in Settings, so ship all 7 in the
+    // base install.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
+    // Shipping every language in the base install would otherwise also drag in
+    // the ~80 locales our libraries translate into. Keep the 7 Sprout actually
+    // offers; anything else falls back to the English default as before.
+    androidResources {
+        localeFilters += listOf("en", "fr", "de", "es", "it", "pl", "pt")
+    }
+
     compileOptions {
         // The *app's* language level and bytecode, constrained by Android (D8
         // desugaring + ART) — deliberately independent of the JDK that runs the

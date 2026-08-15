@@ -28,6 +28,10 @@ fun formatDateTime(context: Context, epochMillis: Long): String {
     return Instant.ofEpochMilli(epochMillis).atZone(zone()).format(fmt)
 }
 
+/** The same wall-clock time one day later (DST-aware). */
+fun nextDay(epochMillis: Long): Long =
+    Instant.ofEpochMilli(epochMillis).atZone(zone()).plusDays(1).toInstant().toEpochMilli()
+
 /** Returns the start-of-day epoch millis for the day containing [epochMillis]. */
 fun startOfDay(epochMillis: Long): Long =
     Instant.ofEpochMilli(epochMillis).atZone(zone()).toLocalDate()

@@ -2,13 +2,18 @@ name: Release
 
 # Manual-only release workflow. Run it from the GitHub UI:
 #   Actions -> Release -> Run workflow
-# Enter a version (e.g. 1.3.0) to cut a release: if it differs from the
-# current versionName, the workflow bumps versionName to it, increments
-# versionCode by one, and pushes that commit to the branch first; it then
-# builds from that commit, tags it with the version, and publishes a GitHub
-# Release with the APK attached. Leave the version empty to only build and
-# upload the artifacts (no commit, no tag, no release). The Play Store upload
-# itself is a manual step in the Play Console — see docs/RELEASING.md.
+# Enter a version (e.g. 1.3.0) to cut a release. The workflow then prepares
+# one release commit and pushes it to the branch before building:
+#   * versionName is set to the version and versionCode incremented by one
+#     (skipped when versionName already matches, e.g. re-running a release);
+#   * CHANGELOG.md's "## [Unreleased]" heading becomes "## [version] — date";
+#   * the "What's new" text typed into the form is written to
+#     fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
+#     every listed language.
+# It then builds from that commit, tags it with the version, and publishes a
+# GitHub Release with the APK attached. Leave the version empty to only build
+# and upload the artifacts (no commit, no tag, no release). The Play Store
+# upload itself is a manual step in the Play Console — see docs/RELEASING.md.
 #
 # Required repository secrets for a SIGNED build (Settings -> Secrets and
 # variables -> Actions):
@@ -28,7 +33,39 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.3.0). Bumps versionName/versionCode + commits if needed, then tags and publishes a GitHub Release. Leave empty to only build artifacts.'
+        description: 'Version to release (e.g. 1.3.0). Bumps versionName/versionCode, dates the changelog, writes the Play release notes, then tags and publishes a GitHub Release. Leave empty to only build artifacts.'
+        required: false
+        default: ''
+      # One "What's new" box per language listed on Play (max 500 characters
+      # each, plain text — Play renders no markdown). Dots are not allowed in
+      # input names, so the locale separator is an underscore: notes_en_US
+      # writes to fastlane/metadata/android/en-US/changelogs/<versionCode>.txt.
+      notes_en_US:
+        description: 'Play release notes, English (max 500 chars). Required with a version; also the fallback for any language left empty.'
+        required: false
+        default: ''
+      notes_fr_FR:
+        description: 'Play release notes, French (max 500 chars). Falls back to English if empty.'
+        required: false
+        default: ''
+      notes_de_DE:
+        description: 'Play release notes, German (max 500 chars). Falls back to English if empty.'
+        required: false
+        default: ''
+      notes_es_ES:
+        description: 'Play release notes, Spanish (max 500 chars). Falls back to English if empty.'
+        required: false
+        default: ''
+      notes_it_IT:
+        description: 'Play release notes, Italian (max 500 chars). Falls back to English if empty.'
+        required: false
+        default: ''
+      notes_pl_PL:
+        description: 'Play release notes, Polish (max 500 chars). Falls back to English if empty.'
+        required: false
+        default: ''
+      notes_pt_PT:
+        description: 'Play release notes, Portuguese (max 500 chars). Falls back to English if empty.'
         required: false
         default: ''
 
@@ -53,6 +90,10 @@ jobs:
           # GITHUB_TOKEN.
           ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
+      # The next four steps build ONE release commit: version bump, dated
+      # changelog section, and the per-language Play release notes. Nothing is
+      # pushed until the last of them, so a rejected input (bad version, notes
+      # over Play's limit) leaves the branch untouched.
       - name: Bump version if requested
         id: bump
         if: inputs.version != ''
@@ -67,28 +108,133 @@ jobs:
             echo "::error::could not parse versionName/versionCode from $FILE"; exit 1
           fi
           if [ "$CURRENT_NAME" = "$VERSION" ]; then
+            NEW_CODE=$CURRENT_CODE
             echo "versionName is already $VERSION (versionCode $CURRENT_CODE); nothing to bump."
           else
             NEW_CODE=$((CURRENT_CODE + 1))
             sed -i "s/^\([[:space:]]*\)versionCode = $CURRENT_CODE\$/\1versionCode = $NEW_CODE/" "$FILE"
             sed -i "s/^\([[:space:]]*\)versionName = \"$CURRENT_NAME\"\$/\1versionName = \"$VERSION\"/" "$FILE"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "$FILE"
-            git commit -m "chore: bump version to $VERSION (versionCode $NEW_CODE) [skip ci]"
+            echo "Bumping $CURRENT_NAME (code $CURRENT_CODE) -> $VERSION (code $NEW_CODE)."
+          fi
+          echo "code=$NEW_CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Date the changelog section
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          python3 - <<'PY'
+          import datetime, os, pathlib
+
+          version = os.environ["VERSION"]
+          path = pathlib.Path("CHANGELOG.md")
+          text = path.read_text(encoding="utf-8")
+          heading = f"## [{version}] — {datetime.date.today().isoformat()}"
+
+          if f"## [{version}]" in text:
+              print(f"CHANGELOG.md already has a [{version}] section; leaving it as it is.")
+          elif "## [Unreleased]" in text:
+              path.write_text(text.replace("## [Unreleased]", heading, 1), encoding="utf-8")
+              print(f"Dated the Unreleased section as {heading.removeprefix('## ')}.")
+          else:
+              # Not fatal: the release itself is still valid, but someone will
+              # want to write the section by hand afterwards.
+              print(
+                  "::warning::CHANGELOG.md has no [Unreleased] section and no "
+                  f"[{version}] section — this release records nothing there."
+              )
+          PY
+
+      - name: Write the Play release notes
+        if: inputs.version != ''
+        env:
+          VERSION_CODE: ${{ steps.bump.outputs.code }}
+          NOTES_en_US: ${{ inputs.notes_en_US }}
+          NOTES_fr_FR: ${{ inputs.notes_fr_FR }}
+          NOTES_de_DE: ${{ inputs.notes_de_DE }}
+          NOTES_es_ES: ${{ inputs.notes_es_ES }}
+          NOTES_it_IT: ${{ inputs.notes_it_IT }}
+          NOTES_pl_PL: ${{ inputs.notes_pl_PL }}
+          NOTES_pt_PT: ${{ inputs.notes_pt_PT }}
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, sys
+
+          # Play's own cap on a "What's new" entry.
+          MAX_CHARS = 500
+          LOCALES = ["en_US", "fr_FR", "de_DE", "es_ES", "it_IT", "pl_PL", "pt_PT"]
+
+          code = os.environ["VERSION_CODE"]
+          notes = {loc: os.environ.get(f"NOTES_{loc}", "").strip() for loc in LOCALES}
+
+          # Annotations are read from stdout, so print then exit rather than
+          # passing the message to sys.exit (which writes to stderr).
+          def fail(message):
+              print(message)
+              sys.exit(1)
+
+          if not notes["en_US"]:
+              fail(
+                  "::error::English release notes are required when releasing a "
+                  "version — they are what every other language falls back to."
+              )
+
+          too_long = [
+              f"{loc.replace('_', '-')} ({len(text)} chars)"
+              for loc, text in notes.items()
+              if len(text) > MAX_CHARS
+          ]
+          if too_long:
+              fail(
+                  f"::error::Play allows at most {MAX_CHARS} characters per "
+                  f"language; over the limit: {', '.join(too_long)}"
+              )
+
+          for loc in LOCALES:
+              text = notes[loc]
+              if not text:
+                  text = notes["en_US"]
+                  print(
+                      f"::warning::No release notes given for {loc.replace('_', '-')}; "
+                      "using the English text so the listing is not left empty."
+                  )
+              path = pathlib.Path(
+                  f"fastlane/metadata/android/{loc.replace('_', '-')}/changelogs/{code}.txt"
+              )
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(text + "\n", encoding="utf-8")
+              print(f"Wrote {path} ({len(text)} chars).")
+          PY
+
+      - name: Commit and push the release prep
+        id: commit
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+          VERSION_CODE: ${{ steps.bump.outputs.code }}
+        run: |
+          # Without this a failed push would still leave the step green, and
+          # the build would go on to tag a commit nobody else can see.
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/build.gradle.kts CHANGELOG.md fastlane/metadata
+          if git diff --cached --quiet; then
+            echo "Version, changelog and release notes are already up to date; nothing to commit."
+          else
+            git commit -m "chore: release $VERSION (versionCode $VERSION_CODE) [skip ci]"
             git push origin "HEAD:${{ github.ref_name }}"
-            echo "Bumped $CURRENT_NAME (code $CURRENT_CODE) -> $VERSION (code $NEW_CODE)."
           fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v5.7.0
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6.2.0
+        uses: gradle/actions/setup-gradle@v6.3.0
 
       - name: Decode keystore
         if: env.KEYSTORE_BASE64 != ''
@@ -101,6 +247,19 @@ jobs:
           SPROUT_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           SPROUT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew bundleRelease assembleRelease
+
+      # Play warns on every upload that the bundle has native code without debug
+      # symbols. That is expected — the one native lib comes from an AndroidX
+      # prebuilt that ships stripped (docs/RELEASING.md) — so this step records
+      # what is actually in the bundle instead of leaving it to be re-diagnosed.
+      - name: Report the bundle's native libraries and debug symbols
+        run: |
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          echo "Native libraries:"
+          unzip -l "$AAB" | grep -E '\.so$' || echo "  none"
+          echo "Native debug symbols packaged for Play:"
+          unzip -l "$AAB" | grep 'BUNDLE-METADATA/com.android.tools.build.debugsymbols' \
+            || echo "  none — Play will warn about missing debug symbols (expected)"
 
       - name: Upload artifacts to the workflow run
         uses: actions/upload-artifact@v7
@@ -116,7 +275,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.version }}
-          # Tag the bump commit, not the commit the workflow started from.
-          target_commitish: ${{ steps.bump.outputs.sha }}
+          # Tag the release-prep commit, not the commit the workflow started from.
+          target_commitish: ${{ steps.commit.outputs.sha }}
           files: app/build/outputs/apk/release/app-release*.apk
           generate_release_notes: true

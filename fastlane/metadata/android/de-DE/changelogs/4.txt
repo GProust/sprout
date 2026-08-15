@@ -1,0 +1,1 @@
+Behebt das Homescreen-Widget, das nie geladen hat — es blieb beim Ladekreis, statt die letzte Stillmahlzeit zu zeigen.

@@ -9,6 +9,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
     <string name="action_details">Details</string>
+    <string name="action_undo">Undo</string>
     <string name="history">History</string>
     <string name="day_today">Today</string>
     <string name="day_yesterday">Yesterday</string>
@@ -86,11 +87,14 @@
     <string name="onboarding_about_title">A little about you</string>
     <string name="onboarding_about_subtitle">So we can greet you properly each day.</string>
     <string name="onboarding_your_name">Your name</string>
+    <string name="onboarding_checkin_q">Would you like a daily check-in?</string>
+    <string name="onboarding_checkin_help">A card on your dashboard for how you\'re doing — never a notification. You can change this anytime in Settings.</string>
     <string name="onboarding_baby_title">Your little one</string>
     <string name="onboarding_baby_subtitle">You can always change this later in the profile.</string>
     <string name="onboarding_default_baby">your baby</string>
     <string name="onboarding_care_title">Caring for %1$s</string>
     <string name="onboarding_care_subtitle">This just tailors your daily check-in. Everything is optional.</string>
+    <string name="onboarding_care_subtitle_no_checkin">This just tailors the wellbeing entries you add yourself. Everything is optional.</string>
     <string name="onboarding_gave_birth_q">Did you give birth to %1$s?</string>
     <string name="onboarding_gave_birth_help">Adds gentle questions about your healing and bleeding.</string>
     <string name="onboarding_birth_how">How was the birth?</string>
@@ -197,6 +201,27 @@
     <string name="stool_color_black">Black</string>
     <string name="stool_color_red">Red</string>
 
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Pumping</string>
+    <string name="quick_pumping">🥛  Pumping</string>
+    <string name="pumping_empty">No pumping logged yet. Add your first with the + button.</string>
+    <string name="pumping_log_title">Log a pumping</string>
+    <string name="pumping_edit_title">Edit pumping</string>
+    <string name="pumping_add">Add pumping</string>
+    <string name="pumping_stash">Milk stash</string>
+    <string name="pumping_stash_empty">Nothing stored right now.</string>
+    <string name="pumping_today">Pumped today: %1$s</string>
+    <string name="field_storage">Where does it go?</string>
+    <string name="storage_fridge">Fridge</string>
+    <string name="storage_freezer">Freezer</string>
+    <string name="storage_room">Room temp</string>
+    <string name="storage_used">Used</string>
+    <string name="pumping_guidance">Rough guide: about 4 hours at room temperature, 4 days in the fridge, 6 months in the freezer.</string>
+    <string name="pumping_keeps_until">Keeps until %1$s</string>
+    <string name="pumping_past_keep">Past its keep-by date</string>
+    <string name="pumping_mark_used">Mark as used</string>
+    <string name="pumping_marked_used">Marked as used</string>
+
     <!-- Growth -->
     <string name="screen_growth">Growth</string>
     <string name="growth_empty">No measurements logged yet.</string>
@@ -288,6 +313,10 @@
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
 
+    <!-- Confirmation before deleting a logged entry -->
+    <string name="entry_delete_title">Delete this entry?</string>
+    <string name="entry_delete_body">It will be removed for good. This can\'t be undone.</string>
+
     <!-- Babies (multiple babies: twins / siblings) -->
     <string name="screen_babies">Babies</string>
     <string name="babies_empty">No babies yet — add your little one to start tracking.</string>
@@ -320,6 +349,8 @@
     <string name="quick_treatments">💊  Treatments</string>
     <string name="treatment_empty">No treatments yet. Add one with the + button — e.g. Vitamin D every day.</string>
     <string name="treatment_add">Add treatment</string>
+    <string name="treatment_delete_title">Delete %1$s?</string>
+    <string name="treatment_delete_body">Its reminders stop and the treatment is removed for good. This can\'t be undone.</string>
     <string name="treatment_new">New treatment</string>
     <string name="treatment_edit">Edit treatment</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
@@ -387,10 +418,23 @@
     <string name="growth_spurt_notif_text">Growth spurts are common %1$s. Extra feeds and fussiness are normal — it usually passes in a few days.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Last breastfeed</string>
-    <string name="widget_description">The last breastfeed (side, how long ago) — or the session in progress with its live timer.</string>
-    <string name="widget_no_breastfeed">No breastfeed yet</string>
+    <string name="widget_label">Last feed</string>
+    <string name="widget_description">The last feed — which baby, what kind, and how long ago — plus which breast the last breastfeed started on, or the breastfeeding session in progress with its live timer.</string>
+    <string name="widget_no_feed">No feed yet</string>
     <string name="widget_ago_minutes">%1$d min ago</string>
     <string name="widget_ago_hours">%1$d h ago</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min ago</string>
+    <string name="widget_last_breast">Last breast: %1$s · %2$s</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Widget diagnostics</string>
+    <string name="settings_troubleshooting">Troubleshooting</string>
+    <string name="settings_widget_diagnostics_hint">Check why the home-screen widget isn\'t working, and share a report.</string>
+    <string name="widget_diagnostics_intro">This tests the home-screen widget right now and lists what it did recently. Share it if the widget isn\'t working — nothing is sent unless you choose to.</string>
+    <string name="widget_diagnostics_share">Share report</string>
+    <string name="widget_diagnostics_copy">Copy</string>
+    <string name="widget_diagnostics_rerun">Run again</string>
+    <string name="widget_diagnostics_force_refresh">Force a refresh</string>
+    <string name="widget_diagnostics_clear">Clear history</string>
+    <string name="widget_error">Widget error — see Settings → Widget diagnostics</string>
 </resources>

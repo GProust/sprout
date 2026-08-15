@@ -1,0 +1,1 @@
+Elegir un idioma en Ajustes ahora sí cambia la app. Las instalaciones desde Play solo incluían el idioma que ya usaba el teléfono, así que elegir otro no hacía nada: ahora vienen los siete. En el widget, el tiempo transcurrido sigue avanzando en vez de quedarse congelado, y muestra el pecho con el que empezó la última toma, no con el que terminó.

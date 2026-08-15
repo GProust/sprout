@@ -1,0 +1,1 @@
+Wybór języka w Ustawieniach naprawdę zmienia teraz aplikację. Instalacje z Play zawierały tylko język używany już na telefonie, więc wybranie innego nic nie dawało — teraz dołączone jest wszystkie siedem. W widżecie upływający czas nadal się liczy, zamiast zastygać, i pokazuje pierś, od której zaczęło się ostatnie karmienie, a nie tę, na której się skończyło.

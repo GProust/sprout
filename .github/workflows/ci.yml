@@ -17,13 +17,13 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v5.7.0
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6.2.0
+        uses: gradle/actions/setup-gradle@v6.3.0
 
       - name: Run lint
         run: ./gradlew lintDebug
@@ -47,9 +47,14 @@ jobs:
       # thing that only shows up on a user's phone, after the update.
       - name: Check the committed Room schema matches the build
         run: |
-          if ! git diff --exit-code --stat -- app/schemas; then
-            echo "::error::The exported Room schema differs from the committed one."
+          # `git status`, not `git diff`: a database version bump writes a
+          # brand-new <version>.json, which is untracked and so invisible to
+          # `git diff` — the check would pass while the new schema went
+          # uncommitted, which is precisely the case it exists to catch.
+          if [ -n "$(git status --porcelain -- app/schemas)" ]; then
+            echo "::error::The exported Room schema differs from what is committed."
             echo "Commit app/schemas together with the migration that produced the change."
+            git status --porcelain -- app/schemas
             git diff -- app/schemas
             exit 1
           fi

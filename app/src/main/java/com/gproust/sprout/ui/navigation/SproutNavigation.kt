@@ -47,8 +47,10 @@ import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
+import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
+import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.startup.Startup
@@ -58,6 +60,7 @@ object Routes {
     const val HOME = "home"
     const val FEEDING = "feeding"
     const val FEEDING_NURSING = "feeding/nursing/{side}"
+    const val PUMPING = "pumping"
     const val SLEEP = "sleep"
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
@@ -66,6 +69,7 @@ object Routes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
+    const val WIDGET_DIAGNOSTICS = "settings/widget-diagnostics"
 }
 
 private data class BottomDestination(
@@ -205,6 +209,9 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
                 )
                 NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
             }
+            composable(Routes.PUMPING) {
+                PumpingScreen(onBack = { navController.popBackStack() })
+            }
             composable(Routes.SLEEP) { SleepScreen() }
             composable(Routes.DIAPER) { DiaperScreen() }
             composable(Routes.GROWTH) { GrowthScreen() }
@@ -218,7 +225,13 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
                 ProfileScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.SETTINGS) {
-                SettingsScreen(onBack = { navController.popBackStack() })
+                SettingsScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenWidgetDiagnostics = { navController.navigate(Routes.WIDGET_DIAGNOSTICS) },
+                )
+            }
+            composable(Routes.WIDGET_DIAGNOSTICS) {
+                WidgetDiagnosticsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.TREATMENTS) {
                 TreatmentsScreen(onBack = { navController.popBackStack() })

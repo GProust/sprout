@@ -1,0 +1,1 @@
+Corrige o widget do ecrã principal que ficava parado no indicador de carregamento depois de uma atualização do Sprout — só reinstalando a app é que voltava. Atualizar já não faz o widget perder-se: continua a mostrar a última refeição.

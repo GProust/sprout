@@ -1,0 +1,1 @@
+Widżet na ekranie głównym jest teraz rysowany przez samego Sprouta, zamiast być przekazywany bibliotece widżetów. W instalacjach z Play ten krok po cichu nic nie robił — stąd widżet kręcący się w nieskończoność zamiast pokazać ostatnie karmienie. Wygląd się nie zmienia. Jeśli teraz zawiedzie, poinformuje o tym zamiast się kręcić.

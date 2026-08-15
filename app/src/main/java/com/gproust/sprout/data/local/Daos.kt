@@ -88,9 +88,20 @@ interface FeedingDao {
     @Query("SELECT MAX(startTime) FROM feeding WHERE babyId = :babyId")
     suspend fun lastFeedTime(babyId: Long): Long?
 
-    /** The most recent breastfeed for a baby, or null if none yet (for the widget). */
-    @Query("SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' ORDER BY startTime DESC LIMIT 1")
-    suspend fun lastBreastFeed(babyId: Long): FeedingEntity?
+    /** The most recent feed of any kind for a baby, or null if none yet (for the widget). */
+    @Query("SELECT * FROM feeding WHERE babyId = :babyId ORDER BY startTime DESC LIMIT 1")
+    suspend fun lastFeed(babyId: Long): FeedingEntity?
+
+    /**
+     * The most recent breastfeed started at or after [since], or null. Kept
+     * apart from [lastFeed] because a bottle in between must not hide which
+     * breast the next feed should start on (for the widget).
+     */
+    @Query(
+        "SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' " +
+            "AND startTime >= :since ORDER BY startTime DESC LIMIT 1",
+    )
+    suspend fun lastBreastFeedSince(babyId: Long, since: Long): FeedingEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
@@ -171,6 +182,19 @@ interface TreatmentDao {
 
     @Query("DELETE FROM treatment WHERE babyId = :babyId")
     suspend fun deleteForBaby(babyId: Long)
+}
+
+@Dao
+interface PumpingDao {
+    /** Every pumping session, newest first (the parent's, not a baby's). */
+    @Query("SELECT * FROM pumping ORDER BY time DESC")
+    fun observeAll(): Flow<List<PumpingEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: PumpingEntity)
+
+    @Delete
+    suspend fun delete(entity: PumpingEntity)
 }
 
 @Dao

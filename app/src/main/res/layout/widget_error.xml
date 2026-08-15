@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shown on the home screen when Glance can't render the widget. Glance's own
+  error layout lives in the library and needs the same machinery that just
+  failed, so this one is deliberately plain — a single TextView from our own
+  resources, referenced from code, inflatable on its own. A visible "something
+  broke, here's where to look" beats the silent loading spinner the widget
+  used to sit on forever.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="8dp"
+    android:text="@string/widget_error"
+    android:textColor="@color/widget_on_background"
+    android:textSize="12sp" />

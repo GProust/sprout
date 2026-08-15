@@ -6,6 +6,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
     <string name="action_details">Detalhes</string>
+    <string name="action_undo">Anular</string>
     <string name="history">Histórico</string>
     <string name="day_today">Hoje</string>
     <string name="day_yesterday">Ontem</string>
@@ -63,11 +64,14 @@
     <string name="onboarding_about_title">Um pouco sobre si</string>
     <string name="onboarding_about_subtitle">Para podermos cumprimentá-lo como deve ser todos os dias.</string>
     <string name="onboarding_your_name">O seu nome</string>
+    <string name="onboarding_checkin_q">Quer uma verificação diária?</string>
+    <string name="onboarding_checkin_help">Um cartão no seu painel para registar como está — nunca uma notificação. Pode mudar de ideias a qualquer momento nas definições.</string>
     <string name="onboarding_baby_title">O seu pequenino</string>
     <string name="onboarding_baby_subtitle">Pode sempre alterar isto mais tarde no perfil.</string>
     <string name="onboarding_default_baby">o seu bebé</string>
     <string name="onboarding_care_title">A cuidar de %1$s</string>
     <string name="onboarding_care_subtitle">Isto serve apenas para personalizar a sua verificação diária. Tudo é opcional.</string>
+    <string name="onboarding_care_subtitle_no_checkin">Isto serve apenas para personalizar os registos de bem-estar que adiciona por si. Tudo é opcional.</string>
     <string name="onboarding_gave_birth_q">Deu à luz %1$s?</string>
     <string name="onboarding_gave_birth_help">Adiciona perguntas suaves sobre a sua recuperação e sangramento.</string>
     <string name="onboarding_birth_how">Como foi o parto?</string>
@@ -157,6 +161,27 @@
     <string name="stool_color_white">Branco / descolorado</string>
     <string name="stool_color_black">Preto</string>
     <string name="stool_color_red">Vermelho</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Extração</string>
+    <string name="quick_pumping">🥛  Extração</string>
+    <string name="pumping_empty">Ainda não há extrações. Adicione a primeira com o botão +.</string>
+    <string name="pumping_log_title">Registar uma extração</string>
+    <string name="pumping_edit_title">Editar extração</string>
+    <string name="pumping_add">Adicionar extração</string>
+    <string name="pumping_stash">Reserva de leite</string>
+    <string name="pumping_stash_empty">Não há nada guardado neste momento.</string>
+    <string name="pumping_today">Extraído hoje: %1$s</string>
+    <string name="field_storage">Onde fica guardado?</string>
+    <string name="storage_fridge">Frigorífico</string>
+    <string name="storage_freezer">Congelador</string>
+    <string name="storage_room">Ambiente</string>
+    <string name="storage_used">Usado</string>
+    <string name="pumping_guidance">Indicação geral: cerca de 4 horas à temperatura ambiente, 4 dias no frigorífico, 6 meses no congelador.</string>
+    <string name="pumping_keeps_until">Conserva-se até %1$s</string>
+    <string name="pumping_past_keep">Fora do prazo de conservação</string>
+    <string name="pumping_mark_used">Marcar como usado</string>
+    <string name="pumping_marked_used">Marcado como usado</string>
     <string name="screen_growth">Crescimento</string>
     <string name="growth_empty">Ainda não há medições registadas.</string>
     <string name="growth_log_title">Registar uma medição</string>
@@ -224,6 +249,8 @@
     <string name="settings_language_system">Predefinição do sistema</string>
     <string name="action_add">Adicionar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="entry_delete_title">Eliminar esta entrada?</string>
+    <string name="entry_delete_body">Será removida definitivamente. Esta ação não pode ser anulada.</string>
     <string name="screen_babies">Bebés</string>
     <string name="babies_empty">Ainda não há bebés — adicione o seu pequenino para começar a acompanhar.</string>
     <string name="baby_active">Ativo</string>
@@ -253,6 +280,8 @@
     <string name="quick_treatments">💊  Tratamentos</string>
     <string name="treatment_empty">Ainda não há tratamentos. Adicione um com o botão + — por exemplo, Vitamina D todos os dias.</string>
     <string name="treatment_add">Adicionar tratamento</string>
+    <string name="treatment_delete_title">Eliminar %1$s?</string>
+    <string name="treatment_delete_body">Os lembretes param e o tratamento é removido definitivamente. Esta ação não pode ser anulada.</string>
     <string name="treatment_new">Novo tratamento</string>
     <string name="treatment_edit">Editar tratamento</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
@@ -317,10 +346,23 @@
     <string name="growth_spurt_notif_text">Os saltos de crescimento são comuns %1$s. Mais refeições e irritação são normais — costuma passar em poucos dias.</string>
 
     <!-- Home-screen widget -->
-    <string name="widget_label">Última mamada</string>
-    <string name="widget_description">A última mamada (lado, há quanto tempo) — ou a mamada em curso com o cronómetro.</string>
-    <string name="widget_no_breastfeed">Ainda sem mamadas</string>
+    <string name="widget_label">Última refeição</string>
+    <string name="widget_description">A última refeição — qual bebé, de que tipo e há quanto tempo — mais a mama em que começou a última amamentação, ou a mamada em curso com o seu cronómetro ao vivo.</string>
+    <string name="widget_no_feed">Ainda sem refeições</string>
     <string name="widget_ago_minutes">há %1$d min</string>
     <string name="widget_ago_hours">há %1$d h</string>
     <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>
+    <string name="widget_last_breast">Última mama: %1$s · %2$s</string>
+
+    <!-- Widget troubleshooting -->
+    <string name="screen_widget_diagnostics">Diagnóstico do widget</string>
+    <string name="settings_troubleshooting">Resolução de problemas</string>
+    <string name="settings_widget_diagnostics_hint">Veja porque o widget do ecrã principal não está a funcionar e partilhe um relatório.</string>
+    <string name="widget_diagnostics_intro">Isto testa o widget do ecrã principal agora e lista o que fez recentemente. Partilhe se o widget não estiver a funcionar — nada é enviado sem a sua escolha.</string>
+    <string name="widget_diagnostics_share">Partilhar relatório</string>
+    <string name="widget_diagnostics_copy">Copiar</string>
+    <string name="widget_diagnostics_rerun">Executar de novo</string>
+    <string name="widget_diagnostics_force_refresh">Forçar atualização</string>
+    <string name="widget_diagnostics_clear">Limpar histórico</string>
+    <string name="widget_error">Erro do widget — ver Definições → Diagnóstico do widget</string>
 </resources>

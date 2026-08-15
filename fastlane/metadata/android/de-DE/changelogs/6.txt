@@ -1,0 +1,1 @@
+Behebt das Homescreen-Widget, das nach einem Update von Sprout an seinem Ladekreis hängen blieb — bis die App neu installiert wurde. Ein Update bringt das Widget nicht mehr aus dem Tritt: Es zeigt die letzte Mahlzeit einfach weiter an.

@@ -3,7 +3,7 @@ agp = "9.3.1"
 # Compose compiler plugin must match the Kotlin compiler AGP's built-in Kotlin bundles
 # (see kotlin-gradle-plugin in AGP's POM when bumping agp).
 kotlin = "2.2.10"
-ksp = "2.3.10"
+ksp = "2.3.11"
 coreKtx = "1.19.0"
 lifecycle = "2.11.0"
 activityCompose = "1.13.0"

@@ -95,6 +95,10 @@ class DatabaseMigrationTest {
         assertEquals("treatment rows", 1, database.countOf("treatment"))
         assertEquals("wellbeing rows", 1, database.countOf("wellbeing"))
         assertEquals("parent_profile rows", 1, database.countOf("parent_profile"))
+
+        // Added by v12 -> v13; querying it at all proves that migration ran as
+        // part of the chain rather than the upgrade stopping short.
+        assertEquals("pumping rows", 0, database.countOf("pumping"))
     }
 
     @Test
@@ -166,7 +170,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(12, database.openHelper.writableDatabase.version)
+        assertEquals(13, database.openHelper.writableDatabase.version)
     }
 
     /**

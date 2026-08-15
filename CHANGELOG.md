@@ -5,6 +5,111 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 💚 **The daily check-in is now a choice from the first launch.** The setup
+  step that asks what to call you also asks whether you'd like it: a card on
+  your dashboard for how you're doing, never a notification. Turn it down and
+  Sprout never offers it — no card, no wellbeing shortcut — instead of showing
+  it until you find the switch in Settings, where it stays if you change your
+  mind. The next step still asks about giving birth and breastfeeding, since
+  those also shape the wellbeing entries you add yourself.
+
+## [1.5.0] — 2026-08-15
+
+- 🥛 **Expressed milk now has a place of its own.** Pumping gets its own screen
+  from the dashboard's log list: the amount, the time (with the date, since it
+  usually gets entered once the bottle is already away), optionally the side,
+  and where the milk went — fridge, freezer, room temperature, or straight to
+  the baby. Above the history sits the **milk stash**: how much is actually
+  available in each place, leaving out what has been used and anything kept
+  past the usual 4 hours / 4 days / 6 months guidance, so the number is what
+  can be given today. Each batch carries its own keep-by date and can be
+  **marked used in one tap**, with an undo. The stash belongs to the parent
+  rather than to a baby — with twins it feeds either of them.
+- 📟 A bottle no longer hides which breast comes next. When the last feed is a
+  bottle or some solids, the widget adds a small line — **"Last breast: Left ·
+  3 h ago"** — for any breastfeed in the past 24 hours, so the alternation
+  survives a feed in between. It's the side the breastfeed *started* on, the
+  one the next feed alternates away from.
+
+## [1.4.6] — 2026-08-05
+
+- 🌍 Fixed **choosing a language doing nothing** for installs from Play. Play
+  only delivers the languages matching the device, so picking any other one
+  silently fell back to the device's language — the choice was saved, the app
+  just had no translation to show. Every install now carries all 7.
+- 📟 The widget now shows the side the last breastfeed **started** on, not the
+  one it ended on. A session that went left then right reads "Left", because
+  the side you need at the next feed is the opposite of the one you began with.
+- ⏱️ The widget's **"x min ago" now keeps counting**. It was written once when
+  the widget was drawn and the system only refreshes widgets every half hour,
+  so a feed from a quarter of an hour ago could still read "just now". It ticks
+  each minute while the phone is awake, and refreshes whenever you open Sprout.
+
+## [1.4.5] — 2026-08-05
+
+- 📟 The widget is now **drawn by Sprout itself** instead of through the
+  widget library's update mechanism, which on Play builds accepted every
+  refresh and then quietly did nothing — the cause of the spinner that four
+  previous attempts didn't shift. Nothing about how the widget looks changes.
+
+## [1.4.4] — 2026-08-05
+
+- 📟 Another go at the **widget stuck on its loading spinner** in installs from
+  Play. Pinning the widget's class name in 1.4.3 wasn't it — a report showed
+  the widget rendering fine on demand while the update the launcher asks for
+  quietly did nothing. Release builds were stripping parts of the widget
+  library they only reach indirectly; those are now kept whole.
+- 🩺 Widget diagnostics gained a **"Force a refresh"** button, and now records
+  what the refresh and the drawing step threw, if anything — so a failure that
+  used to disappear silently ends up in the report.
+
+## [1.4.3] — 2026-08-05
+
+- 📟 Fixed the **widget staying on its loading spinner after an app update**,
+  until the app was uninstalled and reinstalled. Release builds renamed the
+  widget's class on every build, and Glance identifies a placed widget by that
+  name — so after an update it no longer recognised the widget already on the
+  home screen. The name is now pinned across releases.
+
+## [1.4.2] — 2026-08-05
+
+- 📅 Entries logged by hand can now be **put on a past date**, not just a time.
+  Feeding, Sleep, Diapers and Wellbeing each gained a date field in their log
+  form (starting on today), so a feed remembered the next morning lands on the
+  day it actually happened. Editing an existing feed can move it to another day
+  the same way, and dates in the future are no longer selectable.
+- 🌙 A sleep whose wake time is **earlier than its bedtime** is now stored as
+  running past midnight, instead of ending before it started.
+- 🛟 Deleting an entry now **asks first**, on every screen that logs one
+  (Feeding, Sleep, Diapers, Growth, Wellbeing, Treatments). The bin sits right
+  next to the rest of the card and entries are gone for good — one mis-tap
+  while holding a baby shouldn't cost you the log.
+- 📟 The widget now covers **every kind of feed, not just breastfeeds**, and
+  names the baby it belongs to — so with twins you can tell at a glance whose
+  feed you're looking at. Each entry is labelled by kind (Breast, Bottle,
+  Solids) and shows the one detail that kind carries: which breast it ended
+  on, or how much came out of the bottle.
+- 📟 Fixed the **widget never updating after it was placed**: feeds logged
+  afterwards still showed "No breastfeed yet", and a breastfeeding session
+  stayed on screen as "in progress" after it had ended. The widget now
+  follows the data live instead of showing whatever it read when it was
+  first drawn.
+- 🩺 **Widget diagnostics** (Settings → Troubleshooting): tests the
+  home-screen widget on the spot, shows what it did recently, and offers the
+  result as text to copy or share. Added because the widget still isn't
+  loading for some devices and it runs where nothing is visible — no screen,
+  no error, and no practical way to read logs from a Play build.
+- 📟 When the widget can't render it now **says so on the home screen**
+  instead of sitting on a loading spinner for ever.
+
+## [1.4.1] — 2026-08-04
+
+- 📟 Fixed the **home-screen widget never loading**: it sat on its loading
+  spinner instead of ever showing the last breastfeed. Release builds were
+  shrinking away the layouts Glance inflates to draw the widget.
+
+## [1.4.0] — 2026-08-04
+
 - 💚 The **daily wellbeing check-in no longer opens at launch**. It waits as a
   card on the dashboard ("Your daily check-in") until you feel like it — so
   opening Sprout for a 3 a.m. feed never means getting past questions about

@@ -20,6 +20,13 @@ enum class BreastSide { LEFT, RIGHT, BOTH }
  */
 enum class StoolColor { YELLOW, GREEN, BROWN, PALE, CLAY, WHITE, BLACK, RED }
 
+/**
+ * Where a batch of expressed milk went after pumping. [USED] is the milk that
+ * never went into storage (given straight away, or since drunk/discarded) — it
+ * stays in the history but is out of the stash.
+ */
+enum class MilkStorage { FRIDGE, FREEZER, ROOM, USED }
+
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
@@ -159,6 +166,27 @@ data class TreatmentEntity(
 )
 
 /**
+ * One pumping session: when it happened, how much milk came out and where that
+ * milk went (fridge, freezer, room temperature — or straight to the baby).
+ *
+ * Like the wellbeing check-ins, and unlike the feeding/sleep/diaper logs, this
+ * belongs to the *parent* rather than to a baby: the stash is expressed by one
+ * body and, with twins, feeds either of them. So there is no `babyId`, and
+ * deleting a baby leaves the pumping history alone.
+ */
+@Entity(tableName = "pumping")
+data class PumpingEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** When the milk was expressed (epoch millis) — the stash ages from here. */
+    val time: Long,
+    val amountMl: Int,
+    /** Which breast(s) were expressed; null when it wasn't recorded. */
+    val side: BreastSide? = null,
+    val storage: MilkStorage = MilkStorage.FRIDGE,
+    val notes: String? = null,
+)
+
+/**
  * A parent's daily wellbeing check-in. Mood and notes apply to everyone;
  * the postpartum fields (bleeding, recovery) and breast comfort are only
  * filled in when they're relevant to that parent.
@@ -201,10 +229,11 @@ data class ParentProfileEntity(
     @ColumnInfo(defaultValue = "1") val askBleeding: Boolean = true,
     @ColumnInfo(defaultValue = "1") val askBreasts: Boolean = true,
     /**
-     * Whether the parent tracks their own wellbeing at all. When false, the
-     * dashboard stops offering the daily check-in and drops the wellbeing
-     * shortcut — nothing is deleted, and turning it back on in Settings brings
-     * the history back with it.
+     * Whether the parent tracks their own wellbeing at all. Chosen during
+     * onboarding, alongside their name, and changeable in Settings. When false,
+     * the dashboard stops offering the daily check-in and drops the wellbeing
+     * shortcut — nothing is deleted, and turning it back on brings the history
+     * back with it.
      */
     @ColumnInfo(defaultValue = "1") val trackWellbeing: Boolean = true,
     /** Epoch millis of the last completed/dismissed daily check-in. */

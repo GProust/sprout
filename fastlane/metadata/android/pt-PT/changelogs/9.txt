@@ -1,0 +1,1 @@
+Escolher um idioma nas Definições passa mesmo a mudar a app. As instalações da Play só traziam o idioma que o telemóvel já usava, por isso escolher outro não fazia nada — agora vêm os sete. No widget, o tempo decorrido continua a contar em vez de ficar parado, e mostra a mama em que a última mamada começou, e não aquela em que terminou.
