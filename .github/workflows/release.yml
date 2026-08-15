@@ -236,9 +236,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.3.0
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
       - name: Decode keystore
         if: env.KEYSTORE_BASE64 != ''
         run: echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/sprout-upload.jks"

@@ -73,6 +73,30 @@ jobs:
       # 2012 model (800x1280), below Play's 1080px minimum.
       PROFILE: ${{ inputs.device == 'tablet-7' && 'Nexus 9' || inputs.device == 'tablet-10' && 'Nexus 10' || 'pixel_3' }}
       OUTDIR: ${{ inputs.device == 'tablet-7' && 'screenshots/tablet-7' || inputs.device == 'tablet-10' && 'screenshots/tablet-10' || 'screenshots' }}
+      # Fresh capture lands here first and is promoted into OUTDIR only where it
+      # differs visibly (see "Promote only visibly-changed screenshots").
+      STAGEDIR: .screenshots-new
+      # The emulator clock is pinned to this instant so captures are
+      # reproducible. ScreenshotTest seeds every timestamp from
+      # System.currentTimeMillis(), so without this the history rows render the
+      # real wall-clock time and *every* run produced different pixels — which
+      # is what made this workflow commit new PNGs on essentially every PR.
+      # toybox `date` format: MMDDhhmmYYYY.ss (here 2026-06-15 09:00:00 UTC).
+      FAKE_CLOCK: "061509002026.00"
+      # A file is treated as changed when more than this share of its pixels
+      # differ (after DIFF_FUZZ absorbs antialiasing/GPU colour jitter).
+      #
+      # Measured once the committed baseline was itself captured with the clock
+      # pinned: 32 of 35 captures came out byte-identical — including the
+      # dashboard, which renders a relative "time since last feed" and used to
+      # change on every run. The 3 that still move differ by a byte or six.
+      #
+      # Resist raising this to swallow that 0.66%: a changed word in a list row
+      # is itself well under 1% of the screen, so a threshold loose enough to
+      # hide the residue is loose enough to hide a real regression. The residue
+      # wants fixing at the source (deterministic list rendering), not masking.
+      DIFF_THRESHOLD_PCT: "0.05"
+      DIFF_FUZZ: "3%"
 
     steps:
       - name: Checkout PR branch
@@ -89,9 +113,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.3.0
-
-      - name: Make gradlew executable
-        run: chmod +x gradlew
 
       - name: Build app + test APKs
         run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
@@ -118,18 +139,62 @@ jobs:
           # afterwards and wipes the captured screenshots) so the app stays
           # installed and `run-as` can read its internal files.
           script: |
+            adb root && adb wait-for-device || true
+            adb shell settings put global auto_time 0 || true
+            adb shell settings put global auto_time_zone 0 || true
+            adb shell setprop persist.sys.timezone UTC || true
+            adb shell "date -u $FAKE_CLOCK" || adb shell "su 0 date -u $FAKE_CLOCK" || true
+            echo "Emulator clock now: $(adb shell date -u)"
             adb install -r -t app/build/outputs/apk/debug/app-debug.apk
             adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner
-            mkdir -p "$OUTDIR"
-            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "$OUTDIR/$n"; done
-            ls -1 "$OUTDIR" || true
+            mkdir -p "$STAGEDIR"
+            for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "$STAGEDIR/$n"; done
+            ls -1 "$STAGEDIR" || true
 
+      # A capture is never byte-identical to the last one: text antialiasing and
+      # the software GPU vary slightly between runs. Committing on any byte
+      # difference meant a churn commit on nearly every PR, so compare visually
+      # and keep the committed PNG whenever the change is below the threshold.
+      - name: Promote only visibly-changed screenshots
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick
+          mkdir -p "$OUTDIR"
+          promoted=0; added=0; kept=0
+          for new in "$STAGEDIR"/*.png; do
+            [ -e "$new" ] || continue
+            name=$(basename "$new")
+            cur="$OUTDIR/$name"
+            if [ ! -f "$cur" ]; then
+              cp "$new" "$cur"; added=$((added+1)); echo "  + $name (new)"; continue
+            fi
+            if [ "$(identify -format '%wx%h' "$cur")" != "$(identify -format '%wx%h' "$new")" ]; then
+              cp "$new" "$cur"; promoted=$((promoted+1)); echo "  ~ $name (dimensions changed)"; continue
+            fi
+            px=$(identify -format '%[fx:w*h]' "$cur")
+            raw=$(compare -metric AE -fuzz "$DIFF_FUZZ" "$cur" "$new" null: 2>&1 || true)
+            n=${raw%% *}
+            case "$n" in (*[!0-9.eE+-]*|'') n=$px ;; esac
+            pct=$(awk -v d="$n" -v p="$px" 'BEGIN{printf "%.4f", (p>0 ? d*100/p : 100)}')
+            if awk -v a="$pct" -v b="$DIFF_THRESHOLD_PCT" 'BEGIN{exit !(a>b)}'; then
+              cp "$new" "$cur"; promoted=$((promoted+1)); echo "  ~ $name (${pct}% of pixels differ)"
+            else
+              kept=$((kept+1)); echo "    $name unchanged (${pct}% <= ${DIFF_THRESHOLD_PCT}%)"
+            fi
+          done
+          echo "Promoted $promoted, added $added, kept $kept unchanged."
+
+      # The fresh capture, not the promoted set — so a run that promotes nothing
+      # still lets you inspect what the emulator actually rendered.
       - name: Upload screenshots artifact
         uses: actions/upload-artifact@v7
         with:
           name: ui-screenshots-${{ inputs.device || 'phone' }}
-          path: ${{ env.OUTDIR }}/*.png
+          path: ${{ env.STAGEDIR }}/*.png
+          # STAGEDIR is dot-prefixed, so it counts as hidden and would be
+          # silently skipped without this.
+          include-hidden-files: true
           if-no-files-found: warn
 
       - name: Commit screenshots to the PR branch
@@ -142,6 +207,26 @@ jobs:
           if git diff --cached --quiet; then
             echo "No screenshot changes to commit."
           else
+            branch="${{ github.head_ref || github.ref_name }}"
+            # [skip ci] keeps this PNG-only commit from starting another round of
+            # workflows — including this one, which would otherwise capture,
+            # commit and capture again. It does mean the PR head carries no CI
+            # check, but the parent commit has already been checked and this one
+            # only changes images. Dropping the marker was tried and made things
+            # worse: the run is then created but parked in `action_required`, so
+            # the head still has no check and the PR reads `unstable`.
             git commit -m "ci: update UI screenshots [skip ci]"
-            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+            # The branch can have moved since checkout (a push during the ~15
+            # minutes the emulator takes, or a manual run racing a PR run).
+            # This commit only touches PNGs, so replaying it on top is safe and
+            # beats failing the job on a rejected push.
+            #
+            # --autostash because the build leaves other files modified in the
+            # working tree, which plain --rebase refuses to run with. We only
+            # publish `screenshots`, so whatever else the build touched is not
+            # ours to commit; log it rather than silently discarding it.
+            echo "Working tree state before rebase:"
+            git status --porcelain
+            git pull --rebase --autostash origin "$branch"
+            git push origin HEAD:"$branch"
           fi

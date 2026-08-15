@@ -20,12 +20,19 @@ import org.robolectric.annotation.Config
 /**
  * Migration 13 -> 14: the one that makes the data mergeable for partner sync.
  *
- * There is no local Android toolchain, so this test is the only place the
- * migration is ever proven to work (ADR-0006) — and it runs on data a user
- * cannot re-enter (ADR-0002). It builds a real v13 database by hand, then opens
- * it *through Room*, which runs the migration and validates the resulting schema
- * against the entity definitions: if the `ALTER TABLE`s and the entities ever
- * drift apart, opening throws here rather than on someone's phone.
+ * [DatabaseMigrationTest] already walks the whole chain from an old release and
+ * checks that every row survives; this one starts from **v13** — the schema
+ * 1.5.0 shipped, and so the one most phones will actually be upgrading from —
+ * and looks at what the sync columns are worth once they arrive: a distinct
+ * identity per row, an index that enforces it, and the parent's own data left
+ * alone.
+ *
+ * It opens through [SproutDatabase.MIGRATIONS], the same list the app ships, so
+ * a migration that is written but never registered fails here. Room validates
+ * the migrated schema against the entities as part of opening, which is what
+ * catches the `ALTER TABLE`s and the entity definitions drifting apart — on CI
+ * rather than on someone's phone (ADR-0006), on data nobody can re-enter
+ * (ADR-0002).
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -120,7 +127,7 @@ class SyncMigrationTest {
     /** Reopen the migrated database through Room, which validates the schema on the way in. */
     private fun openWithRoom(): SproutDatabase =
         Room.databaseBuilder(context, SproutDatabase::class.java, dbName)
-            .addMigrations(SproutDatabase.MIGRATION_13_14)
+            .addMigrations(*SproutDatabase.MIGRATIONS)
             .allowMainThreadQueries()
             .build()
             .also { db = it }
