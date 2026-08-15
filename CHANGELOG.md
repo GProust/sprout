@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.5.0] — 2026-08-15
 
 - 🥛 **Expressed milk now has a place of its own.** Pumping gets its own screen
   from the dashboard's log list: the amount, the time (with the date, since it
