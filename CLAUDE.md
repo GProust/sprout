@@ -32,15 +32,29 @@ Keep this checklist current as phases land, and **delete this whole section once
 phase 2 ships** (or once the work is abandoned) — the ADR is the permanent
 record; this is only the live status.
 
-- [ ] **Phase 0 — make the data mergeable.** `uid` / `updatedAt` / `deletedAt` on
+- [x] **Phase 0 — make the data mergeable.** `uid` / `updatedAt` / `deletedAt` on
   the synced entities, Room migration 13 → 14 with a UUID backfill, soft deletes
   across every DAO, device id, tombstone compaction. Nothing user-visible.
-  *Riskiest phase: it rewrites how every row is deleted.*
+  Two things worth knowing before building on it:
+  - **Deleting is now two paths.** An ordinary delete flags the row
+    (`deletedAt`); "permanently delete a baby" erases the rows and keeps only
+    their uids in the `tombstone` table, so the deletion still travels without
+    the data lingering. Both are compacted after
+    `TOMBSTONE_RETENTION_DAYS`. Every read filters `deletedAt IS NULL` — a
+    forgotten filter shows deleted entries again.
+  - `SproutRepository` is the only place that stamps `uid`/`updatedAt`. Keep it
+    that way; a DAO called directly writes an unstamped row.
 - [ ] **Phase 1 — exchange a replica file by hand.** Versioned encrypted payload,
   QR pairing into the Keystore, export via `ACTION_SEND`, import + idempotent
   merge, and a summary of what the merge actually did. Includes the **stash
   switch** — pumping is the one part of the sync the user can turn off, asked at
   pairing, device-local, send-side only. No new permissions.
+  - **Open question, decide before writing the merge:** two parents who both
+    tracked *before* pairing have no shared uids, so a first merge duplicates
+    every entry they each logged. Options: seed one side from the other at
+    pairing (simple, loses one side's pre-pairing history), match on
+    (kind, timestamp) heuristically (risky), or accept the duplicates and let
+    them be deleted by hand (honest, ugly). Not covered by ADR-0007.
 - [ ] **Phase 2 — automatic exchange on the local network.** Same payload, same
   merge. Needs its own ADR to pick the transport (`NsdManager` + TCP vs Wi-Fi
   Direct; **not** Nearby Connections), and **`PRIVACY.md` + `README.md` must be

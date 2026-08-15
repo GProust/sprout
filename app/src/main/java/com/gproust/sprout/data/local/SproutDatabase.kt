@@ -20,8 +20,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         PumpingEntity::class,
         WellbeingEntity::class,
         ParentProfileEntity::class,
+        TombstoneEntity::class,
     ],
-    version = 13,
+    version = 14,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -38,6 +39,7 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun pumpingDao(): PumpingDao
     abstract fun wellbeingDao(): WellbeingDao
     abstract fun parentProfileDao(): ParentProfileDao
+    abstract fun tombstoneDao(): TombstoneDao
 
     companion object {
         @Volatile
@@ -251,6 +253,73 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * The tables partner sync merges, and so the ones that gain the sync
+         * columns in [MIGRATION_13_14]. `wellbeing` and `parent_profile` are
+         * absent on purpose — they never leave the device (ADR-0007).
+         */
+        private val SYNCED_TABLES = listOf(
+            "baby", "feeding", "sleep", "diaper", "growth", "treatment", "pumping",
+        )
+
+        /**
+         * A UUIDv4 as a SQL expression, re-evaluated for every row of an UPDATE
+         * (`randomblob` is non-deterministic, so SQLite cannot hoist it out).
+         *
+         * The version nibble is fixed at `4` and the variant one drawn from
+         * `89ab`, as the format requires. The variant uses `random() & 3` rather
+         * than `abs(random()) % 4` because `abs()` of the smallest possible
+         * integer overflows and would abort the migration — vanishingly
+         * unlikely, but this runs once on data the user cannot re-enter.
+         */
+        private const val UUID_V4_SQL =
+            "lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || " +
+                "substr(lower(hex(randomblob(2))), 2) || '-' || " +
+                "substr('89ab', (random() & 3) + 1, 1) || " +
+                "substr(lower(hex(randomblob(2))), 2) || '-' || " +
+                "lower(hex(randomblob(6)))"
+
+        /**
+         * v13 -> v14: make the data mergeable, for partner sync (ADR-0007).
+         *
+         * Every synced table gains `uid` (who this row is, across two phones),
+         * `updatedAt` (which of two edits wins) and `deletedAt` (a tombstone, so
+         * a deletion can be told to the other phone instead of being undone by
+         * it). Existing rows are backfilled with a fresh UUID each — the unique
+         * index is created only afterwards, since every row starts at the `''`
+         * default and would collide.
+         *
+         * `updatedAt` is stamped with the migration time rather than each row's
+         * own timestamp: the true last-write time is unknowable, and "now" is a
+         * safe upper bound while no partner exists yet to disagree with it.
+         *
+         * Nothing here changes what the app shows.
+         */
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val now = System.currentTimeMillis()
+                for (table in SYNCED_TABLES) {
+                    db.execSQL("ALTER TABLE `$table` ADD COLUMN `uid` TEXT NOT NULL DEFAULT ''")
+                    db.execSQL("ALTER TABLE `$table` ADD COLUMN `updatedAt` INTEGER NOT NULL DEFAULT 0")
+                    db.execSQL("ALTER TABLE `$table` ADD COLUMN `deletedAt` INTEGER")
+                    db.execSQL(
+                        "UPDATE `$table` SET `uid` = $UUID_V4_SQL, `updatedAt` = ?",
+                        arrayOf<Any>(now),
+                    )
+                    db.execSQL(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS `index_${table}_uid` ON `$table` (`uid`)",
+                    )
+                }
+                // Carries the deletion of rows that were erased outright, which
+                // have no `deletedAt` of their own left to carry it.
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tombstone` (" +
+                        "`uid` TEXT NOT NULL, `entity` TEXT NOT NULL, " +
+                        "`deletedAt` INTEGER NOT NULL, PRIMARY KEY(`uid`))",
+                )
+            }
+        }
+
+        /**
          * The full migration chain, in order. Exposed so tests can open a
          * database created by an older release through the very same list the
          * app ships — a migration that is written but never registered here
@@ -261,7 +330,7 @@ abstract class SproutDatabase : RoomDatabase() {
         internal val MIGRATIONS: Array<Migration> = arrayOf(
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
-            MIGRATION_12_13,
+            MIGRATION_12_13, MIGRATION_13_14,
         )
 
         fun getInstance(context: Context): SproutDatabase =

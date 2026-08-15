@@ -164,13 +164,15 @@ class DatabaseMigrationTest {
 
     @Test
     fun `a fresh install creates a schema the entities agree with`() {
-        // No pre-existing file: Room creates v12 directly. This catches an
-        // entity change made without a matching migration, which would leave
-        // fresh installs and upgraded installs on different schemas.
+        // No pre-existing file: Room creates the current schema directly. This
+        // catches an entity change made without a matching migration, which
+        // would leave fresh installs and upgraded installs on different
+        // schemas. The version is spelled out rather than read from the
+        // entities on purpose — bumping it should make someone look here.
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(13, database.openHelper.writableDatabase.version)
+        assertEquals(14, database.openHelper.writableDatabase.version)
     }
 
     /**

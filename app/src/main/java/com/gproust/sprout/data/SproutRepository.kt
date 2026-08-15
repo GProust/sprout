@@ -8,9 +8,12 @@ import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.TombstoneEntity
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.local.SproutDatabase
+import com.gproust.sprout.data.sync.TOMBSTONE_RETENTION_MS
+import com.gproust.sprout.data.sync.newUid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -25,14 +28,22 @@ import kotlinx.coroutines.flow.map
  * The baby-scoped logs (feeding/sleep/diaper/growth) always follow the
  * currently *active* baby: reads filter by it and writes are stamped with it,
  * so screens never have to thread a baby id around.
+ *
+ * It is also the one place that stamps the sync columns (ADR-0007). Screens
+ * build entities without knowing about `uid` or `updatedAt`, and deleting an
+ * entry means flagging it rather than removing it — with one exception,
+ * [deleteBaby], which really does erase.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SproutRepository(
     private val db: SproutDatabase,
+    /** The clock every write is stamped with; swappable in tests. */
+    private val now: () -> Long = System::currentTimeMillis,
     /**
      * Invoked after any write that can change what the home-screen widget
      * shows (feeding logs, or which baby is active). Wired by the
-     * application to refresh the widget; a no-op in tests.
+     * application to refresh the widget; a no-op in tests. Stays last so the
+     * application can keep passing it as a trailing lambda.
      */
     private val onWidgetDataChanged: suspend () -> Unit = {},
 ) {
@@ -64,9 +75,21 @@ class SproutRepository(
         if (id == null) flowOf(null) else db.babyDao().observeBaby(id)
     }
 
+    // Sync stamping (ADR-0007). Screens build entities without a uid or an
+    // updatedAt; every write goes through one of these on its way to the DAO,
+    // so no call site has to remember. `ifEmpty` keeps the unique index safe
+    // even if an entity is ever built by hand without one.
+    private fun BabyEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun FeedingEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun SleepEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun DiaperEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun GrowthEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun TreatmentEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun PumpingEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+
     /** Adds a baby and returns its new id, selecting it if none is active yet. */
     suspend fun addBaby(name: String, birthDate: Long): Long {
-        val id = db.babyDao().insert(BabyEntity(name = name.trim(), birthDate = birthDate))
+        val id = db.babyDao().insert(BabyEntity(name = name.trim(), birthDate = birthDate).stamped())
         if (db.parentProfileDao().profileOnce()?.activeBabyId == null) {
             db.parentProfileDao().updateActiveBaby(id)
             onWidgetDataChanged()
@@ -74,7 +97,7 @@ class SproutRepository(
         return id
     }
 
-    suspend fun updateBaby(baby: BabyEntity) = db.babyDao().upsert(baby)
+    suspend fun updateBaby(baby: BabyEntity) = db.babyDao().upsert(baby.stamped())
 
     /** All tracked babies as a one-shot list (for (re)scheduling feeding reminders). */
     suspend fun activeBabies(): List<BabyEntity> = db.babyDao().activeBabiesOnce()
@@ -95,23 +118,63 @@ class SproutRepository(
 
     /** Stop tracking a baby: keep its data but take it out of the active rotation. */
     suspend fun archiveBaby(babyId: Long) {
-        db.babyDao().setArchived(babyId, true)
+        db.babyDao().setArchived(babyId, true, now())
         reassignActiveIfNeeded(babyId)
     }
 
-    suspend fun restoreBaby(babyId: Long) = db.babyDao().setArchived(babyId, false)
+    suspend fun restoreBaby(babyId: Long) = db.babyDao().setArchived(babyId, false, now())
 
-    /** Permanently delete a baby together with all of its logs. */
+    /**
+     * Permanently delete a baby together with all of its logs.
+     *
+     * Unlike deleting a single entry, this really erases: the rows are gone,
+     * not flagged. Only their uids are kept, in `tombstone`, so that a partner's
+     * phone learns the entries were deleted instead of sending them all back at
+     * the next merge (ADR-0007). A tombstone says nothing about what the entry
+     * contained.
+     */
     suspend fun deleteBaby(babyId: Long) {
+        val deletedAt = now()
         db.withTransaction {
-            db.feedingDao().deleteForBaby(babyId)
-            db.sleepDao().deleteForBaby(babyId)
-            db.diaperDao().deleteForBaby(babyId)
-            db.growthDao().deleteForBaby(babyId)
-            db.treatmentDao().deleteForBaby(babyId)
-            db.babyDao().deleteById(babyId)
+            val tombstones = buildList {
+                addAll(db.feedingDao().uidsForBaby(babyId).toTombstones("feeding", deletedAt))
+                addAll(db.sleepDao().uidsForBaby(babyId).toTombstones("sleep", deletedAt))
+                addAll(db.diaperDao().uidsForBaby(babyId).toTombstones("diaper", deletedAt))
+                addAll(db.growthDao().uidsForBaby(babyId).toTombstones("growth", deletedAt))
+                addAll(db.treatmentDao().uidsForBaby(babyId).toTombstones("treatment", deletedAt))
+                addAll(listOfNotNull(db.babyDao().uidById(babyId)).toTombstones("baby", deletedAt))
+            }
+            db.tombstoneDao().insertAll(tombstones)
+
+            db.feedingDao().purgeForBaby(babyId)
+            db.sleepDao().purgeForBaby(babyId)
+            db.diaperDao().purgeForBaby(babyId)
+            db.growthDao().purgeForBaby(babyId)
+            db.treatmentDao().purgeForBaby(babyId)
+            db.babyDao().purgeById(babyId)
         }
         reassignActiveIfNeeded(babyId)
+    }
+
+    private fun List<String>.toTombstones(entity: String, deletedAt: Long) =
+        map { TombstoneEntity(uid = it, entity = entity, deletedAt = deletedAt) }
+
+    /**
+     * Erase soft-deleted rows, and the tombstones of erased ones, once they are
+     * older than the retention window — otherwise a delete would cost storage
+     * for the life of the install. Called on launch.
+     */
+    suspend fun compactTombstones() {
+        val cutoff = now() - TOMBSTONE_RETENTION_MS
+        db.withTransaction {
+            db.feedingDao().compact(cutoff)
+            db.sleepDao().compact(cutoff)
+            db.diaperDao().compact(cutoff)
+            db.growthDao().compact(cutoff)
+            db.treatmentDao().compact(cutoff)
+            db.pumpingDao().compact(cutoff)
+            db.tombstoneDao().compact(cutoff)
+        }
     }
 
     /** When the active baby goes away, fall back to another tracked baby (or none). */
@@ -129,11 +192,11 @@ class SproutRepository(
     }
     suspend fun addFeeding(entity: FeedingEntity) {
         val id = activeBabyId.first() ?: return
-        db.feedingDao().insert(entity.copy(babyId = id))
+        db.feedingDao().insert(entity.copy(babyId = id).stamped())
         onWidgetDataChanged()
     }
     suspend fun deleteFeeding(entity: FeedingEntity) {
-        db.feedingDao().delete(entity)
+        db.feedingDao().softDelete(entity.id, now())
         onWidgetDataChanged()
     }
 
@@ -168,9 +231,9 @@ class SproutRepository(
     }
     suspend fun addSleep(entity: SleepEntity) {
         val id = activeBabyId.first() ?: return
-        db.sleepDao().insert(entity.copy(babyId = id))
+        db.sleepDao().insert(entity.copy(babyId = id).stamped())
     }
-    suspend fun deleteSleep(entity: SleepEntity) = db.sleepDao().delete(entity)
+    suspend fun deleteSleep(entity: SleepEntity) = db.sleepDao().softDelete(entity.id, now())
 
     // Diaper
     val diapers: Flow<List<DiaperEntity>> = activeBabyId.flatMapLatest { id ->
@@ -178,9 +241,9 @@ class SproutRepository(
     }
     suspend fun addDiaper(entity: DiaperEntity) {
         val id = activeBabyId.first() ?: return
-        db.diaperDao().insert(entity.copy(babyId = id))
+        db.diaperDao().insert(entity.copy(babyId = id).stamped())
     }
-    suspend fun deleteDiaper(entity: DiaperEntity) = db.diaperDao().delete(entity)
+    suspend fun deleteDiaper(entity: DiaperEntity) = db.diaperDao().softDelete(entity.id, now())
 
     // Growth
     val growth: Flow<List<GrowthEntity>> = activeBabyId.flatMapLatest { id ->
@@ -188,9 +251,9 @@ class SproutRepository(
     }
     suspend fun addGrowth(entity: GrowthEntity) {
         val id = activeBabyId.first() ?: return
-        db.growthDao().insert(entity.copy(babyId = id))
+        db.growthDao().insert(entity.copy(babyId = id).stamped())
     }
-    suspend fun deleteGrowth(entity: GrowthEntity) = db.growthDao().delete(entity)
+    suspend fun deleteGrowth(entity: GrowthEntity) = db.growthDao().softDelete(entity.id, now())
 
     // Treatments (medications/reminders — per active baby)
     val treatments: Flow<List<TreatmentEntity>> = activeBabyId.flatMapLatest { id ->
@@ -198,10 +261,10 @@ class SproutRepository(
     }
     suspend fun addTreatment(entity: TreatmentEntity): Long? {
         val id = activeBabyId.first() ?: return null
-        return db.treatmentDao().insert(entity.copy(babyId = id))
+        return db.treatmentDao().insert(entity.copy(babyId = id).stamped())
     }
-    suspend fun updateTreatment(entity: TreatmentEntity) = db.treatmentDao().update(entity)
-    suspend fun deleteTreatment(entity: TreatmentEntity) = db.treatmentDao().delete(entity)
+    suspend fun updateTreatment(entity: TreatmentEntity) = db.treatmentDao().update(entity.stamped())
+    suspend fun deleteTreatment(entity: TreatmentEntity) = db.treatmentDao().softDelete(entity.id, now())
     suspend fun getTreatment(id: Long): TreatmentEntity? = db.treatmentDao().getById(id)
 
     /** All active treatments (across babies) that want reminders — for (re)scheduling alarms. */
@@ -209,8 +272,8 @@ class SproutRepository(
 
     // Pumping (expressed milk — the parent's stash, not a baby's log)
     val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()
-    suspend fun addPumping(entity: PumpingEntity) = db.pumpingDao().insert(entity)
-    suspend fun deletePumping(entity: PumpingEntity) = db.pumpingDao().delete(entity)
+    suspend fun addPumping(entity: PumpingEntity) = db.pumpingDao().insert(entity.stamped())
+    suspend fun deletePumping(entity: PumpingEntity) = db.pumpingDao().softDelete(entity.id, now())
 
     // Wellbeing (parent check-ins — per parent, not per baby)
     val wellbeing: Flow<List<WellbeingEntity>> = db.wellbeingDao().observeAll()
