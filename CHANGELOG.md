@@ -3,6 +3,14 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📟 A bottle no longer hides which breast comes next. When the last feed is a
+  bottle or some solids, the widget adds a small line — **"Last breast: Left ·
+  3 h ago"** — for any breastfeed in the past 24 hours, so the alternation
+  survives a feed in between. It's the side the breastfeed *started* on, the
+  one the next feed alternates away from.
+
 ## [1.4.6] — 2026-08-05
 
 - 🌍 Fixed **choosing a language doing nothing** for installs from Play. Play

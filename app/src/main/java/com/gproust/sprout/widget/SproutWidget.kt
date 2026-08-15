@@ -68,17 +68,21 @@ suspend fun renderSproutWidgets(context: Context, appWidgetIds: IntArray) {
     if (appWidgetIds.isEmpty()) return
     val manager = AppWidgetManager.getInstance(context)
     val data = loadWidgetData(context)
+    val lastBreast = data.lastBreast
+        ?.let { firstNursedSide(it)?.name?.lowercase() ?: "side unknown" }
+        ?: "none in 24 h"
     WidgetDiagnostics.record(
         context,
         "rendering ${appWidgetIds.size} widget(s): " +
             "session=${if (data.session != null) "running" else "none"}, " +
             "lastFeed=${data.feed?.type?.name?.lowercase() ?: "none"}, " +
+            "lastBreast=$lastBreast, " +
             "baby=${if (data.babyName != null) "named" else "unknown"}",
     )
     for (id in appWidgetIds) {
         try {
             val views = glanceRemoteViews.compose(context, widgetSize(manager, id)) {
-                GlanceTheme { SproutWidgetUi(data.session, data.feed, data.babyName) }
+                GlanceTheme { SproutWidgetUi(data.session, data.feed, data.lastBreast, data.babyName) }
             }.remoteViews
             manager.updateAppWidget(id, views)
         } catch (e: CancellationException) {
@@ -175,6 +179,7 @@ private const val DEFAULT_WIDGET_HEIGHT_DP = 110
 private class WidgetData(
     val session: NursingSession?,
     val feed: FeedingEntity?,
+    val lastBreast: FeedingEntity?,
     val babyName: String?,
 )
 
@@ -185,6 +190,11 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
     return WidgetData(
         session = readForWidget(context, "nursing session") { NursingSessionStore.load(context) },
         feed = readForWidget(context, "last feed") { app?.repository?.lastFeedForActiveBaby() },
+        lastBreast = readForWidget(context, "last breastfeed") {
+            app?.repository?.lastBreastFeedForActiveBaby(
+                System.currentTimeMillis() - LAST_BREAST_WINDOW_MS,
+            )
+        },
         babyName = readForWidget(context, "active baby name") { app?.repository?.activeBabyName() },
     )
 }
@@ -200,6 +210,40 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
  */
 fun firstNursedSide(feed: FeedingEntity): BreastSide? =
     feed.segments.firstOrNull()?.side ?: feed.side
+
+/** How far back the widget still cares which breast the last breastfeed began on. */
+internal const val LAST_BREAST_WINDOW_MS = 24L * 60L * 60L * 1000L
+
+/**
+ * The reminder line "Last breast: Left · 3 h ago", or null when there is
+ * nothing to remind.
+ *
+ * A bottle (or a spoon of purée) given between two nursings used to take the
+ * side with it: the widget only ever showed the last feed, so the answer to
+ * "which breast do I start on?" disappeared behind the bottle. This keeps it
+ * on screen for a day, alongside whatever the last feed happened to be.
+ *
+ * Null when the last feed *is* the breastfeed — its side is already the big
+ * line — when nothing was nursed in the last 24 hours, or when that
+ * breastfeed never recorded a side.
+ */
+internal fun lastBreastLine(
+    context: Context,
+    feed: FeedingEntity?,
+    lastBreast: FeedingEntity?,
+    now: Long,
+): String? {
+    if (feed == null || feed.type == FeedType.BREAST) return null
+    // Re-checked here as well as in the query: a render can be a tick or two
+    // older than the data it was handed.
+    val breast = lastBreast?.takeIf { now - it.startTime <= LAST_BREAST_WINDOW_MS } ?: return null
+    val side = firstNursedSide(breast) ?: return null
+    return context.getString(
+        R.string.widget_last_breast,
+        context.getString(sideLabel(side)),
+        widgetTimeAgo(context, breast.startTime, now),
+    )
+}
 
 /**
  * The widget's time line: elapsed time since the feed with explicit units
@@ -244,6 +288,7 @@ private suspend fun <T> readForWidget(
 internal fun SproutWidgetUi(
     session: NursingSession?,
     feed: FeedingEntity?,
+    lastBreast: FeedingEntity?,
     babyName: String?,
 ) {
     val context = LocalContext.current
@@ -260,7 +305,7 @@ internal fun SproutWidgetUi(
         if (session != null) {
             NursingLines(session, babyName)
         } else {
-            LastFeedLines(feed, babyName)
+            LastFeedLines(feed, lastBreast, babyName)
         }
     }
 }
@@ -310,7 +355,7 @@ private fun NursingLines(session: NursingSession, babyName: String?) {
 
 /** The finished-feed summary: what kind of feed, its one detail, and how long ago. */
 @Composable
-private fun LastFeedLines(feed: FeedingEntity?, babyName: String?) {
+private fun LastFeedLines(feed: FeedingEntity?, lastBreast: FeedingEntity?, babyName: String?) {
     val context = LocalContext.current
     if (feed == null) {
         CaptionText(babyName, context.getString(R.string.widget_label))
@@ -324,10 +369,19 @@ private fun LastFeedLines(feed: FeedingEntity?, babyName: String?) {
     // Solids have no one number worth shouting, so they simply skip the big
     // line and leave the widget with a caption and a time.
     feedHeadline(context, feed)?.let { HeadlineText(it) }
+    val now = System.currentTimeMillis()
     Text(
-        text = widgetTimeAgo(context, feed.startTime, System.currentTimeMillis()),
+        text = widgetTimeAgo(context, feed.startTime, now),
         style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
     )
+    // A bottle or some solids on top of the day's nursing: say which breast the
+    // last breastfeed started on, so the alternation survives the interruption.
+    lastBreastLine(context, feed, lastBreast, now)?.let {
+        Text(
+            text = it,
+            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp),
+        )
+    }
 }
 
 @StringRes

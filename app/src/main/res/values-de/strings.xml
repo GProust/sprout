@@ -322,11 +322,12 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Letzte Mahlzeit</string>
-    <string name="widget_description">Die letzte Mahlzeit – welches Baby, welche Art und wie lange her – oder die laufende Stillzeit mit Live-Timer.</string>
+    <string name="widget_description">Die letzte Mahlzeit — welches Baby, welche Art und vor wie langer Zeit — dazu die Brust, an der das letzte Stillen begonnen hat, oder die laufende Stillzeit mit Live-Timer.</string>
     <string name="widget_no_feed">Noch keine Mahlzeit</string>
     <string name="widget_ago_minutes">vor %1$d Min.</string>
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
+    <string name="widget_last_breast">Letzte Brust: %1$s · %2$s</string>
 
     <!-- Widget troubleshooting -->
     <string name="screen_widget_diagnostics">Widget-Diagnose</string>

@@ -58,6 +58,7 @@ import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
+import com.gproust.sprout.widget.LAST_BREAST_WINDOW_MS
 import com.gproust.sprout.widget.SproutWidgetUi
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -224,11 +225,16 @@ class ScreenshotTest {
         val context = instrumentation.targetContext
         val session = NursingSessionStore.load(context)
         val feed = runBlocking { app.repository.lastFeedForActiveBaby() }
+        val lastBreast = runBlocking {
+            app.repository.lastBreastFeedForActiveBaby(
+                System.currentTimeMillis() - LAST_BREAST_WINDOW_MS,
+            )
+        }
         val babyName = runBlocking { app.repository.activeBabyName() }
         val size = DpSize(180.dp, 110.dp)
         val remoteViews = runBlocking {
             GlanceRemoteViews().compose(context, size) {
-                GlanceTheme { SproutWidgetUi(session, feed, babyName) }
+                GlanceTheme { SproutWidgetUi(session, feed, lastBreast, babyName) }
             }.remoteViews
         }
         val density = context.resources.displayMetrics.density
