@@ -365,4 +365,54 @@
     <string name="widget_diagnostics_force_refresh">Forçar atualização</string>
     <string name="widget_diagnostics_clear">Limpar histórico</string>
     <string name="widget_error">Erro do widget — ver Definições → Diagnóstico do widget</string>
+
+    <!-- Sincronização entre mães/pais (ADR-0007 fase 1) -->
+    <string name="screen_sync">Partilha entre pais</string>
+    <string name="settings_sharing">Partilha</string>
+    <string name="settings_sync_hint">Partilhe o registo do bebé com a outra mãe ou o outro pai — sem conta e sem nuvem.</string>
+    <string name="sync_intro_title">Dois telemóveis, um só registo</string>
+    <string name="sync_intro_body">Convide a outra pessoa. Assim que os telemóveis estiverem emparelhados, cada um pode enviar os seus registos e o Sprout junta-os — sem conta, sem servidor e sem nada guardado fora dos vossos dois telemóveis.</string>
+    <string name="sync_invite">Convidar a outra pessoa</string>
+    <string name="sync_open_invitation">Abrir um convite recebido</string>
+    <string name="sync_channel_warning">O convite leva a chave do vosso registo. Envie-o por algo privado — uma app de mensagens, Quick Share, Bluetooth — e nunca por um espaço público.</string>
+    <string name="sync_code_title">O vosso código de emparelhamento</string>
+    <string name="sync_code_hint">Os dois telemóveis mostram os mesmos seis caracteres. Leiam-nos um ao outro uma vez: se forem diferentes, não estão emparelhados um com o outro.</string>
+    <string name="sync_send">Enviar os meus registos</string>
+    <string name="sync_receive">Abrir um ficheiro recebido</string>
+    <string name="sync_exchange_hint">Enviem nos dois sentidos para atualizar ambos os telemóveis. Abrir o mesmo ficheiro duas vezes não muda nada.</string>
+    <string name="sync_stash_title">Partilhar o leite extraído</string>
+    <string name="sync_stash_desc">O seu registo de extrações e a reserva de leite. Tudo o que diz respeito ao bebé é partilhado de qualquer forma.</string>
+    <string name="sync_stash_off_note">Desativar interrompe os envios futuros. O que já enviou permanece no outro telemóvel.</string>
+    <string name="sync_invite_again">Enviar o convite outra vez</string>
+    <string name="sync_unpair">Desemparelhar</string>
+    <string name="sync_unpair_confirm">Este telemóvel deixará de enviar e de abrir ficheiros deste emparelhamento. Tudo o que já está guardado aqui fica.</string>
+    <string name="sync_share_invitation_subject">Convite do Sprout</string>
+    <string name="sync_share_data_subject">Registos do Sprout</string>
+    <string name="sync_paired_title">Emparelhados</string>
+    <string name="sync_paired_body">O vosso código de emparelhamento é %1$s. Confirme que o outro telemóvel mostra o mesmo.</string>
+    <string name="sync_paired_body_named">Emparelhado com %1$s. O vosso código de emparelhamento é %2$s — confirme que o outro telemóvel mostra o mesmo.</string>
+    <string name="sync_merged_title">Junto</string>
+    <string name="sync_merged_nothing_new">Nada de novo — os dois telemóveis já concordavam.</string>
+    <plurals name="sync_merged_added">
+        <item quantity="one">%d registo adicionado</item>
+        <item quantity="other">%d registos adicionados</item>
+    </plurals>
+    <plurals name="sync_merged_updated">
+        <item quantity="one">%d registo atualizado</item>
+        <item quantity="other">%d registos atualizados</item>
+    </plurals>
+    <plurals name="sync_merged_deleted">
+        <item quantity="one">%d registo removido</item>
+        <item quantity="other">%d registos removidos</item>
+    </plurals>
+    <string name="sync_failed_title">Não foi junto nada</string>
+    <string name="sync_error_not_paired">Emparelhe primeiro com o telemóvel da outra pessoa.</string>
+    <string name="sync_error_unreadable">Este ficheiro não é um convite nem uma exportação do Sprout.</string>
+    <string name="sync_error_wrong_phone">Este ficheiro não foi enviado pelo telemóvel com que está emparelhado, ou danificou-se pelo caminho.</string>
+    <string name="sync_error_too_new">Este ficheiro foi escrito por uma versão mais recente do Sprout. Atualize a aplicação e tente de novo.</string>
+    <string name="sync_error_invitation_expired">Este convite expirou. Peça um novo.</string>
+    <string name="sync_histories_title">Já têm ambos registos</string>
+    <string name="sync_histories_body">Cada um esteve a registar antes do emparelhamento, e o Sprout não consegue saber que registos são o mesmo momento. Manter tudo — o que ambos anotaram aparecerá duas vezes — ou partilhar só a partir de agora?</string>
+    <string name="sync_histories_keep_all">Manter tudo</string>
+    <string name="sync_histories_from_pairing">A partir de agora</string>
 </resources>

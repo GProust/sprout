@@ -376,4 +376,60 @@
     <string name="widget_diagnostics_force_refresh">Wymuś odświeżenie</string>
     <string name="widget_diagnostics_clear">Wyczyść historię</string>
     <string name="widget_error">Błąd widżetu — zobacz Ustawienia → Diagnostyka widżetu</string>
+
+    <!-- Synchronizacja między rodzicami (ADR-0007 faza 1) -->
+    <string name="screen_sync">Współdzielenie z drugim rodzicem</string>
+    <string name="settings_sharing">Współdzielenie</string>
+    <string name="settings_sync_hint">Udostępnij zapisy dziecka drugiemu rodzicowi — bez konta i bez chmury.</string>
+    <string name="sync_intro_title">Dwa telefony, jeden zapis</string>
+    <string name="sync_intro_body">Zaproś drugiego rodzica. Gdy telefony zostaną sparowane, każde z was może wysłać swoje wpisy, a Sprout je scali — bez konta, bez serwera i bez przechowywania czegokolwiek poza waszymi dwoma telefonami.</string>
+    <string name="sync_invite">Zaproś drugiego rodzica</string>
+    <string name="sync_open_invitation">Otwórz otrzymane zaproszenie</string>
+    <string name="sync_channel_warning">Zaproszenie zawiera klucz do waszych zapisów. Wyślij je czymś prywatnym — komunikatorem, Quick Share, Bluetoothem — a nigdy w miejscu publicznym.</string>
+    <string name="sync_code_title">Wasz kod parowania</string>
+    <string name="sync_code_hint">Oba telefony pokazują te same sześć znaków. Przeczytajcie je sobie raz na głos: jeśli się różnią, nie jesteście sparowani ze sobą.</string>
+    <string name="sync_send">Wyślij moje wpisy</string>
+    <string name="sync_receive">Otwórz otrzymany plik</string>
+    <string name="sync_exchange_hint">Wyślijcie w obie strony, żeby oba telefony były aktualne. Otwarcie tego samego pliku dwa razy niczego nie zmienia.</string>
+    <string name="sync_stash_title">Udostępniaj odciągnięte mleko</string>
+    <string name="sync_stash_desc">Twój zapis odciągania i zapas mleka. Wszystko, co dotyczy dziecka, i tak jest współdzielone.</string>
+    <string name="sync_stash_off_note">Wyłączenie zatrzymuje przyszłe wysyłki. To, co już wysłano, zostaje na drugim telefonie.</string>
+    <string name="sync_invite_again">Wyślij zaproszenie ponownie</string>
+    <string name="sync_unpair">Rozłącz</string>
+    <string name="sync_unpair_confirm">Ten telefon przestanie wysyłać i otwierać pliki dla tego parowania. Wszystko, co już tu zapisano, pozostaje.</string>
+    <string name="sync_share_invitation_subject">Zaproszenie Sprout</string>
+    <string name="sync_share_data_subject">Wpisy Sprout</string>
+    <string name="sync_paired_title">Sparowano</string>
+    <string name="sync_paired_body">Wasz kod parowania to %1$s. Sprawdź, czy drugi telefon pokazuje ten sam.</string>
+    <string name="sync_paired_body_named">Sparowano z %1$s. Wasz kod parowania to %2$s — sprawdź, czy drugi telefon pokazuje ten sam.</string>
+    <string name="sync_merged_title">Scalono</string>
+    <string name="sync_merged_nothing_new">Nic nowego — oba telefony już się zgadzały.</string>
+    <plurals name="sync_merged_added">
+        <item quantity="one">Dodano %d wpis</item>
+        <item quantity="few">Dodano %d wpisy</item>
+        <item quantity="many">Dodano %d wpisów</item>
+        <item quantity="other">Dodano %d wpisu</item>
+    </plurals>
+    <plurals name="sync_merged_updated">
+        <item quantity="one">Zaktualizowano %d wpis</item>
+        <item quantity="few">Zaktualizowano %d wpisy</item>
+        <item quantity="many">Zaktualizowano %d wpisów</item>
+        <item quantity="other">Zaktualizowano %d wpisu</item>
+    </plurals>
+    <plurals name="sync_merged_deleted">
+        <item quantity="one">Usunięto %d wpis</item>
+        <item quantity="few">Usunięto %d wpisy</item>
+        <item quantity="many">Usunięto %d wpisów</item>
+        <item quantity="other">Usunięto %d wpisu</item>
+    </plurals>
+    <string name="sync_failed_title">Nic nie zostało scalone</string>
+    <string name="sync_error_not_paired">Najpierw sparuj telefon drugiego rodzica.</string>
+    <string name="sync_error_unreadable">Ten plik nie jest ani zaproszeniem, ani eksportem Sprout.</string>
+    <string name="sync_error_wrong_phone">Ten plik nie został wysłany z telefonu, z którym jesteś sparowany, albo uszkodził się po drodze.</string>
+    <string name="sync_error_too_new">Ten plik zapisała nowsza wersja Sprout. Zaktualizuj aplikację i spróbuj ponownie.</string>
+    <string name="sync_error_invitation_expired">To zaproszenie wygasło. Poproś o nowe.</string>
+    <string name="sync_histories_title">Oboje macie już wpisy</string>
+    <string name="sync_histories_body">Każde z was zapisywało przed sparowaniem, a Sprout nie rozpozna, które wpisy dotyczą tej samej chwili. Zachować wszystko — to, co zapisaliście oboje, pojawi się podwójnie — czy udostępniać dopiero od teraz?</string>
+    <string name="sync_histories_keep_all">Zachowaj wszystko</string>
+    <string name="sync_histories_from_pairing">Od teraz</string>
 </resources>

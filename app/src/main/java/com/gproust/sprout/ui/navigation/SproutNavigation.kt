@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BabyChangingStation
 import androidx.compose.material.icons.filled.Bedtime
@@ -51,6 +52,7 @@ import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
+import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.startup.Startup
@@ -70,6 +72,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
     const val WIDGET_DIAGNOSTICS = "settings/widget-diagnostics"
+    const val SYNC = "settings/sync"
 }
 
 private data class BottomDestination(
@@ -117,14 +120,20 @@ private fun isBottomDestination(route: String) = bottomDestinations.any { it.rou
  * [onRouteConsumed].
  */
 @Composable
-fun SproutApp(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
+fun SproutApp(
+    routeRequest: String? = null,
+    onRouteConsumed: () -> Unit = {},
+    /** A Sprout file another app just opened with us (an invitation, or a replica). */
+    syncFile: Uri? = null,
+    onSyncFileConsumed: () -> Unit = {},
+) {
     val startupVm: StartupViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val stage by startupVm.startup.collectAsState()
 
     when (stage) {
         Startup.Loading -> LoadingScreen()
         Startup.Onboarding -> OnboardingScreen(onFinish = startupVm::completeOnboarding)
-        Startup.Main -> MainScaffold(routeRequest, onRouteConsumed)
+        Startup.Main -> MainScaffold(routeRequest, onRouteConsumed, syncFile, onSyncFileConsumed)
     }
 }
 
@@ -136,7 +145,12 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Unit = {}) {
+private fun MainScaffold(
+    routeRequest: String? = null,
+    onRouteConsumed: () -> Unit = {},
+    syncFile: Uri? = null,
+    onSyncFileConsumed: () -> Unit = {},
+) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -152,6 +166,12 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
             }
             onRouteConsumed()
         }
+    }
+
+    // A Sprout file opened from a messaging app lands on the sync screen, which
+    // is the only place that knows what to do with one.
+    LaunchedEffect(syncFile) {
+        if (syncFile != null) navController.navigate(Routes.SYNC)
     }
 
     Scaffold(
@@ -228,6 +248,14 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
                     onOpenWidgetDiagnostics = { navController.navigate(Routes.WIDGET_DIAGNOSTICS) },
+                    onOpenSync = { navController.navigate(Routes.SYNC) },
+                )
+            }
+            composable(Routes.SYNC) {
+                SyncScreen(
+                    onBack = { navController.popBackStack() },
+                    incomingFile = syncFile,
+                    onIncomingFileHandled = onSyncFileConsumed,
                 )
             }
             composable(Routes.WIDGET_DIAGNOSTICS) {

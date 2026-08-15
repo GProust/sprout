@@ -9,6 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.sync.PairingStore
+import com.gproust.sprout.data.sync.SyncEngine
 import com.gproust.sprout.ui.checkin.CheckInViewModel
 import com.gproust.sprout.ui.diaper.DiaperViewModel
 import com.gproust.sprout.ui.feeding.FeedingViewModel
@@ -19,6 +21,7 @@ import com.gproust.sprout.ui.profile.ProfileViewModel
 import com.gproust.sprout.ui.pumping.PumpingViewModel
 import com.gproust.sprout.ui.sleep.SleepViewModel
 import com.gproust.sprout.ui.startup.StartupViewModel
+import com.gproust.sprout.ui.sync.SyncViewModel
 import com.gproust.sprout.ui.treatments.TreatmentsViewModel
 
 /**
@@ -27,6 +30,8 @@ import com.gproust.sprout.ui.treatments.TreatmentsViewModel
 class SproutViewModelFactory(
     private val repository: SproutRepository,
     private val context: Context,
+    private val syncEngine: SyncEngine,
+    private val pairingStore: PairingStore,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -43,6 +48,8 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(PumpingViewModel::class.java) -> PumpingViewModel(repository)
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository, context)
             modelClass.isAssignableFrom(TreatmentsViewModel::class.java) -> TreatmentsViewModel(repository, context)
+            modelClass.isAssignableFrom(SyncViewModel::class.java) ->
+                SyncViewModel(repository, syncEngine, pairingStore, context)
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         } as T
     }
@@ -52,5 +59,5 @@ class SproutViewModelFactory(
 @Composable
 fun rememberSproutViewModelFactory(): SproutViewModelFactory {
     val app = LocalContext.current.applicationContext as SproutApplication
-    return remember { SproutViewModelFactory(app.repository, app) }
+    return remember { SproutViewModelFactory(app.repository, app, app.syncEngine, app.pairingStore) }
 }

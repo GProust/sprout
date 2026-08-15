@@ -26,7 +26,34 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+              Partner sync (ADR-0007 phase 1): a Sprout invitation or replica,
+              opened from wherever the other parent sent it. The type is ours
+              alone, so this offers Sprout for its own files and nothing else.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/vnd.sprout.sync" />
+            </intent-filter>
         </activity>
+
+        <!--
+          Hands a staged sync file to the share sheet. Scoped to one cache
+          directory (@xml/file_paths) and not exported, so the URI is only ever
+          readable by the app the user picked, for as long as the grant lasts.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.sync"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <receiver
             android:name=".notifications.ReminderReceiver"
