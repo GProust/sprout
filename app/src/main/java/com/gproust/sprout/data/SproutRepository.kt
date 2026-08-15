@@ -147,6 +147,16 @@ class SproutRepository(
     }
 
     /**
+     * The active baby's most recent breastfeed started at or after [since], or
+     * null. The widget asks for this on top of [lastFeedForActiveBaby] so that
+     * a bottle given between two nursings doesn't take the last breast with it.
+     */
+    suspend fun lastBreastFeedForActiveBaby(since: Long): FeedingEntity? {
+        val id = activeBabyIdNow() ?: return null
+        return db.feedingDao().lastBreastFeedSince(id, since)
+    }
+
+    /**
      * The active baby's name. The widget shows it so that with twins you can
      * tell whose feed you're looking at.
      */

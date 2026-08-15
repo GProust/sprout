@@ -344,11 +344,12 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Ultimo pasto</string>
-    <string name="widget_description">L\'ultimo pasto: quale bambino, di che tipo e quanto tempo fa, o la poppata in corso con il timer dal vivo.</string>
+    <string name="widget_description">L\'ultimo pasto — quale bambino, di che tipo e quanto tempo fa — più il seno da cui è iniziato l\'ultimo allattamento, o la poppata in corso con il suo timer in tempo reale.</string>
     <string name="widget_no_feed">Ancora nessun pasto</string>
     <string name="widget_ago_minutes">%1$d min fa</string>
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
+    <string name="widget_last_breast">Ultimo seno: %1$s · %2$s</string>
 
     <!-- Widget troubleshooting -->
     <string name="screen_widget_diagnostics">Diagnostica del widget</string>

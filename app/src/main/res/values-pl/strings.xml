@@ -355,11 +355,12 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Ostatnie karmienie</string>
-    <string name="widget_description">Ostatnie karmienie — które dziecko, jakiego rodzaju i ile czasu temu — albo trwające karmienie piersią z licznikiem na żywo.</string>
+    <string name="widget_description">Ostatni posiłek — które dziecko, jakiego rodzaju i jak dawno temu — oraz pierś, od której zaczęło się ostatnie karmienie piersią, albo trwające karmienie z licznikiem na żywo.</string>
     <string name="widget_no_feed">Brak karmień</string>
     <string name="widget_ago_minutes">%1$d min temu</string>
     <string name="widget_ago_hours">%1$d godz. temu</string>
     <string name="widget_ago_hours_minutes">%1$d godz. %2$d min temu</string>
+    <string name="widget_last_breast">Ostatnia pierś: %1$s · %2$s</string>
 
     <!-- Widget troubleshooting -->
     <string name="screen_widget_diagnostics">Diagnostyka widżetu</string>

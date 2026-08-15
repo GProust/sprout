@@ -92,6 +92,17 @@ interface FeedingDao {
     @Query("SELECT * FROM feeding WHERE babyId = :babyId ORDER BY startTime DESC LIMIT 1")
     suspend fun lastFeed(babyId: Long): FeedingEntity?
 
+    /**
+     * The most recent breastfeed started at or after [since], or null. Kept
+     * apart from [lastFeed] because a bottle in between must not hide which
+     * breast the next feed should start on (for the widget).
+     */
+    @Query(
+        "SELECT * FROM feeding WHERE babyId = :babyId AND type = 'BREAST' " +
+            "AND startTime >= :since ORDER BY startTime DESC LIMIT 1",
+    )
+    suspend fun lastBreastFeedSince(babyId: Long, since: Long): FeedingEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 

@@ -403,11 +403,12 @@
 
     <!-- Home-screen widget -->
     <string name="widget_label">Dernier repas</string>
-    <string name="widget_description">Le dernier repas — quel bébé, de quel type et il y a combien de temps — ou la tétée en cours avec son minuteur en direct.</string>
+    <string name="widget_description">Le dernier repas — quel bébé, de quel type et il y a combien de temps — ainsi que le sein sur lequel la dernière tétée a commencé, ou la tétée en cours avec son minuteur en direct.</string>
     <string name="widget_no_feed">Aucun repas pour l\'instant</string>
     <string name="widget_ago_minutes">il y a %1$d min</string>
     <string name="widget_ago_hours">il y a %1$d h</string>
     <string name="widget_ago_hours_minutes">il y a %1$d h %2$d min</string>
+    <string name="widget_last_breast">Dernier sein : %1$s · %2$s</string>
 
     <!-- Widget troubleshooting -->
     <string name="screen_widget_diagnostics">Diagnostic du widget</string>
