@@ -76,13 +76,17 @@ fun SyncScreen(
         }
     }
 
+    // Read in composition, not inside the effect: a Context captured by a
+    // coroutine doesn't see a configuration change, so the subject could be
+    // left in the language the app started in.
+    val invitationSubject = stringResource(R.string.sync_share_invitation_subject)
+    val dataSubject = stringResource(R.string.sync_share_data_subject)
+
     // The share sheet is the whole transport: hand the file over and let the
     // parent choose who carries it.
     LaunchedEffect(state.fileToShare) {
         state.fileToShare?.let { request ->
-            val subject = context.getString(
-                if (request.isInvitation) R.string.sync_share_invitation_subject else R.string.sync_share_data_subject,
-            )
+            val subject = if (request.isInvitation) invitationSubject else dataSubject
             context.startActivity(SyncFiles.shareIntent(request.uri, subject))
             vm.shareHandled()
         }
