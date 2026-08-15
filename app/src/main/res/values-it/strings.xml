@@ -157,6 +157,25 @@
     <string name="stool_color_white">Bianco / decolorato</string>
     <string name="stool_color_black">Nero</string>
     <string name="stool_color_red">Rosso</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Tiralatte</string>
+    <string name="quick_pumping">🥛  Tiralatte</string>
+    <string name="pumping_empty">Nessuna estrazione registrata. Aggiungi la prima con il pulsante +.</string>
+    <string name="pumping_log_title">Registra un\'estrazione</string>
+    <string name="pumping_edit_title">Modifica estrazione</string>
+    <string name="pumping_add">Aggiungi estrazione</string>
+    <string name="pumping_stash">Scorta di latte</string>
+    <string name="pumping_stash_empty">Al momento non c\'è nulla in conservazione.</string>
+    <string name="pumping_today">Estratto oggi: %1$s</string>
+    <string name="field_storage">Dove va conservato?</string>
+    <string name="storage_fridge">Frigo</string>
+    <string name="storage_freezer">Congelatore</string>
+    <string name="storage_room">Ambiente</string>
+    <string name="storage_used">Usato</string>
+    <string name="pumping_guidance">Indicazione di massima: circa 4 ore a temperatura ambiente, 4 giorni in frigo, 6 mesi in congelatore.</string>
+    <string name="pumping_keeps_until">Si conserva fino al %1$s</string>
+    <string name="pumping_past_keep">Oltre la data di conservazione</string>
     <string name="screen_growth">Crescita</string>
     <string name="growth_empty">Nessuna misurazione registrata finora.</string>
     <string name="growth_log_title">Registra una misurazione</string>

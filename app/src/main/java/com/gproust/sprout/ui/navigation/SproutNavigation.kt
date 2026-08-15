@@ -47,6 +47,7 @@ import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
+import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
@@ -59,6 +60,7 @@ object Routes {
     const val HOME = "home"
     const val FEEDING = "feeding"
     const val FEEDING_NURSING = "feeding/nursing/{side}"
+    const val PUMPING = "pumping"
     const val SLEEP = "sleep"
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
@@ -206,6 +208,9 @@ private fun MainScaffold(routeRequest: String? = null, onRouteConsumed: () -> Un
                     factory = rememberSproutViewModelFactory(),
                 )
                 NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
+            }
+            composable(Routes.PUMPING) {
+                PumpingScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.SLEEP) { SleepScreen() }
             composable(Routes.DIAPER) { DiaperScreen() }

@@ -193,6 +193,25 @@
     <string name="stool_color_black">Noir</string>
     <string name="stool_color_red">Rouge</string>
 
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Tirage</string>
+    <string name="quick_pumping">🥛  Tirage</string>
+    <string name="pumping_empty">Aucun tirage enregistré. Ajoutez le premier avec le bouton +.</string>
+    <string name="pumping_log_title">Enregistrer un tirage</string>
+    <string name="pumping_edit_title">Modifier le tirage</string>
+    <string name="pumping_add">Ajouter le tirage</string>
+    <string name="pumping_stash">Réserve de lait</string>
+    <string name="pumping_stash_empty">Rien en réserve pour le moment.</string>
+    <string name="pumping_today">Tiré aujourd\'hui : %1$s</string>
+    <string name="field_storage">Où va-t-il ?</string>
+    <string name="storage_fridge">Frigo</string>
+    <string name="storage_freezer">Congélateur</string>
+    <string name="storage_room">Ambiante</string>
+    <string name="storage_used">Utilisé</string>
+    <string name="pumping_guidance">Repère : environ 4 heures à température ambiante, 4 jours au frigo, 6 mois au congélateur.</string>
+    <string name="pumping_keeps_until">Se conserve jusqu\'au %1$s</string>
+    <string name="pumping_past_keep">Date de conservation dépassée</string>
+
     <!-- Growth -->
     <string name="screen_growth">Croissance</string>
     <string name="growth_empty">Aucune mesure enregistrée pour le moment.</string>

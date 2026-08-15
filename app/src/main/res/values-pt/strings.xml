@@ -157,6 +157,25 @@
     <string name="stool_color_white">Branco / descolorado</string>
     <string name="stool_color_black">Preto</string>
     <string name="stool_color_red">Vermelho</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Extração</string>
+    <string name="quick_pumping">🥛  Extração</string>
+    <string name="pumping_empty">Ainda não há extrações. Adicione a primeira com o botão +.</string>
+    <string name="pumping_log_title">Registar uma extração</string>
+    <string name="pumping_edit_title">Editar extração</string>
+    <string name="pumping_add">Adicionar extração</string>
+    <string name="pumping_stash">Reserva de leite</string>
+    <string name="pumping_stash_empty">Não há nada guardado neste momento.</string>
+    <string name="pumping_today">Extraído hoje: %1$s</string>
+    <string name="field_storage">Onde fica guardado?</string>
+    <string name="storage_fridge">Frigorífico</string>
+    <string name="storage_freezer">Congelador</string>
+    <string name="storage_room">Ambiente</string>
+    <string name="storage_used">Usado</string>
+    <string name="pumping_guidance">Indicação geral: cerca de 4 horas à temperatura ambiente, 4 dias no frigorífico, 6 meses no congelador.</string>
+    <string name="pumping_keeps_until">Conserva-se até %1$s</string>
+    <string name="pumping_past_keep">Fora do prazo de conservação</string>
     <string name="screen_growth">Crescimento</string>
     <string name="growth_empty">Ainda não há medições registadas.</string>
     <string name="growth_log_title">Registar uma medição</string>

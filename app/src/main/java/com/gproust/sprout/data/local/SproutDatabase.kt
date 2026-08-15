@@ -16,10 +16,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DiaperEntity::class,
         GrowthEntity::class,
         TreatmentEntity::class,
+        PumpingEntity::class,
         WellbeingEntity::class,
         ParentProfileEntity::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -30,6 +31,7 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun diaperDao(): DiaperDao
     abstract fun growthDao(): GrowthDao
     abstract fun treatmentDao(): TreatmentDao
+    abstract fun pumpingDao(): PumpingDao
     abstract fun wellbeingDao(): WellbeingDao
     abstract fun parentProfileDao(): ParentProfileDao
 
@@ -228,6 +230,22 @@ abstract class SproutDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v12 -> v13: add the `pumping` table (expressed milk: when, how much,
+         * and where it is stored). Parent-scoped like `wellbeing`, so it has no
+         * `babyId` and no index to go with one.
+         */
+        private val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `pumping` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`time` INTEGER NOT NULL, `amountMl` INTEGER NOT NULL, " +
+                        "`side` TEXT, `storage` TEXT NOT NULL, `notes` TEXT)",
+                )
+            }
+        }
+
         fun getInstance(context: Context): SproutDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -237,6 +255,7 @@ abstract class SproutDatabase : RoomDatabase() {
                 ).addMigrations(
                     MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
                     MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
+                    MIGRATION_12_13,
                 ).build().also { instance = it }
             }
     }

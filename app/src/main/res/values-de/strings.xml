@@ -157,6 +157,25 @@
     <string name="stool_color_white">Weiß / entfärbt</string>
     <string name="stool_color_black">Schwarz</string>
     <string name="stool_color_red">Rot</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Abpumpen</string>
+    <string name="quick_pumping">🥛  Abpumpen</string>
+    <string name="pumping_empty">Noch nichts abgepumpt. Füge den ersten Eintrag mit + hinzu.</string>
+    <string name="pumping_log_title">Abpumpen erfassen</string>
+    <string name="pumping_edit_title">Abpumpen bearbeiten</string>
+    <string name="pumping_add">Abpumpen hinzufügen</string>
+    <string name="pumping_stash">Milchvorrat</string>
+    <string name="pumping_stash_empty">Zurzeit ist nichts eingelagert.</string>
+    <string name="pumping_today">Heute abgepumpt: %1$s</string>
+    <string name="field_storage">Wohin kommt sie?</string>
+    <string name="storage_fridge">Kühlschrank</string>
+    <string name="storage_freezer">Gefrierfach</string>
+    <string name="storage_room">Zimmertemp.</string>
+    <string name="storage_used">Verbraucht</string>
+    <string name="pumping_guidance">Richtwert: etwa 4 Stunden bei Zimmertemperatur, 4 Tage im Kühlschrank, 6 Monate im Gefrierfach.</string>
+    <string name="pumping_keeps_until">Haltbar bis %1$s</string>
+    <string name="pumping_past_keep">Haltbarkeit überschritten</string>
     <string name="screen_growth">Wachstum</string>
     <string name="growth_empty">Noch keine Messungen eingetragen.</string>
     <string name="growth_log_title">Messung eintragen</string>

@@ -197,6 +197,25 @@
     <string name="stool_color_black">Black</string>
     <string name="stool_color_red">Red</string>
 
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Pumping</string>
+    <string name="quick_pumping">🥛  Pumping</string>
+    <string name="pumping_empty">No pumping logged yet. Add your first with the + button.</string>
+    <string name="pumping_log_title">Log a pumping</string>
+    <string name="pumping_edit_title">Edit pumping</string>
+    <string name="pumping_add">Add pumping</string>
+    <string name="pumping_stash">Milk stash</string>
+    <string name="pumping_stash_empty">Nothing stored right now.</string>
+    <string name="pumping_today">Pumped today: %1$s</string>
+    <string name="field_storage">Where does it go?</string>
+    <string name="storage_fridge">Fridge</string>
+    <string name="storage_freezer">Freezer</string>
+    <string name="storage_room">Room temp</string>
+    <string name="storage_used">Used</string>
+    <string name="pumping_guidance">Rough guide: about 4 hours at room temperature, 4 days in the fridge, 6 months in the freezer.</string>
+    <string name="pumping_keeps_until">Keeps until %1$s</string>
+    <string name="pumping_past_keep">Past its keep-by date</string>
+
     <!-- Growth -->
     <string name="screen_growth">Growth</string>
     <string name="growth_empty">No measurements logged yet.</string>

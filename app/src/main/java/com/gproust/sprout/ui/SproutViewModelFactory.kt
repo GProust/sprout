@@ -16,6 +16,7 @@ import com.gproust.sprout.ui.growth.GrowthViewModel
 import com.gproust.sprout.ui.health.HealthViewModel
 import com.gproust.sprout.ui.home.HomeViewModel
 import com.gproust.sprout.ui.profile.ProfileViewModel
+import com.gproust.sprout.ui.pumping.PumpingViewModel
 import com.gproust.sprout.ui.sleep.SleepViewModel
 import com.gproust.sprout.ui.startup.StartupViewModel
 import com.gproust.sprout.ui.treatments.TreatmentsViewModel
@@ -39,6 +40,7 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(DiaperViewModel::class.java) -> DiaperViewModel(repository)
             modelClass.isAssignableFrom(GrowthViewModel::class.java) -> GrowthViewModel(repository)
             modelClass.isAssignableFrom(HealthViewModel::class.java) -> HealthViewModel(repository)
+            modelClass.isAssignableFrom(PumpingViewModel::class.java) -> PumpingViewModel(repository)
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository, context)
             modelClass.isAssignableFrom(TreatmentsViewModel::class.java) -> TreatmentsViewModel(repository, context)
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

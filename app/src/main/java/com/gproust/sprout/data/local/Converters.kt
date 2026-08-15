@@ -17,6 +17,12 @@ class Converters {
     fun stringToBreastSide(value: String?): BreastSide? = value?.let { BreastSide.valueOf(it) }
 
     @TypeConverter
+    fun milkStorageToString(value: MilkStorage?): String? = value?.name
+
+    @TypeConverter
+    fun stringToMilkStorage(value: String?): MilkStorage? = value?.let { MilkStorage.valueOf(it) }
+
+    @TypeConverter
     fun stoolColorToString(value: StoolColor?): String? = value?.name
 
     @TypeConverter
