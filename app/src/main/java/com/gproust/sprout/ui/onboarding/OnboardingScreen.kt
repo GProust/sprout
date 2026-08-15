@@ -47,6 +47,7 @@ fun OnboardingScreen(
         deliveryType: DeliveryType?,
         babyName: String,
         birthDate: Long,
+        trackWellbeing: Boolean,
     ) -> Unit,
 ) {
     var step by remember { mutableIntStateOf(0) }
@@ -56,6 +57,7 @@ fun OnboardingScreen(
     var gaveBirth by remember { mutableStateOf(false) }
     var breastfeeding by remember { mutableStateOf(false) }
     var deliveryType by remember { mutableStateOf<DeliveryType?>(null) }
+    var trackWellbeing by remember { mutableStateOf(true) }
 
     Box(Modifier.fillMaxSize().padding(24.dp)) {
         Column(
@@ -68,6 +70,8 @@ fun OnboardingScreen(
                 1 -> AboutYouStep(
                     name = name,
                     onName = { name = it },
+                    trackWellbeing = trackWellbeing,
+                    onTrackWellbeing = { trackWellbeing = it },
                     onBack = { step = 0 },
                     onNext = { step = 2 },
                 )
@@ -81,6 +85,7 @@ fun OnboardingScreen(
                 )
                 else -> CareStep(
                     babyName = babyName,
+                    trackWellbeing = trackWellbeing,
                     gaveBirth = gaveBirth,
                     onGaveBirth = { gaveBirth = it },
                     deliveryType = deliveryType,
@@ -96,6 +101,7 @@ fun OnboardingScreen(
                             if (gaveBirth) deliveryType else null,
                             babyName,
                             birthDate,
+                            trackWellbeing,
                         )
                     },
                 )
@@ -130,6 +136,8 @@ private fun WelcomeStep(onNext: () -> Unit) {
 private fun AboutYouStep(
     name: String,
     onName: (String) -> Unit,
+    trackWellbeing: Boolean,
+    onTrackWellbeing: (Boolean) -> Unit,
     onBack: () -> Unit,
     onNext: () -> Unit,
 ) {
@@ -152,6 +160,16 @@ private fun AboutYouStep(
         label = { Text(stringResource(R.string.onboarding_your_name)) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
+    )
+    // Asked here, with the name, because both are about the parent rather than
+    // the baby — and because a parent who doesn't want the check-in should be
+    // able to say so before Sprout starts offering it, not after.
+    Spacer(Modifier.height(8.dp))
+    ToggleRow(
+        label = stringResource(R.string.onboarding_checkin_q),
+        help = stringResource(R.string.onboarding_checkin_help),
+        checked = trackWellbeing,
+        onChecked = onTrackWellbeing,
     )
     Spacer(Modifier.height(32.dp))
     StepButtons(
@@ -205,6 +223,7 @@ private fun BabyStep(
 @Composable
 private fun CareStep(
     babyName: String,
+    trackWellbeing: Boolean,
     gaveBirth: Boolean,
     onGaveBirth: (Boolean) -> Unit,
     deliveryType: DeliveryType?,
@@ -223,8 +242,16 @@ private fun CareStep(
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
+    // Without the check-in these answers still have a job: they decide which
+    // body questions the wellbeing entries offer. Say that instead of promising
+    // a daily check-in the parent just turned down.
+    val subtitle = if (trackWellbeing) {
+        R.string.onboarding_care_subtitle
+    } else {
+        R.string.onboarding_care_subtitle_no_checkin
+    }
     Text(
-        stringResource(R.string.onboarding_care_subtitle),
+        stringResource(subtitle),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,

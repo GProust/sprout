@@ -87,11 +87,14 @@
     <string name="onboarding_about_title">A little about you</string>
     <string name="onboarding_about_subtitle">So we can greet you properly each day.</string>
     <string name="onboarding_your_name">Your name</string>
+    <string name="onboarding_checkin_q">Would you like a daily check-in?</string>
+    <string name="onboarding_checkin_help">A card on your dashboard for how you\'re doing — never a notification. You can change this anytime in Settings.</string>
     <string name="onboarding_baby_title">Your little one</string>
     <string name="onboarding_baby_subtitle">You can always change this later in the profile.</string>
     <string name="onboarding_default_baby">your baby</string>
     <string name="onboarding_care_title">Caring for %1$s</string>
     <string name="onboarding_care_subtitle">This just tailors your daily check-in. Everything is optional.</string>
+    <string name="onboarding_care_subtitle_no_checkin">This just tailors the wellbeing entries you add yourself. Everything is optional.</string>
     <string name="onboarding_gave_birth_q">Did you give birth to %1$s?</string>
     <string name="onboarding_gave_birth_help">Adds gentle questions about your healing and bleeding.</string>
     <string name="onboarding_birth_how">How was the birth?</string>

@@ -34,6 +34,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         deliveryType: DeliveryType?,
         babyName: String,
         birthDate: Long,
+        trackWellbeing: Boolean,
     ) {
         viewModelScope.launch {
             val babyId = if (babyName.isNotBlank()) {
@@ -50,6 +51,7 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
                     deliveryType = if (gaveBirth) deliveryType else null,
                     lastCheckIn = null,
                     activeBabyId = babyId,
+                    trackWellbeing = trackWellbeing,
                 ),
             )
         }

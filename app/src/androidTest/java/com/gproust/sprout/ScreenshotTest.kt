@@ -269,7 +269,7 @@ class ScreenshotTest {
         rule.setContent { SproutTheme { slot.value() } }
 
         // Onboarding — step through the whole flow.
-        show { OnboardingScreen { _, _, _, _, _, _ -> } }
+        show { OnboardingScreen { _, _, _, _, _, _, _ -> } }
         save("01-onboarding-1-welcome")
         tap("Get started")
         save("01-onboarding-2-about-you")

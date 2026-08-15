@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 💚 **The daily check-in is now a choice from the first launch.** The setup
+  step that asks what to call you also asks whether you'd like it: a card on
+  your dashboard for how you're doing, never a notification. Turn it down and
+  Sprout never offers it — no card, no wellbeing shortcut — instead of showing
+  it until you find the switch in Settings, where it stays if you change your
+  mind. The next step still asks about giving birth and breastfeeding, since
+  those also shape the wellbeing entries you add yourself.
+
 ## [1.5.0] — 2026-08-15
 
 - 🥛 **Expressed milk now has a place of its own.** Pumping gets its own screen

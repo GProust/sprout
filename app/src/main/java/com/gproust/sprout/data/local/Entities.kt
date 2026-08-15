@@ -229,10 +229,11 @@ data class ParentProfileEntity(
     @ColumnInfo(defaultValue = "1") val askBleeding: Boolean = true,
     @ColumnInfo(defaultValue = "1") val askBreasts: Boolean = true,
     /**
-     * Whether the parent tracks their own wellbeing at all. When false, the
-     * dashboard stops offering the daily check-in and drops the wellbeing
-     * shortcut — nothing is deleted, and turning it back on in Settings brings
-     * the history back with it.
+     * Whether the parent tracks their own wellbeing at all. Chosen during
+     * onboarding, alongside their name, and changeable in Settings. When false,
+     * the dashboard stops offering the daily check-in and drops the wellbeing
+     * shortcut — nothing is deleted, and turning it back on brings the history
+     * back with it.
      */
     @ColumnInfo(defaultValue = "1") val trackWellbeing: Boolean = true,
     /** Epoch millis of the last completed/dismissed daily check-in. */
