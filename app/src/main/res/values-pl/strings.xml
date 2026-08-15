@@ -6,6 +6,7 @@
     <string name="action_cancel">Anuluj</string>
     <string name="action_save">Zapisz</string>
     <string name="action_details">Szczegóły</string>
+    <string name="action_undo">Cofnij</string>
     <string name="history">Historia</string>
     <string name="day_today">Dziś</string>
     <string name="day_yesterday">Wczoraj</string>
@@ -163,6 +164,27 @@
     <string name="stool_color_white">Biały / odbarwiony</string>
     <string name="stool_color_black">Czarny</string>
     <string name="stool_color_red">Czerwony</string>
+
+    <!-- Pumping (expressed milk) -->
+    <string name="screen_pumping">Odciąganie</string>
+    <string name="quick_pumping">🥛  Odciąganie</string>
+    <string name="pumping_empty">Nie zapisano jeszcze żadnego odciągania. Dodaj pierwsze przyciskiem +.</string>
+    <string name="pumping_log_title">Zapisz odciąganie</string>
+    <string name="pumping_edit_title">Edytuj odciąganie</string>
+    <string name="pumping_add">Dodaj odciąganie</string>
+    <string name="pumping_stash">Zapas mleka</string>
+    <string name="pumping_stash_empty">Na razie nic nie jest przechowywane.</string>
+    <string name="pumping_today">Odciągnięte dzisiaj: %1$s</string>
+    <string name="field_storage">Gdzie trafia?</string>
+    <string name="storage_fridge">Lodówka</string>
+    <string name="storage_freezer">Zamrażarka</string>
+    <string name="storage_room">Temp. pokojowa</string>
+    <string name="storage_used">Zużyte</string>
+    <string name="pumping_guidance">Orientacyjnie: około 4 godzin w temperaturze pokojowej, 4 dni w lodówce, 6 miesięcy w zamrażarce.</string>
+    <string name="pumping_keeps_until">Zachowuje świeżość do %1$s</string>
+    <string name="pumping_past_keep">Po terminie przechowywania</string>
+    <string name="pumping_mark_used">Oznacz jako zużyte</string>
+    <string name="pumping_marked_used">Oznaczono jako zużyte</string>
     <string name="screen_growth">Wzrost</string>
     <string name="growth_empty">Brak zapisanych pomiarów.</string>
     <string name="growth_log_title">Zapisz pomiar</string>

@@ -101,6 +101,11 @@ fun StatCard(label: String, value: String, icon: ImageVector, modifier: Modifier
     }
 }
 
+/**
+ * One logged entry in a history list. [details] adds an expandable breakdown
+ * under the row; [action] puts a one-tap shortcut next to it (e.g. "Mark as
+ * used"), for the state change that would otherwise mean opening the editor.
+ */
 @Composable
 fun EntryCard(
     title: String,
@@ -111,6 +116,7 @@ fun EntryCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     details: (@Composable () -> Unit)? = null,
+    action: (@Composable () -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val cardModifier = modifier.fillMaxWidth().let {
@@ -151,18 +157,23 @@ fun EntryCard(
                     )
                 }
             }
-            if (details != null) {
-                TextButton(
-                    onClick = { expanded = !expanded },
-                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp),
+            if (details != null || action != null) {
+                Row(
+                    Modifier.padding(start = 8.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.action_details))
-                    Icon(
-                        if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = null,
-                    )
+                    if (details != null) {
+                        TextButton(onClick = { expanded = !expanded }) {
+                            Text(stringResource(R.string.action_details))
+                            Icon(
+                                if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                    if (action != null) action()
                 }
-                if (expanded) {
+                if (details != null && expanded) {
                     Box(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
                         details()
                     }

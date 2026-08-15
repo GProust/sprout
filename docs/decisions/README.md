@@ -30,5 +30,6 @@ ADR log and are cross-linked from here.
 | [0004](0004-default-to-system-language.md) | Default to the device's system language | Product / UX | Accepted |
 | [0005](0005-growth-spurt-guidance.md) | Growth spurt periods: gentle guidance, opt-in alerts | Product / Domain | Accepted |
 | [0006](0006-check-in-waits-on-the-dashboard.md) | The daily check-in waits on the dashboard, and can be stopped | Product / UX | Accepted |
+| [0007](0007-pumping-belongs-to-the-parent.md) | Pumping is the parent's log, and the stash only counts usable milk | Product / Domain | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

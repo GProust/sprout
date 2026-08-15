@@ -1,7 +1,7 @@
 # 🌱 Sprout
 
 A private, **offline-first Android app** for tracking a newborn's first weeks and months —
-feeds, sleep, diapers, growth and medications — while also looking after the parent's own
+feeds, pumping, sleep, diapers, growth and medications — while also looking after the parent's own
 postpartum recovery.
 
 All data stays on the device (Room/SQLite). **No accounts, no cloud, no tracking.** Sprout
@@ -14,6 +14,11 @@ speaks 7 languages and can gently remind you about feeds and treatments.
   delete a baby and all of their logs from the Babies screen.
 - **🍼 Feeding** — breast, bottle (ml) and solids with timestamps, plus a **live breastfeeding
   timer**: start a session, tap to switch sides, and it's saved with the time spent on each side.
+- **🥛 Pumping** — log expressed milk: when, how much, which side, and where it went
+  (fridge, freezer, room temperature — or straight to the baby). A **milk stash** card adds
+  up what's actually available in each place, and each batch shows how long it still keeps
+  (the usual 4 hours / 4 days / 6 months guidance). Once a bottle is drunk, **one tap marks
+  it used** — with an undo, in case of a mistap.
 - **😴 Sleep** — log naps and nights with start/end times and automatic durations.
 - **🧷 Diapers** — wet / dirty / mixed changes.
 - **📏 Growth** — weight, height and head circumference, with a weight-trend chart.
@@ -66,7 +71,7 @@ app/src/main/java/com/gproust/sprout/
     ├── theme/        # Material 3 theme
     ├── navigation/   # NavHost + bottom navigation
     ├── onboarding/  startup/  checkin/   # First-run + daily check-in flow
-    ├── home/  feeding/  sleep/  diaper/  growth/  treatments/
+    ├── home/  feeding/  pumping/  sleep/  diaper/  growth/  treatments/
     ├── health/       # Parent wellbeing
     ├── profile/      # Babies manager
     └── settings/     # Language picker
