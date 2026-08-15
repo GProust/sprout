@@ -44,16 +44,6 @@ jobs:
         # UI-relevant: app code/resources and Gradle build files, except JVM
         # unit tests (app/src/test/**), which can't change what is rendered.
         run: |
-          # Don't re-capture on our own screenshot commit. That commit used to
-          # carry [skip ci], which also robbed the PR head of a CI check; the
-          # marker is gone so ci.yml runs, and this guard is what stops the
-          # capture -> commit -> capture loop instead.
-          HEAD_MSG=$(gh api "repos/${{ github.repository }}/commits/${{ github.event.pull_request.head.sha }}" --jq '.commit.message' | head -1)
-          if [ "$HEAD_MSG" = "ci: update UI screenshots" ]; then
-            echo "Head commit is this workflow's own screenshot commit — not re-capturing."
-            echo "ui=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           CHANGED=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename')
           printf 'Changed files:\n%s\n' "$CHANGED"
           if printf '%s\n' "$CHANGED" | grep -v '^app/src/test/' | grep -qE '^(app/|gradle/|(build|settings)\.gradle\.kts$|gradle\.properties$)'; then
@@ -96,11 +86,10 @@ jobs:
       # A file is treated as changed when more than this share of its pixels
       # differ (after DIFF_FUZZ absorbs antialiasing/GPU colour jitter).
       #
-      # Measured on a back-to-back run with the clock pinned: 23 of 35 captures
-      # came out at exactly 0.0000% — including the dashboard, which renders a
-      # relative "time since last feed" and used to change on every run. The
-      # remaining 12 are the scrolling history screens (feeding, sleep, diaper,
-      # growth) at 0.07%-0.66%.
+      # Measured once the committed baseline was itself captured with the clock
+      # pinned: 32 of 35 captures came out byte-identical — including the
+      # dashboard, which renders a relative "time since last feed" and used to
+      # change on every run. The 3 that still move differ by a byte or six.
       #
       # Resist raising this to swallow that 0.66%: a changed word in a list row
       # is itself well under 1% of the screen, so a threshold loose enough to
@@ -219,7 +208,14 @@ jobs:
             echo "No screenshot changes to commit."
           else
             branch="${{ github.head_ref || github.ref_name }}"
-            git commit -m "ci: update UI screenshots"
+            # [skip ci] keeps this PNG-only commit from starting another round of
+            # workflows — including this one, which would otherwise capture,
+            # commit and capture again. It does mean the PR head carries no CI
+            # check, but the parent commit has already been checked and this one
+            # only changes images. Dropping the marker was tried and made things
+            # worse: the run is then created but parked in `action_required`, so
+            # the head still has no check and the PR reads `unstable`.
+            git commit -m "ci: update UI screenshots [skip ci]"
             # The branch can have moved since checkout (a push during the ~15
             # minutes the emulator takes, or a manual run racing a PR run).
             # This commit only touches PNGs, so replaying it on top is safe and
