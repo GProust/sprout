@@ -9,6 +9,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
     <string name="action_details">Details</string>
+    <string name="action_undo">Undo</string>
     <string name="history">History</string>
     <string name="day_today">Today</string>
     <string name="day_yesterday">Yesterday</string>
@@ -215,6 +216,8 @@
     <string name="pumping_guidance">Rough guide: about 4 hours at room temperature, 4 days in the fridge, 6 months in the freezer.</string>
     <string name="pumping_keeps_until">Keeps until %1$s</string>
     <string name="pumping_past_keep">Past its keep-by date</string>
+    <string name="pumping_mark_used">Mark as used</string>
+    <string name="pumping_marked_used">Marked as used</string>
 
     <!-- Growth -->
     <string name="screen_growth">Growth</string>

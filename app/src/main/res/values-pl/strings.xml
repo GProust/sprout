@@ -6,6 +6,7 @@
     <string name="action_cancel">Anuluj</string>
     <string name="action_save">Zapisz</string>
     <string name="action_details">Szczegóły</string>
+    <string name="action_undo">Cofnij</string>
     <string name="history">Historia</string>
     <string name="day_today">Dziś</string>
     <string name="day_yesterday">Wczoraj</string>
@@ -182,6 +183,8 @@
     <string name="pumping_guidance">Orientacyjnie: około 4 godzin w temperaturze pokojowej, 4 dni w lodówce, 6 miesięcy w zamrażarce.</string>
     <string name="pumping_keeps_until">Zachowuje świeżość do %1$s</string>
     <string name="pumping_past_keep">Po terminie przechowywania</string>
+    <string name="pumping_mark_used">Oznacz jako zużyte</string>
+    <string name="pumping_marked_used">Oznaczono jako zużyte</string>
     <string name="screen_growth">Wzrost</string>
     <string name="growth_empty">Brak zapisanych pomiarów.</string>
     <string name="growth_log_title">Zapisz pomiar</string>

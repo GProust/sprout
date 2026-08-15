@@ -6,6 +6,7 @@
     <string name="action_cancel">Annulla</string>
     <string name="action_save">Salva</string>
     <string name="action_details">Dettagli</string>
+    <string name="action_undo">Annulla</string>
     <string name="history">Cronologia</string>
     <string name="day_today">Oggi</string>
     <string name="day_yesterday">Ieri</string>
@@ -176,6 +177,8 @@
     <string name="pumping_guidance">Indicazione di massima: circa 4 ore a temperatura ambiente, 4 giorni in frigo, 6 mesi in congelatore.</string>
     <string name="pumping_keeps_until">Si conserva fino al %1$s</string>
     <string name="pumping_past_keep">Oltre la data di conservazione</string>
+    <string name="pumping_mark_used">Segna come usato</string>
+    <string name="pumping_marked_used">Segnato come usato</string>
     <string name="screen_growth">Crescita</string>
     <string name="growth_empty">Nessuna misurazione registrata finora.</string>
     <string name="growth_log_title">Registra una misurazione</string>

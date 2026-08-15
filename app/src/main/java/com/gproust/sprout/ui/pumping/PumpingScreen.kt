@@ -10,19 +10,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -78,9 +87,10 @@ class PumpingViewModel(private val repository: SproutRepository) : ViewModel() {
 
 /**
  * Expressed milk: what is in the stash right now, on top of the history of
- * every pumping session (newest first, grouped by day). Tapping an entry
- * re-opens it — that's how a bottle moves from the fridge to the freezer, or
- * gets marked as used once the baby has drunk it.
+ * every pumping session (newest first, grouped by day). A stored batch is one
+ * tap from being marked used once the baby has drunk it; tapping the entry
+ * itself re-opens it, which is how a bottle moves from the fridge to the
+ * freezer or gets corrected.
  */
 @Composable
 fun PumpingScreen(onBack: () -> Unit) {
@@ -93,6 +103,27 @@ fun PumpingScreen(onBack: () -> Unit) {
     var editing by remember { mutableStateOf<PumpingEntity?>(null) }
     // The entry awaiting a "yes, delete it" — deletes are permanent.
     var deleting by remember { mutableStateOf<PumpingEntity?>(null) }
+
+    // Giving a bottle is the most common thing to do to a stored batch, so it
+    // is one tap from the list rather than a trip through the editor. Nothing
+    // is lost either way: the entry keeps its amount and time, only its place
+    // changes — and the snackbar puts it back where it was, mistap or not.
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val markedMessage = stringResource(R.string.pumping_marked_used)
+    val undoLabel = stringResource(R.string.action_undo)
+    fun markUsed(entry: PumpingEntity) {
+        vm.add(entry.copy(storage = MilkStorage.USED))
+        scope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = markedMessage,
+                actionLabel = undoLabel,
+                withDismissAction = false,
+                duration = SnackbarDuration.Short,
+            )
+            if (result == SnackbarResult.ActionPerformed) vm.add(entry)
+        }
+    }
 
     if (adding) {
         AddEntrySheet(
@@ -131,6 +162,7 @@ fun PumpingScreen(onBack: () -> Unit) {
 
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.screen_pumping), onBack = onBack) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.pumping_log_title)) { adding = true }
         },
@@ -154,10 +186,30 @@ fun PumpingScreen(onBack: () -> Unit) {
                         icon = Icons.Filled.WaterDrop,
                         onDelete = { deleting = entry },
                         onClick = { editing = entry },
+                        // Only milk that is still somewhere can be drunk.
+                        action = if (entry.storage != MilkStorage.USED) {
+                            { MarkUsedButton(onClick = { markUsed(entry) }) }
+                        } else {
+                            null
+                        },
                     )
                 }
             }
         }
+    }
+}
+
+/** The one-tap "the baby drank it" shortcut on a stored batch's card. */
+@Composable
+private fun MarkUsedButton(onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
+        Icon(
+            Icons.Filled.Check,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(R.string.pumping_mark_used))
     }
 }
 

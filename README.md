@@ -17,7 +17,8 @@ speaks 7 languages and can gently remind you about feeds and treatments.
 - **🥛 Pumping** — log expressed milk: when, how much, which side, and where it went
   (fridge, freezer, room temperature — or straight to the baby). A **milk stash** card adds
   up what's actually available in each place, and each batch shows how long it still keeps
-  (the usual 4 hours / 4 days / 6 months guidance).
+  (the usual 4 hours / 4 days / 6 months guidance). Once a bottle is drunk, **one tap marks
+  it used** — with an undo, in case of a mistap.
 - **😴 Sleep** — log naps and nights with start/end times and automatic durations.
 - **🧷 Diapers** — wet / dirty / mixed changes.
 - **📏 Growth** — weight, height and head circumference, with a weight-trend chart.

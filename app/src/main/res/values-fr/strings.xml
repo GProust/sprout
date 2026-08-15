@@ -8,6 +8,7 @@
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Enregistrer</string>
     <string name="action_details">Détails</string>
+    <string name="action_undo">Annuler</string>
     <string name="history">Historique</string>
     <string name="day_today">Aujourd\'hui</string>
     <string name="day_yesterday">Hier</string>
@@ -207,10 +208,12 @@
     <string name="storage_fridge">Frigo</string>
     <string name="storage_freezer">Congélateur</string>
     <string name="storage_room">Ambiante</string>
-    <string name="storage_used">Utilisé</string>
+    <string name="storage_used">Consommé</string>
     <string name="pumping_guidance">Repère : environ 4 heures à température ambiante, 4 jours au frigo, 6 mois au congélateur.</string>
     <string name="pumping_keeps_until">Se conserve jusqu\'au %1$s</string>
     <string name="pumping_past_keep">Date de conservation dépassée</string>
+    <string name="pumping_mark_used">Marquer consommé</string>
+    <string name="pumping_marked_used">Marqué comme consommé</string>
 
     <!-- Growth -->
     <string name="screen_growth">Croissance</string>

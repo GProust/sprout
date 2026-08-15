@@ -6,6 +6,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
     <string name="action_details">Detalles</string>
+    <string name="action_undo">Deshacer</string>
     <string name="history">Historial</string>
     <string name="day_today">Hoy</string>
     <string name="day_yesterday">Ayer</string>
@@ -176,6 +177,8 @@
     <string name="pumping_guidance">Orientación: unas 4 horas a temperatura ambiente, 4 días en la nevera, 6 meses en el congelador.</string>
     <string name="pumping_keeps_until">Se conserva hasta el %1$s</string>
     <string name="pumping_past_keep">Fuera de su fecha de conservación</string>
+    <string name="pumping_mark_used">Marcar como usada</string>
+    <string name="pumping_marked_used">Marcada como usada</string>
     <string name="screen_growth">Crecimiento</string>
     <string name="growth_empty">Aún no hay medidas registradas.</string>
     <string name="growth_log_title">Registrar una medida</string>

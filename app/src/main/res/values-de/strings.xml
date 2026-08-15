@@ -6,6 +6,7 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_save">Speichern</string>
     <string name="action_details">Details</string>
+    <string name="action_undo">Rückgängig</string>
     <string name="history">Verlauf</string>
     <string name="day_today">Heute</string>
     <string name="day_yesterday">Gestern</string>
@@ -176,6 +177,8 @@
     <string name="pumping_guidance">Richtwert: etwa 4 Stunden bei Zimmertemperatur, 4 Tage im Kühlschrank, 6 Monate im Gefrierfach.</string>
     <string name="pumping_keeps_until">Haltbar bis %1$s</string>
     <string name="pumping_past_keep">Haltbarkeit überschritten</string>
+    <string name="pumping_mark_used">Als verbraucht markieren</string>
+    <string name="pumping_marked_used">Als verbraucht markiert</string>
     <string name="screen_growth">Wachstum</string>
     <string name="growth_empty">Noch keine Messungen eingetragen.</string>
     <string name="growth_log_title">Messung eintragen</string>

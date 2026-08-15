@@ -46,7 +46,13 @@ fridge for a week.
 - Storage is `FRIDGE`, `FREEZER`, `ROOM` or `USED`. `USED` is the milk that never
   went into storage or has since been drunk or discarded — kept in the history,
   out of the stash. Re-opening an entry is how a bottle moves from fridge to
-  freezer, or becomes used.
+  freezer, or gets corrected.
+- **Marking a batch used is one tap from the list**, not a trip through the
+  editor: it is the thing a parent does to the stash several times a day, and it
+  should cost less than logging the feed it goes with. It is *not* confirmed
+  first — a confirmation on a routine action trains people to tap through it —
+  but the snackbar offers an **undo** that puts the batch back exactly where it
+  was, which a confirmation dialog could not do for a tap noticed a second late.
 - Totals **leave out used milk, and milk kept past its storage guidance** — the
   widely published "about 4 hours at room temperature, 4 days in the fridge,
   6 months in the freezer" figures (CDC; Santé publique France gives the same).
