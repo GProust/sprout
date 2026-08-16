@@ -365,4 +365,54 @@
     <string name="widget_diagnostics_force_refresh">Forzar actualización</string>
     <string name="widget_diagnostics_clear">Borrar historial</string>
     <string name="widget_error">Error del widget: consulta Ajustes → Diagnóstico del widget</string>
+
+    <!-- Sincronización entre madres/padres (ADR-0007 fase 1) -->
+    <string name="screen_sync">Compartir con la otra persona</string>
+    <string name="settings_sharing">Compartir</string>
+    <string name="settings_sync_hint">Comparte el registro del bebé con la otra madre o el otro padre: sin cuenta y sin nube.</string>
+    <string name="sync_intro_title">Dos teléfonos, un solo registro</string>
+    <string name="sync_intro_body">Envía una invitación. Cuando los dos teléfonos estén vinculados, cada uno puede enviar sus entradas y Sprout las combina: sin cuenta, sin servidor y sin que nada se guarde en ningún sitio que no sean vuestros dos teléfonos.</string>
+    <string name="sync_invite">Invitar a la otra persona</string>
+    <string name="sync_open_invitation">Abrir una invitación recibida</string>
+    <string name="sync_channel_warning">La invitación lleva la clave de vuestro registro. Envíala por un canal privado —una app de mensajería, Quick Share, Bluetooth— y nunca por un sitio público.</string>
+    <string name="sync_code_title">Vuestro código de vinculación</string>
+    <string name="sync_code_hint">Los dos teléfonos muestran los mismos seis caracteres. Leedlos en voz alta una vez: si no coinciden, no estáis vinculados entre vosotros.</string>
+    <string name="sync_send">Enviar mis entradas</string>
+    <string name="sync_receive">Abrir un archivo recibido</string>
+    <string name="sync_exchange_hint">Enviad en ambos sentidos para poner al día los dos teléfonos. Abrir el mismo archivo dos veces no cambia nada.</string>
+    <string name="sync_stash_title">Compartir la leche extraída</string>
+    <string name="sync_stash_desc">Tu registro de extracciones y la reserva de leche. Todo lo que tiene que ver con el bebé se comparte igualmente.</string>
+    <string name="sync_stash_off_note">Desactivarlo detiene los envíos futuros. Lo que ya enviaste se queda en el otro teléfono.</string>
+    <string name="sync_invite_again">Volver a enviar la invitación</string>
+    <string name="sync_unpair">Desvincular</string>
+    <string name="sync_unpair_confirm">Este teléfono dejará de enviar y de abrir archivos de esta vinculación. Todo lo que ya está guardado aquí se mantiene.</string>
+    <string name="sync_share_invitation_subject">Invitación de Sprout</string>
+    <string name="sync_share_data_subject">Entradas de Sprout</string>
+    <string name="sync_paired_title">Vinculados</string>
+    <string name="sync_paired_body">Vuestro código de vinculación es %1$s. Comprueba que el otro teléfono muestra el mismo.</string>
+    <string name="sync_paired_body_named">Vinculado con %1$s. Vuestro código de vinculación es %2$s: comprueba que el otro teléfono muestra el mismo.</string>
+    <string name="sync_merged_title">Combinado</string>
+    <string name="sync_merged_nothing_new">Nada nuevo: los dos teléfonos ya coincidían.</string>
+    <plurals name="sync_merged_added">
+        <item quantity="one">%d entrada añadida</item>
+        <item quantity="other">%d entradas añadidas</item>
+    </plurals>
+    <plurals name="sync_merged_updated">
+        <item quantity="one">%d entrada actualizada</item>
+        <item quantity="other">%d entradas actualizadas</item>
+    </plurals>
+    <plurals name="sync_merged_deleted">
+        <item quantity="one">%d entrada eliminada</item>
+        <item quantity="other">%d entradas eliminadas</item>
+    </plurals>
+    <string name="sync_failed_title">No se combinó nada</string>
+    <string name="sync_error_not_paired">Vincula primero el teléfono de la otra persona.</string>
+    <string name="sync_error_unreadable">Este archivo no es una invitación ni una exportación de Sprout.</string>
+    <string name="sync_error_wrong_phone">Este archivo no lo envió el teléfono con el que estás vinculado, o se dañó por el camino.</string>
+    <string name="sync_error_too_new">Este archivo se escribió con una versión más nueva de Sprout. Actualiza la aplicación e inténtalo de nuevo.</string>
+    <string name="sync_error_invitation_expired">Esta invitación ha caducado. Pide una nueva.</string>
+    <string name="sync_histories_title">Los dos tenéis ya entradas</string>
+    <string name="sync_histories_body">Cada uno ha estado registrando antes de vincularse, y Sprout no puede saber qué entradas son el mismo momento. ¿Conservarlo todo —lo que hayáis anotado los dos aparecerá duplicado— o compartir solo a partir de ahora?</string>
+    <string name="sync_histories_keep_all">Conservarlo todo</string>
+    <string name="sync_histories_from_pairing">A partir de ahora</string>
 </resources>

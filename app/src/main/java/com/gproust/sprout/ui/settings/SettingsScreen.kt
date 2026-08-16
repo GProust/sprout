@@ -72,7 +72,11 @@ private data class LanguageChoice(
 // onBack stays last so `SettingsScreen {}` keeps reading like its siblings
 // (ProfileScreen, TreatmentsScreen); the diagnostics hop defaults to a no-op
 // for previews and screenshot captures, which only render the screen.
-fun SettingsScreen(onOpenWidgetDiagnostics: () -> Unit = {}, onBack: () -> Unit) {
+fun SettingsScreen(
+    onOpenWidgetDiagnostics: () -> Unit = {},
+    onOpenSync: () -> Unit = {},
+    onBack: () -> Unit,
+) {
     val context = LocalContext.current
     val current = AppLocale.currentTag(context)
 
@@ -222,7 +226,36 @@ fun SettingsScreen(onOpenWidgetDiagnostics: () -> Unit = {}, onBack: () -> Unit)
             }
 
             item { Spacer(Modifier.height(24.dp)) }
+            item { SharingSection(onOpenSync = onOpenSync) }
+
+            item { Spacer(Modifier.height(24.dp)) }
             item { TroubleshootingSection(onOpenWidgetDiagnostics = onOpenWidgetDiagnostics) }
+        }
+    }
+}
+
+/** The way in to sharing a baby's record with the other parent. */
+@Composable
+private fun SharingSection(onOpenSync: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_sharing),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onOpenSync).padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.screen_sync))
+                Text(
+                    stringResource(R.string.settings_sync_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
         }
     }
 }

@@ -4,6 +4,8 @@ import android.app.Application
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SproutDatabase
 import com.gproust.sprout.data.sync.DeviceIdentity
+import com.gproust.sprout.data.sync.PairingStore
+import com.gproust.sprout.data.sync.SyncEngine
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.notifications.TreatmentReminders
@@ -23,6 +25,12 @@ class SproutApplication : Application() {
             updateSproutWidget(this)
         }
     }
+
+    /** Builds and merges replicas for partner sync (ADR-0007). */
+    val syncEngine: SyncEngine by lazy { SyncEngine(SproutDatabase.getInstance(this)) }
+
+    /** Who this phone is paired with, and on what terms (ADR-0008). */
+    val pairingStore: PairingStore by lazy { PairingStore(this) }
 
     override fun onCreate() {
         super.onCreate()

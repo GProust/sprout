@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the FileProvider is allowed to hand out. Only the one cache directory
+  Sprout stages sync files in — never the database, and never the rest of the
+  app's storage.
+-->
+<paths>
+    <cache-path name="sync" path="sync/" />
+</paths>

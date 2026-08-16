@@ -365,4 +365,54 @@
     <string name="widget_diagnostics_force_refresh">Aktualisierung erzwingen</string>
     <string name="widget_diagnostics_clear">Verlauf löschen</string>
     <string name="widget_error">Widget-Fehler – siehe Einstellungen → Widget-Diagnose</string>
+
+    <!-- Partner-Synchronisierung (ADR-0007 Phase 1) -->
+    <string name="screen_sync">Partner-Abgleich</string>
+    <string name="settings_sharing">Teilen</string>
+    <string name="settings_sync_hint">Teile die Aufzeichnungen des Babys mit dem anderen Elternteil — ohne Konto, ohne Cloud.</string>
+    <string name="sync_intro_title">Zwei Handys, eine Aufzeichnung</string>
+    <string name="sync_intro_body">Lade den anderen Elternteil ein. Sobald die Handys gekoppelt sind, kann jeder seine Einträge hinüberschicken und Sprout führt sie zusammen — ohne Konto, ohne Server, und nichts liegt irgendwo außer auf euren beiden Handys.</string>
+    <string name="sync_invite">Anderen Elternteil einladen</string>
+    <string name="sync_open_invitation">Erhaltene Einladung öffnen</string>
+    <string name="sync_channel_warning">Die Einladung enthält den Schlüssel zu euren Aufzeichnungen. Schick sie über etwas Privates — einen Messenger, Quick Share, Bluetooth — und nicht über etwas Öffentliches.</string>
+    <string name="sync_code_title">Euer Kopplungscode</string>
+    <string name="sync_code_hint">Beide Handys zeigen dieselben sechs Zeichen. Lest sie euch einmal vor: Wenn sie sich unterscheiden, seid ihr nicht miteinander gekoppelt.</string>
+    <string name="sync_send">Meine Einträge senden</string>
+    <string name="sync_receive">Erhaltene Datei öffnen</string>
+    <string name="sync_exchange_hint">Sendet in beide Richtungen, damit beide Handys aktuell sind. Dieselbe Datei zweimal zu öffnen ändert nichts.</string>
+    <string name="sync_stash_title">Abgepumpte Milch teilen</string>
+    <string name="sync_stash_desc">Dein Abpump-Protokoll und der Milchvorrat. Alles rund ums Baby wird ohnehin geteilt.</string>
+    <string name="sync_stash_off_note">Ausschalten stoppt künftige Sendungen. Was du bereits gesendet hast, bleibt auf dem anderen Handy.</string>
+    <string name="sync_invite_again">Einladung erneut senden</string>
+    <string name="sync_unpair">Kopplung aufheben</string>
+    <string name="sync_unpair_confirm">Dieses Handy sendet und öffnet keine Dateien mehr für diese Kopplung. Alles, was hier gespeichert ist, bleibt erhalten.</string>
+    <string name="sync_share_invitation_subject">Sprout-Einladung</string>
+    <string name="sync_share_data_subject">Sprout-Einträge</string>
+    <string name="sync_paired_title">Gekoppelt</string>
+    <string name="sync_paired_body">Euer Kopplungscode ist %1$s. Prüfe, ob das andere Handy denselben zeigt.</string>
+    <string name="sync_paired_body_named">Gekoppelt mit %1$s. Euer Kopplungscode ist %2$s — prüfe, ob das andere Handy denselben zeigt.</string>
+    <string name="sync_merged_title">Zusammengeführt</string>
+    <string name="sync_merged_nothing_new">Nichts Neues — beide Handys waren schon einig.</string>
+    <plurals name="sync_merged_added">
+        <item quantity="one">%d Eintrag hinzugefügt</item>
+        <item quantity="other">%d Einträge hinzugefügt</item>
+    </plurals>
+    <plurals name="sync_merged_updated">
+        <item quantity="one">%d Eintrag aktualisiert</item>
+        <item quantity="other">%d Einträge aktualisiert</item>
+    </plurals>
+    <plurals name="sync_merged_deleted">
+        <item quantity="one">%d Eintrag entfernt</item>
+        <item quantity="other">%d Einträge entfernt</item>
+    </plurals>
+    <string name="sync_failed_title">Nichts wurde zusammengeführt</string>
+    <string name="sync_error_not_paired">Koppelt euch zuerst mit dem Handy des anderen Elternteils.</string>
+    <string name="sync_error_unreadable">Diese Datei ist weder eine Sprout-Einladung noch ein Sprout-Export.</string>
+    <string name="sync_error_wrong_phone">Diese Datei kam nicht von dem Handy, mit dem du gekoppelt bist, oder sie wurde unterwegs beschädigt.</string>
+    <string name="sync_error_too_new">Diese Datei stammt aus einer neueren Version von Sprout. Aktualisiere die App und versuche es erneut.</string>
+    <string name="sync_error_invitation_expired">Diese Einladung ist abgelaufen. Bitte um eine neue.</string>
+    <string name="sync_histories_title">Ihr habt beide schon Einträge</string>
+    <string name="sync_histories_body">Ihr habt beide schon vor der Kopplung aufgezeichnet, und Sprout kann nicht erkennen, welche Einträge denselben Moment meinen. Alles behalten — was ihr beide notiert habt, erscheint dann doppelt — oder erst ab jetzt teilen?</string>
+    <string name="sync_histories_keep_all">Alles behalten</string>
+    <string name="sync_histories_from_pairing">Ab jetzt</string>
 </resources>

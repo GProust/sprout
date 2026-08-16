@@ -2,6 +2,7 @@ package com.gproust.sprout
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
+import com.gproust.sprout.data.sync.SyncFiles
 import com.gproust.sprout.ui.navigation.SproutApp
 import com.gproust.sprout.ui.settings.AppLocale
 import com.gproust.sprout.ui.theme.SproutTheme
@@ -26,6 +28,13 @@ class MainActivity : ComponentActivity() {
     /** Pending navigation request from the launch (or a re-delivered) intent. */
     private var routeRequest by mutableStateOf<String?>(null)
 
+    /**
+     * A Sprout file another app asked us to open — an invitation or a replica.
+     * Held here rather than acted on, because only the sync screen can tell the
+     * two apart or do anything with either.
+     */
+    private var syncFile by mutableStateOf<Uri?>(null)
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLocale.wrap(newBase))
     }
@@ -34,11 +43,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         routeRequest = intent.getStringExtra(EXTRA_ROUTE)
+        syncFile = SyncFiles.incomingUri(intent)
         setContent {
             SproutTheme {
                 SproutApp(
                     routeRequest = routeRequest,
                     onRouteConsumed = { routeRequest = null },
+                    syncFile = syncFile,
+                    onSyncFileConsumed = { syncFile = null },
                 )
             }
         }
@@ -60,5 +72,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.getStringExtra(EXTRA_ROUTE)?.let { routeRequest = it }
+        SyncFiles.incomingUri(intent)?.let { syncFile = it }
     }
 }
