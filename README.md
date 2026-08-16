@@ -39,6 +39,13 @@ speaks 7 languages and can gently remind you about feeds and treatments.
   you want it at all, right where it asks your name, so it's a choice from the first launch.
 - **🏠 Dashboard** — baby's age, today's feeds, sleep total and diaper count, and time since the
   last feed, at a glance.
+- **🏠 Sharing with your household** — one baby's record, on the phones of everyone looking after
+  them, with **no account, no server and no cloud storage**. You pair by sending an invitation file
+  through whatever channel you already use; after that the phones exchange **encrypted** replicas
+  that merge without duplicating or overwriting anything. On Android 12+ it can also happen
+  **automatically over Bluetooth** when you're in the same room with the app open — a few seconds
+  of looking, never a background service, and never the location permission. Your own check-ins
+  stay on your phone whatever you share.
 - **🌍 7 languages** — English, French, German, Spanish, Italian, Polish and Portuguese. Sprout
   follows your device language (falling back to English) and also offers an in-app language picker
   with flags.
@@ -65,6 +72,7 @@ Reminders are local notifications scheduled on-device (no server), and survive a
 app/src/main/java/com/gproust/sprout/
 ├── data/
 │   ├── local/        # Room entities, DAOs, database, type converters
+│   ├── sync/         # Household sharing: replicas, merge, pairing (+ nearby/ for Bluetooth)
 │   └── SproutRepository.kt
 ├── notifications/    # Treatment & feeding reminders (AlarmManager + receivers)
 └── ui/
@@ -75,6 +83,7 @@ app/src/main/java/com/gproust/sprout/
     ├── home/  feeding/  pumping/  sleep/  diaper/  growth/  treatments/
     ├── health/       # Parent wellbeing
     ├── profile/      # Babies manager
+    ├── sync/         # Sharing with the household
     └── settings/     # Language picker
 ```
 

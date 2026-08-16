@@ -425,4 +425,17 @@
     <string name="sync_remove_body">Rimuovere un telefono cambia la chiave della famiglia, quindi anche tutti gli altri telefoni avranno bisogno di un nuovo invito — compreso uno che in questo momento è spento. Il telefono rimosso tiene ciò che ha già; questo non si può riprendere.</string>
     <string name="sync_rotated_title">La chiave della famiglia è cambiata</string>
     <string name="sync_rotated_body">Il vostro nuovo codice è %1$s. Manda un nuovo invito a chi resta: fino ad allora i loro telefoni non possono leggere ciò che invii.</string>
+
+    <!-- Scambio automatico quando i telefoni sono vicini (ADR-0010) -->
+    <string name="sync_nearby_title">Sincronizza quando siete insieme</string>
+    <string name="sync_nearby_desc">All\'apertura di Sprout, cerca via Bluetooth i telefoni della famiglia lì vicino e scambia con loro. Cerca solo mentre l\'app è aperta, per pochi secondi alla volta.</string>
+    <string name="sync_nearby_now">Cerca adesso</string>
+    <string name="sync_by_hand_title">Oppure invia un file</string>
+    <string name="sync_nearby_nobody_title">Nessuno nei paraggi</string>
+    <string name="sync_nearby_nobody_body">Nessun telefono della vostra famiglia ha risposto. Deve essere a pochi metri e con Sprout aperto. Inviare un file funziona da qualunque posto.</string>
+    <string name="sync_nearby_error_no_bluetooth">Questo telefono non ha il Bluetooth, quindi può solo scambiare file.</string>
+    <string name="sync_nearby_error_bluetooth_off">Il Bluetooth è spento. Attivalo e riprova.</string>
+    <string name="sync_nearby_error_no_permission">Sprout ha bisogno del permesso di rilevare i dispositivi vicini. Serve solo a riconoscere i telefoni della famiglia, mai la tua posizione.</string>
+    <string name="sync_nearby_error_too_old">La versione di Android di questo telefono è troppo vecchia per questo; scambia file invece.</string>
+    <string name="sync_nearby_error_first_merge">Il primo scambio ha una domanda a cui rispondere. Apri una volta un file inviato dall\'altro telefono, poi funzionerà da solo.</string>
 </resources>

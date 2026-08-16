@@ -43,18 +43,21 @@ import com.gproust.sprout.R
 import com.gproust.sprout.data.sync.HouseholdDevice
 import com.gproust.sprout.data.sync.MergeSummary
 import com.gproust.sprout.data.sync.SyncFiles
+import com.gproust.sprout.data.sync.nearby.NearbyPermissions
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 
 /**
- * Sharing one baby's record with everyone looking after them — by hand, through
- * whatever channel they already use (ADR-0007 phase 1, ADR-0008, ADR-0009).
+ * Sharing one baby's record with everyone looking after them (ADR-0007,
+ * ADR-0008, ADR-0009, ADR-0010).
  *
  * Usually that is the other parent; it can equally be a grandparent who has the
- * baby twice a week. There is no account here, and nothing happens on its own:
- * this screen makes files and reads files. What it mostly does is explain,
- * because the honest version of "no server" is that people move the data
- * themselves.
+ * baby twice a week. There is still no account and no server — two ways of
+ * moving the same sealed replica meet here. By hand, through whatever channel
+ * the parents already use, which always works; and, on a phone new enough for
+ * it, by Bluetooth when they are in the same room with the app open. What this
+ * screen mostly does is explain, because the honest version of "no server" is
+ * that the data goes directly from one phone to the other.
  */
 @Composable
 fun SyncScreen(
@@ -70,6 +73,21 @@ fun SyncScreen(
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.open(uri)
     }
+
+    // Turning the switch on is the only thing that asks for Bluetooth. Refuse
+    // the permissions and the switch goes back off, rather than sitting on
+    // while nothing works.
+    val permissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { granted ->
+        val ok = granted.values.all { it }
+        vm.setNearbyEnabled(ok)
+        if (ok) vm.syncNearby(userAsked = true)
+    }
+
+    // No automatic window here: that one belongs to the app coming to the
+    // foreground (MainActivity), so it happens wherever in the app the parents
+    // are. This screen only carries the explicit ask, *Sync now*.
 
     // A file that arrived from another app opens the same way a picked one does.
     LaunchedEffect(incomingFile) {
@@ -117,6 +135,16 @@ fun SyncScreen(
                     code = pairing.verificationCode(),
                     shareStash = pairing.shareStash,
                     devices = state.devices,
+                    nearbyEnabled = state.nearbyEnabled,
+                    nearbySupported = state.nearbySupported,
+                    onNearby = { on ->
+                        if (on && !NearbyPermissions.granted(context)) {
+                            permissions.launch(NearbyPermissions.REQUIRED)
+                        } else {
+                            vm.setNearbyEnabled(on)
+                        }
+                    },
+                    onSyncNow = { vm.syncNearby(userAsked = true) },
                     onSend = { vm.exportReplica() },
                     onReceive = { picker.launch(arrayOf("*/*")) },
                     onInviteAgain = { vm.createInvitation(shareStash = pairing.shareStash) },
@@ -167,6 +195,10 @@ private fun PairedSection(
     code: String,
     shareStash: Boolean,
     devices: List<HouseholdDevice>,
+    nearbyEnabled: Boolean,
+    nearbySupported: Boolean,
+    onNearby: (Boolean) -> Unit,
+    onSyncNow: () -> Unit,
     onSend: () -> Unit,
     onReceive: () -> Unit,
     onInviteAgain: () -> Unit,
@@ -193,6 +225,27 @@ private fun PairedSection(
                 textAlign = TextAlign.Center,
             )
         }
+    }
+
+    if (nearbySupported) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.sync_nearby_title))
+                Text(
+                    stringResource(R.string.sync_nearby_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(checked = nearbyEnabled, onCheckedChange = onNearby)
+        }
+        if (nearbyEnabled) {
+            OutlinedButton(onClick = onSyncNow, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.sync_nearby_now))
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(stringResource(R.string.sync_by_hand_title), style = MaterialTheme.typography.titleSmall)
     }
 
     Button(onClick = onSend, modifier = Modifier.fillMaxWidth()) {
@@ -330,6 +383,7 @@ private fun outcomeTitle(outcome: SyncOutcome): String = when (outcome) {
     is SyncOutcome.Paired -> stringResource(R.string.sync_paired_title)
     is SyncOutcome.Merged -> stringResource(R.string.sync_merged_title)
     is SyncOutcome.Failed -> stringResource(R.string.sync_failed_title)
+    is SyncOutcome.NobodyNearby -> stringResource(R.string.sync_nearby_nobody_title)
     is SyncOutcome.SecretRotated -> stringResource(R.string.sync_rotated_title)
     is SyncOutcome.AskAboutHistories -> ""
 }
@@ -344,6 +398,7 @@ private fun outcomeBody(outcome: SyncOutcome): String = when (outcome) {
 
     is SyncOutcome.Merged -> mergeSummaryText(outcome.summary)
     is SyncOutcome.Failed -> stringResource(outcome.message)
+    is SyncOutcome.NobodyNearby -> stringResource(R.string.sync_nearby_nobody_body)
     is SyncOutcome.SecretRotated -> stringResource(R.string.sync_rotated_body, outcome.code)
     is SyncOutcome.AskAboutHistories -> ""
 }

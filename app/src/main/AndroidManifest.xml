@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+      Automatic exchange with the household's phones (ADR-0010), asked for only
+      when that switch is turned on. `neverForLocation` is the point: scanning
+      is for finding a paired phone in the room, never for working out where
+      anyone is — and ACCESS_FINE_LOCATION is deliberately absent, which is why
+      the feature is offered on API 31+ only. No INTERNET permission: the app
+      still cannot open a network socket, and that stays checkable in this file.
+    -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+
     <!-- Treatment & feeding reminders: post notifications, and re-arm alarms after a reboot. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

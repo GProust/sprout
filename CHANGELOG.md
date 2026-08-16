@@ -5,6 +5,28 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🏠 **You can share a baby's record with the people looking after them.**
+  Usually the other parent, sometimes a grandparent too — and still with no
+  account, no server and nothing stored anywhere but your phones. One of you
+  sends an **invitation file** through whatever you already use to send each
+  other things; from then on either phone can send the other its entries, and
+  both sides end up with everything. Nothing is overwritten and nothing is
+  duplicated: entries added on both phones simply come together, the most
+  recent version of a changed entry wins, and a deletion travels like anything
+  else. The first exchange asks the one question that can't be guessed —
+  whether to keep both histories or to start sharing from the day you paired.
+  Your own **check-ins never leave your phone**, whatever you share; expressed
+  milk does, unless you'd rather keep the stash to yourself. The Sharing screen
+  lists the phones you've heard from and can **remove one**, which changes the
+  household's key — everyone who stays needs a new invitation, which is the
+  honest version of taking access away.
+- 📶 **When you're in the same room, it can happen on its own.** Turn on *Sync
+  when you're together* and, whenever you open Sprout, it looks for the
+  household's phones over Bluetooth for a few seconds and exchanges with
+  whoever is there. It never runs in the background, never searches while the
+  app is away, and never asks for your location — it only ever recognises a
+  phone that already has your household's key. Sending a file still works from
+  anywhere, and is what phones on Android 11 or older keep using.
 - 💚 **The daily check-in is now a choice from the first launch.** The setup
   step that asks what to call you also asks whether you'd like it: a card on
   your dashboard for how you're doing, never a notification. Turn it down and
