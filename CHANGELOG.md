@@ -10,7 +10,8 @@ All notable changes to Sprout are documented here. This project follows
   kind — time at the breast, millilitres of bottle, grams of solids — hours
   asleep and how many times your baby settled, and how many changes were wet and
   how many were dirty. Each with a bar per day, so a week has a shape, and a
-  daily average that leaves today out of it while today is still being lived.
+  daily average that leaves today out of it while today is still being lived —
+  and that never counts days from before your baby was born.
 - 📈 **Growth against the WHO curves.** Weight, length and head circumference
   are drawn over the World Health Organization's child growth standards, with
   the latest measurement placed in the band — so "are we in the normal range?"

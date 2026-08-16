@@ -9,6 +9,7 @@ import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.ui.stats.averagesOf
 import com.gproust.sprout.ui.stats.breastfeedMillis
 import com.gproust.sprout.ui.stats.dailyStats
+import com.gproust.sprout.ui.stats.statsWindowStart
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -263,6 +264,52 @@ class DailyStatsTest {
         val averages = averagesOf(days, today = day3)
         assertEquals(1, averages.dayCount)
         assertEquals(60, averages.bottleMlPerDay)
+    }
+
+    @Test
+    fun theWindowNeverReachesBackPastTheBirth() {
+        val today = LocalDate.of(2026, 3, 20)
+        val born = LocalDate.of(2026, 3, 8) // twelve days old
+
+        // A window that fits inside the baby's life is untouched.
+        assertEquals(today.minusDays(6), statsWindowStart(today, 7, born))
+        // One that does not stops at the birth, rather than averaging over
+        // eighteen days the baby was not there for.
+        assertEquals(born, statsWindowStart(today, 30, born))
+        assertEquals(born, statsWindowStart(today, 90, born))
+    }
+
+    @Test
+    fun aBirthDateInTheFutureStillLeavesToday() {
+        val today = LocalDate.of(2026, 3, 20)
+        // Typed ahead of a due date: the window must not end before it starts.
+        assertEquals(today, statsWindowStart(today, 30, today.plusDays(40)))
+    }
+
+    @Test
+    fun withNoBirthDate_theWindowIsTheWholePeriod() {
+        val today = LocalDate.of(2026, 3, 20)
+        assertEquals(today.minusDays(29), statsWindowStart(today, 30, null))
+        // A one-day window is today alone, not an empty one.
+        assertEquals(today, statsWindowStart(today, 1, null))
+    }
+
+    @Test
+    fun aShortenedWindow_averagesOverTheDaysItActuallyCovers() {
+        // The bug this guards: thirty days of window over twelve days of life
+        // used to divide a newborn's ten feeds a day down to four.
+        val born = day1
+        val today = day3
+        val from = statsWindowStart(today, 30, born)
+        val feeds = listOf(day1, day2, day3).flatMap { date ->
+            (0 until 10).map { bottle(date, 6 + it, ml = 60) }
+        }
+        val days = dailyStats(feeds, emptyList(), emptyList(), from, today, at(day3, 23, 59), zone)
+        val averages = averagesOf(days, today = today)
+
+        assertEquals(3, days.size)
+        assertEquals(2, averages.dayCount)
+        assertEquals(10.0, averages.feedsPerDay, 1e-9)
     }
 
     @Test

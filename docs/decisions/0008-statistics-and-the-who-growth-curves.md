@@ -51,6 +51,11 @@ window of 7, 30 or 90 days.
   When today is all there is, today is used.
 - **A day with nothing logged is a zero, not a gap.** Days are what the averages
   divide by, and quietly dropping the empty ones would flatter every figure.
+- **The window never reaches back past the birth.** The same rule read the other
+  way: days the baby did not live are not days, so a twelve-day-old asked for
+  "30 days" is averaged over twelve. Without this, a newborn feeding ten times a
+  day is reported as feeding four — the window is shortened and the screen says
+  how many days it actually covered.
 - **Feeds and changes belong to the day they started; a sleep is split across
   the days it covers.** A night from 20:00 to 06:00 is ten hours of sleep, and
   putting all ten on the evening would leave the next day looking sleepless —

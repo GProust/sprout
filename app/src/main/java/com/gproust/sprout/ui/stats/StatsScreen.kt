@@ -122,9 +122,8 @@ class StatsViewModel(private val repository: SproutRepository) : ViewModel() {
         val now = System.currentTimeMillis()
         val zone = ZoneId.systemDefault()
         val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
-        // The window ends today and starts `days - 1` days earlier, so "7 days"
-        // is this week including today rather than eight columns.
-        val from = today.minusDays((chosen.days - 1).toLong())
+        val born = baby?.birthDate?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }
+        val from = statsWindowStart(today, chosen.days, born)
         val days = dailyStats(entries.feedings, entries.sleeps, entries.diapers, from, today, now, zone)
 
         StatsUiState(

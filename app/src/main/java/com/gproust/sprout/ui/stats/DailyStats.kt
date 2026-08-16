@@ -85,6 +85,28 @@ fun breastfeedMillis(entry: FeedingEntity): Long = when {
 }
 
 /**
+ * The first day a window of [days] ending on [today] covers.
+ *
+ * The window ends today and starts `days - 1` days earlier, so "7 days" is
+ * this week including today rather than eight columns.
+ *
+ * It never reaches back past [birthDay], and that is not cosmetic: the days in
+ * the window are what the averages divide by, so a twelve-day-old read over
+ * thirty days would have every figure halved by eighteen days they did not
+ * live — a newborn feeding ten times a day would be reported as feeding four.
+ * The window shrinking is the honest answer, and the screen says how many days
+ * it actually averaged over.
+ *
+ * A birth date in the future — typed ahead of a due date — still leaves today,
+ * rather than a window that ends before it starts.
+ */
+fun statsWindowStart(today: LocalDate, days: Int, birthDay: LocalDate?): LocalDate {
+    val start = today.minusDays((days - 1).coerceAtLeast(0).toLong())
+    val notBeforeBirth = if (birthDay != null && birthDay.isAfter(start)) birthDay else start
+    return if (notBeforeBirth.isAfter(today)) today else notBeforeBirth
+}
+
+/**
  * One [DayStats] per calendar day from [from] to [to] inclusive, oldest first.
  *
  * Days with nothing logged are present and empty rather than missing: a gap in
