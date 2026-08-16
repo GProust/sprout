@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.6.0] — 2026-08-16
 
 - 🏠 **You can share a baby's record with the people looking after them.**
   Usually the other parent, sometimes a grandparent too — and still with no
