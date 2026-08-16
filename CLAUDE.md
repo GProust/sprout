@@ -68,7 +68,17 @@ record; this is only the live status.
   [ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
   picked **Bluetooth rather than the local network**, because `INTERNET` grants any
   socket at all and would turn a manifest anyone can check into a promise they
-  must trust. Three things to keep straight while building it:
+  must trust. Landing in two PRs, like phase 1:
+  - [x] **2a — what CI can prove.** The rotating household beacon, the session
+    protocol (over plain streams, so the exchange is tested over a pipe with no
+    radio), and the discovery policy. No Android Bluetooth API, so no manifest
+    or privacy change yet.
+  - [ ] **2b — the radio and the screen.** BLE advertising + scanning, insecure
+    RFCOMM, the permission request, *Sync now*, the automatic window on
+    foreground, strings in 7 locales, screenshots — **and the `PRIVACY.md`
+    amendment, which must land with the manifest change, not after it.**
+
+  Three things to keep straight while building it:
   - **Discovery is bounded and triggered** — a ~10 s window on app foreground
     (throttled) or an explicit *Sync now*. No background scan, no periodic job,
     no foreground service. Latency in minutes is the accepted trade for battery.
