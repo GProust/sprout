@@ -48,8 +48,12 @@ class SyncMergeTest {
         val repository = SproutRepository(db, now = { clock })
         val engine = SyncEngine(db, now = { clock })
 
-        suspend fun replica(includePumping: Boolean = true) =
-            engine.buildPayload(household, name, includePumping)
+        suspend fun replica(includePumping: Boolean = true) = engine.buildPayload(
+            householdId = household,
+            deviceId = name,
+            deviceName = name,
+            includePumping = includePumping,
+        )
 
         suspend fun feedings() = db.feedingDao().observeForBaby(babyId()).first()
         suspend fun babyId() = db.babyDao().allForSync().first { it.deletedAt == null }.id

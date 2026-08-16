@@ -4,6 +4,7 @@ import android.app.Application
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SproutDatabase
 import com.gproust.sprout.data.sync.DeviceIdentity
+import com.gproust.sprout.data.sync.HouseholdDevices
 import com.gproust.sprout.data.sync.PairingStore
 import com.gproust.sprout.data.sync.SyncEngine
 import com.gproust.sprout.notifications.FeedingReminders
@@ -31,6 +32,9 @@ class SproutApplication : Application() {
 
     /** Who this phone is paired with, and on what terms (ADR-0008). */
     val pairingStore: PairingStore by lazy { PairingStore(this) }
+
+    /** The other phones in the household this one has heard from (ADR-0009). */
+    val householdDevices: HouseholdDevices by lazy { HouseholdDevices(this) }
 
     override fun onCreate() {
         super.onCreate()

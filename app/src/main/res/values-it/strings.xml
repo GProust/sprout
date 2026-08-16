@@ -367,30 +367,30 @@
     <string name="widget_error">Errore del widget — vedi Impostazioni → Diagnostica del widget</string>
 
     <!-- Sincronizzazione tra genitori (ADR-0007 fase 1) -->
-    <string name="screen_sync">Condivisione tra genitori</string>
+    <string name="screen_sync">Condivisione in famiglia</string>
     <string name="settings_sharing">Condivisione</string>
-    <string name="settings_sync_hint">Condividi il diario del bambino con l\'altro genitore: nessun account, nessun cloud.</string>
-    <string name="sync_intro_title">Due telefoni, un solo diario</string>
-    <string name="sync_intro_body">Invita l\'altro genitore. Una volta abbinati i telefoni, ciascuno può inviare le proprie voci e Sprout le unisce: nessun account, nessun server e niente conservato altrove che sui vostri due telefoni.</string>
-    <string name="sync_invite">Invita l\'altro genitore</string>
+    <string name="settings_sync_hint">Condividi il diario del bambino con le altre persone che se ne occupano: nessun account, nessun cloud.</string>
+    <string name="sync_intro_title">Un solo diario, tutti i telefoni della famiglia</string>
+    <string name="sync_intro_body">Invita l\'altro genitore, o un nonno che tiene il bambino spesso. Quando un telefono entra, ciascuno può inviare le proprie voci e Sprout le unisce: nessun account, nessun server e niente conservato al di fuori dei vostri telefoni.</string>
+    <string name="sync_invite">Invita un telefono</string>
     <string name="sync_open_invitation">Apri un invito ricevuto</string>
-    <string name="sync_channel_warning">L\'invito contiene la chiave del vostro diario. Mandalo con qualcosa di privato — un\'app di messaggistica, Quick Share, Bluetooth — e mai in un luogo pubblico.</string>
-    <string name="sync_code_title">Il vostro codice di abbinamento</string>
-    <string name="sync_code_hint">I due telefoni mostrano gli stessi sei caratteri. Leggeteveli una volta ad alta voce: se sono diversi, non siete abbinati tra voi.</string>
+    <string name="sync_channel_warning">L\'invito contiene la chiave del vostro diario, e chi ce l\'ha può leggere e aggiungere tutto ciò che è condiviso. Mandalo con qualcosa di privato — un\'app di messaggistica, Quick Share, Bluetooth — e mai in un luogo pubblico.</string>
+    <string name="sync_code_title">Il codice della vostra famiglia</string>
+    <string name="sync_code_hint">Tutti i telefoni della famiglia mostrano gli stessi sei caratteri. Leggeteveli una volta ad alta voce: un telefono che ne mostra altri non fa parte della vostra famiglia.</string>
     <string name="sync_send">Invia le mie voci</string>
     <string name="sync_receive">Apri un file ricevuto</string>
-    <string name="sync_exchange_hint">Inviate in entrambe le direzioni per aggiornare tutti e due i telefoni. Aprire due volte lo stesso file non cambia nulla.</string>
+    <string name="sync_exchange_hint">Inviatevi i file in entrambe le direzioni per aggiornare tutti i telefoni. Aprire due volte lo stesso file non cambia nulla.</string>
     <string name="sync_stash_title">Condividi il latte tirato</string>
-    <string name="sync_stash_desc">Il tuo registro dei tiraggi e la scorta di latte. Tutto ciò che riguarda il bambino viene condiviso comunque.</string>
+    <string name="sync_stash_desc">Il tuo registro dei tiraggi e la scorta di latte, condivisi con tutta la famiglia o con nessuno. Tutto ciò che riguarda il bambino viene condiviso comunque.</string>
     <string name="sync_stash_off_note">Disattivarlo ferma gli invii futuri. Quello che hai già inviato resta sull\'altro telefono.</string>
     <string name="sync_invite_again">Invia di nuovo l\'invito</string>
-    <string name="sync_unpair">Annulla abbinamento</string>
-    <string name="sync_unpair_confirm">Questo telefono smetterà di inviare e di aprire file per questo abbinamento. Tutto ciò che è già salvato qui rimane.</string>
+    <string name="sync_unpair">Esci dalla famiglia</string>
+    <string name="sync_unpair_confirm">Questo telefono smetterà di inviare e di aprire i file della famiglia. Tutto ciò che è già salvato qui rimane.</string>
     <string name="sync_share_invitation_subject">Invito Sprout</string>
     <string name="sync_share_data_subject">Voci Sprout</string>
     <string name="sync_paired_title">Abbinati</string>
-    <string name="sync_paired_body">Il vostro codice di abbinamento è %1$s. Controlla che l\'altro telefono mostri lo stesso.</string>
-    <string name="sync_paired_body_named">Abbinato con %1$s. Il vostro codice di abbinamento è %2$s: controlla che l\'altro telefono mostri lo stesso.</string>
+    <string name="sync_paired_body">Il codice della vostra famiglia è %1$s. Controlla che gli altri telefoni mostrino lo stesso.</string>
+    <string name="sync_paired_body_named">Sei entrato nella famiglia di %1$s. Il vostro codice è %2$s: controlla che gli altri telefoni mostrino lo stesso.</string>
     <string name="sync_merged_title">Unito</string>
     <string name="sync_merged_nothing_new">Niente di nuovo: i due telefoni erano già d\'accordo.</string>
     <plurals name="sync_merged_added">
@@ -406,13 +406,23 @@
         <item quantity="other">%d voci rimosse</item>
     </plurals>
     <string name="sync_failed_title">Non è stato unito nulla</string>
-    <string name="sync_error_not_paired">Prima abbinatevi al telefono dell\'altro genitore.</string>
+    <string name="sync_error_not_paired">Entra prima in una famiglia.</string>
     <string name="sync_error_unreadable">Questo file non è né un invito né un\'esportazione di Sprout.</string>
-    <string name="sync_error_wrong_phone">Questo file non è stato inviato dal telefono a cui sei abbinato, oppure si è danneggiato per strada.</string>
+    <string name="sync_error_wrong_phone">Questo file non è stato inviato da un telefono della vostra famiglia, oppure si è danneggiato per strada.</string>
     <string name="sync_error_too_new">Questo file è stato scritto da una versione più recente di Sprout. Aggiorna l\'app e riprova.</string>
     <string name="sync_error_invitation_expired">Questo invito è scaduto. Chiedine uno nuovo.</string>
-    <string name="sync_histories_title">Avete già entrambi delle voci</string>
-    <string name="sync_histories_body">Avete registrato entrambi prima di abbinarvi, e Sprout non può sapere quali voci sono lo stesso momento. Tenere tutto — ciò che avete annotato in due comparirà due volte — oppure condividere solo da adesso in poi?</string>
+    <string name="sync_histories_title">Entrambi i telefoni hanno già delle voci</string>
+    <string name="sync_histories_body">Ogni telefono ha registrato per conto proprio, e Sprout non può sapere quali voci sono lo stesso momento. Tenere tutto — ciò che è stato annotato due volte comparirà due volte — oppure condividere solo da adesso in poi?</string>
     <string name="sync_histories_keep_all">Tieni tutto</string>
     <string name="sync_histories_from_pairing">Da adesso</string>
+
+    <!-- I telefoni della famiglia (ADR-0009) -->
+    <string name="sync_devices_title">Telefoni della vostra famiglia</string>
+    <string name="sync_devices_empty">Nessun altro telefono ha ancora inviato nulla. Ognuno compare qui la prima volta che lo fa.</string>
+    <string name="sync_device_unnamed">Telefono senza nome</string>
+    <string name="sync_device_remove">Rimuovi</string>
+    <string name="sync_remove_title">Rimuovere questo telefono?</string>
+    <string name="sync_remove_body">Rimuovere un telefono cambia la chiave della famiglia, quindi anche tutti gli altri telefoni avranno bisogno di un nuovo invito — compreso uno che in questo momento è spento. Il telefono rimosso tiene ciò che ha già; questo non si può riprendere.</string>
+    <string name="sync_rotated_title">La chiave della famiglia è cambiata</string>
+    <string name="sync_rotated_body">Il vostro nuovo codice è %1$s. Manda un nuovo invito a chi resta: fino ad allora i loro telefoni non possono leggere ciò che invii.</string>
 </resources>

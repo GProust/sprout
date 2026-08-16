@@ -39,6 +39,14 @@ data class SyncPayload(
     val householdId: String,
     /** Which device produced it — for the merge summary, and to ignore our own replica. */
     val deviceId: String,
+    /**
+     * What to call that device in the household list — the sender's own name,
+     * so a phone can say "Mamie's phone" instead of a UUID (ADR-0009).
+     *
+     * Optional: replicas written before households existed don't carry it, and
+     * merge exactly as they did.
+     */
+    val deviceName: String = "",
     val createdAt: Long,
     /** The Room schema the sender was on. A newer one is refused rather than half-applied. */
     val schemaVersion: Int,
@@ -90,6 +98,7 @@ object SyncPayloadCodec {
         put("schemaVersion", payload.schemaVersion)
         put("householdId", payload.householdId)
         put("deviceId", payload.deviceId)
+        if (payload.deviceName.isNotBlank()) put("deviceName", payload.deviceName)
         put("createdAt", payload.createdAt)
         put("babies", payload.babies.map(::babyToJson).toJsonArray())
         put("feedings", payload.feedings.map { it.toJson(::feedingToJson) }.toJsonArray())
@@ -125,6 +134,7 @@ object SyncPayloadCodec {
             SyncPayload(
                 householdId = root.getString("householdId"),
                 deviceId = root.getString("deviceId"),
+                deviceName = root.optString("deviceName"),
                 createdAt = root.getLong("createdAt"),
                 schemaVersion = schemaVersion,
                 babies = root.list("babies", ::babyFromJson),

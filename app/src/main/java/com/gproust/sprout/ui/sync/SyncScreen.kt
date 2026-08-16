@@ -40,18 +40,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
+import com.gproust.sprout.data.sync.HouseholdDevice
 import com.gproust.sprout.data.sync.MergeSummary
 import com.gproust.sprout.data.sync.SyncFiles
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 
 /**
- * Sharing one baby's record with the other parent — by hand, through whatever
- * channel they already use (ADR-0007 phase 1, ADR-0008).
+ * Sharing one baby's record with everyone looking after them — by hand, through
+ * whatever channel they already use (ADR-0007 phase 1, ADR-0008, ADR-0009).
  *
- * There is no account here, and nothing happens on its own: this screen makes
- * files and reads files. What it mostly does is explain, because the honest
- * version of "no server" is that the parents move the data themselves.
+ * Usually that is the other parent; it can equally be a grandparent who has the
+ * baby twice a week. There is no account here, and nothing happens on its own:
+ * this screen makes files and reads files. What it mostly does is explain,
+ * because the honest version of "no server" is that people move the data
+ * themselves.
  */
 @Composable
 fun SyncScreen(
@@ -113,10 +116,12 @@ fun SyncScreen(
                 PairedSection(
                     code = pairing.verificationCode(),
                     shareStash = pairing.shareStash,
+                    devices = state.devices,
                     onSend = { vm.exportReplica() },
                     onReceive = { picker.launch(arrayOf("*/*")) },
                     onInviteAgain = { vm.createInvitation(shareStash = pairing.shareStash) },
                     onShareStash = vm::setShareStash,
+                    onRemoveDevice = { vm.removeDevice(it) },
                     onUnpair = vm::unpair,
                 )
             }
@@ -161,13 +166,16 @@ private fun NotPairedSection(onInvite: () -> Unit, onOpenFile: () -> Unit) {
 private fun PairedSection(
     code: String,
     shareStash: Boolean,
+    devices: List<HouseholdDevice>,
     onSend: () -> Unit,
     onReceive: () -> Unit,
     onInviteAgain: () -> Unit,
     onShareStash: (Boolean) -> Unit,
+    onRemoveDevice: (String) -> Unit,
     onUnpair: () -> Unit,
 ) {
     var confirmUnpair by remember { mutableStateOf(false) }
+    var deviceToRemove by remember { mutableStateOf<HouseholdDevice?>(null) }
 
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -219,9 +227,52 @@ private fun PairedSection(
         )
     }
 
+    // The household's other phones, as they have introduced themselves. A list
+    // of who has been heard from — not who is allowed in; the key is what
+    // decides that (ADR-0009).
+    Spacer(Modifier.height(8.dp))
+    Text(stringResource(R.string.sync_devices_title), style = MaterialTheme.typography.titleSmall)
+    if (devices.isEmpty()) {
+        Text(
+            stringResource(R.string.sync_devices_empty),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    } else {
+        devices.forEach { device ->
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    device.name.ifBlank { stringResource(R.string.sync_device_unnamed) },
+                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                )
+                TextButton(onClick = { deviceToRemove = device }) {
+                    Text(stringResource(R.string.sync_device_remove))
+                }
+            }
+        }
+    }
+
     Spacer(Modifier.height(8.dp))
     TextButton(onClick = onInviteAgain) { Text(stringResource(R.string.sync_invite_again)) }
     TextButton(onClick = { confirmUnpair = true }) { Text(stringResource(R.string.sync_unpair)) }
+
+    deviceToRemove?.let { device ->
+        AlertDialog(
+            onDismissRequest = { deviceToRemove = null },
+            title = { Text(stringResource(R.string.sync_remove_title)) },
+            text = { Text(stringResource(R.string.sync_remove_body)) },
+            confirmButton = {
+                TextButton(onClick = { deviceToRemove = null; onRemoveDevice(device.deviceId) }) {
+                    Text(stringResource(R.string.sync_device_remove))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deviceToRemove = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
 
     if (confirmUnpair) {
         AlertDialog(
@@ -279,6 +330,7 @@ private fun outcomeTitle(outcome: SyncOutcome): String = when (outcome) {
     is SyncOutcome.Paired -> stringResource(R.string.sync_paired_title)
     is SyncOutcome.Merged -> stringResource(R.string.sync_merged_title)
     is SyncOutcome.Failed -> stringResource(R.string.sync_failed_title)
+    is SyncOutcome.SecretRotated -> stringResource(R.string.sync_rotated_title)
     is SyncOutcome.AskAboutHistories -> ""
 }
 
@@ -292,6 +344,7 @@ private fun outcomeBody(outcome: SyncOutcome): String = when (outcome) {
 
     is SyncOutcome.Merged -> mergeSummaryText(outcome.summary)
     is SyncOutcome.Failed -> stringResource(outcome.message)
+    is SyncOutcome.SecretRotated -> stringResource(R.string.sync_rotated_body, outcome.code)
     is SyncOutcome.AskAboutHistories -> ""
 }
 

@@ -53,6 +53,7 @@ class SyncEngine(
     suspend fun buildPayload(
         householdId: String,
         deviceId: String,
+        deviceName: String,
         includePumping: Boolean,
     ): SyncPayload = db.withTransaction {
         val babies = db.babyDao().allForSync()
@@ -66,6 +67,7 @@ class SyncEngine(
         SyncPayload(
             householdId = householdId,
             deviceId = deviceId,
+            deviceName = deviceName,
             createdAt = now(),
             schemaVersion = schemaVersion(),
             babies = babies,
