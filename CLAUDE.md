@@ -20,73 +20,56 @@ MVVM, Room. No accounts, no network calls, no analytics.
 - `CHANGELOG.md` is user-facing release notes, in the voice of the existing
   entries. Docs-only changes don't go in it.
 
-## Work in progress — sharing a baby's record
+## Sharing a baby's record between phones
 
-Sharing one baby's record between the phones of everyone looking after them —
-usually two parents, sometimes a grandparent as well — with **no server and no
-external storage**: a direct device-to-device merge, specified in
+Shipped, and the one part of the app with rules that are easy to break by
+accident. The **why** is in
 [ADR-0007](docs/adr/0007-partner-sync-by-direct-device-to-device-exchange.md)
-and amended by
-[ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md),
-[ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md) and
-[ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md).
-Read them before touching anything below — the merge rules, the transport and
-the "what syncs / what doesn't" line are decided there, not per-PR.
+(direct device-to-device merge),
+[ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) (pairing
+by invitation file, no QR; the first merge adopts),
+[ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md) (a household,
+removal by rotating the secret) and
+[ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
+(Bluetooth rather than the local network; bounded, triggered discovery). Read
+the relevant one before changing behaviour — what syncs, what doesn't, and how
+conflicts resolve are decided there, not per-PR.
 
-Keep this checklist current as work lands, and **delete this whole section once
-phase 2 ships** (or once the work is abandoned) — the ADRs are the permanent
-record; this is only the live status.
+Four things that a change can quietly undo:
 
-- [x] **Phase 0 — make the data mergeable.** `uid` / `updatedAt` / `deletedAt` on
-  the synced entities, Room migration 13 → 14 with a UUID backfill, soft deletes
-  across every DAO, device id, tombstone compaction. Nothing user-visible.
-  Two things worth knowing before building on it:
-  - **Deleting is now two paths.** An ordinary delete flags the row
-    (`deletedAt`); "permanently delete a baby" erases the rows and keeps only
-    their uids in the `tombstone` table, so the deletion still travels without
-    the data lingering. Both are compacted after
-    `TOMBSTONE_RETENTION_DAYS`. Every read filters `deletedAt IS NULL` — a
-    forgotten filter shows deleted entries again.
-  - `SproutRepository` is the only place that stamps `uid`/`updatedAt`. Keep it
-    that way; a DAO called directly writes an unstamped row.
-- [x] **Phase 1 — exchange a replica file by hand.** Landed in two PRs: the
-  engine (#65), then everything the user can see (#66).
-  [ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) settled
-  the two questions it couldn't start without — **no QR code** (scanning needs a
-  camera permission the phase promises not to add; pairing travels as an
-  invitation file through the same channel as the data), and the first merge
-  **adopts** rather than duplicates.
-- [ ] **Households — more than two phones.**
-  [ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md): the merge
-  already worked for any number of devices, so this is wording, a list of the
-  phones heard from, and removal by **rotating the shared secret** — which locks
-  out everyone until they are re-invited, including a phone that was merely
-  switched off. Not part of the original three phases; folded in here because it
-  changes what phase 2 will be built on.
-- [ ] **Phase 2 — automatic exchange when the phones are near each other.**
-  Same payload, same merge, same tests — only a new way to deliver a replica.
-  [ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
-  picked **Bluetooth rather than the local network**, because `INTERNET` grants any
-  socket at all and would turn a manifest anyone can check into a promise they
-  must trust. Landing in two PRs, like phase 1:
-  - [x] **2a — what CI can prove.** The rotating household beacon, the session
-    protocol (over plain streams, so the exchange is tested over a pipe with no
-    radio), and the discovery policy. No Android Bluetooth API, so no manifest
-    or privacy change yet.
-  - [ ] **2b — the radio and the screen.** BLE advertising + scanning, insecure
-    RFCOMM, the permission request, *Sync now*, the automatic window on
-    foreground, strings in 7 locales, screenshots — **and the `PRIVACY.md`
-    amendment, which must land with the manifest change, not after it.**
+- **Deleting is two paths.** An ordinary delete flags the row (`deletedAt`);
+  "permanently delete a baby" erases the rows and keeps only their uids in the
+  `tombstone` table, so the deletion still travels without the data lingering.
+  Both are compacted after `TOMBSTONE_RETENTION_DAYS`. Every read filters
+  `deletedAt IS NULL` — a forgotten filter shows deleted entries again.
+- **`SproutRepository` is the only place that stamps `uid`/`updatedAt`.** Keep
+  it that way; a DAO called directly writes an unstamped row, which then loses
+  every merge.
+- **No `INTERNET` permission, ever.** It grants any socket at all, and its
+  absence is the one privacy claim a user can check for themselves rather than
+  take on trust. The same goes for `ACCESS_FINE_LOCATION`: `BLUETOOTH_SCAN` is
+  declared `neverForLocation`, which is why the automatic exchange is offered on
+  API 31+ only while `minSdk` stays 26.
+- **Discovery is bounded and triggered** — a ~10 s window when the app comes to
+  the foreground (throttled by `NearbyPolicy`) or an explicit *Sync now*. No
+  background scan, no periodic job, no foreground service. Latency in minutes is
+  the accepted trade for battery.
 
-  Three things to keep straight while building it:
-  - **Discovery is bounded and triggered** — a ~10 s window on app foreground
-    (throttled) or an explicit *Sync now*. No background scan, no periodic job,
-    no foreground service. Latency in minutes is the accepted trade for battery.
-  - **API 31+ only**, so `ACCESS_FINE_LOCATION` is never declared. `minSdk`
-    stays 26; older phones keep the manual exchange.
-  - **`PRIVACY.md` needs an amendment in the same PR**: the "no internet
-    permission" half stays true, the "no sensitive runtime permissions" half
-    does not.
+Anything user-visible here also touches `PRIVACY.md`, which carries its own
+dated change log at the end.
 
-Each item is independently shippable and lands as its own PR. Phase 1 is a
-complete feature on its own if phase 2 never happens.
+## Historical — how it was built
+
+Delivered in the order below; kept only as a map of which PR introduced what.
+
+- **Phase 0 — make the data mergeable** (#64). `uid` / `updatedAt` / `deletedAt`
+  on the synced entities, Room migration 13 → 14 with a UUID backfill, soft
+  deletes across every DAO, device id, tombstone compaction.
+- **Phase 1 — exchange a replica file by hand.** The engine (#65), then
+  everything the user can see (#66).
+- **Households — more than two phones** (#67). The merge already worked for any
+  number of devices, so this was wording, a list of the phones heard from, and
+  removal by rotating the shared secret.
+- **Phase 2 — automatic exchange when the phones are near each other.** What CI
+  can prove — beacon, session protocol, discovery policy (#69), then the radio
+  and the screen.

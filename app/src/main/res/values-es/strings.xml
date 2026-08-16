@@ -425,4 +425,17 @@
     <string name="sync_remove_body">Quitar un teléfono cambia la clave del hogar, así que todos los demás necesitarán también una invitación nueva, incluido cualquiera que esté apagado ahora mismo. El teléfono quitado conserva lo que ya tiene; eso no se le puede retirar.</string>
     <string name="sync_rotated_title">La clave del hogar ha cambiado</string>
     <string name="sync_rotated_body">Vuestro nuevo código es %1$s. Envía una invitación nueva a quienes se quedan: hasta entonces, sus teléfonos no podrán leer lo que envíes.</string>
+
+    <!-- Intercambio automático cuando los teléfonos están cerca (ADR-0010) -->
+    <string name="sync_nearby_title">Sincronizar cuando estáis juntos</string>
+    <string name="sync_nearby_desc">Al abrir Sprout, buscar por Bluetooth los teléfonos del hogar que estén cerca e intercambiar con ellos. Solo busca mientras la aplicación está abierta, unos segundos cada vez.</string>
+    <string name="sync_nearby_now">Buscar ahora</string>
+    <string name="sync_by_hand_title">O enviar un archivo</string>
+    <string name="sync_nearby_nobody_title">No hay nadie cerca</string>
+    <string name="sync_nearby_nobody_body">Ningún teléfono de vuestro hogar respondió. Tiene que estar a unos metros y con Sprout abierto. Enviar un archivo funciona desde cualquier sitio.</string>
+    <string name="sync_nearby_error_no_bluetooth">Este teléfono no tiene Bluetooth, así que solo puede intercambiar archivos.</string>
+    <string name="sync_nearby_error_bluetooth_off">El Bluetooth está apagado. Actívalo e inténtalo de nuevo.</string>
+    <string name="sync_nearby_error_no_permission">Sprout necesita permiso para detectar dispositivos cercanos. Solo se usa para reconocer los teléfonos del hogar, nunca tu ubicación.</string>
+    <string name="sync_nearby_error_too_old">La versión de Android de este teléfono es demasiado antigua para esto; intercambia archivos en su lugar.</string>
+    <string name="sync_nearby_error_first_merge">El primer intercambio tiene una pregunta que responder. Abre una vez un archivo enviado desde el otro teléfono y después esto funcionará solo.</string>
 </resources>

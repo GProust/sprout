@@ -497,4 +497,17 @@
     <string name="sync_remove_body">Removing a phone changes the household\'s key, so every other phone needs a new invitation too — including any that is switched off right now. The removed phone keeps what it already has; nothing can take that back.</string>
     <string name="sync_rotated_title">The household key changed</string>
     <string name="sync_rotated_body">Your new code is %1$s. Send a fresh invitation to everyone who stays — until you do, their phones cannot read what you send.</string>
+
+    <!-- Automatic exchange when the phones are near each other (ADR-0010) -->
+    <string name="sync_nearby_title">Sync when you\'re together</string>
+    <string name="sync_nearby_desc">When you open Sprout, look for the household\'s phones nearby over Bluetooth and exchange with them. It only looks while the app is open, for a few seconds at a time.</string>
+    <string name="sync_nearby_now">Look for phones nearby now</string>
+    <string name="sync_by_hand_title">Or send a file</string>
+    <string name="sync_nearby_nobody_title">Nobody nearby</string>
+    <string name="sync_nearby_nobody_body">No phone from your household answered. They have to be within a few metres with Sprout open. Sending a file works from anywhere.</string>
+    <string name="sync_nearby_error_no_bluetooth">This phone has no Bluetooth, so it can only exchange files.</string>
+    <string name="sync_nearby_error_bluetooth_off">Bluetooth is off. Turn it on and try again.</string>
+    <string name="sync_nearby_error_no_permission">Sprout needs permission to find nearby devices. It is only used to spot the household\'s phones, never your location.</string>
+    <string name="sync_nearby_error_too_old">This phone\'s version of Android is too old for this, so it exchanges files instead.</string>
+    <string name="sync_nearby_error_first_merge">The first exchange has a question to answer. Open a file sent from the other phone once, and after that this works on its own.</string>
 </resources>

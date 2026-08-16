@@ -47,6 +47,7 @@ import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.sync.Pairing
 import com.gproust.sprout.data.sync.SyncSecret
+import com.gproust.sprout.data.sync.nearby.NearbySettings
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
@@ -213,9 +214,22 @@ class ScreenshotTest {
         rule.waitForIdle()
     }
 
-    /** A sync ViewModel reading whatever pairing the store holds right now. */
-    private fun syncViewModel() =
-        SyncViewModel(app.repository, app.syncEngine, app.pairingStore, app.householdDevices, app)
+    /**
+     * A sync ViewModel reading whatever pairing the store holds right now.
+     *
+     * `nearbySupported` is forced on: the emulator these captures run on is
+     * older than the API 31 floor the automatic exchange has (ADR-0010), so
+     * leaving it to answer for itself would photograph a screen missing a
+     * section that every phone new enough to install this actually shows.
+     */
+    private fun syncViewModel() = SyncViewModel(
+        app.repository,
+        app.syncEngine,
+        app.pairingStore,
+        app.householdDevices,
+        app,
+        nearbySupported = true,
+    )
 
     private fun save(name: String) {
         val bmp = rule.onRoot().captureToImage().asAndroidBitmap()
@@ -473,8 +487,14 @@ class ScreenshotTest {
         // ordinary (ADR-0009).
         app.householdDevices.seen("screenshot-device-1", "Aurélien", 1_700_000_100_000)
         app.householdDevices.seen("screenshot-device-2", "Mamie", 1_700_000_200_000)
+        // Switched on for the capture so the automatic exchange is visible with
+        // its *Sync now* (ADR-0010). It is off by default in the app, and no
+        // radio is touched here: the screen only ever looks when asked, and the
+        // window on opening the app belongs to MainActivity, not to this screen.
+        NearbySettings.setEnabled(app, true)
         show { SyncScreen(onBack = {}, vm = syncViewModel()) }
         save("13-sync-2-paired")
+        NearbySettings.setEnabled(app, false)
         // Same screen with the stash left at home, which adds the note about
         // what turning it off can and cannot take back.
         app.pairingStore.setShareStash(false)

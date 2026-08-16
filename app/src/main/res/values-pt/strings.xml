@@ -425,4 +425,17 @@
     <string name="sync_remove_body">Remover um telemóvel muda a chave do agregado, por isso todos os outros vão precisar de um novo convite — incluindo qualquer um que esteja desligado neste momento. O telemóvel removido fica com o que já tem; isso não se pode retirar.</string>
     <string name="sync_rotated_title">A chave do agregado mudou</string>
     <string name="sync_rotated_body">O vosso novo código é %1$s. Envie um novo convite a quem fica — até lá, os telemóveis deles não conseguem ler o que enviar.</string>
+
+    <!-- Troca automática quando os telemóveis estão perto (ADR-0010) -->
+    <string name="sync_nearby_title">Sincronizar quando estão juntos</string>
+    <string name="sync_nearby_desc">Ao abrir o Sprout, procurar por Bluetooth os telemóveis do agregado que estejam perto e trocar com eles. Só procura enquanto a aplicação está aberta, uns segundos de cada vez.</string>
+    <string name="sync_nearby_now">Procurar agora</string>
+    <string name="sync_by_hand_title">Ou enviar um ficheiro</string>
+    <string name="sync_nearby_nobody_title">Ninguém por perto</string>
+    <string name="sync_nearby_nobody_body">Nenhum telemóvel do vosso agregado respondeu. Tem de estar a poucos metros e com o Sprout aberto. Enviar um ficheiro funciona a partir de qualquer lado.</string>
+    <string name="sync_nearby_error_no_bluetooth">Este telemóvel não tem Bluetooth, por isso só pode trocar ficheiros.</string>
+    <string name="sync_nearby_error_bluetooth_off">O Bluetooth está desligado. Ligue-o e tente de novo.</string>
+    <string name="sync_nearby_error_no_permission">O Sprout precisa de autorização para detetar dispositivos por perto. Serve apenas para reconhecer os telemóveis do agregado, nunca a sua localização.</string>
+    <string name="sync_nearby_error_too_old">A versão de Android deste telemóvel é demasiado antiga para isto; troca ficheiros em vez disso.</string>
+    <string name="sync_nearby_error_first_merge">A primeira troca tem uma pergunta a responder. Abra uma vez um ficheiro enviado do outro telemóvel e depois passa a funcionar sozinho.</string>
 </resources>

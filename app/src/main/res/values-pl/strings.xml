@@ -442,4 +442,17 @@
     <string name="sync_remove_body">Usunięcie telefonu zmienia klucz domu, więc każdy pozostały telefon również będzie potrzebował nowego zaproszenia — także taki, który jest teraz wyłączony. Usunięty telefon zachowuje to, co już ma; tego nie da się cofnąć.</string>
     <string name="sync_rotated_title">Klucz domu się zmienił</string>
     <string name="sync_rotated_body">Wasz nowy kod to %1$s. Wyślij nowe zaproszenie wszystkim, którzy zostają — do tego czasu ich telefony nie odczytają tego, co wysyłasz.</string>
+
+    <!-- Automatyczna wymiana, gdy telefony są blisko siebie (ADR-0010) -->
+    <string name="sync_nearby_title">Synchronizuj, gdy jesteście razem</string>
+    <string name="sync_nearby_desc">Po otwarciu Sprout szukaj przez Bluetooth telefonów domowników w pobliżu i wymieniaj się z nimi. Szuka tylko wtedy, gdy aplikacja jest otwarta, po kilka sekund.</string>
+    <string name="sync_nearby_now">Szukaj teraz</string>
+    <string name="sync_by_hand_title">Albo wyślij plik</string>
+    <string name="sync_nearby_nobody_title">Nikogo w pobliżu</string>
+    <string name="sync_nearby_nobody_body">Żaden telefon z waszego domu nie odpowiedział. Musi być w odległości kilku metrów z otwartym Sprout. Wysłanie pliku działa z dowolnego miejsca.</string>
+    <string name="sync_nearby_error_no_bluetooth">Ten telefon nie ma Bluetootha, więc może tylko wymieniać pliki.</string>
+    <string name="sync_nearby_error_bluetooth_off">Bluetooth jest wyłączony. Włącz go i spróbuj ponownie.</string>
+    <string name="sync_nearby_error_no_permission">Sprout potrzebuje zgody na wykrywanie urządzeń w pobliżu. Służy wyłącznie do rozpoznania telefonów domowników, nigdy do ustalania twojej lokalizacji.</string>
+    <string name="sync_nearby_error_too_old">Wersja Androida na tym telefonie jest na to za stara; zamiast tego wymienia pliki.</string>
+    <string name="sync_nearby_error_first_merge">Pierwsza wymiana wymaga odpowiedzi na jedno pytanie. Otwórz raz plik przysłany z drugiego telefonu, a potem będzie działać samo.</string>
 </resources>
