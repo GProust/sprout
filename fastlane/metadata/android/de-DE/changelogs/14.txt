@@ -1,0 +1,1 @@
+Behoben: Sprout erschien nicht unter „Öffnen mit“, wenn Sie eine über WhatsApp erhaltene .sprout-Einladung antippen. Eine Messenger-App reicht eine Datei ohne Namen und ohne Typ weiter, es blieb also nichts, woran man sie erkennen konnte. Sprout bietet nun an, solche Dateien zu öffnen — und sagt sofort, wenn eine davon keine Sprout-Datei ist.

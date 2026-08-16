@@ -1,0 +1,1 @@
+Fixed Sprout not appearing in "Open with" when you tap a .sprout invitation received through WhatsApp. A messaging app passes a file on without its name or its type, so nothing was left to recognise it by. Sprout now offers to open files of that kind — and tells you straight away when one turns out not to be a Sprout file.

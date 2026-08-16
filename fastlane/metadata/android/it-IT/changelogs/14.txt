@@ -1,0 +1,1 @@
+Corretto: Sprout non compariva in «Apri con» toccando un invito .sprout ricevuto via WhatsApp. Un'app di messaggistica passa il file senza nome e senza tipo, quindi non restava nulla per riconoscerlo. Ora Sprout si propone per aprire file di quel genere — e ti dice subito se uno di essi non è un file di Sprout.
