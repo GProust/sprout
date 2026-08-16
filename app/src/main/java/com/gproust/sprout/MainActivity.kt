@@ -3,6 +3,7 @@ package com.gproust.sprout
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,10 +13,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.gproust.sprout.data.sync.SyncFiles
+import com.gproust.sprout.data.sync.nearby.BluetoothNearbyTransport
+import com.gproust.sprout.data.sync.nearby.NearbySettings
+import com.gproust.sprout.data.sync.nearby.NearbySync
 import com.gproust.sprout.ui.navigation.SproutApp
 import com.gproust.sprout.ui.settings.AppLocale
 import com.gproust.sprout.ui.theme.SproutTheme
 import com.gproust.sprout.widget.updateSproutWidget
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -57,14 +63,53 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
+     * Two things worth doing the moment the app comes back to the foreground.
+     *
      * The widget's elapsed time is fixed when it is drawn, and the system only
      * refreshes widgets every half hour. Opening the app is both a moment the
      * widget is likely about to be looked at and a free chance to redraw it, so
-     * take it.
+     * take it. The other is looking for the household's phones.
      */
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch { updateSproutWidget(this@MainActivity) }
+        openNearbyWindow()
+    }
+
+    /**
+     * The automatic half of ADR-0010: one bounded discovery window when the app
+     * comes to the foreground.
+     *
+     * Here rather than on the sync screen, because "when the app opens" is what
+     * the ADR promises and nobody opens the sync screen in order to be synced.
+     * Three things keep it modest: the switch has to be on, `NearbyPolicy`
+     * throttles it to at most one window every few minutes, and the window
+     * closes itself after ten seconds whether or not anyone answered. There is
+     * no service and nothing running while the app is away.
+     *
+     * The outcome is deliberately silent. A merge shows up on its own as fresher
+     * data, and "nobody was in the room" is not news worth a dialog — the sync
+     * screen's *Sync now* is where an answer is expected.
+     */
+    private fun openNearbyWindow() {
+        val app = application as? SproutApplication ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Spelled out rather than hidden behind a helper: lint only
+            // recognises a direct SDK_INT check as a guard for the API-gated
+            // transport, and only within the same lambda.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return@launch
+            if (!NearbySettings.isEnabled(this@MainActivity)) return@launch
+            runCatching {
+                NearbySync(
+                    context = applicationContext,
+                    engine = app.syncEngine,
+                    pairingStore = app.pairingStore,
+                    householdDevices = app.householdDevices,
+                    transport = BluetoothNearbyTransport(applicationContext),
+                    deviceName = { app.repository.parentProfile.first()?.name.orEmpty() },
+                ).run(userAsked = false)
+            }
+        }
     }
 
     // The widget launches with CLEAR_TOP | SINGLE_TOP, so an already-running

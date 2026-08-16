@@ -2,6 +2,7 @@ package com.gproust.sprout.ui.sync
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +24,12 @@ import com.gproust.sprout.data.sync.SyncInvitationException
 import com.gproust.sprout.data.sync.SyncPayloadCodec
 import com.gproust.sprout.data.sync.SyncPayloadException
 import com.gproust.sprout.data.sync.SyncSecret
+import com.gproust.sprout.data.sync.nearby.BluetoothNearbyTransport
+import com.gproust.sprout.data.sync.nearby.NearbyPermissions
+import com.gproust.sprout.data.sync.nearby.NearbyResult
+import com.gproust.sprout.data.sync.nearby.NearbySettings
+import com.gproust.sprout.data.sync.nearby.NearbySync
+import com.gproust.sprout.data.sync.nearby.NearbyTransport
 import com.gproust.sprout.data.sync.newUid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +46,10 @@ data class SyncUiState(
     /** The other phones this one has heard from (ADR-0009). */
     val devices: List<HouseholdDevice> = emptyList(),
     val busy: Boolean = false,
+    /** Whether this phone looks for the household when the app opens (ADR-0010). */
+    val nearbyEnabled: Boolean = false,
+    /** False on phones too old to be offered it at all — they keep the manual exchange. */
+    val nearbySupported: Boolean = true,
     /** A file to hand to the share sheet; consumed once shared. */
     val fileToShare: ShareRequest? = null,
     val outcome: SyncOutcome? = null,
@@ -67,14 +78,20 @@ sealed interface SyncOutcome {
     data class AskAboutHistories(val uri: Uri) : SyncOutcome
 
     data class Failed(@param:StringRes val message: Int) : SyncOutcome
+
+    /** A discovery window closed without meeting anyone — ordinary, and worth saying. */
+    data object NobodyNearby : SyncOutcome
 }
 
 /**
- * Pairing with a partner's phone, and exchanging replicas with it.
+ * Pairing with the household's other phones, and exchanging replicas with them.
  *
- * Everything here is user-initiated: a file is written when they ask to send
- * one, and read when they hand one over. Nothing watches, polls, or reaches the
- * network — that is phase 2, and it needs its own ADR.
+ * Two ways in, one merge. By hand — a file is written when the parents ask to
+ * send one, and read when they hand one over — and by Bluetooth, in a window
+ * that lasts ten seconds and only ever opens while the app is in front of
+ * someone (ADR-0010). Nothing polls, nothing runs in the background, and
+ * nothing here touches the network: the app has no `INTERNET` permission to
+ * touch it with.
  */
 class SyncViewModel(
     private val repository: SproutRepository,
@@ -83,10 +100,22 @@ class SyncViewModel(
     private val householdDevices: HouseholdDevices,
     private val context: Context,
     private val now: () -> Long = System::currentTimeMillis,
+    /**
+     * Whether to offer the automatic exchange at all — normally the phone's own
+     * answer. Overridable for the screenshot capture, which runs on an emulator
+     * older than the API 31 floor and would otherwise photograph a screen no
+     * current phone shows.
+     */
+    nearbySupported: Boolean = NearbyPermissions.isSupported(),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        SyncUiState(pairing = pairingStore.current(), devices = householdDevices.all()),
+        SyncUiState(
+            pairing = pairingStore.current(),
+            devices = householdDevices.all(),
+            nearbyEnabled = NearbySettings.isEnabled(context),
+            nearbySupported = nearbySupported,
+        ),
     )
     val state: StateFlow<SyncUiState> = _state.asStateFlow()
 
@@ -177,6 +206,67 @@ class SyncViewModel(
                 outcome = SyncOutcome.SecretRotated(rotated.verificationCode()),
             )
         }
+    }
+
+    // --- meeting the household in person (ADR-0010) ------------------------
+
+    /**
+     * Turns the automatic exchange on or off.
+     *
+     * Only records the choice: asking for the Bluetooth permissions belongs to
+     * the screen, which is where a dialog can be shown.
+     */
+    fun setNearbyEnabled(enabled: Boolean) {
+        NearbySettings.setEnabled(context, enabled)
+        _state.update { it.copy(nearbyEnabled = enabled) }
+    }
+
+    /**
+     * Opens a discovery window: advertise, look, and merge with whoever is
+     * within a few metres and has Sprout open.
+     *
+     * @param userAsked true for *Sync now*, which is never throttled. On the
+     * automatic path a window that is refused, or that meets nobody, says
+     * nothing — there is no news in "your partner isn't in the room".
+     */
+    fun syncNearby(userAsked: Boolean) = work {
+        if (!userAsked && !NearbySettings.isEnabled(context)) return@work
+        // Spelled out rather than hidden behind a helper: lint only recognises
+        // a direct SDK_INT check as a guard for the API-gated transport.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            if (userAsked) fail(R.string.sync_nearby_error_too_old)
+            return@work
+        }
+        val outcome = NearbySync(
+            context = context,
+            engine = engine,
+            pairingStore = pairingStore,
+            householdDevices = householdDevices,
+            transport = BluetoothNearbyTransport(context),
+            deviceName = { repository.parentProfile.first()?.name.orEmpty() },
+            now = now,
+        ).run(userAsked)
+        when (outcome) {
+            is NearbyResult.Synced -> _state.update {
+                it.copy(devices = householdDevices.all(), outcome = SyncOutcome.Merged(outcome.summary))
+            }
+            NearbyResult.NobodyNearby ->
+                if (userAsked) _state.update { it.copy(outcome = SyncOutcome.NobodyNearby) }
+            NearbyResult.FirstMergeNeedsYou ->
+                if (userAsked) fail(R.string.sync_nearby_error_first_merge)
+            is NearbyResult.CannotStart ->
+                if (userAsked) fail(reasonMessage(outcome.reason))
+            // Throttled, or not paired: nothing worth interrupting anyone for.
+            NearbyResult.TooSoon, NearbyResult.NotPaired -> Unit
+        }
+    }
+
+    @StringRes
+    private fun reasonMessage(reason: NearbyTransport.Unavailable): Int = when (reason) {
+        NearbyTransport.Unavailable.NO_BLUETOOTH -> R.string.sync_nearby_error_no_bluetooth
+        NearbyTransport.Unavailable.BLUETOOTH_OFF -> R.string.sync_nearby_error_bluetooth_off
+        NearbyTransport.Unavailable.NO_PERMISSION -> R.string.sync_nearby_error_no_permission
+        NearbyTransport.Unavailable.TOO_OLD -> R.string.sync_nearby_error_too_old
     }
 
     // --- the two kinds of file --------------------------------------------

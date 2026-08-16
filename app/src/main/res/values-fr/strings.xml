@@ -484,4 +484,17 @@
     <string name="sync_remove_body">Retirer un téléphone change la clé du foyer : tous les autres téléphones auront eux aussi besoin d\'une nouvelle invitation — y compris ceux qui sont éteints en ce moment. Le téléphone retiré garde ce qu\'il a déjà ; rien ne peut le lui reprendre.</string>
     <string name="sync_rotated_title">La clé du foyer a changé</string>
     <string name="sync_rotated_body">Votre nouveau code est %1$s. Envoyez une nouvelle invitation à tous ceux qui restent — d\'ici là, leurs téléphones ne peuvent pas lire ce que vous envoyez.</string>
+
+    <!-- Échange automatique quand les téléphones sont proches (ADR-0010) -->
+    <string name="sync_nearby_title">Synchroniser quand vous êtes ensemble</string>
+    <string name="sync_nearby_desc">À l\'ouverture de Sprout, chercher les téléphones du foyer à proximité par Bluetooth et échanger avec eux. La recherche n\'a lieu que pendant que l\'application est ouverte, quelques secondes à la fois.</string>
+    <string name="sync_nearby_now">Chercher maintenant</string>
+    <string name="sync_by_hand_title">Ou envoyer un fichier</string>
+    <string name="sync_nearby_nobody_title">Personne à proximité</string>
+    <string name="sync_nearby_nobody_body">Aucun téléphone de votre foyer n\'a répondu. Il faut qu\'il soit à quelques mètres avec Sprout ouvert. L\'envoi d\'un fichier fonctionne de n\'importe où.</string>
+    <string name="sync_nearby_error_no_bluetooth">Ce téléphone n\'a pas de Bluetooth : il ne peut qu\'échanger des fichiers.</string>
+    <string name="sync_nearby_error_bluetooth_off">Le Bluetooth est désactivé. Activez-le et réessayez.</string>
+    <string name="sync_nearby_error_no_permission">Sprout a besoin de l\'autorisation de détecter les appareils à proximité. Elle sert uniquement à repérer les téléphones du foyer, jamais à connaître votre position.</string>
+    <string name="sync_nearby_error_too_old">La version d\'Android de ce téléphone est trop ancienne pour cela ; il échange des fichiers à la place.</string>
+    <string name="sync_nearby_error_first_merge">Le premier échange comporte une question à trancher. Ouvrez une fois un fichier envoyé par l\'autre téléphone, ensuite cela se fera tout seul.</string>
 </resources>

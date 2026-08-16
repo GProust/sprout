@@ -425,4 +425,17 @@
     <string name="sync_remove_body">Ein Handy zu entfernen ändert den Schlüssel des Haushalts, also braucht auch jedes andere Handy eine neue Einladung — auch eines, das gerade ausgeschaltet ist. Das entfernte Handy behält, was es schon hat; das lässt sich nicht zurücknehmen.</string>
     <string name="sync_rotated_title">Der Haushaltsschlüssel hat sich geändert</string>
     <string name="sync_rotated_body">Euer neuer Code ist %1$s. Schick allen, die bleiben, eine neue Einladung — bis dahin können ihre Handys nicht lesen, was du sendest.</string>
+
+    <!-- Automatischer Austausch, wenn die Handys nah beieinander sind (ADR-0010) -->
+    <string name="sync_nearby_title">Abgleichen, wenn ihr zusammen seid</string>
+    <string name="sync_nearby_desc">Beim Öffnen von Sprout per Bluetooth nach den Handys des Haushalts in der Nähe suchen und mit ihnen austauschen. Gesucht wird nur, während die App offen ist, und jeweils ein paar Sekunden.</string>
+    <string name="sync_nearby_now">Jetzt in der Nähe suchen</string>
+    <string name="sync_by_hand_title">Oder eine Datei schicken</string>
+    <string name="sync_nearby_nobody_title">Niemand in der Nähe</string>
+    <string name="sync_nearby_nobody_body">Kein Handy aus eurem Haushalt hat geantwortet. Es muss ein paar Meter entfernt sein und Sprout offen haben. Eine Datei zu schicken geht von überall.</string>
+    <string name="sync_nearby_error_no_bluetooth">Dieses Handy hat kein Bluetooth und kann daher nur Dateien austauschen.</string>
+    <string name="sync_nearby_error_bluetooth_off">Bluetooth ist aus. Schalte es ein und versuche es erneut.</string>
+    <string name="sync_nearby_error_no_permission">Sprout braucht die Berechtigung, Geräte in der Nähe zu finden. Sie dient nur dazu, die Handys des Haushalts zu erkennen, nie deinem Standort.</string>
+    <string name="sync_nearby_error_too_old">Die Android-Version dieses Handys ist dafür zu alt; es tauscht stattdessen Dateien aus.</string>
+    <string name="sync_nearby_error_first_merge">Beim ersten Austausch ist eine Frage zu beantworten. Öffne einmal eine Datei vom anderen Handy, danach läuft es von allein.</string>
 </resources>
