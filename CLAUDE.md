@@ -27,10 +27,11 @@ usually two parents, sometimes a grandparent as well — with **no server and no
 external storage**: a direct device-to-device merge, specified in
 [ADR-0007](docs/adr/0007-partner-sync-by-direct-device-to-device-exchange.md)
 and amended by
-[ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) and
-[ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md). Read them
-before touching anything below — the merge rules and the "what syncs / what
-doesn't" line are decided there, not per-PR.
+[ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md),
+[ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md) and
+[ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md).
+Read them before touching anything below — the merge rules, the transport and
+the "what syncs / what doesn't" line are decided there, not per-PR.
 
 Keep this checklist current as work lands, and **delete this whole section once
 phase 2 ships** (or once the work is abandoned) — the ADRs are the permanent
@@ -62,10 +63,20 @@ record; this is only the live status.
   out everyone until they are re-invited, including a phone that was merely
   switched off. Not part of the original three phases; folded in here because it
   changes what phase 2 will be built on.
-- [ ] **Phase 2 — automatic exchange on the local network.** Same payload, same
-  merge. Needs its own ADR to pick the transport (`NsdManager` + TCP vs Wi-Fi
-  Direct; **not** Nearby Connections), and **`PRIVACY.md` + `README.md` must be
-  rewritten in the same PR** — both currently promise no internet permission.
+- [ ] **Phase 2 — automatic exchange when the phones are near each other.**
+  Same payload, same merge, same tests — only a new way to deliver a replica.
+  [ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
+  picked **Bluetooth rather than the local network**, because `INTERNET` grants any
+  socket at all and would turn a manifest anyone can check into a promise they
+  must trust. Three things to keep straight while building it:
+  - **Discovery is bounded and triggered** — a ~10 s window on app foreground
+    (throttled) or an explicit *Sync now*. No background scan, no periodic job,
+    no foreground service. Latency in minutes is the accepted trade for battery.
+  - **API 31+ only**, so `ACCESS_FINE_LOCATION` is never declared. `minSdk`
+    stays 26; older phones keep the manual exchange.
+  - **`PRIVACY.md` needs an amendment in the same PR**: the "no internet
+    permission" half stays true, the "no sensitive runtime permissions" half
+    does not.
 
 Each item is independently shippable and lands as its own PR. Phase 1 is a
 complete feature on its own if phase 2 never happens.
