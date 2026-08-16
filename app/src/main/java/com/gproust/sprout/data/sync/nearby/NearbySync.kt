@@ -79,11 +79,17 @@ class NearbySync(
             pairing.secret,
         )
 
-        val replies = transport.exchange(
-            beacon = HouseholdBeacon.value(pairing.secret, now()),
-            mine = mine,
-            windowMs = NearbyPolicy.WINDOW_MS,
-        )
+        val replies = try {
+            transport.exchange(
+                beacon = HouseholdBeacon.value(pairing.secret, now()),
+                // The secret stays here; the transport only ever gets an answer.
+                isOurs = { HouseholdBeacon.matches(it, pairing.secret, now()) },
+                mine = mine,
+                windowMs = NearbyPolicy.WINDOW_MS,
+            )
+        } catch (e: NearbyTransport.RadioRefused) {
+            return NearbyResult.CannotStart(NearbyTransport.Unavailable.RADIO_REFUSED)
+        }
         if (replies.isEmpty()) return NearbyResult.NobodyNearby
 
         var summary = MergeSummary()

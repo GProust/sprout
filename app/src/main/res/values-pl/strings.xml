@@ -454,5 +454,6 @@
     <string name="sync_nearby_error_bluetooth_off">Bluetooth jest wyłączony. Włącz go i spróbuj ponownie.</string>
     <string name="sync_nearby_error_no_permission">Sprout potrzebuje zgody na wykrywanie urządzeń w pobliżu. Służy wyłącznie do rozpoznania telefonów domowników, nigdy do ustalania twojej lokalizacji.</string>
     <string name="sync_nearby_error_too_old">Wersja Androida na tym telefonie jest na to za stara; zamiast tego wymienia pliki.</string>
+    <string name="sync_nearby_error_radio">Bluetooth odmówił rozpoczęcia wyszukiwania. Zwykle wystarczy go wyłączyć i włączyć ponownie; jeśli nie, wysłanie pliku zawsze działa.</string>
     <string name="sync_nearby_error_first_merge">Pierwsza wymiana wymaga odpowiedzi na jedno pytanie. Otwórz raz plik przysłany z drugiego telefonu, a potem będzie działać samo.</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.gproust.sprout.data.sync.nearby
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -12,7 +13,6 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -24,6 +24,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.Collections
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * The radio (ADR-0010): BLE to say "a phone of this household is here", plain
@@ -38,7 +40,9 @@ import java.util.Collections
  * has no authentication or encryption of its own. That is correct here, and
  * only here: what crosses it is a replica already sealed with AES-256-GCM under
  * the household secret. Link-layer security would protect protected data, and
- * would cost a second pairing dialog on top of the one Sprout already does.
+ * would cost a second pairing dialog on top of the one Sprout already does. It
+ * also means the phones do **not** need to be paired in Android's Bluetooth
+ * settings — pairing them there changes nothing either way.
  */
 @RequiresApi(Build.VERSION_CODES.S)
 class BluetoothNearbyTransport(private val context: Context) : NearbyTransport {
@@ -61,14 +65,27 @@ class BluetoothNearbyTransport(private val context: Context) : NearbyTransport {
     @SuppressLint("MissingPermission") // guarded by unavailableReason(), checked before every window
     override suspend fun exchange(
         beacon: ByteArray,
+        isOurs: (ByteArray) -> Boolean,
         mine: ByteArray,
         windowMs: Long,
     ): List<ByteArray> = withContext(Dispatchers.IO) {
-        val adapter = adapter ?: return@withContext emptyList()
+        val adapter = adapter ?: throw NearbyTransport.RadioRefused("no adapter")
         val received = Collections.synchronizedList(mutableListOf<ByteArray>())
+        // Connecting is a blocking RFCOMM dial plus a whole exchange. Doing it
+        // on the scan callback — a system thread — stalls delivery of the other
+        // phones' results, so it happens here instead.
+        val dialling = Executors.newCachedThreadPool()
+        val failures = Collections.synchronizedList(mutableListOf<String>())
 
         val advertiser = runCatching { adapter.bluetoothLeAdvertiser }.getOrNull()
-        val advertiseCallback = object : AdvertiseCallback() {}
+        val advertiseCallback = object : AdvertiseCallback() {
+            override fun onStartFailure(errorCode: Int) {
+                // Silence here is how the first version of this hid a broken
+                // window for a whole release: nothing advertised, nothing
+                // found, and "nobody nearby" reported as though that were news.
+                failures += "advertising refused ($errorCode)"
+            }
+        }
         runCatching { advertiser?.startAdvertising(settings(), advertisement(beacon), advertiseCallback) }
 
         // Accepting and connecting both run for the window: whichever phone
@@ -90,11 +107,17 @@ class BluetoothNearbyTransport(private val context: Context) : NearbyTransport {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 val advertised = result.scanRecord
                     ?.getServiceData(ParcelUuid(HouseholdBeacon.SERVICE_UUID)) ?: return
-                // The beacon is compared by the caller's rules; here we only
-                // avoid connecting to the same phone twice in one window.
-                if (!advertised.contentEquals(beacon)) return
+                // Whether this beacon is one of ours is the caller's rule, not
+                // ours — it is the only side that holds the household secret,
+                // and it accepts the previous half-hour as well as this one.
+                if (!isOurs(advertised)) return
                 if (!met.add(result.device.address)) return
-                connect(result.device, mine)?.let { received += it }
+                val device = result.device
+                dialling.execute { connect(device, mine)?.let { received += it } }
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+                failures += "scanning refused ($errorCode)"
             }
         }
         runCatching { scanner?.startScan(listOf(filter()), scanSettings(), scanCallback) }
@@ -108,6 +131,17 @@ class BluetoothNearbyTransport(private val context: Context) : NearbyTransport {
             // accept(); interrupting one on its own would not.
             runCatching { server?.close() }
             accepting.interrupt()
+            // A dial started just before the window closed is worth finishing:
+            // the exchange itself takes well under a second once connected.
+            dialling.shutdown()
+            runCatching { dialling.awaitTermination(DIAL_GRACE_MS, TimeUnit.MILLISECONDS) }
+            dialling.shutdownNow()
+        }
+        // A window in which neither half of the radio ever started is a
+        // failure, not an empty room, and saying so is the difference between
+        // "nobody answered" and "turn something back on".
+        if (received.isEmpty() && failures.isNotEmpty()) {
+            throw NearbyTransport.RadioRefused(failures.joinToString("; "))
         }
         received.toList()
     }
@@ -143,18 +177,41 @@ class BluetoothNearbyTransport(private val context: Context) : NearbyTransport {
         .setConnectable(true)
         .build()
 
+    /**
+     * Matches any advertisement carrying service data under Sprout's UUID.
+     *
+     * `setServiceData`, **not** `setServiceUuid`, and the distinction is the
+     * whole reason nothing was ever found: a scan filter's service-uuid clause
+     * is matched against the advertised *list of service UUIDs* (AD types
+     * 0x02–0x07), while what Sprout advertises is *service data* (AD type
+     * 0x21), which the scan record parses into a different field entirely. The
+     * filter could never match, so the callback never fired, and two phones
+     * side by side each reported an empty room.
+     *
+     * Advertising the UUID in both fields would be the other way out, and does
+     * not fit: 3 bytes of flags plus 18 for a 128-bit service UUID plus 26 for
+     * the same UUID again with 8 bytes of data is well past the 31 an
+     * advertisement has. Filtering on the data is both correct and free.
+     *
+     * Empty data with an empty mask means "any value" — the beacon itself is
+     * checked in code, where the previous half-hour is accepted too.
+     */
     private fun filter(): ScanFilter = ScanFilter.Builder()
-        .setServiceUuid(ParcelUuid(HouseholdBeacon.SERVICE_UUID))
+        .setServiceData(ParcelUuid(HouseholdBeacon.SERVICE_UUID), ByteArray(0), ByteArray(0))
         .build()
 
     private fun scanSettings(): ScanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
         .build()
 
     private fun hasPermissions(): Boolean = NearbyPermissions.granted(context)
 
     private companion object {
         const val SERVICE_NAME = "Sprout household sync"
+
+        /** How long a dial already under way may finish after the window shuts. */
+        const val DIAL_GRACE_MS = 5_000L
     }
 }
 

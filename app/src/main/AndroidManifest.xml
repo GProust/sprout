@@ -53,6 +53,51 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/vnd.sprout.sync" />
             </intent-filter>
+
+            <!--
+              The same file, arriving from an app that never learned its type.
+              Sprout sets the type when it shares, but a messaging app stores
+              what it was given and hands it back as application/octet-stream —
+              so the filter above matches a file opened straight out of Sprout's
+              share sheet, and nothing at all when it comes back out of
+              WhatsApp, Gmail or Drive. Which is where an invitation actually
+              travels.
+
+              Opening one by tapping it: scoped by extension, so Sprout is
+              offered for its own files rather than for every unknown blob. The
+              repeated patterns cover the copies those apps make —
+              "invitation.sprout", "invitation-1.sprout", "invitation (1).sprout".
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:pathPattern=".*\\.sprout" />
+                <data android:pathPattern=".*\\..*\\.sprout" />
+                <data android:pathPattern=".*\\..*\\..*\\.sprout" />
+            </intent-filter>
+
+            <!--
+              Sharing one *into* Sprout, which is the route that works when the
+              provider's URI carries no file name to match a pattern against —
+              the common case for a content:// from a messaging app.
+
+              A SEND intent has no data URI, only a type, so this has to be its
+              own filter: a filter declaring schemes would never match one. That
+              makes it type-only, and octet-stream is broad, so Sprout appears
+              in the share sheet for other unknown files too. That is the price
+              of receiving an invitation at all, and it is cheap: Sprout says
+              within a second that the file is not one of its own.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
         </activity>
 
         <!--

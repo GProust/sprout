@@ -58,17 +58,28 @@ class NearbySyncTest {
     private class FakeTransport(
         private val replies: List<ByteArray> = emptyList(),
         private val unavailable: NearbyTransport.Unavailable? = null,
+        private val refuse: Boolean = false,
     ) : NearbyTransport {
         var windows = 0
         var advertised: ByteArray? = null
         var sent: ByteArray? = null
 
+        /** The rule the caller handed down for recognising a household beacon. */
+        var isOurs: ((ByteArray) -> Boolean)? = null
+
         override fun unavailableReason() = unavailable
 
-        override suspend fun exchange(beacon: ByteArray, mine: ByteArray, windowMs: Long): List<ByteArray> {
+        override suspend fun exchange(
+            beacon: ByteArray,
+            isOurs: (ByteArray) -> Boolean,
+            mine: ByteArray,
+            windowMs: Long,
+        ): List<ByteArray> {
             windows++
             advertised = beacon
             sent = mine
+            this.isOurs = isOurs
+            if (refuse) throw NearbyTransport.RadioRefused("advertising refused (1)")
             return replies
         }
     }
@@ -148,6 +159,37 @@ class NearbySyncTest {
         assertTrue(
             "what is advertised is the rotating beacon, not the household",
             HouseholdBeacon.matches(transport.advertised!!, secret, clock),
+        )
+    }
+
+    @Test
+    fun `the transport is told how to recognise a beacon, previous window included`() = runBlocking {
+        val transport = FakeTransport()
+
+        sync(transport).run(userAsked = true)
+
+        val isOurs = transport.isOurs!!
+        assertTrue("this half-hour", isOurs(HouseholdBeacon.value(secret, clock)))
+        assertTrue(
+            "the half-hour before, so a boundary is not a wall",
+            isOurs(HouseholdBeacon.value(secret, clock - HouseholdBeacon.WINDOW_MS)),
+        )
+        assertTrue(
+            "another household's beacon is not ours",
+            !isOurs(HouseholdBeacon.value(SyncSecret(ByteArray(SyncSecret.SIZE_BYTES) { 7 }), clock)),
+        )
+    }
+
+    @Test
+    fun `a radio that refuses mid-window is not an empty room`() = runBlocking {
+        val transport = FakeTransport(refuse = true)
+
+        val result = sync(transport).run(userAsked = true)
+
+        assertEquals(
+            "\"nobody answered\" would tell a parent to wait; this tells them to fix something",
+            NearbyResult.CannotStart(NearbyTransport.Unavailable.RADIO_REFUSED),
+            result,
         )
     }
 
