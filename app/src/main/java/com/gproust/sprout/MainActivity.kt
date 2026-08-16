@@ -29,6 +29,16 @@ class MainActivity : ComponentActivity() {
     companion object {
         /** Intent extra naming a bottom-bar route to open (used by the widget). */
         const val EXTRA_ROUTE = "com.gproust.sprout.extra.ROUTE"
+
+        /**
+         * What the widget sends to ask for a screen. Ours alone, deliberately:
+         * `ACTION_VIEW` is what Sprout's manifest filter uses for an invitation
+         * or a replica, so a navigation intent wearing it is one field away from
+         * being read as a file. It also keeps this pending intent distinct from
+         * the reminders', which `PendingIntent` matches on action and data —
+         * never on extras.
+         */
+        const val ACTION_OPEN_ROUTE = "com.gproust.sprout.action.OPEN_ROUTE"
     }
 
     /** Pending navigation request from the launch (or a re-delivered) intent. */
@@ -48,8 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        routeRequest = intent.getStringExtra(EXTRA_ROUTE)
-        syncFile = SyncFiles.incomingUri(intent)
+        consumeIntent(intent)
         setContent {
             SproutTheme {
                 SproutApp(
@@ -116,7 +125,25 @@ class MainActivity : ComponentActivity() {
     // activity receives the tap here instead of being recreated.
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent.getStringExtra(EXTRA_ROUTE)?.let { routeRequest = it }
-        SyncFiles.incomingUri(intent)?.let { syncFile = it }
+        consumeIntent(intent)
+    }
+
+    /**
+     * Reads an intent once — a screen the widget asked for, or a Sprout file
+     * another app handed over — and then takes it away.
+     *
+     * Both halves matter. **Assigning rather than merging**: an intent that
+     * carries no file has to clear the previous one, or a file opened earlier
+     * stays pending and the next widget tap lands on the sharing screen instead
+     * of Feeding. **Replacing the intent afterwards**: an intent is delivered
+     * once but remains the activity's for as long as it lives, so `getIntent()`
+     * would hand the same file back on every recreation — a rotation, a switch
+     * to dark mode, the activity restored into its task — each time reopening
+     * something the parent already dealt with.
+     */
+    private fun consumeIntent(intent: Intent?) {
+        routeRequest = intent?.getStringExtra(EXTRA_ROUTE)
+        syncFile = SyncFiles.incomingUri(intent)
+        setIntent(Intent(this, MainActivity::class.java))
     }
 }

@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📟 Fixed **tapping the widget opening Household sharing instead of Feeding**,
+  usually with a "nothing was merged" message on top. The widget asked for a
+  screen using the same kind of intent Sprout uses to open an invitation or a
+  replica, so a tap could be read as a file to merge — and a file the app had
+  been handed earlier stayed pending, ready to reappear the next time the app
+  was reopened or the screen rotated. The widget now asks in a way that cannot
+  be mistaken for a file, and a file is only ever opened once.
+
 ## [1.6.0] — 2026-08-16
 
 - 🏠 **You can share a baby's record with the people looking after them.**

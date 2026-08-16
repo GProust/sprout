@@ -326,10 +326,16 @@ private fun CaptionText(babyName: String?, detail: String) {
     )
 }
 
-/** Tapping the widget lands directly on the Feeding screen. */
+/**
+ * Tapping the widget lands directly on the Feeding screen.
+ *
+ * The action is Sprout's own, not `ACTION_VIEW`: that one belongs to opening an
+ * invitation or a replica, and a navigation intent must never be mistaken for a
+ * file to merge.
+ */
 private fun openFeedingScreen(context: Context) = actionStartActivity(
     Intent(context, MainActivity::class.java)
-        .setAction(Intent.ACTION_VIEW)
+        .setAction(MainActivity.ACTION_OPEN_ROUTE)
         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         .putExtra(MainActivity.EXTRA_ROUTE, Routes.FEEDING),
 )
