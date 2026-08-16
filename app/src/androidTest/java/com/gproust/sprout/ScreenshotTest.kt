@@ -45,6 +45,8 @@ import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
+import com.gproust.sprout.data.sync.Pairing
+import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
@@ -58,6 +60,8 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
+import com.gproust.sprout.ui.sync.SyncScreen
+import com.gproust.sprout.ui.sync.SyncViewModel
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
@@ -208,6 +212,10 @@ class ScreenshotTest {
         rule.onNode(hasSetTextAction()).performTextInput(text)
         rule.waitForIdle()
     }
+
+    /** A sync ViewModel reading whatever pairing the store holds right now. */
+    private fun syncViewModel() =
+        SyncViewModel(app.repository, app.syncEngine, app.pairingStore, app)
 
     private fun save(name: String) {
         val bmp = rule.onRoot().captureToImage().asAndroidBitmap()
@@ -440,6 +448,34 @@ class ScreenshotTest {
         runBlocking { app.repository.setTrackWellbeing(true) }
         show { TreatmentsScreen {} }
         save("12-treatments")
+
+        // Partner sync: before pairing, after, and with the stash held back.
+        // The ViewModel is built by hand rather than through viewModel(),
+        // because each capture needs a different pairing and the activity's
+        // ViewModelStore would hand every one of them the first instance.
+        app.pairingStore.unpair()
+        show { SyncScreen(onBack = {}, vm = syncViewModel()) }
+        save("13-sync")
+        // Paired: the verification code, the exchange, and the stash switch.
+        // The secret is fixed, not random, so the code renders the same every
+        // run — a random one would make this capture churn on every build.
+        app.pairingStore.save(
+            Pairing(
+                householdId = "screenshot-household",
+                secret = SyncSecret(ByteArray(SyncSecret.SIZE_BYTES) { it.toByte() }),
+                // Never rendered, so a fixed value keeps the capture stable.
+                pairedAt = 1_700_000_000_000,
+                shareStash = true,
+            ),
+        )
+        show { SyncScreen(onBack = {}, vm = syncViewModel()) }
+        save("13-sync-2-paired")
+        // Same screen with the stash left at home, which adds the note about
+        // what turning it off can and cannot take back.
+        app.pairingStore.setShareStash(false)
+        show { SyncScreen(onBack = {}, vm = syncViewModel()) }
+        save("13-sync-3-stash-off")
+        app.pairingStore.unpair()
 
         // Widget (live): the nursing session started for the timer captures is
         // still running (back on the left), so the widget shows the ongoing
