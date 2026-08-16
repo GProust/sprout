@@ -1,5 +1,6 @@
 package com.gproust.sprout.data.sync
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -62,12 +63,20 @@ object SyncFiles {
         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
             ?: throw IllegalArgumentException("cannot read $uri")
 
-    /** The URI carried by an intent that opened or shared a file with Sprout. */
+    /**
+     * The URI carried by an intent that opened or shared a file with Sprout.
+     *
+     * Null for everything else, and the scheme check is the part that matters:
+     * `ACTION_VIEW` is a broad action, so an intent wearing it is not evidence
+     * of a file. Only something we could actually open — a `content://` from a
+     * share sheet or the document picker, or a `file://` — is treated as one.
+     * Anything else belongs to somebody other than the sync screen.
+     */
     fun incomingUri(intent: Intent?): Uri? = when (intent?.action) {
         Intent.ACTION_VIEW -> intent.data
         Intent.ACTION_SEND -> @Suppress("DEPRECATION") intent.getParcelableExtra(Intent.EXTRA_STREAM)
         else -> null
-    }
+    }?.takeIf { it.scheme == ContentResolver.SCHEME_CONTENT || it.scheme == ContentResolver.SCHEME_FILE }
 
     private fun authority(context: Context) = "${context.packageName}.sync"
 }
