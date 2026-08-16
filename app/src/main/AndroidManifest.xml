@@ -63,9 +63,34 @@
               WhatsApp, Gmail or Drive. Which is where an invitation actually
               travels.
 
-              Opening one by tapping it: scoped by extension, so Sprout is
-              offered for its own files rather than for every unknown blob. The
-              repeated patterns cover the copies those apps make —
+              Opening one by tapping it. Deliberately **not** scoped by
+              extension: a first attempt matched `.*\.sprout` against the path,
+              which sounds exactly right and never fires, because a messaging
+              app's content:// URI carries an opaque id and no file name at all
+              — "content://com.whatsapp.provider.media/item/42". There is
+              nothing there to match, which is why WhatsApp's "Open with" still
+              did not list Sprout.
+
+              So the type is the only thing left to go on, and it is broad:
+              Sprout will be offered for other unknown files too. That is the
+              price of an invitation being openable at all, and it is a fair one
+              — Sprout says within a second when a file is not its own, and
+              every other app in that chooser is there for the same reason.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+
+            <!--
+              And when the name *is* visible — a file manager, the Downloads
+              folder, a file:// URI — match it whatever type the sender guessed.
+              This one costs nothing: only a file actually called ".sprout" can
+              match it. The repeated patterns cover the copies those apps make:
               "invitation.sprout", "invitation-1.sprout", "invitation (1).sprout".
             -->
             <intent-filter>
@@ -75,7 +100,7 @@
                 <data android:scheme="content" />
                 <data android:scheme="file" />
                 <data android:host="*" />
-                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="*/*" />
                 <data android:pathPattern=".*\\.sprout" />
                 <data android:pathPattern=".*\\..*\\.sprout" />
                 <data android:pathPattern=".*\\..*\\..*\\.sprout" />

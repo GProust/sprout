@@ -3,6 +3,14 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📄 Fixed **Sprout still not being offered for a `.sprout` file** sent through
+  WhatsApp. The previous attempt matched the file's name, which sounds right
+  and never works: a messaging app hands the file over under an internal
+  address with no name in it at all, so there was nothing to match. Tapping an
+  invitation now offers Sprout, wherever it was sent from.
+
 ## [1.6.2] — 2026-08-16
 
 - 📶 Fixed **two phones of the same household never finding each other** over
