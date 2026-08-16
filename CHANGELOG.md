@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.7.0] — 2026-08-16
 
 - 📊 **Statistics.** A new screen, one tap from the dashboard, showing what the
   last 7, 30 or 90 days actually added up to: feeds a day and how much of each
