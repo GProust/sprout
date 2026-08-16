@@ -147,6 +147,11 @@ fun StatsScreen(onBack: () -> Unit = {}) {
     val vm: StatsViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
     val context = LocalContext.current
+    // Resolved out here rather than inside `labelOf`: neither that lambda nor
+    // `LazyColumn`'s content is composable, so a `Context.getString` in either
+    // would not be re-read when the configuration changes — switching language
+    // in Settings would leave the old chips behind.
+    val periodLabels = StatsPeriod.entries.associateWith { stringResource(it.labelRes) }
 
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.screen_stats), onBack = onBack) },
@@ -166,7 +171,7 @@ fun StatsScreen(onBack: () -> Unit = {}) {
                     options = StatsPeriod.entries,
                     selected = state.period,
                     onSelect = vm::setPeriod,
-                    labelOf = { context.getString(it.labelRes) },
+                    labelOf = { periodLabels.getValue(it) },
                 )
             }
 
@@ -287,13 +292,15 @@ private fun DiaperStats(state: StatsUiState, context: Context) {
 private fun GrowthStats(state: StatsUiState, context: Context) {
     var measure by remember { mutableStateOf(GrowthMeasure.WEIGHT) }
     val birthDate = state.birthDate
+    // See the period chips: resolved in the composable, not in `labelOf`.
+    val measureLabels = GrowthMeasure.entries.associateWith { stringResource(MEASURE_LABELS.getValue(it)) }
 
     StatsCard(stringResource(R.string.stats_growth_title), Icons.Filled.Monitor) {
         ChoiceChips(
             options = GrowthMeasure.entries,
             selected = measure,
             onSelect = { measure = it },
-            labelOf = { context.getString(MEASURE_LABELS.getValue(it)) },
+            labelOf = { measureLabels.getValue(it) },
         )
         Spacer(Modifier.height(8.dp))
 
