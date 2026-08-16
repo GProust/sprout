@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.6.1] — 2026-08-16
 
 - 📟 Fixed **tapping the widget opening Household sharing instead of Feeding**,
   usually with a "nothing was merged" message on top. The widget asked for a
