@@ -58,6 +58,33 @@ Four things that a change can quietly undo:
 Anything user-visible here also touches `PRIVACY.md`, which carries its own
 dated change log at the end.
 
+## Statistics and the growth curves
+
+The Statistics screen turns the logs into per-day figures, and draws growth
+against the WHO standards. The rules are in
+[BDR-0008](docs/decisions/0008-statistics-and-the-who-growth-curves.md); three
+that a change can quietly break:
+
+- **The WHO tables in `ui/stats/WhoGrowth.kt` are reference data, not code.**
+  They are the published LMS parameters, and `WhoGrowthTest` checks the computed
+  curves against the WHO's own printed z-score values. Never "tidy" a number
+  there; if a table needs to change, re-derive it from the published tables.
+- **The baby's sex is never asked.** Curves are read against *both* references
+  and reported as a span, and "inside the band" means inside for at least one of
+  them. A `sex` field would be a product decision, not a convenience.
+- **Empty days count, today doesn't, and days before the birth never do.** Days
+  with nothing logged are zeroes in the series (they are what the averages
+  divide by); averages cover completed days only, so a half-lived today can't
+  drag a week down; and the window stops at the birth, or a twelve-day-old asked
+  for "30 days" is averaged over eighteen days they did not live.
+- **Chart colours are validated, not chosen.** The growth band's warm/cool pair
+  and the nappy bars' two colours were picked by running a colour-vision check,
+  not by eye — the obvious four-hue palettes all failed it. Re-run the check
+  before changing one.
+
+Exporting a report (PDF) and the raw data as a workbook build on these same
+per-day figures, and are deliberately still to come.
+
 ## Historical — how it was built
 
 Delivered in the order below; kept only as a map of which PR introduced what.

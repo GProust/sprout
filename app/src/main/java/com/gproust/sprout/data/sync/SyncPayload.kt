@@ -180,6 +180,7 @@ object SyncPayloadCodec {
         put("type", entity.type.name)
         putOrNull("side", entity.side?.name)
         putOrNull("amountMl", entity.amountMl)
+        putOrNull("amountGrams", entity.amountGrams)
         put("startTime", entity.startTime)
         putOrNull("endTime", entity.endTime)
         putOrNull("leftDurationMs", entity.leftDurationMs)
@@ -192,6 +193,7 @@ object SyncPayloadCodec {
         type = FeedType.valueOf(o.getString("type")),
         side = o.stringOrNull("side")?.let { BreastSide.valueOf(it) },
         amountMl = o.intOrNull("amountMl"),
+        amountGrams = o.intOrNull("amountGrams"),
         startTime = o.getLong("startTime"),
         endTime = o.longOrNull("endTime"),
         leftDurationMs = o.longOrNull("leftDurationMs"),

@@ -145,6 +145,8 @@
     <string name="unit_ml">ml</string>
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
+    <string name="field_amount_solid">Quantité mangée</string>
+    <string name="feeding_amount_g">%1$d g</string>
 
     <!-- Breastfeeding live timer -->
     <string name="feeding_breastfeeding">Allaitement</string>
@@ -498,4 +500,68 @@
     <string name="sync_nearby_error_too_old">La version d\'Android de ce téléphone est trop ancienne pour cela ; il échange des fichiers à la place.</string>
     <string name="sync_nearby_error_radio">Le Bluetooth a refusé de lancer la recherche. L\'éteindre puis le rallumer suffit en général ; sinon, l\'envoi d\'un fichier fonctionne toujours.</string>
     <string name="sync_nearby_error_first_merge">Le premier échange comporte une question à trancher. Ouvrez une fois un fichier envoyé par l\'autre téléphone, ensuite cela se fera tout seul.</string>
+
+    <!-- Statistics: what the logs add up to, day by day (BDR-0008) -->
+    <string name="screen_stats">Statistiques</string>
+    <string name="home_see_stats">Voir les statistiques</string>
+    <string name="stats_period_week">7 jours</string>
+    <string name="stats_period_month">30 jours</string>
+    <string name="stats_period_quarter">90 jours</string>
+    <string name="stats_no_baby">Ajoutez un bébé pour voir le bilan de ses journées.</string>
+    <string name="stats_empty">Rien d\'enregistré sur cette période. Les repas, le sommeil et les changes sont additionnés ici, jour par jour.</string>
+    <string name="stats_average_over">Moyenne par jour sur %1$d jours complets</string>
+    <string name="stats_average_today_only">Aujourd\'hui, jusqu\'ici</string>
+    <string name="stats_per_day">Par jour</string>
+    <string name="stats_count_and_amount">%1$s × · %2$s</string>
+    <string name="stats_feeding_title">Alimentation</string>
+    <string name="stats_feeds_per_day">Repas</string>
+    <string name="stats_breast_per_day">Tétées</string>
+    <string name="stats_bottle_per_day">Biberons</string>
+    <string name="stats_solid_per_day">Solides</string>
+    <string name="stats_sleep_title">Sommeil</string>
+    <string name="stats_sleep_per_day">Endormi</string>
+    <string name="stats_sleeps_per_day">Fois endormi</string>
+    <string name="stats_diaper_title">Couches</string>
+    <string name="stats_diapers_per_day">Changes</string>
+    <string name="stats_wet_per_day">Pipis</string>
+    <string name="stats_dirty_per_day">Selles</string>
+    <string name="stats_growth_title">Croissance</string>
+    <string name="stats_measure_weight">Poids</string>
+    <string name="stats_measure_length">Taille</string>
+    <string name="stats_measure_head">Périmètre crânien</string>
+    <string name="stats_growth_empty">Enregistrez un poids ou une mesure pour voir la courbe.</string>
+    <string name="stats_age_months">%1$d mois</string>
+    <string name="stats_last_measurement">%1$s à %2$s</string>
+    <string name="stats_percentile_one">P%1$d</string>
+    <string name="stats_percentile_range">P%1$d–P%2$d</string>
+    <string name="stats_who_inside">Dans la bande OMS (P3–P97), autour de %1$s.</string>
+    <string name="stats_who_outside">Hors de la bande OMS (P3–P97), autour de %1$s. À signaler au prochain rendez-vous.</string>
+    <string name="stats_who_past_range">Les courbes OMS affichées ici s\'arrêtent à deux ans.</string>
+    <string name="action_close">Fermer</string>
+    <string name="stats_reference_both">Les deux</string>
+    <string name="stats_reference_girls">Filles</string>
+    <string name="stats_reference_boys">Garçons</string>
+    <string name="stats_window_range">%1$s – %2$s</string>
+    <string name="stats_window_earlier">Période précédente</string>
+    <string name="stats_window_later">Période suivante</string>
+    <string name="stats_band_above">Au-dessus de la médiane</string>
+    <string name="stats_band_below">En dessous</string>
+    <string name="stats_diaper_both">Les deux</string>
+    <string name="stats_age_days">%1$d j</string>
+    <string name="stats_readout_measure">%1$s · %2$s</string>
+    <string name="stats_readout_past_range">au-delà des tables OMS</string>
+    <string name="stats_detail_no_feeds">Aucun repas ce jour-là.</string>
+    <string name="stats_detail_no_sleep">Aucun sommeil enregistré ce jour-là.</string>
+    <string name="stats_detail_no_diapers">Aucun change ce jour-là.</string>
+    <string name="stats_detail_breast">Tétée · %1$s</string>
+    <string name="stats_detail_bottle">Biberon · %1$s</string>
+    <string name="stats_detail_bottle_unmeasured">Biberon · quantité non notée</string>
+    <string name="stats_detail_solid">Solide · %1$s</string>
+    <string name="stats_detail_solid_unweighed">Solide · non pesé</string>
+    <string name="stats_detail_sleep">→ %1$s · %2$s</string>
+    <string name="stats_detail_sleep_split">→ %1$s · %2$s · %3$s sur ce jour</string>
+    <string name="stats_who_disclaimer_both">Zone colorée : les standards de croissance de l\'OMS, du 3e au 97e percentile — chaud en dessous de la médiane, froid au-dessus. Les deux références sont affichées, filles en aplat et garçons en hachuré, parce que Sprout ne demande jamais le sexe du bébé. Une mesure isolée ne dit pas grand-chose ; ce que lit un médecin, c\'est l\'allure de la courbe au fil des mois. Ceci n\'est pas un avis médical.</string>
+    <string name="stats_who_disclaimer_one">Zone colorée : les standards de croissance de l\'OMS pour les %1$s, du 3e au 97e percentile — chaud en dessous de la médiane, froid au-dessus. Ce choix n\'est pas enregistré : Sprout ne demande jamais le sexe du bébé, vous choisissez seulement la courbe affichée. Une mesure isolée ne dit pas grand-chose ; ce que lit un médecin, c\'est l\'allure de la courbe au fil des mois. Ceci n\'est pas un avis médical.</string>
+    <string name="stats_reference_girls_in_sentence">filles</string>
+    <string name="stats_reference_boys_in_sentence">garçons</string>
 </resources>

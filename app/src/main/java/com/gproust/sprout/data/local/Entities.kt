@@ -111,6 +111,13 @@ data class FeedingEntity(
     /** Which breast(s) were used; [BreastSide.BOTH] when the session switched sides. */
     val side: BreastSide? = null,
     val amountMl: Int? = null,
+    /**
+     * How much solid food was eaten, in grams ([FeedType.SOLID] only). Null on
+     * every other kind of feed, and on solids logged before there was anywhere
+     * to put the number — so an absent amount reads as "not recorded" rather
+     * than as zero, and the statistics leave those days' totals alone.
+     */
+    val amountGrams: Int? = null,
     val startTime: Long,
     val endTime: Long? = null,
     /** Time spent on the left breast, in millis (breastfeeding sessions only). */

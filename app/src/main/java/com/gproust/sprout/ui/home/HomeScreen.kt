@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BabyChangingStation
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
@@ -288,6 +289,20 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     value = state.diapersToday.toString(),
                     icon = Icons.Filled.BabyChangingStation,
                     modifier = Modifier.weight(1f),
+                )
+            }
+            // Today's three numbers are the glance; the trend behind them —
+            // averages over the week, and the growth curve against the WHO
+            // band — is one tap further, right where the question comes up.
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = { onNavigate(Routes.STATS) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.BarChart, contentDescription = null)
+                Text(
+                    stringResource(R.string.home_see_stats),
+                    modifier = Modifier.padding(start = 8.dp),
                 )
             }
 

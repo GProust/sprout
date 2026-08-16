@@ -54,6 +54,7 @@ import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
+import com.gproust.sprout.ui.stats.StatsScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.startup.Startup
 import com.gproust.sprout.ui.startup.StartupViewModel
@@ -67,6 +68,7 @@ object Routes {
     const val DIAPER = "diaper"
     const val GROWTH = "growth"
     const val HEALTH = "health"
+    const val STATS = "stats"
     const val CHECKIN = "checkin"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
@@ -237,6 +239,9 @@ private fun MainScaffold(
             composable(Routes.GROWTH) { GrowthScreen() }
             composable(Routes.HEALTH) {
                 HealthScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.STATS) {
+                StatsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.CHECKIN) {
                 CheckInRoute(onDone = { navController.popBackStack() })

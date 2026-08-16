@@ -48,7 +48,7 @@ class SyncPayloadTest {
         householdId = "household-1",
         deviceId = "device-a",
         createdAt = 1_700_000_000_000,
-        schemaVersion = 14,
+        schemaVersion = 15,
         babies = listOf(
             BabyEntity(
                 name = "Léa",
@@ -90,6 +90,17 @@ class SyncPayloadTest {
                     uid = "feed-2",
                     updatedAt = 21,
                     deletedAt = 22,
+                ),
+            ),
+            // A solid, weighed — the field a phone on schema 14 knows nothing about.
+            BabyScoped(
+                babyUid,
+                FeedingEntity(
+                    type = FeedType.SOLID,
+                    amountGrams = 75,
+                    startTime = 1_700_001_500_000,
+                    uid = "feed-3",
+                    updatedAt = 23,
                 ),
             ),
         ),
@@ -138,7 +149,7 @@ class SyncPayloadTest {
     fun `a payload survives the round trip unchanged`() {
         val original = fullPayload()
 
-        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(original), currentSchemaVersion = 14)
+        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(original), currentSchemaVersion = 15)
 
         assertEquals(original.householdId, decoded.householdId)
         assertEquals(original.deviceId, decoded.deviceId)
@@ -153,7 +164,7 @@ class SyncPayloadTest {
 
     @Test
     fun `an empty optional comes back null, not blank`() {
-        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 14)
+        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 15)
 
         val sam = decoded.babies.single { it.uid == "baby-uid-2" }
         assertNull(sam.feedingReminderEnabled)
@@ -167,7 +178,7 @@ class SyncPayloadTest {
 
     @Test
     fun `a deleted row travels flagged, which is how the deletion travels at all`() {
-        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 14)
+        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 15)
 
         assertEquals(22L, decoded.feedings.single { it.row.uid == "feed-2" }.row.deletedAt)
     }
@@ -188,7 +199,7 @@ class SyncPayloadTest {
         val bytes = SyncPayloadCodec.encode(fullPayload().copy(schemaVersion = 99))
 
         val failure = assertThrows(SyncPayloadException.TooNew::class.java) {
-            SyncPayloadCodec.decode(bytes, currentSchemaVersion = 14)
+            SyncPayloadCodec.decode(bytes, currentSchemaVersion = 15)
         }
         assertEquals(99, failure.schemaVersion)
     }

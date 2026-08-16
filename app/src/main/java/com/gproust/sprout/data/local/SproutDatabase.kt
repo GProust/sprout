@@ -22,7 +22,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ParentProfileEntity::class,
         TombstoneEntity::class,
     ],
-    version = 14,
+    version = 15,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -320,6 +320,22 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * v14 -> v15: record how much a solid feed was, in grams.
+         *
+         * Bottles have had `amountMl` since v1; solids had nowhere to put a
+         * quantity, so "what did they actually eat today" could only ever be
+         * counted in spoonfuls-shaped nothing. The column is nullable and
+         * backfills to NULL on purpose: nobody can tell us retroactively how
+         * many grams a feed logged last month was, and NULL says "not
+         * recorded" where a 0 would claim they ate nothing.
+         */
+        private val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `amountGrams` INTEGER")
+            }
+        }
+
+        /**
          * The full migration chain, in order. Exposed so tests can open a
          * database created by an older release through the very same list the
          * app ships — a migration that is written but never registered here
@@ -330,7 +346,7 @@ abstract class SproutDatabase : RoomDatabase() {
         internal val MIGRATIONS: Array<Migration> = arrayOf(
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
-            MIGRATION_12_13, MIGRATION_13_14,
+            MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15,
         )
 
         fun getInstance(context: Context): SproutDatabase =

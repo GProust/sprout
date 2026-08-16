@@ -163,6 +163,20 @@ class DatabaseMigrationTest {
     }
 
     @Test
+    fun `a feed logged before v15 has no weight, rather than a weight of zero`() {
+        createV10Database()
+        val database = openWithMigrations()
+
+        // Nobody can say afterwards how many grams a purée logged last month
+        // was, so the v14 -> v15 column backfills to NULL. A 0 here would read
+        // as "they ate nothing" and would drag the solids average down with it.
+        database.query("SELECT amountGrams FROM `feeding` WHERE id = 1", null).use { c ->
+            assertTrue("feeding 1 missing", c.moveToFirst())
+            assertTrue("amountGrams should be NULL for a pre-v15 feed", c.isNull(0))
+        }
+    }
+
+    @Test
     fun `a fresh install creates a schema the entities agree with`() {
         // No pre-existing file: Room creates the current schema directly. This
         // catches an entity change made without a matching migration, which
@@ -172,7 +186,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(14, database.openHelper.writableDatabase.version)
+        assertEquals(15, database.openHelper.writableDatabase.version)
     }
 
     /**
