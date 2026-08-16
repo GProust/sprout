@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.6.2] — 2026-08-16
 
 - 📶 Fixed **two phones of the same household never finding each other** over
   Bluetooth, even side by side with both apps open. Sprout was listening for
