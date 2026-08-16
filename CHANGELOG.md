@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.6.3] — 2026-08-16
 
 - 📄 Fixed **Sprout still not being offered for a `.sprout` file** sent through
   WhatsApp. The previous attempt matched the file's name, which sounds right

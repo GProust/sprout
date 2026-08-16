@@ -1,0 +1,1 @@
+Correction de Sprout qui n'apparaissait pas dans « Ouvrir avec » quand vous touchez une invitation .sprout reçue par WhatsApp. Une messagerie transmet un fichier sans son nom ni son type, il ne restait donc rien pour le reconnaître. Sprout propose désormais d'ouvrir ce genre de fichiers — et vous dit tout de suite si l'un d'eux n'est pas un fichier Sprout.

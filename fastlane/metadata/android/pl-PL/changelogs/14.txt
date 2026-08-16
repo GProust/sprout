@@ -1,0 +1,1 @@
+Poprawka: Sprout nie pojawiał się w „Otwórz za pomocą” po dotknięciu zaproszenia .sprout otrzymanego przez WhatsApp. Komunikator przekazuje plik bez nazwy i bez typu, więc nie zostawało nic, po czym można go rozpoznać. Sprout proponuje teraz otwieranie takich plików — i od razu mówi, gdy któryś nie jest plikiem Sprout.
