@@ -509,5 +509,6 @@
     <string name="sync_nearby_error_bluetooth_off">Bluetooth is off. Turn it on and try again.</string>
     <string name="sync_nearby_error_no_permission">Sprout needs permission to find nearby devices. It is only used to spot the household\'s phones, never your location.</string>
     <string name="sync_nearby_error_too_old">This phone\'s version of Android is too old for this, so it exchanges files instead.</string>
+    <string name="sync_nearby_error_radio">Bluetooth refused to start the search. Turning Bluetooth off and on again usually clears it; otherwise, sending a file always works.</string>
     <string name="sync_nearby_error_first_merge">The first exchange has a question to answer. Open a file sent from the other phone once, and after that this works on its own.</string>
 </resources>

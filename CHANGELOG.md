@@ -3,6 +3,24 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📶 Fixed **two phones of the same household never finding each other** over
+  Bluetooth, even side by side with both apps open. Sprout was listening for
+  the wrong part of what the other phone broadcasts, so the search could not
+  have matched anything, ever — "nobody nearby" was the only possible answer.
+  Two smaller things that hid it are fixed with it: a search the radio refuses
+  to start now says so instead of reporting an empty room, and two phones that
+  meet either side of a half-hour boundary recognise each other rather than
+  missing by minutes. Pairing the phones in Android's Bluetooth settings was
+  never needed and makes no difference.
+- 📄 **Sprout files sent through WhatsApp, Gmail or Drive can now be opened.**
+  An invitation keeps its meaning when Sprout hands it over, but a messaging
+  app stores what it was given and passes it back as an anonymous file — so
+  Sprout wasn't offered when you tapped it, which is exactly where invitations
+  travel. Tapping a `.sprout` file now opens Sprout, and so does sharing one to
+  it from another app.
+
 ## [1.6.1] — 2026-08-16
 
 - 📟 Fixed **tapping the widget opening Household sharing instead of Feeding**,

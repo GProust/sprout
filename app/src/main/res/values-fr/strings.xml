@@ -496,5 +496,6 @@
     <string name="sync_nearby_error_bluetooth_off">Le Bluetooth est désactivé. Activez-le et réessayez.</string>
     <string name="sync_nearby_error_no_permission">Sprout a besoin de l\'autorisation de détecter les appareils à proximité. Elle sert uniquement à repérer les téléphones du foyer, jamais à connaître votre position.</string>
     <string name="sync_nearby_error_too_old">La version d\'Android de ce téléphone est trop ancienne pour cela ; il échange des fichiers à la place.</string>
+    <string name="sync_nearby_error_radio">Le Bluetooth a refusé de lancer la recherche. L\'éteindre puis le rallumer suffit en général ; sinon, l\'envoi d\'un fichier fonctionne toujours.</string>
     <string name="sync_nearby_error_first_merge">Le premier échange comporte une question à trancher. Ouvrez une fois un fichier envoyé par l\'autre téléphone, ensuite cela se fera tout seul.</string>
 </resources>

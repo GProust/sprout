@@ -267,6 +267,7 @@ class SyncViewModel(
         NearbyTransport.Unavailable.BLUETOOTH_OFF -> R.string.sync_nearby_error_bluetooth_off
         NearbyTransport.Unavailable.NO_PERMISSION -> R.string.sync_nearby_error_no_permission
         NearbyTransport.Unavailable.TOO_OLD -> R.string.sync_nearby_error_too_old
+        NearbyTransport.Unavailable.RADIO_REFUSED -> R.string.sync_nearby_error_radio
     }
 
     // --- the two kinds of file --------------------------------------------

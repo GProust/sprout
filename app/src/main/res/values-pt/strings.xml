@@ -437,5 +437,6 @@
     <string name="sync_nearby_error_bluetooth_off">O Bluetooth está desligado. Ligue-o e tente de novo.</string>
     <string name="sync_nearby_error_no_permission">O Sprout precisa de autorização para detetar dispositivos por perto. Serve apenas para reconhecer os telemóveis do agregado, nunca a sua localização.</string>
     <string name="sync_nearby_error_too_old">A versão de Android deste telemóvel é demasiado antiga para isto; troca ficheiros em vez disso.</string>
+    <string name="sync_nearby_error_radio">O Bluetooth recusou iniciar a procura. Desligá-lo e voltar a ligá-lo costuma resolver; caso contrário, enviar um ficheiro funciona sempre.</string>
     <string name="sync_nearby_error_first_merge">A primeira troca tem uma pergunta a responder. Abra uma vez um ficheiro enviado do outro telemóvel e depois passa a funcionar sozinho.</string>
 </resources>
