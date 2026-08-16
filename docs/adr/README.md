@@ -29,8 +29,9 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted |
 | [0005](0005-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
 | [0006](0006-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
-| [0007](0007-partner-sync-by-direct-device-to-device-exchange.md) | Partner sync by direct device-to-device exchange | Accepted (pairing amended by [ADR-0008](0008-pairing-by-invitation-and-the-first-merge.md); phase 2 transport open) |
-| [0008](0008-pairing-by-invitation-and-the-first-merge.md) | Pairing by invitation, and what the first merge does | Accepted |
+| [0007](0007-partner-sync-by-direct-device-to-device-exchange.md) | Partner sync by direct device-to-device exchange | Accepted (amended by [ADR-0008](0008-pairing-by-invitation-and-the-first-merge.md) and [ADR-0009](0009-the-household-is-a-group-not-a-pair.md); phase 2 transport open) |
+| [0008](0008-pairing-by-invitation-and-the-first-merge.md) | Pairing by invitation, and what the first merge does | Accepted (extended to households by [ADR-0009](0009-the-household-is-a-group-not-a-pair.md)) |
+| [0009](0009-the-household-is-a-group-not-a-pair.md) | The household is a group, not a pair | Accepted |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive

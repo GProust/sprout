@@ -20,16 +20,20 @@ MVVM, Room. No accounts, no network calls, no analytics.
 - `CHANGELOG.md` is user-facing release notes, in the voice of the existing
   entries. Docs-only changes don't go in it.
 
-## Work in progress — partner sync
+## Work in progress — sharing a baby's record
 
-Sharing one baby's record between two parents' phones, with **no server and no
+Sharing one baby's record between the phones of everyone looking after them —
+usually two parents, sometimes a grandparent as well — with **no server and no
 external storage**: a direct device-to-device merge, specified in
-[ADR-0007](docs/adr/0007-partner-sync-by-direct-device-to-device-exchange.md).
-Read it before touching any of the three phases below — the merge rules and the
-"what syncs / what doesn't" line are decided there, not per-PR.
+[ADR-0007](docs/adr/0007-partner-sync-by-direct-device-to-device-exchange.md)
+and amended by
+[ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) and
+[ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md). Read them
+before touching anything below — the merge rules and the "what syncs / what
+doesn't" line are decided there, not per-PR.
 
-Keep this checklist current as phases land, and **delete this whole section once
-phase 2 ships** (or once the work is abandoned) — the ADR is the permanent
+Keep this checklist current as work lands, and **delete this whole section once
+phase 2 ships** (or once the work is abandoned) — the ADRs are the permanent
 record; this is only the live status.
 
 - [x] **Phase 0 — make the data mergeable.** `uid` / `updatedAt` / `deletedAt` on
@@ -44,27 +48,24 @@ record; this is only the live status.
     forgotten filter shows deleted entries again.
   - `SproutRepository` is the only place that stamps `uid`/`updatedAt`. Keep it
     that way; a DAO called directly writes an unstamped row.
-- [ ] **Phase 1 — exchange a replica file by hand.** Landing in two PRs, because
-  it is too big for one: the engine, then everything the user can see.
+- [x] **Phase 1 — exchange a replica file by hand.** Landed in two PRs: the
+  engine (#65), then everything the user can see (#66).
   [ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) settled
-  the two questions this phase couldn't start without — **no QR code** (scanning
-  needs a camera permission the phase promises not to add; pairing travels as an
+  the two questions it couldn't start without — **no QR code** (scanning needs a
+  camera permission the phase promises not to add; pairing travels as an
   invitation file through the same channel as the data), and the first merge
   **adopts** rather than duplicates.
-  - [x] **1a — the engine.** Versioned payload, AES-GCM envelope, and the merge
-    itself: idempotent, commutative, tombstone always wins. No UI.
-  - [ ] **1b — what the user sees.** Pairing by invitation + verification code,
-    the Keystore-backed secret, the **stash switch** (pumping is the one part of
-    the sync that can be turned off, asked at pairing, device-local, send-side
-    only), export via `ACTION_SEND`, import, the merge summary — and strings in
-    all 7 locales. No new permissions.
-  - **Known gap for 1b:** adopting a partner's baby doesn't select it as the
-    active one (the merge writes rows, it doesn't touch `activeBabyId`). The
-    import flow has to, or a freshly paired phone shows an empty dashboard.
+- [ ] **Households — more than two phones.**
+  [ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md): the merge
+  already worked for any number of devices, so this is wording, a list of the
+  phones heard from, and removal by **rotating the shared secret** — which locks
+  out everyone until they are re-invited, including a phone that was merely
+  switched off. Not part of the original three phases; folded in here because it
+  changes what phase 2 will be built on.
 - [ ] **Phase 2 — automatic exchange on the local network.** Same payload, same
   merge. Needs its own ADR to pick the transport (`NsdManager` + TCP vs Wi-Fi
   Direct; **not** Nearby Connections), and **`PRIVACY.md` + `README.md` must be
   rewritten in the same PR** — both currently promise no internet permission.
 
-Phases are independently shippable and land as separate PRs. Phase 1 is a
+Each item is independently shippable and lands as its own PR. Phase 1 is a
 complete feature on its own if phase 2 never happens.

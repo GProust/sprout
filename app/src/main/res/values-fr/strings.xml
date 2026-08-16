@@ -426,30 +426,30 @@
     <string name="widget_error">Erreur du widget — voir Paramètres → Diagnostic du widget</string>
 
     <!-- Synchronisation entre parents (ADR-0007 phase 1) -->
-    <string name="screen_sync">Partage entre parents</string>
+    <string name="screen_sync">Partage du foyer</string>
     <string name="settings_sharing">Partage</string>
-    <string name="settings_sync_hint">Partagez le suivi du bébé avec l\'autre parent — sans compte, sans cloud.</string>
-    <string name="sync_intro_title">Deux téléphones, un seul suivi</string>
-    <string name="sync_intro_body">Invitez l\'autre parent. Une fois vos téléphones associés, chacun peut envoyer ses saisies à l\'autre et Sprout les fusionne — sans compte, sans serveur, et rien n\'est conservé ailleurs que sur vos deux téléphones.</string>
-    <string name="sync_invite">Inviter l\'autre parent</string>
+    <string name="settings_sync_hint">Partagez le suivi du bébé avec les autres personnes qui s\'en occupent — sans compte, sans cloud.</string>
+    <string name="sync_intro_title">Un seul suivi, tous les téléphones du foyer</string>
+    <string name="sync_intro_body">Invitez l\'autre parent — ou un grand-parent qui garde le bébé régulièrement. Une fois un téléphone entré dans le foyer, chacun peut envoyer ses saisies et Sprout les fusionne : sans compte, sans serveur, et rien n\'est conservé ailleurs que sur vos propres téléphones.</string>
+    <string name="sync_invite">Inviter un téléphone</string>
     <string name="sync_open_invitation">Ouvrir une invitation reçue</string>
-    <string name="sync_channel_warning">L\'invitation contient la clé de votre suivi. Envoyez-la par un canal privé — messagerie, Quick Share, Bluetooth — et jamais sur un espace public.</string>
-    <string name="sync_code_title">Votre code d\'association</string>
-    <string name="sync_code_hint">Les deux téléphones affichent les mêmes six caractères. Lisez-les-vous une fois à voix haute : s\'ils diffèrent, vous n\'êtes pas associés l\'un à l\'autre.</string>
+    <string name="sync_channel_warning">L\'invitation contient la clé de votre suivi, et quiconque l\'a peut lire et compléter tout ce qui est partagé. Envoyez-la par un canal privé — messagerie, Quick Share, Bluetooth — et jamais sur un espace public.</string>
+    <string name="sync_code_title">Le code de votre foyer</string>
+    <string name="sync_code_hint">Tous les téléphones du foyer affichent ces six mêmes caractères. Lisez-les-vous une fois à voix haute : un téléphone qui en affiche d\'autres n\'est pas dans votre foyer.</string>
     <string name="sync_send">Envoyer mes saisies</string>
     <string name="sync_receive">Ouvrir un fichier reçu</string>
-    <string name="sync_exchange_hint">Envoyez dans les deux sens pour mettre les deux téléphones à jour. Ouvrir deux fois le même fichier ne change rien.</string>
+    <string name="sync_exchange_hint">Envoyez-vous les fichiers dans les deux sens pour mettre tous les téléphones à jour. Ouvrir deux fois le même fichier ne change rien.</string>
     <string name="sync_stash_title">Partager le lait tiré</string>
-    <string name="sync_stash_desc">Votre historique de tirage et le stock de lait. Tout ce qui concerne le bébé est partagé dans tous les cas.</string>
+    <string name="sync_stash_desc">Votre historique de tirage et le stock de lait, partagés avec tout le foyer ou avec personne. Tout ce qui concerne le bébé est partagé dans tous les cas.</string>
     <string name="sync_stash_off_note">Désactiver arrête les envois à venir. Ce que vous avez déjà envoyé reste sur l\'autre téléphone.</string>
     <string name="sync_invite_again">Renvoyer l\'invitation</string>
-    <string name="sync_unpair">Dissocier</string>
-    <string name="sync_unpair_confirm">Ce téléphone cessera d\'envoyer et d\'ouvrir des fichiers pour cette association. Tout ce qui est déjà enregistré ici reste.</string>
+    <string name="sync_unpair">Quitter le foyer</string>
+    <string name="sync_unpair_confirm">Ce téléphone cessera d\'envoyer et d\'ouvrir les fichiers du foyer. Tout ce qui est déjà enregistré ici reste.</string>
     <string name="sync_share_invitation_subject">Invitation Sprout</string>
     <string name="sync_share_data_subject">Saisies Sprout</string>
     <string name="sync_paired_title">Associés</string>
-    <string name="sync_paired_body">Votre code d\'association est %1$s. Vérifiez que l\'autre téléphone affiche le même.</string>
-    <string name="sync_paired_body_named">Associé à %1$s. Votre code d\'association est %2$s — vérifiez que l\'autre téléphone affiche le même.</string>
+    <string name="sync_paired_body">Le code de votre foyer est %1$s. Vérifiez que les autres téléphones affichent le même.</string>
+    <string name="sync_paired_body_named">Vous avez rejoint le foyer de %1$s. Votre code est %2$s — vérifiez que les autres téléphones affichent le même.</string>
     <string name="sync_merged_title">Fusionné</string>
     <string name="sync_merged_nothing_new">Rien de nouveau — les deux téléphones étaient déjà d\'accord.</string>
     <plurals name="sync_merged_added">
@@ -465,13 +465,23 @@
         <item quantity="other">%d saisies supprimées</item>
     </plurals>
     <string name="sync_failed_title">Rien n\'a été fusionné</string>
-    <string name="sync_error_not_paired">Associez d\'abord le téléphone de l\'autre parent.</string>
+    <string name="sync_error_not_paired">Rejoignez d\'abord un foyer.</string>
     <string name="sync_error_unreadable">Ce fichier n\'est ni une invitation ni un export Sprout.</string>
-    <string name="sync_error_wrong_phone">Ce fichier n\'a pas été envoyé par le téléphone auquel vous êtes associé, ou il a été abîmé en route.</string>
+    <string name="sync_error_wrong_phone">Ce fichier n\'a pas été envoyé par un téléphone de votre foyer, ou il a été abîmé en route.</string>
     <string name="sync_error_too_new">Ce fichier a été écrit par une version plus récente de Sprout. Mettez l\'application à jour et réessayez.</string>
     <string name="sync_error_invitation_expired">Cette invitation a expiré. Demandez-en une nouvelle.</string>
-    <string name="sync_histories_title">Vous avez déjà tous les deux des saisies</string>
-    <string name="sync_histories_body">Vous avez chacun suivi le bébé avant de vous associer, et Sprout ne peut pas deviner quelles saisies correspondent au même moment. Tout garder — ce que vous avez noté tous les deux apparaîtra en double — ou ne partager qu\'à partir de maintenant ?</string>
+    <string name="sync_histories_title">Les deux téléphones ont déjà des saisies</string>
+    <string name="sync_histories_body">Chaque téléphone a suivi le bébé de son côté, et Sprout ne peut pas deviner quelles saisies correspondent au même moment. Tout garder — ce qui a été noté deux fois apparaîtra en double — ou ne partager qu\'à partir de maintenant ?</string>
     <string name="sync_histories_keep_all">Tout garder</string>
     <string name="sync_histories_from_pairing">À partir de maintenant</string>
+
+    <!-- Les téléphones du foyer (ADR-0009) -->
+    <string name="sync_devices_title">Téléphones de votre foyer</string>
+    <string name="sync_devices_empty">Aucun autre téléphone n\'a encore envoyé quoi que ce soit. Chacun apparaît ici la première fois qu\'il le fait.</string>
+    <string name="sync_device_unnamed">Téléphone sans nom</string>
+    <string name="sync_device_remove">Retirer</string>
+    <string name="sync_remove_title">Retirer ce téléphone ?</string>
+    <string name="sync_remove_body">Retirer un téléphone change la clé du foyer : tous les autres téléphones auront eux aussi besoin d\'une nouvelle invitation — y compris ceux qui sont éteints en ce moment. Le téléphone retiré garde ce qu\'il a déjà ; rien ne peut le lui reprendre.</string>
+    <string name="sync_rotated_title">La clé du foyer a changé</string>
+    <string name="sync_rotated_body">Votre nouveau code est %1$s. Envoyez une nouvelle invitation à tous ceux qui restent — d\'ici là, leurs téléphones ne peuvent pas lire ce que vous envoyez.</string>
 </resources>

@@ -439,30 +439,30 @@
     <string name="widget_error">Widget error — see Settings → Widget diagnostics</string>
 
     <!-- Partner sync (ADR-0007 phase 1) -->
-    <string name="screen_sync">Partner sync</string>
+    <string name="screen_sync">Household sharing</string>
     <string name="settings_sharing">Sharing</string>
-    <string name="settings_sync_hint">Share this baby\'s record with the other parent — no account, no cloud.</string>
-    <string name="sync_intro_title">Two phones, one record</string>
-    <string name="sync_intro_body">Invite the other parent. Once your phones are paired you can each send your entries across, and Sprout merges them — no account, no server, nothing kept anywhere but your two phones.</string>
-    <string name="sync_invite">Invite the other parent</string>
+    <string name="settings_sync_hint">Share this baby\'s record with the other people looking after them — no account, no cloud.</string>
+    <string name="sync_intro_title">One record, every phone in the household</string>
+    <string name="sync_intro_body">Invite the other parent — or a grandparent who has the baby regularly. Once a phone has joined, everyone can send their entries across and Sprout merges them: no account, no server, and nothing kept anywhere but your own phones.</string>
+    <string name="sync_invite">Invite a phone</string>
     <string name="sync_open_invitation">Open an invitation I was sent</string>
-    <string name="sync_channel_warning">The invitation carries the key to your record. Send it through something private — a messaging app, Quick Share, Bluetooth — and not anywhere public.</string>
-    <string name="sync_code_title">Your pairing code</string>
-    <string name="sync_code_hint">Both phones show the same six characters. Read them to each other once: if they differ, you are not paired with each other.</string>
+    <string name="sync_channel_warning">The invitation carries the key to your record, and anyone who has it can read and add to everything shared. Send it through something private — a messaging app, Quick Share, Bluetooth — and not anywhere public.</string>
+    <string name="sync_code_title">Your household code</string>
+    <string name="sync_code_hint">Every phone in the household shows these same six characters. Read them to each other once: a phone showing something else is not in your household.</string>
     <string name="sync_send">Send my entries</string>
     <string name="sync_receive">Open a file I was sent</string>
-    <string name="sync_exchange_hint">Send in both directions to bring both phones up to date. Opening the same file twice changes nothing.</string>
+    <string name="sync_exchange_hint">Send to each other in both directions to bring every phone up to date. Opening the same file twice changes nothing.</string>
     <string name="sync_stash_title">Share expressed milk</string>
-    <string name="sync_stash_desc">Your pumping log and the milk stash. Everything about the baby is shared either way.</string>
+    <string name="sync_stash_desc">Your pumping log and the milk stash, shared with the whole household or with nobody. Everything about the baby is shared either way.</string>
     <string name="sync_stash_off_note">Turning this off stops future sends. What you have already sent stays on the other phone.</string>
     <string name="sync_invite_again">Send the invitation again</string>
-    <string name="sync_unpair">Unpair</string>
-    <string name="sync_unpair_confirm">This phone will stop sending and opening files for this pairing. Everything already saved here stays.</string>
+    <string name="sync_unpair">Leave the household</string>
+    <string name="sync_unpair_confirm">This phone will stop sending and opening the household\'s files. Everything already saved here stays.</string>
     <string name="sync_share_invitation_subject">Sprout invitation</string>
     <string name="sync_share_data_subject">Sprout entries</string>
     <string name="sync_paired_title">Paired</string>
-    <string name="sync_paired_body">Your pairing code is %1$s. Check that the other phone shows the same one.</string>
-    <string name="sync_paired_body_named">Paired with %1$s. Your pairing code is %2$s — check that the other phone shows the same one.</string>
+    <string name="sync_paired_body">Your household code is %1$s. Check that the other phones show the same one.</string>
+    <string name="sync_paired_body_named">Joined %1$s\'s household. Your code is %2$s — check that the other phones show the same one.</string>
     <string name="sync_merged_title">Merged</string>
     <string name="sync_merged_nothing_new">Nothing new — both phones already agreed.</string>
     <plurals name="sync_merged_added">
@@ -478,13 +478,23 @@
         <item quantity="other">%d entries removed</item>
     </plurals>
     <string name="sync_failed_title">Nothing was merged</string>
-    <string name="sync_error_not_paired">Pair with the other parent\'s phone first.</string>
+    <string name="sync_error_not_paired">Join a household first.</string>
     <string name="sync_error_unreadable">This file is not a Sprout invitation or a Sprout export.</string>
-    <string name="sync_error_wrong_phone">This file was not sent by the phone you are paired with, or it was damaged on the way.</string>
+    <string name="sync_error_wrong_phone">This file was not sent by a phone in your household, or it was damaged on the way.</string>
     <string name="sync_error_too_new">This file was written by a newer version of Sprout. Update the app and try again.</string>
     <string name="sync_error_invitation_expired">This invitation has expired. Ask for a new one.</string>
-    <string name="sync_histories_title">You both have entries already</string>
-    <string name="sync_histories_body">You have each been tracking before pairing, and Sprout cannot tell which entries are the same moment. Keep everything — anything you both logged will appear twice — or share only from now on?</string>
+    <string name="sync_histories_title">Both phones have entries already</string>
+    <string name="sync_histories_body">Each phone has been tracking on its own, and Sprout cannot tell which entries are the same moment. Keep everything — anything logged twice will appear twice — or share only from now on?</string>
     <string name="sync_histories_keep_all">Keep everything</string>
     <string name="sync_histories_from_pairing">From now on</string>
+
+    <!-- The household's phones (ADR-0009) -->
+    <string name="sync_devices_title">Phones in your household</string>
+    <string name="sync_devices_empty">No other phone has sent anything yet. Each one appears here the first time it does.</string>
+    <string name="sync_device_unnamed">Unnamed phone</string>
+    <string name="sync_device_remove">Remove</string>
+    <string name="sync_remove_title">Remove this phone?</string>
+    <string name="sync_remove_body">Removing a phone changes the household\'s key, so every other phone needs a new invitation too — including any that is switched off right now. The removed phone keeps what it already has; nothing can take that back.</string>
+    <string name="sync_rotated_title">The household key changed</string>
+    <string name="sync_rotated_body">Your new code is %1$s. Send a fresh invitation to everyone who stays — until you do, their phones cannot read what you send.</string>
 </resources>

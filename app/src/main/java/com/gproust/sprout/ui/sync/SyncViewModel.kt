@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.sync.DeviceIdentity
+import com.gproust.sprout.data.sync.HouseholdDevice
+import com.gproust.sprout.data.sync.HouseholdDevices
 import com.gproust.sprout.data.sync.MergeSummary
 import com.gproust.sprout.data.sync.Pairing
 import com.gproust.sprout.data.sync.PairingStore
@@ -34,6 +36,8 @@ import kotlinx.coroutines.withContext
 /** What the sync screen is showing. */
 data class SyncUiState(
     val pairing: Pairing? = null,
+    /** The other phones this one has heard from (ADR-0009). */
+    val devices: List<HouseholdDevice> = emptyList(),
     val busy: Boolean = false,
     /** A file to hand to the share sheet; consumed once shared. */
     val fileToShare: ShareRequest? = null,
@@ -48,6 +52,13 @@ sealed interface SyncOutcome {
     data class Paired(val partnerName: String, val code: String) : SyncOutcome
 
     data class Merged(val summary: MergeSummary) : SyncOutcome
+
+    /**
+     * A device was removed, so the household's secret changed. Everyone who
+     * stays needs a fresh invitation — including anyone who was simply away
+     * (ADR-0009).
+     */
+    data class SecretRotated(val code: String) : SyncOutcome
 
     /**
      * Both phones tracked before pairing, so their entries cannot be matched up
@@ -69,11 +80,14 @@ class SyncViewModel(
     private val repository: SproutRepository,
     private val engine: SyncEngine,
     private val pairingStore: PairingStore,
+    private val householdDevices: HouseholdDevices,
     private val context: Context,
     private val now: () -> Long = System::currentTimeMillis,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SyncUiState(pairing = pairingStore.current()))
+    private val _state = MutableStateFlow(
+        SyncUiState(pairing = pairingStore.current(), devices = householdDevices.all()),
+    )
     val state: StateFlow<SyncUiState> = _state.asStateFlow()
 
     fun dismissOutcome() = _state.update { it.copy(outcome = null) }
@@ -113,6 +127,8 @@ class SyncViewModel(
         val payload = engine.buildPayload(
             householdId = pairing.householdId,
             deviceId = DeviceIdentity.id(context),
+            // So the household list on the other phones can name this one.
+            deviceName = repository.parentProfile.first()?.name.orEmpty(),
             includePumping = pairing.shareStash,
         )
         val sealed = SyncCrypto.seal(SyncPayloadCodec.encode(payload), pairing.secret)
@@ -139,7 +155,28 @@ class SyncViewModel(
 
     fun unpair() {
         pairingStore.unpair()
-        _state.update { it.copy(pairing = null, outcome = null) }
+        householdDevices.clear()
+        _state.update { it.copy(pairing = null, devices = emptyList(), outcome = null) }
+    }
+
+    /**
+     * Removes a phone from the household (ADR-0009).
+     *
+     * Membership is possession of the secret, so this rotates it: the removed
+     * phone can no longer read what comes next, and **every** other phone needs
+     * a fresh invitation before it can either. The removed phone keeps what it
+     * already has, which no amount of rotation can change.
+     */
+    fun removeDevice(deviceId: String) = work {
+        householdDevices.forget(deviceId)
+        val rotated = pairingStore.rotateSecret(now()) ?: return@work fail(R.string.sync_error_not_paired)
+        _state.update {
+            it.copy(
+                pairing = rotated,
+                devices = householdDevices.all(),
+                outcome = SyncOutcome.SecretRotated(rotated.verificationCode()),
+            )
+        }
     }
 
     // --- the two kinds of file --------------------------------------------
@@ -156,11 +193,16 @@ class SyncViewModel(
                 },
             )
         }
+        val existing = pairingStore.current()
+        // Re-invited after a rotation, this is the same pairing with a new key —
+        // moving the cut-off would quietly change what "share from the pairing
+        // forward" means.
+        val rejoined = existing?.takeIf { it.householdId == invitation.householdId }
         val pairing = Pairing(
             householdId = invitation.householdId,
             secret = invitation.secret,
-            pairedAt = now(),
-            shareStash = pairingStore.current()?.shareStash ?: true,
+            pairedAt = rejoined?.pairedAt ?: now(),
+            shareStash = existing?.shareStash ?: true,
         )
         pairingStore.save(pairing)
         _state.update {
@@ -203,8 +245,11 @@ class SyncViewModel(
         val since = if (historyChoice == HistoryChoice.FROM_PAIRING) pairing.pairedAt else null
         val summary = engine.merge(payload, since = since)
         pairingStore.markFirstMergeDone()
+        householdDevices.seen(payload.deviceId, payload.deviceName, now())
         selectABabyIfNoneActive()
-        _state.update { it.copy(outcome = SyncOutcome.Merged(summary)) }
+        _state.update {
+            it.copy(devices = householdDevices.all(), outcome = SyncOutcome.Merged(summary))
+        }
     }
 
     /**

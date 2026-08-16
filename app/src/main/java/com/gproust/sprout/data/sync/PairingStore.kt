@@ -117,6 +117,26 @@ class PairingStore(
     }
 
     /**
+     * Replaces the household's secret, keeping the household itself (ADR-0009).
+     *
+     * This is how a device is removed: possession of the secret *is* membership,
+     * so the only way to take it away is to change it and re-invite everyone who
+     * stays. Every other phone goes mute until it is re-invited — including one
+     * that was merely switched off at the wrong moment — and the phone being
+     * removed keeps whatever it already holds. Rotation stops what comes next;
+     * it cannot reach backwards.
+     *
+     * The verification code changes with the secret, which is the visible signal:
+     * anyone still showing the old code has not been re-invited yet.
+     */
+    fun rotateSecret(now: Long): Pairing? {
+        val current = current() ?: return null
+        val rotated = current.copy(secret = SyncSecret.random(), pairedAt = now)
+        save(rotated)
+        return rotated
+    }
+
+    /**
      * The stash switch (ADR-0008). Send-side only, and prospective: turning it
      * off stops future replicas carrying the stash, it cannot reach into the
      * other phone and take back what was already sent.

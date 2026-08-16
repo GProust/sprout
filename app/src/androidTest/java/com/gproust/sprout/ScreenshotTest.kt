@@ -215,7 +215,7 @@ class ScreenshotTest {
 
     /** A sync ViewModel reading whatever pairing the store holds right now. */
     private fun syncViewModel() =
-        SyncViewModel(app.repository, app.syncEngine, app.pairingStore, app)
+        SyncViewModel(app.repository, app.syncEngine, app.pairingStore, app.householdDevices, app)
 
     private fun save(name: String) {
         val bmp = rule.onRoot().captureToImage().asAndroidBitmap()
@@ -468,6 +468,11 @@ class ScreenshotTest {
                 shareStash = true,
             ),
         )
+        // A household with someone else in it, so the list has something to
+        // show — the common case being a co-parent, with a grandparent just as
+        // ordinary (ADR-0009).
+        app.householdDevices.seen("screenshot-device-1", "Aurélien", 1_700_000_100_000)
+        app.householdDevices.seen("screenshot-device-2", "Mamie", 1_700_000_200_000)
         show { SyncScreen(onBack = {}, vm = syncViewModel()) }
         save("13-sync-2-paired")
         // Same screen with the stash left at home, which adds the note about
@@ -476,6 +481,7 @@ class ScreenshotTest {
         show { SyncScreen(onBack = {}, vm = syncViewModel()) }
         save("13-sync-3-stash-off")
         app.pairingStore.unpair()
+        app.householdDevices.clear()
 
         // Widget (live): the nursing session started for the timer captures is
         // still running (back on the left), so the widget shows the ongoing

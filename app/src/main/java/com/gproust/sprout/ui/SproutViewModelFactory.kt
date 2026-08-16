@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.sync.HouseholdDevices
 import com.gproust.sprout.data.sync.PairingStore
 import com.gproust.sprout.data.sync.SyncEngine
 import com.gproust.sprout.ui.checkin.CheckInViewModel
@@ -32,6 +33,7 @@ class SproutViewModelFactory(
     private val context: Context,
     private val syncEngine: SyncEngine,
     private val pairingStore: PairingStore,
+    private val householdDevices: HouseholdDevices,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -49,7 +51,7 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository, context)
             modelClass.isAssignableFrom(TreatmentsViewModel::class.java) -> TreatmentsViewModel(repository, context)
             modelClass.isAssignableFrom(SyncViewModel::class.java) ->
-                SyncViewModel(repository, syncEngine, pairingStore, context)
+                SyncViewModel(repository, syncEngine, pairingStore, householdDevices, context)
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         } as T
     }
@@ -59,5 +61,13 @@ class SproutViewModelFactory(
 @Composable
 fun rememberSproutViewModelFactory(): SproutViewModelFactory {
     val app = LocalContext.current.applicationContext as SproutApplication
-    return remember { SproutViewModelFactory(app.repository, app, app.syncEngine, app.pairingStore) }
+    return remember {
+        SproutViewModelFactory(
+            app.repository,
+            app,
+            app.syncEngine,
+            app.pairingStore,
+            app.householdDevices,
+        )
+    }
 }
