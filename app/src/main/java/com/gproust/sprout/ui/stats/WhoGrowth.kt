@@ -146,23 +146,31 @@ fun percentileOf(zScore: Double): Double {
     return 100.0 * if (zScore >= 0) 1.0 - tail else tail
 }
 
+/** One reference's five percentile lines at a given age. */
+data class WhoPercentiles(
+    val p3: Double,
+    val p15: Double,
+    val p50: Double,
+    val p85: Double,
+    val p97: Double,
+)
+
 /**
- * One age's worth of the band drawn behind a baby's own measurements.
+ * One age's worth of the reference, carrying both published standards in full.
  *
- * Since the sex is unknown, each edge takes whichever reference is further out
- * — the band is the union of the girls' and the boys' — while the two medians
- * are kept apart, because their gap is exactly the uncertainty being admitted
- * to.
+ * They are deliberately *not* merged into a single band here. The screen shows
+ * either one of them or both side by side, and flattening the pair into an
+ * envelope — or worse, an average of two curves that describe different
+ * populations — would throw away the thing the parent is being shown.
  */
 data class WhoBandPoint(
     val ageMonths: Double,
-    val p3: Double,
-    val p15: Double,
-    val p85: Double,
-    val p97: Double,
-    val girlsMedian: Double,
-    val boysMedian: Double,
-)
+    val girls: WhoPercentiles,
+    val boys: WhoPercentiles,
+) {
+    /** The reference for one sex, so a caller can loop over what it is drawing. */
+    fun of(sex: WhoSex): WhoPercentiles = if (sex == WhoSex.GIRLS) girls else boys
+}
 
 /**
  * The band for [measure] from [fromMonths] to [toMonths], sampled at [steps]+1
@@ -179,28 +187,32 @@ fun whoBand(
     val span = toMonths - fromMonths
     return (0..steps).mapNotNull { i ->
         val age = fromMonths + span * i / steps
-        fun at(sex: WhoSex, z: Double) = whoValueAt(measure, sex, age, z)
-        val girlsMedian = at(WhoSex.GIRLS, Z_P50) ?: return@mapNotNull null
-        val boysMedian = at(WhoSex.BOYS, Z_P50) ?: return@mapNotNull null
-        WhoBandPoint(
-            ageMonths = age,
-            p3 = minOf(at(WhoSex.GIRLS, Z_P3) ?: return@mapNotNull null, at(WhoSex.BOYS, Z_P3) ?: return@mapNotNull null),
-            p15 = minOf(at(WhoSex.GIRLS, Z_P15) ?: return@mapNotNull null, at(WhoSex.BOYS, Z_P15) ?: return@mapNotNull null),
-            p85 = maxOf(at(WhoSex.GIRLS, Z_P85) ?: return@mapNotNull null, at(WhoSex.BOYS, Z_P85) ?: return@mapNotNull null),
-            p97 = maxOf(at(WhoSex.GIRLS, Z_P97) ?: return@mapNotNull null, at(WhoSex.BOYS, Z_P97) ?: return@mapNotNull null),
-            girlsMedian = girlsMedian,
-            boysMedian = boysMedian,
-        )
+        val girls = percentilesAt(measure, WhoSex.GIRLS, age) ?: return@mapNotNull null
+        val boys = percentilesAt(measure, WhoSex.BOYS, age) ?: return@mapNotNull null
+        WhoBandPoint(age, girls, boys)
     }
 }
 
+private fun percentilesAt(measure: GrowthMeasure, sex: WhoSex, ageMonths: Double): WhoPercentiles? {
+    fun at(z: Double) = whoValueAt(measure, sex, ageMonths, z)
+    return WhoPercentiles(
+        p3 = at(Z_P3) ?: return null,
+        p15 = at(Z_P15) ?: return null,
+        p50 = at(Z_P50) ?: return null,
+        p85 = at(Z_P85) ?: return null,
+        p97 = at(Z_P97) ?: return null,
+    )
+}
+
 /**
- * Where one measurement lands, read against both references.
+ * Where one measurement lands, read against one reference or both.
  *
- * [insideBand] is the lenient reading, and deliberately so: the baby is one sex
- * or the other, so a value inside P3–P97 for *either* reference is inside the
- * band for a baby it could belong to. Saying otherwise would flag healthy
- * babies on the strength of a fact Sprout chose not to ask for.
+ * With [WhoPlacement.girlsPercentile] and [WhoPlacement.boysPercentile] equal,
+ * the reader chose a reference and gets a single number; otherwise the pair is
+ * the span, and [insideBand] is the lenient reading — the baby is one sex or
+ * the other, so a value inside P3–P97 for *either* reference is inside the band
+ * for a baby it could belong to. Saying otherwise would flag healthy babies on
+ * the strength of a fact Sprout chose not to ask for.
  */
 data class WhoPlacement(
     val girlsPercentile: Double,
@@ -214,10 +226,20 @@ data class WhoPlacement(
     val insideBand: Boolean get() = highPercentile >= 3.0 && lowPercentile <= 97.0
 }
 
-/** [value] read against both references at [ageMonths]; null past the tables. */
-fun whoPlacement(measure: GrowthMeasure, ageMonths: Double, value: Double): WhoPlacement? {
-    val girls = whoZScore(measure, WhoSex.GIRLS, ageMonths, value) ?: return null
-    val boys = whoZScore(measure, WhoSex.BOYS, ageMonths, value) ?: return null
+/**
+ * [value] read at [ageMonths]; null past the tables.
+ *
+ * [only] restricts the reading to one reference — the reader picked a curve, so
+ * both halves of the pair come back the same and the screen shows one number.
+ */
+fun whoPlacement(
+    measure: GrowthMeasure,
+    ageMonths: Double,
+    value: Double,
+    only: WhoSex? = null,
+): WhoPlacement? {
+    val girls = whoZScore(measure, only ?: WhoSex.GIRLS, ageMonths, value) ?: return null
+    val boys = whoZScore(measure, only ?: WhoSex.BOYS, ageMonths, value) ?: return null
     return WhoPlacement(percentileOf(girls), percentileOf(boys))
 }
 

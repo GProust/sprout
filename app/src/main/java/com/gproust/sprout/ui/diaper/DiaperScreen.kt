@@ -138,7 +138,10 @@ fun DiaperScreen() {
 }
 
 /** Short label for a stool colour, e.g. "Yellow". */
-private fun StoolColor.label(context: Context): String = context.getString(
+// Not private: the statistics screen shows the same swatches behind a
+// tapped day, and a colour card used for cholestasis screening must not
+// have two sources of truth.
+fun StoolColor.label(context: Context): String = context.getString(
     when (this) {
         StoolColor.YELLOW -> R.string.stool_color_yellow
         StoolColor.GREEN -> R.string.stool_color_green
@@ -152,7 +155,7 @@ private fun StoolColor.label(context: Context): String = context.getString(
 )
 
 /** Swatch colour for the picker (approximating the infant stool colour card). */
-private fun StoolColor.swatch(): Color = when (this) {
+fun StoolColor.swatch(): Color = when (this) {
     StoolColor.YELLOW -> Color(0xFFE7C24B)
     StoolColor.GREEN -> Color(0xFF7C8A4A)
     StoolColor.BROWN -> Color(0xFF7A5230)

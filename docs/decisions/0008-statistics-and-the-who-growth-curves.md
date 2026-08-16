@@ -81,6 +81,40 @@ and the length standard changes measurement at 24 months (lying down becomes
 standing up, with its own table) — comparing a toddler's standing height against
 a lying-down reference would be quietly wrong.
 
+**Each card draws one number at a time, and the window slides.** A count, a
+duration, millilitres and grams cannot share an axis, so the feeding card has
+its own selector rather than a combined chart — two scales on one picture would
+invent a relationship that isn't there. And the period chips choose how *wide*
+the window is, while dragging any chart sideways chooses *where* it sits: the
+three charts move together, and the window stops at the birth in the same way
+and for the same reason it never starts before it.
+
+**Tapping a day opens what it was made of** — the feeds with their times and
+amounts, the sleeps with how much of a night landed on that day, the changes
+with the stool colour from the same card the diaper screen uses. One selected
+day is shared by the three cards, because the question is "what happened on the
+14th", not "what happened on the 14th, for nappies".
+
+**Nappy bars stack into what each change actually was**: urine only, both, stool
+only. Stacking "wet" and "dirty" as recorded would count every mixed change
+twice and leave the bar disagreeing with the figure printed above it. The
+overlap segment is a hatch of the other two rather than a third colour, because
+that is what it is.
+
+**Colour carries meaning, and is checked rather than chosen by eye.** On the
+growth chart, colour is the *side of the median* — warm below, cool above, a
+diverging pair — and *texture* is which reference, so that showing both does not
+need four hues. That was not an aesthetic preference: every four-hue set tried
+collapsed to a colour distance of 3–4 under deuteranopia, which is no
+distinction at all for roughly one man in twelve. The same check picked the
+nappy pair. A palette in this app is validated, not eyeballed.
+
+**The reference is a view choice, never a stored one.** The growth card offers
+"both / girls / boys"; picking one narrows the band and turns the span into a
+single percentile. Nothing is written down, nothing is synced, and the app still
+never asks — the wording under the chart says exactly that, so the choice cannot
+be mistaken for a fact Sprout now knows.
+
 **The wording never diagnoses.** Being outside the band reads as "worth a word at
 the next appointment", not as an alarm; every growth card carries a line saying
 that one measurement means little on its own, that what a doctor reads is the

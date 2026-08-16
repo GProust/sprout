@@ -123,6 +123,22 @@ class WhoGrowthTest {
     }
 
     @Test
+    fun placement_againstOneReference_isASingleNumber() {
+        // The girls' median at 6 months, read as girls only: the 50th, with no
+        // span left over, because the reader chose the curve.
+        val girlsMedian = whoValueAt(GrowthMeasure.WEIGHT, WhoSex.GIRLS, 6.0, Z_P50)!!
+        val chosen = whoPlacement(GrowthMeasure.WEIGHT, 6.0, girlsMedian, only = WhoSex.GIRLS)!!
+        assertEquals(50.0, chosen.girlsPercentile, 0.05)
+        assertEquals(chosen.lowPercentile, chosen.highPercentile, 0.0)
+
+        // The same measurement read against both still opens back up.
+        val both = whoPlacement(GrowthMeasure.WEIGHT, 6.0, girlsMedian)!!
+        assertTrue(both.highPercentile - both.lowPercentile > 5.0)
+        assertEquals(50.0, both.girlsPercentile, 0.05)
+        assertTrue(both.boysPercentile < 50.0)
+    }
+
+    @Test
     fun insideTheBand_isTrueWhenEitherReferenceWouldSaySo() {
         // Just inside the girls' 97th at 6 months is well past the boys' — and
         // still "inside", because the baby may well be a girl.
@@ -137,21 +153,44 @@ class WhoGrowthTest {
     }
 
     @Test
-    fun band_isOrderedAndBracketsBothMedians() {
+    fun band_keepsBothReferencesApart_andEachOneIsOrdered() {
         val band = whoBand(GrowthMeasure.WEIGHT, 0.0, WHO_MAX_AGE_MONTHS, steps = 24)
         assertEquals(25, band.size)
         assertEquals(0.0, band.first().ageMonths, 1e-9)
         assertEquals(WHO_MAX_AGE_MONTHS, band.last().ageMonths, 1e-9)
-        band.forEach {
-            assertTrue(it.p3 < it.p15)
-            assertTrue(it.p15 < minOf(it.girlsMedian, it.boysMedian))
-            assertTrue(it.p85 > maxOf(it.girlsMedian, it.boysMedian))
-            assertTrue(it.p85 < it.p97)
-            // Boys are the heavier reference throughout the first two years.
-            assertTrue(it.boysMedian > it.girlsMedian)
+        band.forEach { point ->
+            for (sex in WhoSex.entries) {
+                val p = point.of(sex)
+                assertTrue(p.p3 < p.p15)
+                assertTrue(p.p15 < p.p50)
+                assertTrue(p.p50 < p.p85)
+                assertTrue(p.p85 < p.p97)
+            }
+            // The two references are distinct, which is why they are drawn
+            // separately rather than merged: boys are the heavier standard
+            // throughout the first two years.
+            assertTrue(point.boys.p50 > point.girls.p50)
         }
-        // And the curve rises.
-        band.zipWithNext().forEach { (a, b) -> assertTrue(b.boysMedian > a.boysMedian) }
+        // And each curve rises.
+        band.zipWithNext().forEach { (a, b) -> assertTrue(b.boys.p50 > a.boys.p50) }
+        band.zipWithNext().forEach { (a, b) -> assertTrue(b.girls.p50 > a.girls.p50) }
+    }
+
+    @Test
+    fun band_agreesWithTheValueItIsBuiltFrom() {
+        val band = whoBand(GrowthMeasure.HEAD, 0.0, 6.0, steps = 6)
+        band.forEach { point ->
+            assertEquals(
+                whoValueAt(GrowthMeasure.HEAD, WhoSex.GIRLS, point.ageMonths, Z_P50)!!,
+                point.girls.p50,
+                1e-9,
+            )
+            assertEquals(
+                whoValueAt(GrowthMeasure.HEAD, WhoSex.BOYS, point.ageMonths, Z_P97)!!,
+                point.boys.p97,
+                1e-9,
+            )
+        }
     }
 
     @Test

@@ -72,9 +72,15 @@ that a change can quietly break:
 - **The baby's sex is never asked.** Curves are read against *both* references
   and reported as a span, and "inside the band" means inside for at least one of
   them. A `sex` field would be a product decision, not a convenience.
-- **Empty days count, today doesn't.** Days with nothing logged are zeroes in
-  the series (they are what the averages divide by); averages cover completed
-  days only, so a half-lived today can't drag a week down.
+- **Empty days count, today doesn't, and days before the birth never do.** Days
+  with nothing logged are zeroes in the series (they are what the averages
+  divide by); averages cover completed days only, so a half-lived today can't
+  drag a week down; and the window stops at the birth, or a twelve-day-old asked
+  for "30 days" is averaged over eighteen days they did not live.
+- **Chart colours are validated, not chosen.** The growth band's warm/cool pair
+  and the nappy bars' two colours were picked by running a colour-vision check,
+  not by eye — the obvious four-hue palettes all failed it. Re-run the check
+  before changing one.
 
 Exporting a report (PDF) and the raw data as a workbook build on these same
 per-day figures, and are deliberately still to come.

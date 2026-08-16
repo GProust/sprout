@@ -7,6 +7,7 @@ import com.gproust.sprout.data.local.SleepEntity
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Turning the logs into "what did a day actually look like".
@@ -56,9 +57,20 @@ data class DayStats(
     val wetCount: Int = 0,
     /** Changes with stool present. */
     val dirtyCount: Int = 0,
+    /**
+     * Changes that were both at once — kept apart so a stacked bar can add up
+     * to [diaperCount] instead of counting every mixed change twice.
+     */
+    val bothCount: Int = 0,
     /** Changes logged, however they were made up. */
     val diaperCount: Int = 0,
 ) {
+    /** Changes with urine and no stool — the bottom segment of the stacked bar. */
+    val wetOnlyCount: Int get() = wetCount - bothCount
+
+    /** Changes with stool and no urine — the top segment. */
+    val dirtyOnlyCount: Int get() = dirtyCount - bothCount
+
     /** Feeds of every kind — the "how many times did they eat today" number. */
     val feedCount: Int get() = breastCount + bottleCount + solidCount
 }
@@ -84,26 +96,47 @@ fun breastfeedMillis(entry: FeedingEntity): Long = when {
     else -> 0L
 }
 
+/** The stretch of days a chart is showing: [from] through [to], inclusive. */
+data class StatsWindow(val from: LocalDate, val to: LocalDate)
+
 /**
- * The first day a window of [days] ending on [today] covers.
+ * The window of [days] ending [offset] days before [today].
  *
- * The window ends today and starts `days - 1` days earlier, so "7 days" is
- * this week including today rather than eight columns.
+ * An offset of 0 ends today, and the window starts `days - 1` days earlier —
+ * so "7 days" is this week including today rather than eight columns. A larger
+ * offset walks the whole window into the past, which is what dragging the
+ * charts sideways does.
  *
  * It never reaches back past [birthDay], and that is not cosmetic: the days in
  * the window are what the averages divide by, so a twelve-day-old read over
  * thirty days would have every figure halved by eighteen days they did not
  * live — a newborn feeding ten times a day would be reported as feeding four.
- * The window shrinking is the honest answer, and the screen says how many days
- * it actually averaged over.
+ * The window shrinking is the honest answer, and the screen says which days it
+ * actually covered.
  *
  * A birth date in the future — typed ahead of a due date — still leaves today,
  * rather than a window that ends before it starts.
  */
-fun statsWindowStart(today: LocalDate, days: Int, birthDay: LocalDate?): LocalDate {
-    val start = today.minusDays((days - 1).coerceAtLeast(0).toLong())
+fun statsWindow(
+    today: LocalDate,
+    days: Int,
+    birthDay: LocalDate?,
+    offset: Int = 0,
+): StatsWindow {
+    val end = today.minusDays(offset.coerceIn(0, maxStatsOffset(today, birthDay)).toLong())
+    val start = end.minusDays((days - 1).coerceAtLeast(0).toLong())
     val notBeforeBirth = if (birthDay != null && birthDay.isAfter(start)) birthDay else start
-    return if (notBeforeBirth.isAfter(today)) today else notBeforeBirth
+    val from = if (notBeforeBirth.isAfter(end)) end else notBeforeBirth
+    return StatsWindow(from, end)
+}
+
+/**
+ * How far back the window can be walked: to the day the baby was born, and no
+ * further. Without a birth date — no baby yet — it stays put.
+ */
+fun maxStatsOffset(today: LocalDate, birthDay: LocalDate?): Int {
+    if (birthDay == null || !birthDay.isBefore(today)) return 0
+    return ChronoUnit.DAYS.between(birthDay, today).toInt().coerceAtLeast(0)
 }
 
 /**
@@ -167,9 +200,52 @@ fun dailyStats(
         day.diaperCount++
         if (entry.wet) day.wetCount++
         if (entry.dirty) day.dirtyCount++
+        if (entry.wet && entry.dirty) day.bothCount++
     }
 
     return days.map { building.getValue(it).build(it) }
+}
+
+// --- What a single day was made of, for the detail behind a tapped bar.
+
+/** The feeds that started on [day], oldest first. */
+fun feedsOn(
+    feedings: List<FeedingEntity>,
+    day: LocalDate,
+    zone: ZoneId = ZoneId.systemDefault(),
+): List<FeedingEntity> =
+    feedings.filter { it.startTime.toLocalDate(zone) == day }.sortedBy { it.startTime }
+
+/** The changes logged on [day], oldest first. */
+fun diapersOn(
+    diapers: List<DiaperEntity>,
+    day: LocalDate,
+    zone: ZoneId = ZoneId.systemDefault(),
+): List<DiaperEntity> =
+    diapers.filter { it.time.toLocalDate(zone) == day }.sortedBy { it.time }
+
+/**
+ * The sleeps that *touch* [day] — a night started the evening before belongs
+ * in the day it woke into, which is the whole point of splitting it.
+ */
+fun sleepsOn(
+    sleeps: List<SleepEntity>,
+    day: LocalDate,
+    now: Long,
+    zone: ZoneId = ZoneId.systemDefault(),
+): List<SleepEntity> = sleeps
+    .filter { sleepMillisOn(it, day, now, zone) > 0 }
+    .sortedBy { it.startTime }
+
+/** How much of [sleep] fell inside [day]; 0 if none of it did. */
+fun sleepMillisOn(
+    sleep: SleepEntity,
+    day: LocalDate,
+    now: Long,
+    zone: ZoneId = ZoneId.systemDefault(),
+): Long {
+    val end = (sleep.endTime ?: now).coerceAtLeast(sleep.startTime)
+    return splitByDay(sleep.startTime, end, zone)[day] ?: 0L
 }
 
 /**
@@ -261,6 +337,7 @@ private class Builder {
     var sleepMillis = 0L
     var wetCount = 0
     var dirtyCount = 0
+    var bothCount = 0
     var diaperCount = 0
 
     fun build(date: LocalDate) = DayStats(
@@ -275,6 +352,7 @@ private class Builder {
         sleepMillis = sleepMillis,
         wetCount = wetCount,
         dirtyCount = dirtyCount,
+        bothCount = bothCount,
         diaperCount = diaperCount,
     )
 }

@@ -17,7 +17,21 @@ All notable changes to Sprout are documented here. This project follows
   the latest measurement placed in the band — so "are we in the normal range?"
   has an answer without a chart to hunt for. Sprout still never asks your baby's
   sex, so it reads both references and tells you the span; one measurement means
-  little on its own, and the screen says so.
+  little on its own, and the screen says so. You can also choose to look at just
+  the girls' or just the boys' curve — that only changes what is on screen,
+  nothing is remembered. Tap a measurement to read its percentile.
+- 👆 **Tap a day to see what it was made of** — the feeds with their times and
+  amounts, the sleeps with how much of a night fell on that day, and the changes
+  with the colour of each stool. One tap opens the same day in all three cards.
+- ↔️ **Slide back through time.** Drag any chart sideways, or use the arrows, to
+  walk the whole window into the past — as far back as the day your baby was
+  born, and no further.
+- 🍽️ **Pick what the feeding chart draws** — number of feeds, time at the breast,
+  millilitres of bottle or grams of solids. Four different units, so they take
+  turns rather than crowd one chart.
+- 🧷 **Wet and dirty, on the same bar.** Each day's changes are split into urine,
+  both, and stool, in colours picked to stay distinguishable for colour-blind
+  readers.
 - 🥄 **Solids can now be weighed.** A purée or a bowl of porridge takes a
   quantity in grams, the way a bottle takes millilitres — and it is optional,
   because most of them are given nowhere near a scale.

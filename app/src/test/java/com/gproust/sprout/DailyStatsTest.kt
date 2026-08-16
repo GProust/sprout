@@ -9,7 +9,9 @@ import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.ui.stats.averagesOf
 import com.gproust.sprout.ui.stats.breastfeedMillis
 import com.gproust.sprout.ui.stats.dailyStats
-import com.gproust.sprout.ui.stats.statsWindowStart
+import com.gproust.sprout.ui.stats.StatsWindow
+import com.gproust.sprout.ui.stats.maxStatsOffset
+import com.gproust.sprout.ui.stats.statsWindow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -234,6 +236,25 @@ class DailyStatsTest {
     }
 
     @Test
+    fun theStackedSegmentsAddUpToTheNumberOfChanges() {
+        val days = stats(
+            diapers = listOf(
+                DiaperEntity(time = at(day2, 8), wet = true),
+                DiaperEntity(time = at(day2, 11), wet = true, dirty = true),
+                DiaperEntity(time = at(day2, 13), wet = true, dirty = true),
+                DiaperEntity(time = at(day2, 15), dirty = true),
+            ),
+        )
+        val d = days[1]
+        assertEquals(2, d.bothCount)
+        assertEquals(1, d.wetOnlyCount)
+        assertEquals(1, d.dirtyOnlyCount)
+        // Which is the whole point: stacking `wet` and `dirty` as they come
+        // would draw six changes where four happened.
+        assertEquals(d.diaperCount, d.wetOnlyCount + d.bothCount + d.dirtyOnlyCount)
+    }
+
+    @Test
     fun aFeedJustBeforeMidnightBelongsToTheDayItStarted() {
         val days = stats(feedings = listOf(bottle(day1, 23, minute = 55, ml = 100)))
         assertEquals(100, days[0].bottleMl)
@@ -272,26 +293,59 @@ class DailyStatsTest {
         val born = LocalDate.of(2026, 3, 8) // twelve days old
 
         // A window that fits inside the baby's life is untouched.
-        assertEquals(today.minusDays(6), statsWindowStart(today, 7, born))
+        assertEquals(StatsWindow(today.minusDays(6), today), statsWindow(today, 7, born))
         // One that does not stops at the birth, rather than averaging over
         // eighteen days the baby was not there for.
-        assertEquals(born, statsWindowStart(today, 30, born))
-        assertEquals(born, statsWindowStart(today, 90, born))
+        assertEquals(StatsWindow(born, today), statsWindow(today, 30, born))
+        assertEquals(StatsWindow(born, today), statsWindow(today, 90, born))
     }
 
     @Test
     fun aBirthDateInTheFutureStillLeavesToday() {
         val today = LocalDate.of(2026, 3, 20)
         // Typed ahead of a due date: the window must not end before it starts.
-        assertEquals(today, statsWindowStart(today, 30, today.plusDays(40)))
+        assertEquals(StatsWindow(today, today), statsWindow(today, 30, today.plusDays(40)))
     }
 
     @Test
     fun withNoBirthDate_theWindowIsTheWholePeriod() {
         val today = LocalDate.of(2026, 3, 20)
-        assertEquals(today.minusDays(29), statsWindowStart(today, 30, null))
+        assertEquals(StatsWindow(today.minusDays(29), today), statsWindow(today, 30, null))
         // A one-day window is today alone, not an empty one.
-        assertEquals(today, statsWindowStart(today, 1, null))
+        assertEquals(StatsWindow(today, today), statsWindow(today, 1, null))
+    }
+
+    @Test
+    fun anOffsetWalksTheWholeWindowIntoThePast() {
+        val today = LocalDate.of(2026, 3, 20)
+        val born = LocalDate.of(2026, 1, 1)
+
+        assertEquals(StatsWindow(today.minusDays(6), today), statsWindow(today, 7, born, offset = 0))
+        // A week back: both ends move together, and the window keeps its width.
+        assertEquals(
+            StatsWindow(today.minusDays(13), today.minusDays(7)),
+            statsWindow(today, 7, born, offset = 7),
+        )
+    }
+
+    @Test
+    fun theOffsetStopsAtTheBirth_ratherThanRunningOffTheStartOfTheLife() {
+        val today = LocalDate.of(2026, 3, 20)
+        val born = LocalDate.of(2026, 3, 8)
+
+        assertEquals(12, maxStatsOffset(today, born))
+        // Asked for more than there is, the window parks on the day of birth.
+        assertEquals(StatsWindow(born, born), statsWindow(today, 7, born, offset = 99))
+        // And an offset can never be negative — there is no data after today.
+        assertEquals(statsWindow(today, 7, born, offset = 0), statsWindow(today, 7, born, offset = -5))
+    }
+
+    @Test
+    fun withNoBaby_thereIsNowhereToWalkTo() {
+        val today = LocalDate.of(2026, 3, 20)
+        assertEquals(0, maxStatsOffset(today, null))
+        assertEquals(0, maxStatsOffset(today, today))
+        assertEquals(0, maxStatsOffset(today, today.plusDays(10)))
     }
 
     @Test
@@ -300,11 +354,11 @@ class DailyStatsTest {
         // used to divide a newborn's ten feeds a day down to four.
         val born = day1
         val today = day3
-        val from = statsWindowStart(today, 30, born)
+        val window = statsWindow(today, 30, born)
         val feeds = listOf(day1, day2, day3).flatMap { date ->
             (0 until 10).map { bottle(date, 6 + it, ml = 60) }
         }
-        val days = dailyStats(feeds, emptyList(), emptyList(), from, today, at(day3, 23, 59), zone)
+        val days = dailyStats(feeds, emptyList(), emptyList(), window.from, window.to, at(day3, 23, 59), zone)
         val averages = averagesOf(days, today = today)
 
         assertEquals(3, days.size)
