@@ -58,6 +58,27 @@ Four things that a change can quietly undo:
 Anything user-visible here also touches `PRIVACY.md`, which carries its own
 dated change log at the end.
 
+## Statistics and the growth curves
+
+The Statistics screen turns the logs into per-day figures, and draws growth
+against the WHO standards. The rules are in
+[BDR-0008](docs/decisions/0008-statistics-and-the-who-growth-curves.md); three
+that a change can quietly break:
+
+- **The WHO tables in `ui/stats/WhoGrowth.kt` are reference data, not code.**
+  They are the published LMS parameters, and `WhoGrowthTest` checks the computed
+  curves against the WHO's own printed z-score values. Never "tidy" a number
+  there; if a table needs to change, re-derive it from the published tables.
+- **The baby's sex is never asked.** Curves are read against *both* references
+  and reported as a span, and "inside the band" means inside for at least one of
+  them. A `sex` field would be a product decision, not a convenience.
+- **Empty days count, today doesn't.** Days with nothing logged are zeroes in
+  the series (they are what the averages divide by); averages cover completed
+  days only, so a half-lived today can't drag a week down.
+
+Exporting a report (PDF) and the raw data as a workbook build on these same
+per-day figures, and are deliberately still to come.
+
 ## Historical — how it was built
 
 Delivered in the order below; kept only as a map of which PR introduced what.

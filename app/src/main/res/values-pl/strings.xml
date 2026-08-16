@@ -125,6 +125,8 @@
     <string name="unit_ml">ml</string>
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
+    <string name="field_amount_solid">Zjedzona ilość</string>
+    <string name="feeding_amount_g">%1$d g</string>
     <string name="feeding_breastfeeding">Karmienie piersią</string>
     <string name="feeding_resume">Wznów karmienie · %1$s</string>
     <string name="feeding_start_left">Zacznij od lewej</string>
@@ -456,4 +458,42 @@
     <string name="sync_nearby_error_too_old">Wersja Androida na tym telefonie jest na to za stara; zamiast tego wymienia pliki.</string>
     <string name="sync_nearby_error_radio">Bluetooth odmówił rozpoczęcia wyszukiwania. Zwykle wystarczy go wyłączyć i włączyć ponownie; jeśli nie, wysłanie pliku zawsze działa.</string>
     <string name="sync_nearby_error_first_merge">Pierwsza wymiana wymaga odpowiedzi na jedno pytanie. Otwórz raz plik przysłany z drugiego telefonu, a potem będzie działać samo.</string>
+
+    <!-- Statistics: what the logs add up to, day by day (BDR-0008) -->
+    <string name="screen_stats">Statystyki</string>
+    <string name="home_see_stats">Zobacz statystyki</string>
+    <string name="stats_period_week">7 dni</string>
+    <string name="stats_period_month">30 dni</string>
+    <string name="stats_period_quarter">90 dni</string>
+    <string name="stats_no_baby">Dodaj dziecko, aby zobaczyć podsumowanie jego dni.</string>
+    <string name="stats_empty">W tym okresie nic nie zapisano. Karmienia, sen i przewijania są tu sumowane, dzień po dniu.</string>
+    <string name="stats_average_over">Średnia dzienna z %1$d pełnych dni</string>
+    <string name="stats_average_today_only">Dziś jak dotąd</string>
+    <string name="stats_per_day">Dziennie</string>
+    <string name="stats_count_and_amount">%1$s × · %2$s</string>
+    <string name="stats_feeding_title">Karmienie</string>
+    <string name="stats_feeds_per_day">Karmienia</string>
+    <string name="stats_breast_per_day">Pierś</string>
+    <string name="stats_bottle_per_day">Butelka</string>
+    <string name="stats_solid_per_day">Stałe</string>
+    <string name="stats_sleep_title">Sen</string>
+    <string name="stats_sleep_per_day">Przespane</string>
+    <string name="stats_sleeps_per_day">Razy zasnęło</string>
+    <string name="stats_diaper_title">Pieluchy</string>
+    <string name="stats_diapers_per_day">Zmiany</string>
+    <string name="stats_wet_per_day">Mocz</string>
+    <string name="stats_dirty_per_day">Stolec</string>
+    <string name="stats_growth_title">Wzrastanie</string>
+    <string name="stats_measure_weight">Waga</string>
+    <string name="stats_measure_length">Długość</string>
+    <string name="stats_measure_head">Obwód głowy</string>
+    <string name="stats_growth_empty">Zapisz wagę lub pomiar, aby zobaczyć krzywą.</string>
+    <string name="stats_age_months">%1$d mies.</string>
+    <string name="stats_last_measurement">%1$s w %2$s</string>
+    <string name="stats_percentile_one">P%1$d</string>
+    <string name="stats_percentile_range">P%1$d–P%2$d</string>
+    <string name="stats_who_inside">W paśmie WHO (P3–P97), około %1$s.</string>
+    <string name="stats_who_outside">Poza pasmem WHO (P3–P97), około %1$s. Warto wspomnieć na najbliższej wizycie.</string>
+    <string name="stats_who_past_range">Pokazane tu krzywe WHO kończą się na dwóch latach.</string>
+    <string name="stats_who_disclaimer">Zacieniowany obszar: standardy wzrastania dzieci WHO, od 3. do 97. centyla, dziewczynki i chłopcy razem — Sprout nigdy nie pyta o płeć dziecka, więc odczytuje obie normy. Pojedynczy pomiar mówi niewiele; lekarz czyta przebieg krzywej przez miesiące. To nie jest porada medyczna.</string>
 </resources>

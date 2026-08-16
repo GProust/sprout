@@ -119,6 +119,8 @@
     <string name="unit_ml">ml</string>
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
+    <string name="field_amount_solid">Gegessene Menge</string>
+    <string name="feeding_amount_g">%1$d g</string>
     <string name="feeding_breastfeeding">Stillen</string>
     <string name="feeding_resume">Stillen fortsetzen · %1$s</string>
     <string name="feeding_start_left">Links starten</string>
@@ -439,4 +441,42 @@
     <string name="sync_nearby_error_too_old">Die Android-Version dieses Handys ist dafür zu alt; es tauscht stattdessen Dateien aus.</string>
     <string name="sync_nearby_error_radio">Bluetooth hat die Suche verweigert. Bluetooth aus- und wieder einzuschalten hilft meist; andernfalls funktioniert das Senden einer Datei immer.</string>
     <string name="sync_nearby_error_first_merge">Beim ersten Austausch ist eine Frage zu beantworten. Öffne einmal eine Datei vom anderen Handy, danach läuft es von allein.</string>
+
+    <!-- Statistics: what the logs add up to, day by day (BDR-0008) -->
+    <string name="screen_stats">Statistik</string>
+    <string name="home_see_stats">Statistik ansehen</string>
+    <string name="stats_period_week">7 Tage</string>
+    <string name="stats_period_month">30 Tage</string>
+    <string name="stats_period_quarter">90 Tage</string>
+    <string name="stats_no_baby">Füge ein Baby hinzu, um seine Tage zusammengefasst zu sehen.</string>
+    <string name="stats_empty">In diesem Zeitraum ist noch nichts eingetragen. Mahlzeiten, Schlaf und Wickeln werden hier Tag für Tag zusammengezählt.</string>
+    <string name="stats_average_over">Tagesdurchschnitt über %1$d volle Tage</string>
+    <string name="stats_average_today_only">Heute bisher</string>
+    <string name="stats_per_day">Pro Tag</string>
+    <string name="stats_count_and_amount">%1$s × · %2$s</string>
+    <string name="stats_feeding_title">Ernährung</string>
+    <string name="stats_feeds_per_day">Mahlzeiten</string>
+    <string name="stats_breast_per_day">Stillen</string>
+    <string name="stats_bottle_per_day">Fläschchen</string>
+    <string name="stats_solid_per_day">Beikost</string>
+    <string name="stats_sleep_title">Schlaf</string>
+    <string name="stats_sleep_per_day">Geschlafen</string>
+    <string name="stats_sleeps_per_day">Mal eingeschlafen</string>
+    <string name="stats_diaper_title">Windeln</string>
+    <string name="stats_diapers_per_day">Wechsel</string>
+    <string name="stats_wet_per_day">Nass</string>
+    <string name="stats_dirty_per_day">Stuhl</string>
+    <string name="stats_growth_title">Wachstum</string>
+    <string name="stats_measure_weight">Gewicht</string>
+    <string name="stats_measure_length">Länge</string>
+    <string name="stats_measure_head">Kopfumfang</string>
+    <string name="stats_growth_empty">Trage ein Gewicht oder eine Messung ein, um die Kurve zu sehen.</string>
+    <string name="stats_age_months">%1$d Mon.</string>
+    <string name="stats_last_measurement">%1$s mit %2$s</string>
+    <string name="stats_percentile_one">P%1$d</string>
+    <string name="stats_percentile_range">P%1$d–P%2$d</string>
+    <string name="stats_who_inside">Im WHO-Bereich (P3–P97), etwa %1$s.</string>
+    <string name="stats_who_outside">Außerhalb des WHO-Bereichs (P3–P97), etwa %1$s. Beim nächsten Termin ansprechen.</string>
+    <string name="stats_who_past_range">Die hier gezeigten WHO-Kurven enden mit zwei Jahren.</string>
+    <string name="stats_who_disclaimer">Farbige Fläche: die WHO-Wachstumsstandards, 3. bis 97. Perzentil, Mädchen und Jungen zusammen — Sprout fragt nie nach dem Geschlecht des Babys und liest deshalb beide Referenzen. Ein einzelner Messwert sagt wenig aus; was Ärztinnen und Ärzte lesen, ist der Verlauf über Monate. Dies ist keine medizinische Beratung.</string>
 </resources>

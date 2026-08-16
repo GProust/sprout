@@ -61,6 +61,7 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
+import com.gproust.sprout.ui.stats.StatsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sync.SyncViewModel
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
@@ -420,6 +421,9 @@ class ScreenshotTest {
         saveScreen("07-diaper-3-colour-picked")
         show { GrowthScreen() }
         save("08-growth")
+        // Statistics: the week's averages, and the weight curve over the WHO band.
+        show { StatsScreen() }
+        save("08-stats")
         show { HealthScreen {} }
         save("09-wellbeing")
         // Babies manager: both babies, the active marker, and add/track/delete actions.

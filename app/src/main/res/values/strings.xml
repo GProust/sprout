@@ -146,6 +146,8 @@
     <string name="unit_ml">ml</string>
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
+    <string name="field_amount_solid">Amount eaten</string>
+    <string name="feeding_amount_g">%1$d g</string>
 
     <!-- Breastfeeding live timer -->
     <string name="feeding_breastfeeding">Breastfeeding</string>
@@ -511,4 +513,42 @@
     <string name="sync_nearby_error_too_old">This phone\'s version of Android is too old for this, so it exchanges files instead.</string>
     <string name="sync_nearby_error_radio">Bluetooth refused to start the search. Turning Bluetooth off and on again usually clears it; otherwise, sending a file always works.</string>
     <string name="sync_nearby_error_first_merge">The first exchange has a question to answer. Open a file sent from the other phone once, and after that this works on its own.</string>
+
+    <!-- Statistics: what the logs add up to, day by day (BDR-0008) -->
+    <string name="screen_stats">Statistics</string>
+    <string name="home_see_stats">See the statistics</string>
+    <string name="stats_period_week">7 days</string>
+    <string name="stats_period_month">30 days</string>
+    <string name="stats_period_quarter">90 days</string>
+    <string name="stats_no_baby">Add a baby to see how their days add up.</string>
+    <string name="stats_empty">Nothing logged over this period yet. Feeds, sleep and changes are added up here, day by day.</string>
+    <string name="stats_average_over">Daily average over %1$d full days</string>
+    <string name="stats_average_today_only">Today so far</string>
+    <string name="stats_per_day">Per day</string>
+    <string name="stats_count_and_amount">%1$s × · %2$s</string>
+    <string name="stats_feeding_title">Feeding</string>
+    <string name="stats_feeds_per_day">Feeds</string>
+    <string name="stats_breast_per_day">Breast</string>
+    <string name="stats_bottle_per_day">Bottle</string>
+    <string name="stats_solid_per_day">Solids</string>
+    <string name="stats_sleep_title">Sleep</string>
+    <string name="stats_sleep_per_day">Asleep</string>
+    <string name="stats_sleeps_per_day">Times settled</string>
+    <string name="stats_diaper_title">Diapers</string>
+    <string name="stats_diapers_per_day">Changes</string>
+    <string name="stats_wet_per_day">Wet</string>
+    <string name="stats_dirty_per_day">Dirty</string>
+    <string name="stats_growth_title">Growth</string>
+    <string name="stats_measure_weight">Weight</string>
+    <string name="stats_measure_length">Length</string>
+    <string name="stats_measure_head">Head</string>
+    <string name="stats_growth_empty">Log a weight or a measurement to see the curve.</string>
+    <string name="stats_age_months">%1$d mo</string>
+    <string name="stats_last_measurement">%1$s at %2$s</string>
+    <string name="stats_percentile_one">P%1$d</string>
+    <string name="stats_percentile_range">P%1$d–P%2$d</string>
+    <string name="stats_who_inside">Inside the WHO band (P3–P97), around %1$s.</string>
+    <string name="stats_who_outside">Outside the WHO band (P3–P97), around %1$s. Worth a word at the next appointment.</string>
+    <string name="stats_who_past_range">The WHO curves shown here stop at two years.</string>
+    <string name="stats_who_disclaimer">Shaded: the WHO child growth standards, 3rd to 97th percentile, girls and boys together — Sprout never asks a baby\'s sex, so it reads both. One measurement means little on its own; what a doctor reads is the shape of the line over months. This is not medical advice.</string>
 </resources>

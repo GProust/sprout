@@ -563,6 +563,10 @@ private fun FeedingForm(
 
     var type by remember(initial) { mutableStateOf(initial?.type ?: FeedType.BREAST) }
     var amount by remember(initial) { mutableStateOf(initial?.amountMl?.toString() ?: "") }
+    // Solids are weighed rather than measured, so they get their own field —
+    // sharing one with the bottle's millilitres would carry a number across
+    // when the type is switched and silently change what it means.
+    var grams by remember(initial) { mutableStateOf(initial?.amountGrams?.toString() ?: "") }
     var start by remember(initial) { mutableLongStateOf(initial?.startTime ?: now) }
     // Whether each breast's length is entered as an end time or a duration.
     var byEnd by remember(initial) { mutableStateOf(initial?.endTime != null) }
@@ -574,6 +578,7 @@ private fun FeedingForm(
     fun reset() {
         type = FeedType.BREAST
         amount = ""
+        grams = ""
         start = System.currentTimeMillis()
         byEnd = false
         segs = listOf(SegInput(BreastSide.LEFT, "", System.currentTimeMillis()))
@@ -609,6 +614,7 @@ private fun FeedingForm(
             type = type,
             side = if (breast) breastSide else null,
             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
+            amountGrams = if (type == FeedType.SOLID) grams.toIntOrNull() else null,
             startTime = start,
             endTime = if (breast) built.lastOrNull()?.endTime else null,
             leftDurationMs = left.takeIf { breast && it > 0 },
@@ -633,6 +639,18 @@ private fun FeedingForm(
             value = amount,
             onChange = { amount = it },
             suffix = stringResource(R.string.unit_ml),
+        )
+    }
+
+    // Optional, and stays optional: a purée is often given without a scale in
+    // sight, and a solid feed with no number is still worth logging.
+    if (type == FeedType.SOLID) {
+        FieldLabel(stringResource(R.string.field_amount_solid))
+        NumberField(
+            label = stringResource(R.string.field_amount_solid),
+            value = grams,
+            onChange = { grams = it },
+            suffix = stringResource(R.string.unit_g),
         )
     }
 
@@ -799,7 +817,8 @@ private fun feedingTitle(context: Context, entry: FeedingEntity): String {
             (entry.side?.let { sep + it.label(context) } ?: "")
         FeedType.BOTTLE -> context.getString(R.string.feed_type_bottle) +
             (entry.amountMl?.let { sep + context.getString(R.string.feeding_amount_ml, it) } ?: "")
-        FeedType.SOLID -> context.getString(R.string.feed_type_solid)
+        FeedType.SOLID -> context.getString(R.string.feed_type_solid) +
+            (entry.amountGrams?.let { sep + context.getString(R.string.feeding_amount_g, it) } ?: "")
     }
 }
 

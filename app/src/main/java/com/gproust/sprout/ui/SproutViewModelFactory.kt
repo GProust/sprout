@@ -22,6 +22,7 @@ import com.gproust.sprout.ui.profile.ProfileViewModel
 import com.gproust.sprout.ui.pumping.PumpingViewModel
 import com.gproust.sprout.ui.sleep.SleepViewModel
 import com.gproust.sprout.ui.startup.StartupViewModel
+import com.gproust.sprout.ui.stats.StatsViewModel
 import com.gproust.sprout.ui.sync.SyncViewModel
 import com.gproust.sprout.ui.treatments.TreatmentsViewModel
 
@@ -46,6 +47,7 @@ class SproutViewModelFactory(
             modelClass.isAssignableFrom(SleepViewModel::class.java) -> SleepViewModel(repository)
             modelClass.isAssignableFrom(DiaperViewModel::class.java) -> DiaperViewModel(repository)
             modelClass.isAssignableFrom(GrowthViewModel::class.java) -> GrowthViewModel(repository)
+            modelClass.isAssignableFrom(StatsViewModel::class.java) -> StatsViewModel(repository)
             modelClass.isAssignableFrom(HealthViewModel::class.java) -> HealthViewModel(repository)
             modelClass.isAssignableFrom(PumpingViewModel::class.java) -> PumpingViewModel(repository)
             modelClass.isAssignableFrom(ProfileViewModel::class.java) -> ProfileViewModel(repository, context)

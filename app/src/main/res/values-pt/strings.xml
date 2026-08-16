@@ -119,6 +119,8 @@
     <string name="unit_ml">ml</string>
     <string name="feeding_detail_separator"> · </string>
     <string name="feeding_amount_ml">%1$d ml</string>
+    <string name="field_amount_solid">Quantidade comida</string>
+    <string name="feeding_amount_g">%1$d g</string>
     <string name="feeding_breastfeeding">Amamentação</string>
     <string name="feeding_resume">Retomar a mamada · %1$s</string>
     <string name="feeding_start_left">Começar à esquerda</string>
@@ -439,4 +441,42 @@
     <string name="sync_nearby_error_too_old">A versão de Android deste telemóvel é demasiado antiga para isto; troca ficheiros em vez disso.</string>
     <string name="sync_nearby_error_radio">O Bluetooth recusou iniciar a procura. Desligá-lo e voltar a ligá-lo costuma resolver; caso contrário, enviar um ficheiro funciona sempre.</string>
     <string name="sync_nearby_error_first_merge">A primeira troca tem uma pergunta a responder. Abra uma vez um ficheiro enviado do outro telemóvel e depois passa a funcionar sozinho.</string>
+
+    <!-- Statistics: what the logs add up to, day by day (BDR-0008) -->
+    <string name="screen_stats">Estatísticas</string>
+    <string name="home_see_stats">Ver as estatísticas</string>
+    <string name="stats_period_week">7 dias</string>
+    <string name="stats_period_month">30 dias</string>
+    <string name="stats_period_quarter">90 dias</string>
+    <string name="stats_no_baby">Adicione um bebé para ver o resumo dos seus dias.</string>
+    <string name="stats_empty">Nada registado neste período. As mamadas, o sono e as mudas são somados aqui, dia a dia.</string>
+    <string name="stats_average_over">Média diária em %1$d dias completos</string>
+    <string name="stats_average_today_only">Hoje até agora</string>
+    <string name="stats_per_day">Por dia</string>
+    <string name="stats_count_and_amount">%1$s × · %2$s</string>
+    <string name="stats_feeding_title">Alimentação</string>
+    <string name="stats_feeds_per_day">Refeições</string>
+    <string name="stats_breast_per_day">Mama</string>
+    <string name="stats_bottle_per_day">Biberão</string>
+    <string name="stats_solid_per_day">Sólidos</string>
+    <string name="stats_sleep_title">Sono</string>
+    <string name="stats_sleep_per_day">A dormir</string>
+    <string name="stats_sleeps_per_day">Vezes que adormeceu</string>
+    <string name="stats_diaper_title">Fraldas</string>
+    <string name="stats_diapers_per_day">Mudas</string>
+    <string name="stats_wet_per_day">Xixi</string>
+    <string name="stats_dirty_per_day">Cocó</string>
+    <string name="stats_growth_title">Crescimento</string>
+    <string name="stats_measure_weight">Peso</string>
+    <string name="stats_measure_length">Comprimento</string>
+    <string name="stats_measure_head">Perímetro cefálico</string>
+    <string name="stats_growth_empty">Registe um peso ou uma medida para ver a curva.</string>
+    <string name="stats_age_months">%1$d meses</string>
+    <string name="stats_last_measurement">%1$s aos %2$s</string>
+    <string name="stats_percentile_one">P%1$d</string>
+    <string name="stats_percentile_range">P%1$d–P%2$d</string>
+    <string name="stats_who_inside">Dentro da banda da OMS (P3–P97), à volta de %1$s.</string>
+    <string name="stats_who_outside">Fora da banda da OMS (P3–P97), à volta de %1$s. Vale a pena falar na próxima consulta.</string>
+    <string name="stats_who_past_range">As curvas da OMS mostradas aqui terminam aos dois anos.</string>
+    <string name="stats_who_disclaimer">Zona sombreada: os padrões de crescimento infantil da OMS, do percentil 3 ao 97, meninas e meninos juntos — o Sprout nunca pergunta o sexo do bebé, por isso lê ambas as referências. Uma medida isolada diz pouco; o que um médico lê é a forma da curva ao longo dos meses. Isto não é aconselhamento médico.</string>
 </resources>
