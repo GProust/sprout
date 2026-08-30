@@ -1,0 +1,1 @@
+Housekeeping. Nothing in the app itself has changed with this release — it only moves Sprout onto newer versions of the tools and libraries it is built on. Keeping those current is what makes the next fix you actually notice a small step rather than a big one.

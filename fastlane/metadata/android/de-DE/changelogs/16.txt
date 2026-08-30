@@ -1,0 +1,1 @@
+Wartung. In der App selbst hat sich nichts geändert: Diese Version bringt Sprout lediglich auf neuere Versionen der Werkzeuge und Bibliotheken, auf denen es aufbaut. Sie aktuell zu halten sorgt dafür, dass die nächste sichtbare Verbesserung ein kleiner Schritt bleibt statt eines großen.

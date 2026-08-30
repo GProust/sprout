@@ -1,0 +1,1 @@
+Manutenção. Nada mudou na aplicação em si: esta versão apenas leva o Sprout para versões mais recentes das ferramentas e bibliotecas sobre as quais é construído. Mantê-las atualizadas é o que faz com que a próxima melhoria visível seja um passo pequeno e não um grande.

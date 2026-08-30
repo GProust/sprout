@@ -1,0 +1,1 @@
+Mantenimiento. Nada ha cambiado en la app en sí: esta versión solo lleva a Sprout a versiones más recientes de las herramientas y bibliotecas sobre las que está construido. Mantenerlas al día es lo que hace que la próxima mejora que sí se note sea un paso pequeño y no uno grande.

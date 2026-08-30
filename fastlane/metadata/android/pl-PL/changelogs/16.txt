@@ -1,0 +1,1 @@
+Prace porządkowe. W samej aplikacji nic się nie zmieniło — ta wersja przenosi Sprout na nowsze wersje narzędzi i bibliotek, na których jest zbudowany. Utrzymywanie ich w aktualności sprawia, że następna zauważalna poprawka będzie małym krokiem, a nie dużym.

@@ -1,0 +1,1 @@
+Entretien. Rien n'a changé dans l'application elle-même : cette version met simplement Sprout à jour vers de nouvelles versions des outils et des bibliothèques sur lesquels il est construit. Les garder à jour, c'est ce qui fait que la prochaine correction visible sera un petit pas plutôt qu'un grand.

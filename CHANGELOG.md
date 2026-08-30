@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.7.1] — 2026-08-30
 
 - 🧰 **Housekeeping only — nothing in the app itself has changed.** The tools
   and libraries Sprout is built on moved up a version: the Android Gradle
