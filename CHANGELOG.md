@@ -3,6 +3,14 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🧰 **Housekeeping only — nothing in the app itself has changed.** The tools
+  and libraries Sprout is built on moved up a version: the Android Gradle
+  plugin to 9.3.2, Gradle to 9.7.1 and Jetpack Navigation to 2.10.0. Keeping
+  those current is what makes the next fix that *is* visible a small step
+  rather than a big one.
+
 ## [1.7.0] — 2026-08-16
 
 - 📊 **Statistics.** A new screen, one tap from the dashboard, showing what the
