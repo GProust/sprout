@@ -29,13 +29,14 @@ accident. The **why** is in
 [ADR-0008](docs/adr/0008-pairing-by-invitation-and-the-first-merge.md) (pairing
 by invitation file, no QR; the first merge adopts),
 [ADR-0009](docs/adr/0009-the-household-is-a-group-not-a-pair.md) (a household,
-removal by rotating the secret) and
+removal by rotating the secret),
 [ADR-0010](docs/adr/0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
-(Bluetooth rather than the local network; bounded, triggered discovery). Read
-the relevant one before changing behaviour — what syncs, what doesn't, and how
-conflicts resolve are decided there, not per-PR.
+(Bluetooth rather than the local network; bounded, triggered discovery) and
+[ADR-0011](docs/adr/0011-what-survives-a-new-phone.md) (what a backup and a new
+phone carry). Read the relevant one before changing behaviour — what syncs, what
+doesn't, and how conflicts resolve are decided there, not per-PR.
 
-Four things that a change can quietly undo:
+Five things that a change can quietly undo:
 
 - **Deleting is two paths.** An ordinary delete flags the row (`deletedAt`);
   "permanently delete a baby" erases the rows and keeps only their uids in the
@@ -54,6 +55,11 @@ Four things that a change can quietly undo:
   the foreground (throttled by `NearbyPolicy`) or an explicit *Sync now*. No
   background scan, no periodic job, no foreground service. Latency in minutes is
   the accepted trade for battery.
+- **`device.xml` is the file backups leave alone** ([ADR-0011](docs/adr/0011-what-survives-a-new-phone.md)).
+  Everything else travels to a new phone; this phone's sync identity must not,
+  or a restore leaves two handsets answering to one id. Put device-local values
+  there and nowhere else, and keep `@xml/backup_rules` and
+  `@xml/data_extraction_rules` — which `BackupRulesTest` checks — in step.
 
 Anything user-visible here also touches `PRIVACY.md`, which carries its own
 dated change log at the end.

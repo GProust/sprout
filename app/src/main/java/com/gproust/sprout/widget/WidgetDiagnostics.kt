@@ -36,7 +36,13 @@ object WidgetDiagnostics {
     /** logcat tag — `adb logcat -s SproutWidget` when a cable is an option. */
     const val TAG = "SproutWidget"
 
-    private const val PREFS = "widget_diagnostics"
+    /**
+     * Breadcrumbs about *this* handset's launcher, so `@xml/backup_rules` and
+     * `@xml/data_extraction_rules` keep the file out of a backup: a report from
+     * a new phone that opened with the old one's history would be worse than a
+     * report with none (ADR-0011).
+     */
+    const val PREFS = "widget_diagnostics"
     private const val KEY_LOG = "log"
 
     /** Enough to cover several update cycles without growing without bound. */

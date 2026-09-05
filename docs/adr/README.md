@@ -33,6 +33,7 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0008](0008-pairing-by-invitation-and-the-first-merge.md) | Pairing by invitation, and what the first merge does | Accepted (extended to households by [ADR-0009](0009-the-household-is-a-group-not-a-pair.md)) |
 | [0009](0009-the-household-is-a-group-not-a-pair.md) | The household is a group, not a pair | Accepted |
 | [0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md) | Automatic exchange over Bluetooth, while the app is open | Accepted |
+| [0011](0011-what-survives-a-new-phone.md) | What survives a new phone | Accepted |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive
