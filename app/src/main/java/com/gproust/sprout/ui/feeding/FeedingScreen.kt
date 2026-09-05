@@ -191,6 +191,7 @@ class FeedingViewModel(
 
 @Composable
 fun FeedingScreen(
+    onBack: () -> Unit = {},
     onOpenNursing: (BreastSide) -> Unit = {},
     vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
 ) {
@@ -239,7 +240,7 @@ fun FeedingScreen(
     val byDay = remember(feedings) { feedings.groupBy { startOfDay(it.startTime) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_feeding)) },
+        topBar = { SproutTopBar(stringResource(R.string.screen_feeding), onBack = onBack) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.feeding_log_title)) { adding = true }
         },

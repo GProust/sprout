@@ -81,7 +81,7 @@ class DiaperViewModel(private val repository: SproutRepository) : ViewModel() {
 }
 
 @Composable
-fun DiaperScreen() {
+fun DiaperScreen(onBack: () -> Unit = {}) {
     val vm: DiaperViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val diapers by vm.diapers.collectAsState()
     val context = LocalContext.current
@@ -108,7 +108,7 @@ fun DiaperScreen() {
     val byDay = remember(diapers) { diapers.groupBy { startOfDay(it.time) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_diapers)) },
+        topBar = { SproutTopBar(stringResource(R.string.screen_diapers), onBack = onBack) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.diaper_log_title)) { adding = true }
         },

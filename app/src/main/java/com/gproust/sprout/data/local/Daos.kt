@@ -139,6 +139,17 @@ interface FeedingDao {
     )
     suspend fun lastBreastFeedSince(babyId: Long, since: Long): FeedingEntity?
 
+    /**
+     * Every tracked baby's feeds since [since], newest first.
+     *
+     * The one read that deliberately crosses babies: the dashboard summarises
+     * the whole household at once, so it cannot go through the active-baby
+     * flows ([BDR-9](docs/decisions/0009-the-dashboard-is-the-household.md)).
+     * Bounded by a window rather than unbounded — it is a summary, not a log.
+     */
+    @Query("SELECT * FROM feeding WHERE startTime >= :since AND deletedAt IS NULL ORDER BY startTime DESC")
+    fun observeAllSince(since: Long): Flow<List<FeedingEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 
@@ -176,6 +187,19 @@ interface SleepDao {
     @Query("SELECT * FROM sleep WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY startTime DESC")
     fun observeForBaby(babyId: Long): Flow<List<SleepEntity>>
 
+    /** Every tracked baby's sleeps since [since] — see [FeedingDao.observeAllSince]. */
+    @Query("SELECT * FROM sleep WHERE startTime >= :since AND deletedAt IS NULL ORDER BY startTime DESC")
+    fun observeAllSince(since: Long): Flow<List<SleepEntity>>
+
+    /**
+     * Sleeps that have started and not yet ended, for any baby.
+     *
+     * Deliberately unwindowed: a nap someone forgot to close is exactly the
+     * one the dashboard has to surface, however long ago it began.
+     */
+    @Query("SELECT * FROM sleep WHERE endTime IS NULL AND deletedAt IS NULL ORDER BY startTime DESC")
+    fun observeOngoing(): Flow<List<SleepEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: SleepEntity)
 
@@ -212,6 +236,10 @@ interface SleepDao {
 interface DiaperDao {
     @Query("SELECT * FROM diaper WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY time DESC")
     fun observeForBaby(babyId: Long): Flow<List<DiaperEntity>>
+
+    /** Every tracked baby's nappies since [since] — see [FeedingDao.observeAllSince]. */
+    @Query("SELECT * FROM diaper WHERE time >= :since AND deletedAt IS NULL ORDER BY time DESC")
+    fun observeAllSince(since: Long): Flow<List<DiaperEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: DiaperEntity)

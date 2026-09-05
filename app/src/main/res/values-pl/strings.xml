@@ -12,7 +12,6 @@
     <string name="day_yesterday">Wczoraj</string>
     <string name="cd_back">Wstecz</string>
     <string name="cd_delete">Usuń</string>
-    <string name="cd_wellbeing">Samopoczucie</string>
     <string name="cd_baby_profile">Profil dziecka</string>
     <string name="nav_home">Start</string>
     <string name="nav_feed">Karmienie</string>
@@ -85,7 +84,6 @@
     <string name="onboarding_breastfeeding_help">Dodaje pytanie o komfort piersi.</string>
     <string name="onboarding_all_done">Gotowe</string>
     <string name="home_greeting">%1$s, %2$s 👋</string>
-    <string name="home_last_feed">Ostatnie karmienie: %1$s</string>
     <string name="home_welcome_no_profile">Witaj w Sprout 🌱</string>
     <string name="home_setup_prompt">Skonfiguruj profil dziecka, aby zacząć.</string>
     <string name="home_setup_profile">Skonfiguruj profil</string>
@@ -94,11 +92,6 @@
     <string name="stat_feeds">Karmienia</string>
     <string name="stat_sleep">Sen</string>
     <string name="stat_diapers">Pieluchy</string>
-    <string name="quick_feeding">🍼  Karmienie</string>
-    <string name="quick_sleep">😴  Sen</string>
-    <string name="quick_diaper">🧷  Pielucha</string>
-    <string name="quick_growth">📏  Wzrost</string>
-    <string name="quick_wellbeing">💚  Samopoczucie</string>
     <string name="home_checkin_title">Twój codzienny wpis</string>
     <string name="home_checkin_body">Spokojna chwila dla Ciebie — kiedy tylko zechcesz.</string>
     <string name="home_checkin_action">Dodaj wpis</string>
@@ -172,7 +165,6 @@
 
     <!-- Pumping (expressed milk) -->
     <string name="screen_pumping">Odciąganie</string>
-    <string name="quick_pumping">🥛  Odciąganie</string>
     <string name="pumping_empty">Nie zapisano jeszcze żadnego odciągania. Dodaj pierwsze przyciskiem +.</string>
     <string name="pumping_log_title">Zapisz odciąganie</string>
     <string name="pumping_edit_title">Edytuj odciąganie</string>
@@ -267,10 +259,8 @@
     <string name="baby_editor_edit">Edytuj %1$s</string>
     <string name="babies_not_tracking">Nieśledzone</string>
     <string name="babies_not_tracking_help">Ich historia jest zachowana. Przywróć, aby śledzić ponownie.</string>
-    <string name="babies_manage">Zarządzaj dziećmi…</string>
     <string name="baby_delete_title">Usunąć %1$s?</string>
     <string name="baby_delete_body">To trwale usuwa %1$s oraz każdy wpis karmienia, snu, pieluchy i wzrostu dla tego dziecka. Tego nie można cofnąć.</string>
-    <string name="cd_switch_baby">Zmień dziecko</string>
     <string name="cd_edit_baby">Edytuj %1$s</string>
     <string name="cd_stop_tracking_baby">Przestań śledzić %1$s</string>
     <string name="cd_restore_baby">Przywróć %1$s</string>
@@ -285,7 +275,6 @@
     <string name="baby_reminder_summary_default">Przypomnienie o karmieniu: domyślne</string>
     <string name="baby_reminder_summary_every">Przypomnienie o karmieniu: co %1$s</string>
     <string name="screen_treatments">Leczenie</string>
-    <string name="quick_treatments">💊  Leczenie</string>
     <string name="treatment_empty">Brak leczenia. Dodaj je przyciskiem + — np. witamina D codziennie.</string>
     <string name="treatment_add">Dodaj leczenie</string>
     <string name="treatment_delete_title">Usunąć %1$s?</string>
@@ -522,4 +511,20 @@
     <string name="stats_who_disclaimer_one">Zacieniowany obszar: standardy wzrastania dzieci WHO dla grupy %1$s, od 3. do 97. centyla — ciepły poniżej mediany, chłodny powyżej. Ten wybór nie jest zapisywany: Sprout nigdy nie pyta o płeć dziecka, wybierasz tylko pokazywaną krzywą. Pojedynczy pomiar mówi niewiele; lekarz czyta przebieg krzywej przez miesiące. To nie jest porada medyczna.</string>
     <string name="stats_reference_girls_in_sentence">dziewczynki</string>
     <string name="stats_reference_boys_in_sentence">chłopcy</string>
+    <!-- The household dashboard, the baby's own tab, and the parent's tab. -->
+    <string name="nav_baby">Dziecko</string>
+    <string name="nav_trends">Trendy</string>
+    <string name="nav_you">Ty</string>
+    <string name="home_chip_fed">Karmienie %1$s</string>
+    <string name="home_chip_slept">Sen %1$s</string>
+    <string name="home_chip_nappy">Pielucha %1$s</string>
+    <string name="home_live_nursing">Karmienie · %1$s</string>
+    <string name="home_live_asleep">%1$s śpi</string>
+    <string name="home_live_open">Otwórz</string>
+    <string name="sleep_woke_up">Pobudka</string>
+    <string name="cd_open_baby">Otwórz: %1$s</string>
+    <string name="you_intro">Odciąganie, Twoje samopoczucie i codzienny wpis.</string>
+    <string name="you_pumping_body">Sesje i to, co jest w lodówce.</string>
+    <string name="you_wellbeing_body">Twój nastrój i powrót do formy, w czasie.</string>
+    <string name="you_checkin_done">Na dziś gotowe — otwórz, aby przejrzeć.</string>
 </resources>

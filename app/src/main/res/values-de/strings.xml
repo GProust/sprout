@@ -12,7 +12,6 @@
     <string name="day_yesterday">Gestern</string>
     <string name="cd_back">Zurück</string>
     <string name="cd_delete">Löschen</string>
-    <string name="cd_wellbeing">Wohlbefinden</string>
     <string name="cd_baby_profile">Babyprofil</string>
     <string name="nav_home">Start</string>
     <string name="nav_feed">Mahlzeit</string>
@@ -79,7 +78,6 @@
     <string name="onboarding_breastfeeding_help">Fügt eine Frage zum Wohlbefinden der Brust hinzu.</string>
     <string name="onboarding_all_done">Fertig</string>
     <string name="home_greeting">%1$s, %2$s 👋</string>
-    <string name="home_last_feed">Letzte Mahlzeit: %1$s</string>
     <string name="home_welcome_no_profile">Willkommen bei Sprout 🌱</string>
     <string name="home_setup_prompt">Richte das Profil deines Babys ein, um loszulegen.</string>
     <string name="home_setup_profile">Profil einrichten</string>
@@ -88,11 +86,6 @@
     <string name="stat_feeds">Mahlzeiten</string>
     <string name="stat_sleep">Schlaf</string>
     <string name="stat_diapers">Windeln</string>
-    <string name="quick_feeding">🍼  Mahlzeit</string>
-    <string name="quick_sleep">😴  Schlaf</string>
-    <string name="quick_diaper">🧷  Windel</string>
-    <string name="quick_growth">📏  Wachstum</string>
-    <string name="quick_wellbeing">💚  Wohlbefinden</string>
     <string name="home_checkin_title">Dein täglicher Check-in</string>
     <string name="home_checkin_body">Ein ruhiger Moment für dich — wann immer du magst.</string>
     <string name="home_checkin_action">Check-in machen</string>
@@ -166,7 +159,6 @@
 
     <!-- Pumping (expressed milk) -->
     <string name="screen_pumping">Abpumpen</string>
-    <string name="quick_pumping">🥛  Abpumpen</string>
     <string name="pumping_empty">Noch nichts abgepumpt. Füge den ersten Eintrag mit + hinzu.</string>
     <string name="pumping_log_title">Abpumpen erfassen</string>
     <string name="pumping_edit_title">Abpumpen bearbeiten</string>
@@ -261,10 +253,8 @@
     <string name="baby_editor_edit">%1$s bearbeiten</string>
     <string name="babies_not_tracking">Nicht aktiv</string>
     <string name="babies_not_tracking_help">Der Verlauf bleibt erhalten. Stelle wieder her, um erneut zu tracken.</string>
-    <string name="babies_manage">Babys verwalten…</string>
     <string name="baby_delete_title">%1$s löschen?</string>
     <string name="baby_delete_body">Dies entfernt %1$s dauerhaft sowie alle Mahlzeiten-, Schlaf-, Windel- und Wachstumseinträge für sie. Das kann nicht rückgängig gemacht werden.</string>
-    <string name="cd_switch_baby">Baby wechseln</string>
     <string name="cd_edit_baby">%1$s bearbeiten</string>
     <string name="cd_stop_tracking_baby">Tracking für %1$s beenden</string>
     <string name="cd_restore_baby">%1$s wiederherstellen</string>
@@ -279,7 +269,6 @@
     <string name="baby_reminder_summary_default">Mahlzeit-Erinnerung: Standard</string>
     <string name="baby_reminder_summary_every">Mahlzeit-Erinnerung: alle %1$s</string>
     <string name="screen_treatments">Behandlungen</string>
-    <string name="quick_treatments">💊  Behandlungen</string>
     <string name="treatment_empty">Noch keine Behandlungen. Füge mit der +-Schaltfläche eine hinzu — z. B. Vitamin D jeden Tag.</string>
     <string name="treatment_add">Behandlung hinzufügen</string>
     <string name="treatment_delete_title">%1$s löschen?</string>
@@ -505,4 +494,20 @@
     <string name="stats_who_disclaimer_one">Farbige Fläche: die WHO-Wachstumsstandards für %1$s, 3. bis 97. Perzentil — warm unterhalb des Medians, kühl darüber. Diese Wahl wird nicht gespeichert: Sprout fragt nie nach dem Geschlecht des Babys, du wählst nur die angezeigte Kurve. Ein einzelner Messwert sagt wenig aus; was Ärztinnen und Ärzte lesen, ist der Verlauf über Monate. Dies ist keine medizinische Beratung.</string>
     <string name="stats_reference_girls_in_sentence">Mädchen</string>
     <string name="stats_reference_boys_in_sentence">Jungen</string>
+    <!-- The household dashboard, the baby's own tab, and the parent's tab. -->
+    <string name="nav_baby">Baby</string>
+    <string name="nav_trends">Trends</string>
+    <string name="nav_you">Du</string>
+    <string name="home_chip_fed">Mahlzeit %1$s</string>
+    <string name="home_chip_slept">Schlaf %1$s</string>
+    <string name="home_chip_nappy">Windel %1$s</string>
+    <string name="home_live_nursing">Stillen · %1$s</string>
+    <string name="home_live_asleep">%1$s schläft</string>
+    <string name="home_live_open">Öffnen</string>
+    <string name="sleep_woke_up">Aufgewacht</string>
+    <string name="cd_open_baby">%1$s öffnen</string>
+    <string name="you_intro">Abpumpen, dein Wohlbefinden und der tägliche Check-in.</string>
+    <string name="you_pumping_body">Sitzungen, und was im Kühlschrank ist.</string>
+    <string name="you_wellbeing_body">Deine Stimmung und Erholung, über die Zeit.</string>
+    <string name="you_checkin_done">Für heute erledigt — zum Nachlesen öffnen.</string>
 </resources>

@@ -16,7 +16,6 @@
     <!-- Content descriptions (accessibility) -->
     <string name="cd_back">Retour</string>
     <string name="cd_delete">Supprimer</string>
-    <string name="cd_wellbeing">Bien-être</string>
     <string name="cd_baby_profile">Profil du bébé</string>
 
     <!-- Bottom navigation -->
@@ -103,7 +102,6 @@
 
     <!-- Home -->
     <string name="home_greeting">%1$s, %2$s 👋</string>
-    <string name="home_last_feed">Dernier repas : %1$s</string>
     <string name="home_welcome_no_profile">Bienvenue dans Sprout 🌱</string>
     <string name="home_setup_prompt">Configurez le profil de votre bébé pour commencer.</string>
     <string name="home_setup_profile">Configurer le profil</string>
@@ -112,11 +110,6 @@
     <string name="stat_feeds">Repas</string>
     <string name="stat_sleep">Sommeil</string>
     <string name="stat_diapers">Couches</string>
-    <string name="quick_feeding">🍼  Repas</string>
-    <string name="quick_sleep">😴  Sommeil</string>
-    <string name="quick_diaper">🧷  Couche</string>
-    <string name="quick_growth">📏  Croissance</string>
-    <string name="quick_wellbeing">💚  Bien-être</string>
     <string name="home_checkin_title">Votre bilan du jour</string>
     <string name="home_checkin_body">Un moment pour vous, quand vous le souhaitez.</string>
     <string name="home_checkin_action">Faire le bilan</string>
@@ -201,7 +194,6 @@
 
     <!-- Pumping (expressed milk) -->
     <string name="screen_pumping">Tirage</string>
-    <string name="quick_pumping">🥛  Tirage</string>
     <string name="pumping_empty">Aucun tirage enregistré. Ajoutez le premier avec le bouton +.</string>
     <string name="pumping_log_title">Enregistrer un tirage</string>
     <string name="pumping_edit_title">Modifier le tirage</string>
@@ -316,10 +308,8 @@
     <string name="baby_editor_edit">Modifier %1$s</string>
     <string name="babies_not_tracking">Suivi arrêté</string>
     <string name="babies_not_tracking_help">Leur historique est conservé. Restaurez pour reprendre le suivi.</string>
-    <string name="babies_manage">Gérer les bébés…</string>
     <string name="baby_delete_title">Supprimer %1$s ?</string>
     <string name="baby_delete_body">Cela supprime définitivement %1$s ainsi que tous ses repas, sommeils, couches et mesures de croissance. Cette action est irréversible.</string>
-    <string name="cd_switch_baby">Changer de bébé</string>
     <string name="cd_edit_baby">Modifier %1$s</string>
     <string name="cd_stop_tracking_baby">Arrêter le suivi de %1$s</string>
     <string name="cd_restore_baby">Restaurer %1$s</string>
@@ -336,7 +326,6 @@
 
     <!-- Traitements / médicaments -->
     <string name="screen_treatments">Traitements</string>
-    <string name="quick_treatments">💊  Traitements</string>
     <string name="treatment_empty">Aucun traitement pour le moment. Ajoutez-en un avec le bouton + — par ex. vitamine D tous les jours.</string>
     <string name="treatment_add">Ajouter un traitement</string>
     <string name="treatment_delete_title">Supprimer %1$s ?</string>
@@ -564,4 +553,20 @@
     <string name="stats_who_disclaimer_one">Zone colorée : les standards de croissance de l\'OMS pour les %1$s, du 3e au 97e percentile — chaud en dessous de la médiane, froid au-dessus. Ce choix n\'est pas enregistré : Sprout ne demande jamais le sexe du bébé, vous choisissez seulement la courbe affichée. Une mesure isolée ne dit pas grand-chose ; ce que lit un médecin, c\'est l\'allure de la courbe au fil des mois. Ceci n\'est pas un avis médical.</string>
     <string name="stats_reference_girls_in_sentence">filles</string>
     <string name="stats_reference_boys_in_sentence">garçons</string>
+    <!-- The household dashboard, the baby's own tab, and the parent's tab. -->
+    <string name="nav_baby">Bébé</string>
+    <string name="nav_trends">Tendances</string>
+    <string name="nav_you">Vous</string>
+    <string name="home_chip_fed">Repas %1$s</string>
+    <string name="home_chip_slept">Sommeil %1$s</string>
+    <string name="home_chip_nappy">Couche %1$s</string>
+    <string name="home_live_nursing">Tétée · %1$s</string>
+    <string name="home_live_asleep">%1$s dort</string>
+    <string name="home_live_open">Ouvrir</string>
+    <string name="sleep_woke_up">Réveil</string>
+    <string name="cd_open_baby">Ouvrir %1$s</string>
+    <string name="you_intro">Le tirage, votre bien-être et le bilan du jour.</string>
+    <string name="you_pumping_body">Les séances, et ce qu\'il y a au frigo.</string>
+    <string name="you_wellbeing_body">Votre humeur et votre récupération, dans le temps.</string>
+    <string name="you_checkin_done">Fait pour aujourd\'hui — ouvrez pour relire.</string>
 </resources>

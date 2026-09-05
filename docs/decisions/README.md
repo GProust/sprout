@@ -32,5 +32,7 @@ ADR log and are cross-linked from here.
 | [0006](0006-check-in-waits-on-the-dashboard.md) | The daily check-in waits on the dashboard, and can be stopped | Product / UX | Accepted |
 | [0007](0007-pumping-belongs-to-the-parent.md) | Pumping is the parent's log, and the stash only counts usable milk | Product / Domain | Accepted |
 | [0008](0008-statistics-and-the-who-growth-curves.md) | Statistics, and WHO curves read against both references | Product / Domain | Accepted |
+| [0009](0009-the-dashboard-is-the-household.md) | The dashboard is the household; the active baby scopes the logs | Product / UX | Accepted |
+| [0010](0010-the-bottom-bar-is-four-kinds-of-place.md) | The bottom bar is kinds of place, not kinds of log | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.
