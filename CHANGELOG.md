@@ -3,6 +3,15 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 💚 **A way to support Sprout, for anyone who wants one.** Settings now ends
+  with two links — GitHub Sponsors and Buy Me a Coffee. That is the whole of it:
+  there is no prompt, no reminder and no dialog, and **nothing in the app is
+  behind them.** Every feature is here for someone who never gives a penny, and
+  it will stay that way. Both links open in your browser; Sprout still has no
+  internet permission and still cannot make a network request of its own.
+
 ## [1.8.0] — 2026-09-05
 
 - 🏠 **Home is now the whole household.** Instead of showing whichever baby was

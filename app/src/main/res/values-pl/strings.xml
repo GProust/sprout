@@ -527,4 +527,14 @@
     <string name="you_pumping_body">Sesje i to, co jest w lodówce.</string>
     <string name="you_wellbeing_body">Twój nastrój i powrót do formy, w czasie.</string>
     <string name="you_checkin_done">Na dziś gotowe — otwórz, aby przejrzeć.</string>
+
+    <!-- Wsparcie projektu (BDR-11) -->
+    <string name="settings_support">Wesprzyj Sprout</string>
+    <string name="settings_support_desc">Sprout jest darmowa, otwartoźródłowa i taka pozostanie — wszystkie funkcje są dostępne niezależnie od tego, czy wesprzesz projekt. Jeśli aplikacja pomogła Ci w pierwszych tygodniach i chcesz dołożyć się do jej rozwoju, te odnośniki otworzą się w przeglądarce.</string>
+    <string name="settings_support_sponsors">GitHub Sponsors</string>
+    <string name="settings_support_sponsors_hint">Jednorazowo lub miesięcznie, przez GitHub.</string>
+    <string name="settings_support_coffee">Postaw mi kawę</string>
+    <string name="settings_support_coffee_hint">Jednorazowy datek, bez zakładania konta.</string>
+    <string name="settings_support_no_browser">Nie znaleziono przeglądarki, aby otworzyć stronę.</string>
+    <string name="cd_opens_in_browser">Otwiera się w przeglądarce</string>
 </resources>

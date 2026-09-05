@@ -85,6 +85,24 @@ that a change can quietly break:
 Exporting a report (PDF) and the raw data as a workbook build on these same
 per-day figures, and are deliberately still to come.
 
+## Asking for support
+
+Settings ends with two donation links (GitHub Sponsors, Buy Me a Coffee). The
+rules are in [BDR-11](docs/decisions/0011-donations-are-a-link-out-and-buy-nothing.md),
+and two of them are the whole point:
+
+- **A donation buys nothing.** No feature gated, no limit lifted, no badge, no
+  ad removed. The moment one unlocks anything it becomes an in-app purchase and
+  Google Play requires Play Billing rather than a link out — so this is a
+  policy line, not a preference.
+- **It stays a link.** `ACTION_VIEW` hands the URL to the browser; fetching
+  anything in-app (a supporter count, a balance, a payment page) would need the
+  `INTERNET` permission and spend the privacy claim above. `SupportLinksTest`
+  asserts the permission's absence so it breaks CI, not trust.
+
+One quiet row at the bottom of Settings, and nowhere else — no prompt, no
+dialog, no dashboard card. `PRIVACY.md` covers what a tap actually exposes.
+
 ## Historical — how it was built
 
 Delivered in the order below; kept only as a map of which PR introduced what.

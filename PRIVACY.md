@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-08-16 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-05 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -58,6 +58,27 @@ after them — usually two parents, sometimes a grandparent as well. It works
 Nothing is uploaded anywhere at any point. Sharing is entirely optional and the
 app works fully with it switched off.
 
+## Supporting the app
+
+Settings has a **Support Sprout** section with two links — GitHub Sponsors and
+Buy Me a Coffee. They are optional in every sense: nothing in the app is behind
+them, no feature is unlocked by using them, and the app never asks you about
+them anywhere else.
+
+Be aware of what tapping one does:
+
+- It **opens the page in your browser**, which is a different app. Sprout itself
+  fetches nothing — it still has no internet permission and still cannot open a
+  network connection.
+- From that point **you are on GitHub's or Buy Me a Coffee's website**, and
+  their privacy policies apply, not this one. Like any website you visit, they
+  will see your IP address and whatever your browser tells them.
+- If you go on to donate, **that payment is between you and them.** We never see
+  your card details, and none of your Sprout data — not one feed, not one
+  check-in — is involved, sent, or attached in any way.
+
+Not tapping them changes nothing about how the app works.
+
 ## Permissions
 
 Sprout requests **no internet permission**. The app cannot open a network
@@ -83,6 +104,15 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-05
+
+- Added the section on **supporting the app**. Settings now offers two donation
+  links, and while Sprout still fetches nothing itself, tapping one hands the
+  page to your browser and puts you on someone else's website under their
+  policy — so this policy says that outright rather than leaving it implied.
+  Nothing about what Sprout stores, shares or transmits has changed, and the
+  internet permission is still absent.
 
 ### 2026-08-16
 
