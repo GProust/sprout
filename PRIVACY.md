@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-08-16 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-05 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -29,7 +29,19 @@ you uninstall the app or clear the app's data.
 If you have enabled Android's system backup ("Back up to Google Drive") on
 your device, Android may include app data in that encrypted backup according
 to **your own Google account settings** — this is a feature of the Android
-operating system, not something Sprout sends or controls.
+operating system, not something Sprout sends or controls. The same applies to
+the copy Android makes when you set up a new phone from your old one.
+
+Sprout tells Android what to include, so that moving to a new phone brings your
+record and your settings with you. Two things are deliberately left out: the
+identifier this particular phone uses when sharing with your household, and the
+widget's diagnostic log — both describe the handset rather than you, and
+copying them would leave two phones claiming to be the same one.
+
+**Your household's sharing key never travels.** It is locked to the phone's
+own secure hardware, so the copy in a backup cannot be opened anywhere else.
+A new phone therefore starts unpaired: to share again, ask a phone that is
+already in your household for a fresh invitation.
 
 ## Children's data
 
@@ -83,6 +95,15 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-05
+
+- **Said what a backup and a new phone actually carry.** The section on where
+  your data lives now spells out that your record and settings are included,
+  that this phone's sharing identifier and the widget diagnostic log are not,
+  and that the household's sharing key cannot be opened on any other phone — so
+  a new phone starts unpaired and needs a fresh invitation. Nothing about what
+  Sprout collects or sends has changed; this is the same behaviour, described.
 
 ### 2026-08-16
 
