@@ -92,11 +92,30 @@ class PairingStore(
     private val vault: SecretVault = KeystoreVault(),
 ) {
 
+    /**
+     * The pairing this phone can actually use, or null.
+     *
+     * A wrapped secret that no longer opens is not a temporary problem: the key
+     * that wrapped it lives in the Keystore, which never leaves the handset, so
+     * this is what a record restored from a backup onto a *new* phone looks like
+     * (ADR-0011) — and equally a Keystore wiped by a factory reset of the screen
+     * lock. Either way the household is only rejoinable by invitation, so the
+     * leftovers are cleared rather than left to half-say otherwise.
+     *
+     * That matters beyond tidiness: `first_merge_done` is one of the leftovers,
+     * and a phone that keeps it while claiming to be unpaired would skip
+     * ADR-0008's question — "keep both histories, or share from the pairing
+     * forward" — the next time it is invited into a household.
+     */
     fun current(): Pairing? {
         val prefs = prefs()
         val householdId = prefs.getString(KEY_HOUSEHOLD, null) ?: return null
         val wrapped = prefs.getString(KEY_SECRET, null) ?: return null
-        val secret = runCatching { SyncSecret(vault.unwrap(wrapped)) }.getOrNull() ?: return null
+        val secret = runCatching { SyncSecret(vault.unwrap(wrapped)) }.getOrNull()
+        if (secret == null) {
+            unpair()
+            return null
+        }
         return Pairing(
             householdId = householdId,
             secret = secret,

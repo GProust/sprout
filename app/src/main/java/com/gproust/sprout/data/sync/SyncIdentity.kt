@@ -39,19 +39,43 @@ const val TOMBSTONE_RETENTION_MS: Long = TOMBSTONE_RETENTION_DAYS * 24 * 60 * 60
  * of the install.
  *
  * It is deliberately **not** in the database: it identifies the device, so it
- * must not travel inside a replica the way a synced row does. It lives in the
- * same SharedPreferences file as the other device-local settings, and it is
- * meaningless to anyone but the paired phone — a random UUID, tied to no
- * account and to nothing about the hardware.
+ * must not travel inside a replica the way a synced row does. It is meaningless
+ * to anyone but the paired phone — a random UUID, tied to no account and to
+ * nothing about the hardware.
+ *
+ * It also must not travel in an Android *backup*. A parent who restores their
+ * record onto a new phone and keeps the old one running — handed to the other
+ * parent, or simply not wiped yet — would otherwise have two handsets answering
+ * to one id: the household list would show one entry for both, and removing
+ * "that phone" would be removing whichever of them the list happened to be
+ * describing. So it lives in a preferences file of its own, `device.xml`, which
+ * `@xml/backup_rules` and `@xml/data_extraction_rules` exclude from the cloud
+ * backup and from the phone-to-phone transfer alike (ADR-0011).
  */
 object DeviceIdentity {
-    private const val PREFS = "settings"
+    /** Device-local, and excluded from backup — nothing else belongs in here. */
+    const val PREFS = "device"
     private const val KEY_DEVICE_ID = "device_id"
+
+    /**
+     * Where the id lived before ADR-0011 gave it a file of its own: in with the
+     * settings, and so in every backup taken up to then.
+     */
+    private const val LEGACY_PREFS = "settings"
 
     /** This device's id, creating and persisting one the first time it is asked for. */
     fun id(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         prefs.getString(KEY_DEVICE_ID, null)?.let { return it }
-        return newUid().also { fresh -> prefs.edit { putString(KEY_DEVICE_ID, fresh) } }
+
+        // An install that predates the move keeps the id it already has: the
+        // other phones in the household know it by that name, and handing it a
+        // fresh one would leave a ghost in their lists that nothing can clear.
+        val legacy = context.getSharedPreferences(LEGACY_PREFS, Context.MODE_PRIVATE)
+        val id = legacy.getString(KEY_DEVICE_ID, null) ?: newUid()
+        prefs.edit { putString(KEY_DEVICE_ID, id) }
+        // Out of the backed-up file, so this is the last backup that carries it.
+        legacy.edit { remove(KEY_DEVICE_ID) }
+        return id
     }
 }

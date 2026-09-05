@@ -169,4 +169,24 @@ class PairingTest {
 
         assertNull(PairingStore(context, FakeVault()).current())
     }
+
+    @Test
+    fun `and it clears itself, so the next invitation still asks about histories`() {
+        store.save(pairing())
+        store.markFirstMergeDone()
+
+        // A record restored onto a new phone: the secret came across, the
+        // Keystore key that wrapped it did not, and it is not coming back
+        // (ADR-0011). What is left cannot open anything.
+        context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit()
+            .putString("sync_secret", "not base64 at all !!").commit()
+
+        val restored = PairingStore(context, FakeVault())
+        assertNull(restored.current())
+        assertFalse("the household id must not linger", restored.isPaired())
+        assertFalse(
+            "a phone that skipped this would silently adopt the other history",
+            restored.firstMergeDone(),
+        )
+    }
 }

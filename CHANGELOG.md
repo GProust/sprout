@@ -3,6 +3,21 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 📱 **Moving to a new phone keeps things straight.** Sprout now says exactly
+  what belongs in an Android backup and in the copy made when you set up a new
+  handset: your record and your settings come with you, while the identifier
+  this phone uses inside your household stays behind. Restore onto a new phone
+  and pass the old one on, and the two are now told apart properly — before,
+  your household could see one phone where there were two, and "remove this
+  phone" could take out the wrong one.
+- 🔑 **A new phone says it is unpaired, and means it.** Your household's sharing
+  key is locked to the handset and cannot come across, so a restored phone was
+  quietly left half-paired: it could not sync, and the next invitation it
+  accepted would have skipped the question about what to do with both phones'
+  histories. It now starts genuinely fresh and asks properly.
+
 ## [1.8.0] — 2026-09-05
 
 - 🏠 **Home is now the whole household.** Instead of showing whichever baby was
