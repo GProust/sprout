@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.8.0] — 2026-09-05
 
 - 🏠 **Home is now the whole household.** Instead of showing whichever baby was
   selected in a menu, the dashboard gives every baby you track a card of their
