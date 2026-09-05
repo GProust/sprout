@@ -17,7 +17,6 @@
     <!-- Content descriptions (accessibility) -->
     <string name="cd_back">Back</string>
     <string name="cd_delete">Delete</string>
-    <string name="cd_wellbeing">Wellbeing</string>
     <string name="cd_baby_profile">Baby profile</string>
 
     <!-- Bottom navigation -->
@@ -104,7 +103,6 @@
 
     <!-- Home -->
     <string name="home_greeting">%1$s, %2$s 👋</string>
-    <string name="home_last_feed">Last feed: %1$s</string>
     <string name="home_welcome_no_profile">Welcome to Sprout 🌱</string>
     <string name="home_setup_prompt">Set up your baby\'s profile to get started.</string>
     <string name="home_setup_profile">Set up profile</string>
@@ -113,11 +111,6 @@
     <string name="stat_feeds">Feeds</string>
     <string name="stat_sleep">Sleep</string>
     <string name="stat_diapers">Diapers</string>
-    <string name="quick_feeding">🍼  Feeding</string>
-    <string name="quick_sleep">😴  Sleep</string>
-    <string name="quick_diaper">🧷  Diaper</string>
-    <string name="quick_growth">📏  Growth</string>
-    <string name="quick_wellbeing">💚  Wellbeing</string>
     <string name="home_checkin_title">Your daily check-in</string>
     <string name="home_checkin_body">A quiet moment for you, whenever you\'re ready.</string>
     <string name="home_checkin_action">Check in</string>
@@ -205,7 +198,6 @@
 
     <!-- Pumping (expressed milk) -->
     <string name="screen_pumping">Pumping</string>
-    <string name="quick_pumping">🥛  Pumping</string>
     <string name="pumping_empty">No pumping logged yet. Add your first with the + button.</string>
     <string name="pumping_log_title">Log a pumping</string>
     <string name="pumping_edit_title">Edit pumping</string>
@@ -328,10 +320,8 @@
     <string name="baby_editor_edit">Edit %1$s</string>
     <string name="babies_not_tracking">Not tracking</string>
     <string name="babies_not_tracking_help">Their history is kept. Restore to track again.</string>
-    <string name="babies_manage">Manage babies…</string>
     <string name="baby_delete_title">Delete %1$s?</string>
     <string name="baby_delete_body">This permanently removes %1$s and every feeding, sleep, diaper and growth entry for them. This can\'t be undone.</string>
-    <string name="cd_switch_baby">Switch baby</string>
     <string name="cd_edit_baby">Edit %1$s</string>
     <string name="cd_stop_tracking_baby">Stop tracking %1$s</string>
     <string name="cd_restore_baby">Restore %1$s</string>
@@ -348,7 +338,6 @@
 
     <!-- Treatments / medications -->
     <string name="screen_treatments">Treatments</string>
-    <string name="quick_treatments">💊  Treatments</string>
     <string name="treatment_empty">No treatments yet. Add one with the + button — e.g. Vitamin D every day.</string>
     <string name="treatment_add">Add treatment</string>
     <string name="treatment_delete_title">Delete %1$s?</string>
@@ -577,4 +566,20 @@
     <string name="stats_who_disclaimer_one">Shaded: the WHO child growth standards for %1$s, 3rd to 97th percentile — warm below the median, cool above it. This choice is not saved: Sprout never asks a baby\'s sex, you are only picking the curve on screen. One measurement means little on its own; what a doctor reads is the shape of the line over months. This is not medical advice.</string>
     <string name="stats_reference_girls_in_sentence">girls</string>
     <string name="stats_reference_boys_in_sentence">boys</string>
+    <!-- The household dashboard, the baby's own tab, and the parent's tab. -->
+    <string name="nav_baby">Baby</string>
+    <string name="nav_trends">Trends</string>
+    <string name="nav_you">You</string>
+    <string name="home_chip_fed">Fed %1$s</string>
+    <string name="home_chip_slept">Slept %1$s</string>
+    <string name="home_chip_nappy">Nappy %1$s</string>
+    <string name="home_live_nursing">Feeding · %1$s</string>
+    <string name="home_live_asleep">%1$s is asleep</string>
+    <string name="home_live_open">Open</string>
+    <string name="sleep_woke_up">Woke up</string>
+    <string name="cd_open_baby">Open %1$s</string>
+    <string name="you_intro">Pumping, your wellbeing and the daily check-in.</string>
+    <string name="you_pumping_body">Sessions, and what is in the fridge.</string>
+    <string name="you_wellbeing_body">Your mood and recovery, over time.</string>
+    <string name="you_checkin_done">Done for today — open it to look back.</string>
 </resources>

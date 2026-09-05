@@ -75,6 +75,24 @@ class SproutRepository(
         if (id == null) flowOf(null) else db.babyDao().observeBaby(id)
     }
 
+    // The household reads (BDR-9). Everything above and below follows the
+    // active baby; these three deliberately do not, because the dashboard
+    // summarises every tracked baby at once. They are summaries rather than
+    // logs, so they are bounded by HOUSEHOLD_WINDOW_MS instead of returning a
+    // baby's whole history — the log screens are still where that lives.
+
+    /** Every tracked baby's feeds since [since]. */
+    fun householdFeedings(since: Long): Flow<List<FeedingEntity>> =
+        db.feedingDao().observeAllSince(since)
+
+    /** Every tracked baby's sleeps since [since]. */
+    fun householdSleeps(since: Long): Flow<List<SleepEntity>> =
+        db.sleepDao().observeAllSince(since)
+
+    /** Every tracked baby's nappies since [since]. */
+    fun householdDiapers(since: Long): Flow<List<DiaperEntity>> =
+        db.diaperDao().observeAllSince(since)
+
     // Sync stamping (ADR-0007). Screens build entities without a uid or an
     // updatedAt; every write goes through one of these on its way to the DAO,
     // so no call site has to remember. `ifEmpty` keeps the unique index safe
@@ -195,6 +213,24 @@ class SproutRepository(
         db.feedingDao().insert(entity.copy(babyId = id).stamped())
         onWidgetDataChanged()
     }
+
+    /**
+     * Add a feed to a named baby rather than to whichever one is active.
+     *
+     * The dashboard's quick feed button starts a session from a card, and the
+     * baby it belongs to is decided by the card that was tapped — not by a mode
+     * set elsewhere. Going through [addFeeding] there would resolve the active
+     * baby at insert time, minutes later, which with twins is how a feed lands
+     * on the wrong child.
+     */
+    suspend fun addFeedingFor(babyId: Long, entity: FeedingEntity) {
+        db.feedingDao().insert(entity.copy(babyId = babyId).stamped())
+        onWidgetDataChanged()
+    }
+
+    /** A named baby's most recent breastfeed started at or after [since], or null. */
+    suspend fun lastBreastFeedFor(babyId: Long, since: Long): FeedingEntity? =
+        db.feedingDao().lastBreastFeedSince(babyId, since)
     suspend fun deleteFeeding(entity: FeedingEntity) {
         db.feedingDao().softDelete(entity.id, now())
         onWidgetDataChanged()
@@ -234,6 +270,20 @@ class SproutRepository(
         db.sleepDao().insert(entity.copy(babyId = id).stamped())
     }
     suspend fun deleteSleep(entity: SleepEntity) = db.sleepDao().softDelete(entity.id, now())
+
+    /**
+     * Save a change to an existing sleep — in practice, closing one that was
+     * started with no end time.
+     *
+     * Until this existed a sleep logged as "still asleep" could only be deleted
+     * and re-entered, and in the meantime it read as *still running*: both the
+     * dashboard and the daily statistics take `endTime ?: now`, so the day's
+     * total climbed on its own.
+     */
+    suspend fun updateSleep(entity: SleepEntity) = db.sleepDao().update(entity.stamped())
+
+    /** Sleeps that have begun and not yet ended, for any baby. */
+    val ongoingSleeps: Flow<List<SleepEntity>> = db.sleepDao().observeOngoing()
 
     // Diaper
     val diapers: Flow<List<DiaperEntity>> = activeBabyId.flatMapLatest { id ->

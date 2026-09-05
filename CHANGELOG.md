@@ -3,6 +3,32 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🏠 **Home is now the whole household.** Instead of showing whichever baby was
+  selected in a menu, the dashboard gives every baby you track a card of their
+  own — how long since the last feed, the last sleep and the last change, and
+  their own buttons. With twins that means a feed can no longer land on the
+  wrong child because the menu at the top was set to the other one. If you track
+  one baby, nothing gets further away: the card simply opens out into the full
+  screen, where it always was.
+- 🤱 **Start a feed from the dashboard.** One tap, on the breast you did not
+  start on last time — Sprout already worked that out for the widget, and now
+  says it where you are looking. The other side is right beside it, because it
+  is a reminder and not a rule.
+- ⏱️ **A running feed or sleep now says so.** If you started a breastfeed and
+  came back later, the timer is on the dashboard where you left it instead of
+  only on the home-screen widget. A baby who is still asleep is on there too.
+- 😴 **A sleep you left open can be closed.** Logging a nap as "still asleep"
+  used to be a one-way door: the only way out was to delete it and type it in
+  again, and until you did, it went on adding to the day's total by itself.
+  There is now a **Woke up** button on the entry, and on the dashboard.
+- 🧭 **A simpler bottom bar.** Four places rather than four of the things you
+  log: your household, the baby you picked, your trends, and you. Pumping, your
+  wellbeing and the daily check-in finally sit together, and everything there is
+  to log — medication included, which never used to fit — is a tile on the
+  dashboard.
+
 ## [1.7.1] — 2026-08-30
 
 - 🧰 **Housekeeping only — nothing in the app itself has changed.** The tools

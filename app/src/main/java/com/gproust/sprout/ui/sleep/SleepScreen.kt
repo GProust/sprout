@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,10 +61,22 @@ class SleepViewModel(private val repository: SproutRepository) : ViewModel() {
 
     fun add(entity: SleepEntity) = viewModelScope.launch { repository.addSleep(entity) }
     fun delete(entity: SleepEntity) = viewModelScope.launch { repository.deleteSleep(entity) }
+
+    /**
+     * Close a sleep that was logged as still running.
+     *
+     * Without this the only way out of an ongoing entry was to delete it and
+     * type it in again — and while it stayed open it went on counting, because
+     * both the dashboard and the statistics read a missing end as "still
+     * asleep".
+     */
+    fun wake(entity: SleepEntity) = viewModelScope.launch {
+        repository.updateSleep(entity.copy(endTime = System.currentTimeMillis()))
+    }
 }
 
 @Composable
-fun SleepScreen() {
+fun SleepScreen(onBack: () -> Unit = {}) {
     val vm: SleepViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val sleeps by vm.sleeps.collectAsState()
     val context = LocalContext.current
@@ -90,7 +103,7 @@ fun SleepScreen() {
     val byDay = remember(sleeps) { sleeps.groupBy { startOfDay(it.startTime) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_sleep)) },
+        topBar = { SproutTopBar(stringResource(R.string.screen_sleep), onBack = onBack) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.sleep_log_title)) { adding = true }
         },
@@ -120,10 +133,25 @@ fun SleepScreen() {
                         meta = formatTime(entry.startTime),
                         icon = Icons.Filled.Bedtime,
                         onDelete = { deleting = entry },
+                        // A sleep still running is the one entry with something
+                        // left to say; ending it is one tap, from here.
+                        action = if (entry.endTime == null) {
+                            { WokeUpButton(onClick = { vm.wake(entry) }) }
+                        } else {
+                            null
+                        },
                     )
                 }
             }
         }
+    }
+}
+
+/** The one-tap "they're awake now" shortcut on an ongoing sleep's card. */
+@Composable
+private fun WokeUpButton(onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
+        Text(stringResource(R.string.sleep_woke_up))
     }
 }
 

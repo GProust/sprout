@@ -67,7 +67,7 @@ class GrowthViewModel(private val repository: SproutRepository) : ViewModel() {
 }
 
 @Composable
-fun GrowthScreen() {
+fun GrowthScreen(onBack: () -> Unit = {}) {
     val vm: GrowthViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val growth by vm.growth.collectAsState()
     val lineColor = MaterialTheme.colorScheme.primary
@@ -93,7 +93,7 @@ fun GrowthScreen() {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_growth)) },
+        topBar = { SproutTopBar(stringResource(R.string.screen_growth), onBack = onBack) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.growth_log_title)) { adding = true }
         },

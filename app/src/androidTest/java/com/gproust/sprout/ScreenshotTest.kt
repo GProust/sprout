@@ -55,7 +55,9 @@ import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.NursingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.health.HealthScreen
+import com.gproust.sprout.ui.baby.BabyScreen
 import com.gproust.sprout.ui.home.HomeScreen
+import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
@@ -351,10 +353,19 @@ class ScreenshotTest {
         tap("Next")
         save("03-checkin-partner-3-notes")
 
-        // Single-page screens. The Home top bar shows the active baby (Léa) with
-        // the switcher affordance, since two babies are seeded.
-        show { HomeScreen {} }
+        // Single-page screens. Two babies are seeded, so Home is the household
+        // dashboard: a card each for Léa and Noah, carrying their own numbers
+        // and their own feed button.
+        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
         save("04-home")
+        // The picked baby's own tab — the same pane the dashboard shows in
+        // place when a family has only one child.
+        show { BabyScreen(onNavigate = {}, onQuickFeed = {}) }
+        save("04-baby")
+        // The parent's tab: the two logs that belong to a person rather than to
+        // a child, plus the daily check-in.
+        show { YouScreen(onNavigate = {}) }
+        save("04-you")
         // The feeding history now fills the screen, newest first with day
         // headers; the log form lives in a bottom sheet behind the "+" button.
         show { FeedingScreen() }

@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BabyChangingStation
-import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalDrink
-import androidx.compose.material.icons.filled.Monitor
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -27,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.gproust.sprout.R
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -37,7 +38,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.ui.baby.BabyScreen
 import com.gproust.sprout.ui.checkin.CheckInRoute
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -56,11 +60,17 @@ import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
+import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.startup.Startup
 import com.gproust.sprout.ui.startup.StartupViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 object Routes {
     const val HOME = "home"
+    const val BABY = "baby"
+    const val YOU = "you"
     const val FEEDING = "feeding"
     const val FEEDING_NURSING = "feeding/nursing/{side}"
     const val PUMPING = "pumping"
@@ -75,6 +85,9 @@ object Routes {
     const val TREATMENTS = "treatments"
     const val WIDGET_DIAGNOSTICS = "settings/widget-diagnostics"
     const val SYNC = "settings/sync"
+
+    /** The live nursing screen for one breast, timer already running. */
+    fun nursing(side: BreastSide) = "feeding/nursing/${side.name}"
 }
 
 private data class BottomDestination(
@@ -83,12 +96,36 @@ private data class BottomDestination(
     val icon: ImageVector,
 )
 
+/**
+ * The bottom bar is four *kinds of place*, not four of the things there are to
+ * log (BDR-9, BDR-10): the household, the child you picked, the numbers, and
+ * you. The logs themselves are all reached from the dashboard's grid, which is
+ * the only arrangement with room for every one of them — the old bar had five
+ * baby-scoped screens and four seats, and treatments never got one.
+ *
+ * [Routes.BABY] stays in this list even when it isn't drawn in the bar, so that
+ * opening a baby from a card always behaves as a sibling tab rather than
+ * sometimes being pushed on top of Home.
+ */
 private val bottomDestinations = listOf(
     BottomDestination(Routes.HOME, R.string.nav_home, Icons.Filled.Home),
-    BottomDestination(Routes.FEEDING, R.string.nav_feed, Icons.Filled.LocalDrink),
-    BottomDestination(Routes.SLEEP, R.string.nav_sleep, Icons.Filled.Bedtime),
-    BottomDestination(Routes.DIAPER, R.string.nav_diaper, Icons.Filled.BabyChangingStation),
-    BottomDestination(Routes.GROWTH, R.string.nav_growth, Icons.Filled.Monitor),
+    BottomDestination(Routes.BABY, R.string.nav_baby, Icons.Filled.Person),
+    BottomDestination(Routes.STATS, R.string.nav_trends, Icons.Filled.BarChart),
+    BottomDestination(Routes.YOU, R.string.nav_you, Icons.Filled.Favorite),
+)
+
+/**
+ * Every route this app knows how to open.
+ *
+ * The launching intent's route is attacker-controllable in principle — it is an
+ * extra on an exported activity — so it is matched against this set before it
+ * reaches the nav controller, which would throw on anything unrecognised.
+ */
+private val knownRoutes = setOf(
+    Routes.HOME, Routes.BABY, Routes.YOU, Routes.STATS,
+    Routes.FEEDING, Routes.PUMPING, Routes.SLEEP, Routes.DIAPER,
+    Routes.GROWTH, Routes.HEALTH, Routes.TREATMENTS, Routes.CHECKIN,
+    Routes.PROFILE, Routes.SETTINGS, Routes.SYNC, Routes.WIDGET_DIAGNOSTICS,
 )
 
 /**
@@ -99,7 +136,7 @@ private val bottomDestinations = listOf(
  * the shortcuts on the Home screen. Reaching one of these destinations with a
  * plain [NavController.navigate] would push it on top of Home instead of making
  * it a sibling tab, which corrupts the saved state and makes the Home tab restore
- * the wrong screen (e.g. tapping Home landing on Diaper).
+ * the wrong screen (e.g. tapping Home landing on the baby's screen).
  */
 private fun NavController.navigateToBottomDestination(route: String) {
     navigate(route) {
@@ -114,11 +151,33 @@ private fun NavController.navigateToBottomDestination(route: String) {
 private fun isBottomDestination(route: String) = bottomDestinations.any { it.route == route }
 
 /**
+ * Opens any known route the right way round: tabs as siblings, everything else
+ * pushed on top of wherever we are.
+ *
+ * The widget asks for [Routes.FEEDING], which stopped being a tab when the bar
+ * became four kinds of place — so a guard that only honoured bottom destinations
+ * would drop that tap on the floor without saying anything.
+ */
+private fun NavController.navigateToKnown(route: String) {
+    if (route !in knownRoutes) return
+    if (isBottomDestination(route)) navigateToBottomDestination(route) else navigate(route)
+}
+
+/** Babies and the current selection, for the shell's own bar. */
+class ShellViewModel(repository: SproutRepository) : ViewModel() {
+    val babies = repository.babies
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val activeBabyId = repository.parentProfile
+        .map { it?.activeBabyId }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+}
+
+/**
  * Root composable: chooses between onboarding and the main app based on the
  * startup stage. The daily check-in is *not* one of the stages — it waits on the
  * dashboard instead of standing between a parent and the app. [routeRequest] is
- * a bottom-bar route the launching intent asked to open (e.g. the widget landing
- * on Feeding); it is honoured once the main scaffold is up and acknowledged via
+ * a route the launching intent asked to open (e.g. the widget landing on
+ * Feeding); it is honoured once the main scaffold is up and acknowledged via
  * [onRouteConsumed].
  */
 @Composable
@@ -157,15 +216,17 @@ private fun MainScaffold(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    val shellVm: ShellViewModel = viewModel(factory = rememberSproutViewModelFactory())
+    val babies by shellVm.babies.collectAsState()
+    val activeBabyId by shellVm.activeBabyId.collectAsState()
+
     val showBottomBar = currentRoute in bottomDestinations.map { it.route }
 
     // Honour a route the launching intent asked for (widget tap → Feeding),
     // then consume it so it doesn't re-fire on recomposition or rotation.
     LaunchedEffect(routeRequest) {
         if (routeRequest != null) {
-            if (isBottomDestination(routeRequest)) {
-                navController.navigateToBottomDestination(routeRequest)
-            }
+            navController.navigateToKnown(routeRequest)
             onRouteConsumed()
         }
     }
@@ -176,20 +237,35 @@ private fun MainScaffold(
         if (syncFile != null) navController.navigate(Routes.SYNC)
     }
 
+    /**
+     * Start a breastfeed from the dashboard. Feeding goes on the stack first so
+     * that backing out of the timer lands on the feed history rather than on
+     * Home, and so the nursing screen can still share the feeding ViewModel that
+     * owns the live session.
+     */
+    fun openNursing(side: BreastSide) {
+        navController.navigate(Routes.FEEDING)
+        navController.navigate(Routes.nursing(side))
+    }
+
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
-                    bottomDestinations.forEach { dest ->
+                    // The baby's own tab only earns a seat once there is a
+                    // choice to make; with one baby the dashboard is already it.
+                    val visible = bottomDestinations.filter {
+                        it.route != Routes.BABY || babies.size > 1
+                    }
+                    visible.forEach { dest ->
                         val selected = backStackEntry?.destination?.hierarchy
                             ?.any { it.route == dest.route } == true
+                        val label = babyTabLabel(dest, babies, activeBabyId)
                         NavigationBarItem(
                             selected = selected,
                             onClick = { navController.navigateToBottomDestination(dest.route) },
-                            icon = {
-                                Icon(dest.icon, contentDescription = stringResource(dest.labelRes))
-                            },
-                            label = { Text(stringResource(dest.labelRes)) },
+                            icon = { Icon(dest.icon, contentDescription = label) },
+                            label = { Text(label) },
                         )
                     }
                 }
@@ -202,18 +278,25 @@ private fun MainScaffold(
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(Routes.HOME) {
-                HomeScreen(onNavigate = { route ->
-                    if (isBottomDestination(route)) {
-                        navController.navigateToBottomDestination(route)
-                    } else {
-                        navController.navigate(route)
-                    }
-                })
+                HomeScreen(
+                    onNavigate = { route -> navController.navigateToKnown(route) },
+                    onQuickFeed = { side -> openNursing(side) },
+                )
+            }
+            composable(Routes.BABY) {
+                BabyScreen(
+                    onNavigate = { route -> navController.navigateToKnown(route) },
+                    onQuickFeed = { side -> openNursing(side) },
+                )
+            }
+            composable(Routes.YOU) {
+                YouScreen(onNavigate = { route -> navController.navigateToKnown(route) })
             }
             composable(Routes.FEEDING) {
-                FeedingScreen(onOpenNursing = { side ->
-                    navController.navigate("feeding/nursing/${side.name}")
-                })
+                FeedingScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenNursing = { side -> navController.navigate(Routes.nursing(side)) },
+                )
             }
             composable(
                 Routes.FEEDING_NURSING,
@@ -234,14 +317,20 @@ private fun MainScaffold(
             composable(Routes.PUMPING) {
                 PumpingScreen(onBack = { navController.popBackStack() })
             }
-            composable(Routes.SLEEP) { SleepScreen() }
-            composable(Routes.DIAPER) { DiaperScreen() }
-            composable(Routes.GROWTH) { GrowthScreen() }
+            composable(Routes.SLEEP) {
+                SleepScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.DIAPER) {
+                DiaperScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.GROWTH) {
+                GrowthScreen(onBack = { navController.popBackStack() })
+            }
             composable(Routes.HEALTH) {
                 HealthScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.STATS) {
-                StatsScreen(onBack = { navController.popBackStack() })
+                StatsScreen()
             }
             composable(Routes.CHECKIN) {
                 CheckInRoute(onDone = { navController.popBackStack() })
@@ -271,4 +360,19 @@ private fun MainScaffold(
             }
         }
     }
+}
+
+/**
+ * The baby tab wears the child's name, because "Baby" next to a dashboard that
+ * lists Léa and Noé says nothing about which one it opens.
+ */
+@Composable
+private fun babyTabLabel(
+    dest: BottomDestination,
+    babies: List<BabyEntity>,
+    activeBabyId: Long?,
+): String {
+    if (dest.route != Routes.BABY) return stringResource(dest.labelRes)
+    val active = babies.firstOrNull { it.id == activeBabyId }
+    return active?.name ?: stringResource(dest.labelRes)
 }

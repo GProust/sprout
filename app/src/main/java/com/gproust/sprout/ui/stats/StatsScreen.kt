@@ -226,7 +226,7 @@ class StatsViewModel(private val repository: SproutRepository) : ViewModel() {
 }
 
 @Composable
-fun StatsScreen(onBack: () -> Unit = {}) {
+fun StatsScreen(onBack: (() -> Unit)? = null) {
     val vm: StatsViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
     val context = LocalContext.current
