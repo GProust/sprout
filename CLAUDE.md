@@ -55,7 +55,8 @@ Five things that a change can quietly undo:
   the foreground (throttled by `NearbyPolicy`) or an explicit *Sync now*. No
   background scan, no periodic job, no foreground service. Latency in minutes is
   the accepted trade for battery.
-- **`device.xml` is the file backups leave alone** ([ADR-0011](docs/adr/0011-what-survives-a-new-phone.md)).
+- **`device.xml` is the file backups leave alone** ([ADR-0011](docs/adr/0011-what-survives-a-new-phone.md),
+  exclusion list amended by [ADR-0012](docs/adr/0012-the-widget-diagnostics-screen-comes-out.md)).
   Everything else travels to a new phone; this phone's sync identity must not,
   or a restore leaves two handsets answering to one id. Put device-local values
   there and nowhere else, and keep `@xml/backup_rules` and

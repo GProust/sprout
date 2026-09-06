@@ -345,17 +345,8 @@
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
     <string name="widget_last_breast">Letzte Brust: %1$s · %2$s</string>
 
-    <!-- Widget troubleshooting -->
-    <string name="screen_widget_diagnostics">Widget-Diagnose</string>
-    <string name="settings_troubleshooting">Fehlersuche</string>
-    <string name="settings_widget_diagnostics_hint">Prüfen, warum das Homescreen-Widget nicht funktioniert, und einen Bericht teilen.</string>
-    <string name="widget_diagnostics_intro">Dies testet das Homescreen-Widget jetzt und listet auf, was es zuletzt getan hat. Teile den Bericht, wenn das Widget nicht funktioniert – nichts wird ohne dein Zutun gesendet.</string>
-    <string name="widget_diagnostics_share">Bericht teilen</string>
-    <string name="widget_diagnostics_copy">Kopieren</string>
-    <string name="widget_diagnostics_rerun">Erneut ausführen</string>
-    <string name="widget_diagnostics_force_refresh">Aktualisierung erzwingen</string>
-    <string name="widget_diagnostics_clear">Verlauf löschen</string>
-    <string name="widget_error">Widget-Fehler – siehe Einstellungen → Widget-Diagnose</string>
+    <!-- Shown on the home screen when the widget can't be drawn -->
+    <string name="widget_error">Widget konnte nicht gezeichnet werden. Öffne Sprout, oder entferne es und füge es neu hinzu.</string>
 
     <!-- Partner-Synchronisierung (ADR-0007 Phase 1) -->
     <string name="screen_sync">Haushalt teilen</string>

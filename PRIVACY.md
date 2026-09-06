@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-09-05 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-06 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -33,10 +33,10 @@ operating system, not something Sprout sends or controls. The same applies to
 the copy Android makes when you set up a new phone from your old one.
 
 Sprout tells Android what to include, so that moving to a new phone brings your
-record and your settings with you. Two things are deliberately left out: the
-identifier this particular phone uses when sharing with your household, and the
-widget's diagnostic log — both describe the handset rather than you, and
-copying them would leave two phones claiming to be the same one.
+record and your settings with you. One thing is deliberately left out: the
+identifier this particular phone uses when sharing with your household — it
+describes the handset rather than you, and copying it would leave two phones
+claiming to be the same one.
 
 **Your household's sharing key never travels.** It is locked to the phone's
 own secure hardware, so the copy in a backup cannot be opened anywhere else.
@@ -116,6 +116,15 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-06
+
+- **The widget diagnostic log is gone**, so it is no longer named as something
+  a backup leaves behind — there is nothing left to leave behind. The
+  Troubleshooting screen that read it has been removed from Settings along with
+  the log itself, which means one less file written on your phone. What a
+  backup carries is otherwise unchanged, and the identifier this phone uses
+  inside your household is still held back.
 
 ### 2026-09-05
 

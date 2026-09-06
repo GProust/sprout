@@ -4,8 +4,8 @@
   error layout lives in the library and needs the same machinery that just
   failed, so this one is deliberately plain — a single TextView from our own
   resources, referenced from code, inflatable on its own. A visible "something
-  broke, here's where to look" beats the silent loading spinner the widget
-  used to sit on forever.
+  broke, here's what to try" beats the silent loading spinner the widget used
+  to sit on forever (ADR-0012).
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

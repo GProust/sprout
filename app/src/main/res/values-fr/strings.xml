@@ -404,17 +404,8 @@
     <string name="widget_ago_hours_minutes">il y a %1$d h %2$d min</string>
     <string name="widget_last_breast">Dernier sein : %1$s · %2$s</string>
 
-    <!-- Widget troubleshooting -->
-    <string name="screen_widget_diagnostics">Diagnostic du widget</string>
-    <string name="settings_troubleshooting">Dépannage</string>
-    <string name="settings_widget_diagnostics_hint">Vérifiez pourquoi le widget d\'écran d\'accueil ne fonctionne pas, et partagez un rapport.</string>
-    <string name="widget_diagnostics_intro">Ceci teste le widget d\'écran d\'accueil maintenant et liste ce qu\'il a fait récemment. Partagez-le si le widget ne fonctionne pas : rien n\'est envoyé sans votre accord.</string>
-    <string name="widget_diagnostics_share">Partager le rapport</string>
-    <string name="widget_diagnostics_copy">Copier</string>
-    <string name="widget_diagnostics_rerun">Relancer</string>
-    <string name="widget_diagnostics_force_refresh">Forcer l\'actualisation</string>
-    <string name="widget_diagnostics_clear">Effacer l\'historique</string>
-    <string name="widget_error">Erreur du widget — voir Paramètres → Diagnostic du widget</string>
+    <!-- Shown on the home screen when the widget can't be drawn -->
+    <string name="widget_error">Impossible d\'afficher le widget. Ouvrez Sprout, ou retirez-le et rajoutez-le.</string>
 
     <!-- Synchronisation entre parents (ADR-0007 phase 1) -->
     <string name="screen_sync">Partage du foyer</string>
