@@ -277,6 +277,9 @@
     <string name="treatment_edit">Editar tratamento</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
     <string name="treatment_reminders_off">Lembretes desativados</string>
+    <string name="treatment_section_active">Ativos</string>
+    <string name="treatment_section_past">Anteriores</string>
+    <string name="treatment_ended">Terminou em %1$s</string>
     <string name="treatment_name">Nome (por exemplo, Vitamina D)</string>
     <string name="treatment_dose">Dose (opcional, por exemplo, 1 gota)</string>
     <string name="treatment_frequency">Com que frequência</string>

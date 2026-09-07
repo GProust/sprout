@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDuration
@@ -338,15 +339,6 @@ private fun TodayRow(summary: BabySummary) {
             modifier = Modifier.weight(1f),
         )
     }
-}
-
-@Composable
-internal fun SectionLabel(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold,
-    )
 }
 
 /**

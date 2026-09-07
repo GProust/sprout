@@ -196,6 +196,16 @@ fun DayHeader(dayStartMillis: Long) {
     )
 }
 
+/** A heading over a group of cards in a list, e.g. "Active" / "Past". */
+@Composable
+fun SectionLabel(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+    )
+}
+
 /** The "+" button that opens a tracking screen's log form. */
 @Composable
 fun AddEntryFab(contentDescription: String, onClick: () -> Unit) {
