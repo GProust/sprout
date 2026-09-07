@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.9.0] — 2026-09-07
 
 - 🤱 **One breastfeed is logged once.** Starting a feed, leaving the app and
   coming back through the widget could leave a second copy of the timer behind
