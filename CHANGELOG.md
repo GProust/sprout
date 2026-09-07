@@ -29,6 +29,18 @@ All notable changes to Sprout are documented here. This project follows
   quietly left half-paired: it could not sync, and the next invitation it
   accepted would have skipped the question about what to do with both phones'
   histories. It now starts genuinely fresh and asks properly.
+- 🧹 **The widget troubleshooting screen is gone.** It existed to chase one
+  bug in the home-screen widget — the one that used to leave it stuck on a
+  loading spinner — and that bug has been fixed for several releases now.
+  Settings is one section shorter, and your phone writes one less file every
+  time the widget refreshes. If the widget ever *can't* draw, it still says so
+  on your home screen rather than sitting there silently.
+- 💚 **A way to support Sprout, for anyone who wants one.** Settings now ends
+  with two links — GitHub Sponsors and Buy Me a Coffee. That is the whole of it:
+  there is no prompt, no reminder and no dialog, and **nothing in the app is
+  behind them.** Every feature is here for someone who never gives a penny, and
+  it will stay that way. Both links open in your browser; Sprout still has no
+  internet permission and still cannot make a network request of its own.
 
 ## [1.8.0] — 2026-09-05
 

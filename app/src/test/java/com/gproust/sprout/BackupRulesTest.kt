@@ -3,7 +3,6 @@ package com.gproust.sprout
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.sync.DeviceIdentity
-import com.gproust.sprout.widget.WidgetDiagnostics
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,12 +26,11 @@ class BackupRulesTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     private val deviceFile = "${DeviceIdentity.PREFS}.xml"
-    private val diagnosticsFile = "${WidgetDiagnostics.PREFS}.xml"
 
     @Test
     fun `the pre-31 rules hold back this handset's own preferences`() {
         assertEquals(
-            mapOf("" to setOf(deviceFile, diagnosticsFile)),
+            mapOf("" to setOf(deviceFile)),
             excludedSharedPrefs(R.xml.backup_rules),
         )
     }
@@ -44,8 +42,8 @@ class BackupRulesTest {
         // handset just as surely as a restore does.
         assertEquals(
             mapOf(
-                "cloud-backup" to setOf(deviceFile, diagnosticsFile),
-                "device-transfer" to setOf(deviceFile, diagnosticsFile),
+                "cloud-backup" to setOf(deviceFile),
+                "device-transfer" to setOf(deviceFile),
             ),
             excludedSharedPrefs(R.xml.data_extraction_rules),
         )
@@ -53,7 +51,7 @@ class BackupRulesTest {
 
     @Test
     fun `nothing is included by name, so the record itself still travels`() {
-        // The point of the exclusions is to hold back two files, not to smuggle
+        // The point of the exclusion is to hold back one file, not to smuggle
         // in an allow-list: a stray <include> would silently stop the database
         // and every setting around it from reaching the new phone.
         assertEquals(emptyList<String>(), tagNames(R.xml.backup_rules).filter { it == "include" })

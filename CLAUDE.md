@@ -55,7 +55,8 @@ Five things that a change can quietly undo:
   the foreground (throttled by `NearbyPolicy`) or an explicit *Sync now*. No
   background scan, no periodic job, no foreground service. Latency in minutes is
   the accepted trade for battery.
-- **`device.xml` is the file backups leave alone** ([ADR-0011](docs/adr/0011-what-survives-a-new-phone.md)).
+- **`device.xml` is the file backups leave alone** ([ADR-0011](docs/adr/0011-what-survives-a-new-phone.md),
+  exclusion list amended by [ADR-0012](docs/adr/0012-the-widget-diagnostics-screen-comes-out.md)).
   Everything else travels to a new phone; this phone's sync identity must not,
   or a restore leaves two handsets answering to one id. Put device-local values
   there and nowhere else, and keep `@xml/backup_rules` and
@@ -90,6 +91,24 @@ that a change can quietly break:
 
 Exporting a report (PDF) and the raw data as a workbook build on these same
 per-day figures, and are deliberately still to come.
+
+## Asking for support
+
+Settings ends with two donation links (GitHub Sponsors, Buy Me a Coffee). The
+rules are in [BDR-11](docs/decisions/0011-donations-are-a-link-out-and-buy-nothing.md),
+and two of them are the whole point:
+
+- **A donation buys nothing.** No feature gated, no limit lifted, no badge, no
+  ad removed. The moment one unlocks anything it becomes an in-app purchase and
+  Google Play requires Play Billing rather than a link out — so this is a
+  policy line, not a preference.
+- **It stays a link.** `ACTION_VIEW` hands the URL to the browser; fetching
+  anything in-app (a supporter count, a balance, a payment page) would need the
+  `INTERNET` permission and spend the privacy claim above. `SupportLinksTest`
+  asserts the permission's absence so it breaks CI, not trust.
+
+One quiet row at the bottom of Settings, and nowhere else — no prompt, no
+dialog, no dashboard card. `PRIVACY.md` covers what a tap actually exposes.
 
 ## Historical — how it was built
 

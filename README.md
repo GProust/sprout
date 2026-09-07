@@ -139,6 +139,24 @@ the Google Play Store (plus the GitHub Release route).
 
 Sprout collects nothing — all data stays on your device. See [PRIVACY.md](PRIVACY.md).
 
+## Supporting Sprout
+
+Sprout is free, open-source, ad-free and account-free, and it will stay that
+way — **every feature is in the app whether or not anyone ever donates.**
+Nothing is unlocked by giving, because nothing is locked.
+
+If it helped you through the early weeks and you'd like to chip in towards its
+development:
+
+- [**GitHub Sponsors**](https://github.com/sponsors/gproust) — one-off or monthly.
+- [**Buy Me a Coffee**](https://buymeacoffee.com/gproust) — a one-off tip, no account needed.
+
+The same two links sit at the bottom of the app's Settings screen, and nowhere
+else: there is no prompt, no dialog and no reminder. Both simply open in your
+browser — the app still has **no internet permission** and still cannot make a
+network request of its own. The reasoning is recorded in
+[BDR-11](docs/decisions/0011-donations-are-a-link-out-and-buy-nothing.md).
+
 ## License
 
 Sprout is free, open-source software licensed under the **GNU General Public License v3.0** — see

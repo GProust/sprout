@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  What crosses to a new phone on API 30 and below (ADR-0011).
+  What crosses to a new phone on API 30 and below (ADR-0011, amended by
+  ADR-0012).
 
   No <include> means "everything eligible", which is what we want: the whole
   record — the Room database and the settings around it — should arrive on the
@@ -11,6 +12,4 @@
 <full-backup-content>
     <!-- This install's sync identity: see DeviceIdentity. -->
     <exclude domain="sharedpref" path="device.xml" />
-    <!-- Widget breadcrumbs, about this handset's launcher and nothing else. -->
-    <exclude domain="sharedpref" path="widget_diagnostics.xml" />
 </full-backup-content>

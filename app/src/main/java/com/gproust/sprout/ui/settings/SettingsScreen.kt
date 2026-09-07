@@ -32,6 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,10 +72,9 @@ private data class LanguageChoice(
 
 @Composable
 // onBack stays last so `SettingsScreen {}` keeps reading like its siblings
-// (ProfileScreen, TreatmentsScreen); the diagnostics hop defaults to a no-op
-// for previews and screenshot captures, which only render the screen.
+// (ProfileScreen, TreatmentsScreen); the sync hop defaults to a no-op for
+// previews and screenshot captures, which only render the screen.
 fun SettingsScreen(
-    onOpenWidgetDiagnostics: () -> Unit = {},
     onOpenSync: () -> Unit = {},
     onBack: () -> Unit,
 ) {
@@ -97,6 +98,11 @@ fun SettingsScreen(
         ActivityResultContracts.RequestPermission(),
     ) {}
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    // Read in composition rather than inside the coroutine: a Context captured
+    // by a launched job doesn't see a configuration change, so the message
+    // could surface in the language the app started in.
+    val noBrowser = stringResource(R.string.settings_support_no_browser)
     var remindersEnabled by remember { mutableStateOf(FeedingReminderSettings.isEnabled(context)) }
     var intervalMinutes by remember { mutableIntStateOf(FeedingReminderSettings.intervalMinutes(context)) }
     var growthSpurtsEnabled by remember { mutableStateOf(GrowthSpurtSettings.isEnabled(context)) }
@@ -106,7 +112,10 @@ fun SettingsScreen(
         scope.launch(Dispatchers.IO) { FeedingReminders.rescheduleAll(context, repository) }
     }
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_settings), onBack = onBack) }) { padding ->
+    Scaffold(
+        topBar = { SproutTopBar(stringResource(R.string.screen_settings), onBack = onBack) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
@@ -229,8 +238,73 @@ fun SettingsScreen(
             item { SharingSection(onOpenSync = onOpenSync) }
 
             item { Spacer(Modifier.height(24.dp)) }
-            item { TroubleshootingSection(onOpenWidgetDiagnostics = onOpenWidgetDiagnostics) }
+            item {
+                SupportSection(
+                    onOpen = { url ->
+                        if (!SupportLinks.open(context, url)) {
+                            scope.launch { snackbarHostState.showSnackbar(noBrowser) }
+                        }
+                    },
+                )
+            }
         }
+    }
+}
+
+/**
+ * The one place Sprout asks for anything (BDR-11). It sits last, it never
+ * appears anywhere else, and both rows only hand a URL to the browser — no
+ * purchase, and nothing bought: every feature is here either way.
+ */
+@Composable
+private fun SupportSection(onOpen: (String) -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_support),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Text(
+            stringResource(R.string.settings_support_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        SupportRow(
+            label = stringResource(R.string.settings_support_sponsors),
+            hint = stringResource(R.string.settings_support_sponsors_hint),
+            onClick = { onOpen(SupportLinks.GITHUB_SPONSORS) },
+        )
+        SupportRow(
+            label = stringResource(R.string.settings_support_coffee),
+            hint = stringResource(R.string.settings_support_coffee_hint),
+            onClick = { onOpen(SupportLinks.BUY_ME_A_COFFEE) },
+        )
+    }
+}
+
+/** A row that leaves the app: the globe says so before the tap does. */
+@Composable
+private fun SupportRow(label: String, hint: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(label)
+            Text(
+                hint,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        // A globe, not the chevron the in-app rows use: this one leaves Sprout.
+        Icon(
+            Icons.Filled.Public,
+            contentDescription = stringResource(R.string.cd_opens_in_browser),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }
 
@@ -251,32 +325,6 @@ private fun SharingSection(onOpenSync: () -> Unit) {
                 Text(stringResource(R.string.screen_sync))
                 Text(
                     stringResource(R.string.settings_sync_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-        }
-    }
-}
-
-/** A way in to the widget report when the home-screen widget misbehaves. */
-@Composable
-private fun TroubleshootingSection(onOpenWidgetDiagnostics: () -> Unit) {
-    Column(Modifier.fillMaxWidth()) {
-        Text(
-            stringResource(R.string.settings_troubleshooting),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        Row(
-            Modifier.fillMaxWidth().clickable(onClick = onOpenWidgetDiagnostics).padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                Text(stringResource(R.string.screen_widget_diagnostics))
-                Text(
-                    stringResource(R.string.settings_widget_diagnostics_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

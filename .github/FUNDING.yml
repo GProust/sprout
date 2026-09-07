@@ -1,0 +1,5 @@
+# Shows the "Sponsor" button on the repository, and mirrors the two links the
+# app offers under Settings → Support Sprout. See BDR-11: these are donations
+# with nothing given in return — no feature of Sprout is ever behind them.
+github: [gproust]
+buy_me_a_coffee: gproust

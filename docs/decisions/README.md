@@ -34,5 +34,6 @@ ADR log and are cross-linked from here.
 | [0008](0008-statistics-and-the-who-growth-curves.md) | Statistics, and WHO curves read against both references | Product / Domain | Accepted |
 | [0009](0009-the-dashboard-is-the-household.md) | The dashboard is the household; the active baby scopes the logs | Product / UX | Accepted |
 | [0010](0010-the-bottom-bar-is-four-kinds-of-place.md) | The bottom bar is kinds of place, not kinds of log | Product / UX | Accepted |
+| [0011](0011-donations-are-a-link-out-and-buy-nothing.md) | Donations are a link out, and they buy nothing | Business / Product | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

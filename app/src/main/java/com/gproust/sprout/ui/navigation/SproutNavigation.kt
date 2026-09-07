@@ -55,7 +55,6 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
-import com.gproust.sprout.ui.settings.WidgetDiagnosticsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
@@ -83,7 +82,6 @@ object Routes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
-    const val WIDGET_DIAGNOSTICS = "settings/widget-diagnostics"
     const val SYNC = "settings/sync"
 
     /** The live nursing screen for one breast, timer already running. */
@@ -125,7 +123,7 @@ private val knownRoutes = setOf(
     Routes.HOME, Routes.BABY, Routes.YOU, Routes.STATS,
     Routes.FEEDING, Routes.PUMPING, Routes.SLEEP, Routes.DIAPER,
     Routes.GROWTH, Routes.HEALTH, Routes.TREATMENTS, Routes.CHECKIN,
-    Routes.PROFILE, Routes.SETTINGS, Routes.SYNC, Routes.WIDGET_DIAGNOSTICS,
+    Routes.PROFILE, Routes.SETTINGS, Routes.SYNC,
 )
 
 /**
@@ -368,7 +366,6 @@ private fun MainScaffold(
             composable(Routes.SETTINGS) {
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
-                    onOpenWidgetDiagnostics = { navController.navigate(Routes.WIDGET_DIAGNOSTICS) },
                     onOpenSync = { navController.navigate(Routes.SYNC) },
                 )
             }
@@ -378,9 +375,6 @@ private fun MainScaffold(
                     incomingFile = syncFile,
                     onIncomingFileHandled = onSyncFileConsumed,
                 )
-            }
-            composable(Routes.WIDGET_DIAGNOSTICS) {
-                WidgetDiagnosticsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.TREATMENTS) {
                 TreatmentsScreen(onBack = { navController.popBackStack() })

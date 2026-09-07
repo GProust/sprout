@@ -348,17 +348,8 @@
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
     <string name="widget_last_breast">Ultimo seno: %1$s · %2$s</string>
 
-    <!-- Widget troubleshooting -->
-    <string name="screen_widget_diagnostics">Diagnostica del widget</string>
-    <string name="settings_troubleshooting">Risoluzione dei problemi</string>
-    <string name="settings_widget_diagnostics_hint">Verifica perché il widget della schermata Home non funziona e condividi un report.</string>
-    <string name="widget_diagnostics_intro">Questo testa il widget della schermata Home adesso ed elenca cosa ha fatto di recente. Condividilo se il widget non funziona: non viene inviato nulla senza il tuo consenso.</string>
-    <string name="widget_diagnostics_share">Condividi report</string>
-    <string name="widget_diagnostics_copy">Copia</string>
-    <string name="widget_diagnostics_rerun">Esegui di nuovo</string>
-    <string name="widget_diagnostics_force_refresh">Forza aggiornamento</string>
-    <string name="widget_diagnostics_clear">Cancella cronologia</string>
-    <string name="widget_error">Errore del widget — vedi Impostazioni → Diagnostica del widget</string>
+    <!-- Shown on the home screen when the widget can't be drawn -->
+    <string name="widget_error">Impossibile disegnare il widget. Apri Sprout, oppure rimuovilo e aggiungilo di nuovo.</string>
 
     <!-- Sincronizzazione tra genitori (ADR-0007 fase 1) -->
     <string name="screen_sync">Condivisione in famiglia</string>
@@ -513,4 +504,14 @@
     <string name="you_pumping_body">Le sessioni, e cosa c\'è in frigo.</string>
     <string name="you_wellbeing_body">Il tuo umore e il tuo recupero, nel tempo.</string>
     <string name="you_checkin_done">Fatto per oggi — apri per rileggere.</string>
+
+    <!-- Sostenere il progetto (BDR-11) -->
+    <string name="settings_support">Sostieni Sprout</string>
+    <string name="settings_support_desc">Sprout è gratuita, open source e lo resterà — tutte le funzioni ci sono, che tu doni o no. Se l\'app ti è stata d\'aiuto nelle prime settimane e vuoi contribuire al suo sviluppo, questi link si aprono nel browser.</string>
+    <string name="settings_support_sponsors">GitHub Sponsors</string>
+    <string name="settings_support_sponsors_hint">Una tantum o mensile, tramite GitHub.</string>
+    <string name="settings_support_coffee">Offrimi un caffè</string>
+    <string name="settings_support_coffee_hint">Un contributo una tantum, senza account.</string>
+    <string name="settings_support_no_browser">Nessun browser trovato per aprire la pagina.</string>
+    <string name="cd_opens_in_browser">Si apre nel browser</string>
 </resources>

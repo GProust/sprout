@@ -9,6 +9,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -48,6 +49,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
+ * The widget runs in a receiver the user never sees, so the three paths that
+ * can fail say so here: `adb logcat -s SproutWidget` when a cable is an option.
+ * Nothing is written to disk and nothing is surfaced in the app — a widget that
+ * fails to draw says so on the home screen instead, via `R.layout.widget_error`.
+ */
+private const val TAG = "SproutWidget"
+
+/**
  * Draws every placed widget and hands the result to the launcher.
  *
  * Deliberately *not* GlanceAppWidget.update(). On minified release builds that
@@ -68,17 +77,6 @@ suspend fun renderSproutWidgets(context: Context, appWidgetIds: IntArray) {
     if (appWidgetIds.isEmpty()) return
     val manager = AppWidgetManager.getInstance(context)
     val data = loadWidgetData(context)
-    val lastBreast = data.lastBreast
-        ?.let { firstNursedSide(it)?.name?.lowercase() ?: "side unknown" }
-        ?: "none in 24 h"
-    WidgetDiagnostics.record(
-        context,
-        "rendering ${appWidgetIds.size} widget(s): " +
-            "session=${if (data.session != null) "running" else "none"}, " +
-            "lastFeed=${data.feed?.type?.name?.lowercase() ?: "none"}, " +
-            "lastBreast=$lastBreast, " +
-            "baby=${if (data.babyName != null) "named" else "unknown"}",
-    )
     for (id in appWidgetIds) {
         try {
             val views = glanceRemoteViews.compose(context, widgetSize(manager, id)) {
@@ -90,14 +88,13 @@ suspend fun renderSproutWidgets(context: Context, appWidgetIds: IntArray) {
         } catch (e: Throwable) {
             // Say so on the home screen rather than leave the launcher showing
             // its loading spinner for ever, which is how this hid for so long.
-            WidgetDiagnostics.record(context, "could not draw widget $id", e)
+            Log.e(TAG, "could not draw widget $id", e)
             runCatching {
                 manager.updateAppWidget(id, RemoteViews(context.packageName, R.layout.widget_error))
             }
         }
     }
     scheduleWidgetTick(context, data)
-    WidgetDiagnostics.record(context, "render finished")
 }
 
 /**
@@ -143,9 +140,7 @@ private const val RELATIVE_TIME_LIMIT_MS = 48L * 60L * 60L * 1000L
 
 /** One-stop widget refresh, called wherever widget-visible data changes. */
 suspend fun updateSproutWidget(context: Context) {
-    val ids = placedWidgetIds(context)
-    WidgetDiagnostics.record(context, "app asked the widget to refresh (${ids.size} placed)")
-    renderSproutWidgets(context, ids)
+    renderSproutWidgets(context, placedWidgetIds(context))
 }
 
 internal fun placedWidgetIds(context: Context): IntArray =
@@ -184,18 +179,18 @@ private class WidgetData(
 )
 
 private suspend fun loadWidgetData(context: Context): WidgetData {
-    val app = readForWidget(context, "app container") {
+    val app = readForWidget("app container") {
         context.applicationContext as SproutApplication
     }
     return WidgetData(
-        session = readForWidget(context, "nursing session") { NursingSessionStore.load(context) },
-        feed = readForWidget(context, "last feed") { app?.repository?.lastFeedForActiveBaby() },
-        lastBreast = readForWidget(context, "last breastfeed") {
+        session = readForWidget("nursing session") { NursingSessionStore.load(context) },
+        feed = readForWidget("last feed") { app?.repository?.lastFeedForActiveBaby() },
+        lastBreast = readForWidget("last breastfeed") {
             app?.repository?.lastBreastFeedForActiveBaby(
                 System.currentTimeMillis() - LAST_BREAST_WINDOW_MS,
             )
         },
-        babyName = readForWidget(context, "active baby name") { app?.repository?.activeBabyName() },
+        babyName = readForWidget("active baby name") { app?.repository?.activeBabyName() },
     )
 }
 
@@ -270,7 +265,6 @@ internal fun widgetTimeAgo(context: Context, epochMillis: Long, now: Long): Stri
  * not Exception: a member removed by shrinking arrives as an Error.
  */
 private suspend fun <T> readForWidget(
-    context: Context,
     what: String,
     read: suspend () -> T,
 ): T? =
@@ -279,7 +273,7 @@ private suspend fun <T> readForWidget(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Throwable) {
-        WidgetDiagnostics.record(context, "could not read the $what; showing the empty state", e)
+        Log.e(TAG, "could not read the $what; showing the empty state", e)
         null
     }
 
@@ -446,16 +440,11 @@ class SproutWidgetReceiver : AppWidgetProvider() {
         const val ACTION_TICK = "com.gproust.sprout.widget.TICK"
     }
 
-    override fun onEnabled(context: Context) {
-        WidgetDiagnostics.record(context, "receiver: first widget added")
-    }
-
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        WidgetDiagnostics.record(context, "receiver: onUpdate for ${appWidgetIds.size} widget(s)")
         renderInBackground(context, appWidgetIds)
     }
 
@@ -466,17 +455,11 @@ class SproutWidgetReceiver : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        WidgetDiagnostics.record(context, "receiver: widget $appWidgetId resized")
         renderInBackground(context, intArrayOf(appWidgetId))
-    }
-
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        WidgetDiagnostics.record(context, "receiver: ${appWidgetIds.size} widget(s) removed")
     }
 
     /** Nothing left on the home screen to keep up to date. */
     override fun onDisabled(context: Context) {
-        WidgetDiagnostics.record(context, "receiver: last widget removed")
         cancelWidgetTick(context)
     }
 
@@ -499,7 +482,7 @@ class SproutWidgetReceiver : AppWidgetProvider() {
             try {
                 renderSproutWidgets(context, appWidgetIds)
             } catch (e: Throwable) {
-                WidgetDiagnostics.record(context, "receiver: render failed", e)
+                Log.e(TAG, "receiver: render failed", e)
             } finally {
                 pending.finish()
             }
