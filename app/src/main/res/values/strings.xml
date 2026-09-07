@@ -346,6 +346,9 @@
     <string name="treatment_edit">Edit treatment</string>
     <string name="treatment_title_dose">%1$s · %2$s</string>
     <string name="treatment_reminders_off">Reminders off</string>
+    <string name="treatment_section_active">Active</string>
+    <string name="treatment_section_past">Past</string>
+    <string name="treatment_ended">Ended %1$s</string>
     <string name="treatment_name">Name (e.g. Vitamin D)</string>
     <string name="treatment_dose">Dose (optional, e.g. 1 drop)</string>
     <string name="treatment_frequency">How often</string>

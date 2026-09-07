@@ -165,6 +165,17 @@ class ScreenshotTest {
                 endDate = now + 358 * day,
             ),
         )
+        // A finished course, so the capture shows the past section too.
+        repo.addTreatment(
+            TreatmentEntity(
+                name = "Iron",
+                dose = "2 ml",
+                intervalDays = 1,
+                timesOfDay = listOf(8 * 60, 20 * 60),
+                startDate = now - 30 * day,
+                endDate = now - 3 * day,
+            ),
+        )
         repo.addWellbeing(
             WellbeingEntity(
                 time = now - day,

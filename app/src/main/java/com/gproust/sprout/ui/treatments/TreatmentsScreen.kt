@@ -28,7 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -50,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,8 +65,10 @@ import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.NumberField
+import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
+import com.gproust.sprout.ui.common.formatDate
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -151,6 +152,13 @@ fun TreatmentsScreen(onBack: () -> Unit) {
             }
         },
     ) { padding ->
+        // Courses that are over drop to their own section at the bottom, newest
+        // first; the ones still running (or not started yet) stay on top in the
+        // DAO's by-name order.
+        val now = System.currentTimeMillis()
+        val (past, current) = treatments.partition { hasEnded(it, now) }
+        val sortedPast = past.sortedByDescending { it.endDate }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
@@ -159,10 +167,31 @@ fun TreatmentsScreen(onBack: () -> Unit) {
             if (treatments.isEmpty()) {
                 item { EmptyHint(stringResource(R.string.treatment_empty)) }
             }
-            items(treatments, key = { it.id }) { treatment ->
+            // Headings only earn their space once there is something to tell
+            // apart — with no past course the list reads as it always did.
+            if (sortedPast.isNotEmpty() && current.isNotEmpty()) {
+                item(key = "header-active") {
+                    SectionLabel(stringResource(R.string.treatment_section_active))
+                }
+            }
+            items(current, key = { it.id }) { treatment ->
                 TreatmentCard(
                     treatment = treatment,
                     summary = scheduleSummary(context, treatment),
+                    onEdit = { editing = treatment },
+                    onDelete = { deleting = treatment },
+                )
+            }
+            if (sortedPast.isNotEmpty()) {
+                item(key = "header-past") {
+                    SectionLabel(stringResource(R.string.treatment_section_past))
+                }
+            }
+            items(sortedPast, key = { it.id }) { treatment ->
+                TreatmentCard(
+                    treatment = treatment,
+                    summary = scheduleSummary(context, treatment),
+                    past = true,
                     onEdit = { editing = treatment },
                     onDelete = { deleting = treatment },
                 )
@@ -171,14 +200,37 @@ fun TreatmentsScreen(onBack: () -> Unit) {
     }
 }
 
+/**
+ * One treatment. A [past] course is drawn flat and in the muted on-surface
+ * pair rather than at a lower alpha: it should read as finished at a glance,
+ * yet still be legible, and still open its details when tapped.
+ */
 @Composable
 private fun TreatmentCard(
     treatment: TreatmentEntity,
     summary: String,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    past: Boolean = false,
 ) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
+    val context = LocalContext.current
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = if (past) {
+            CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = muted,
+            )
+        } else {
+            CardDefaults.elevatedCardColors()
+        },
+        elevation = if (past) {
+            CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+        } else {
+            CardDefaults.elevatedCardElevation()
+        },
+    ) {
         Row(
             Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -186,7 +238,7 @@ private fun TreatmentCard(
             Icon(
                 Icons.Filled.Medication,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = if (past) muted else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(end = 12.dp),
             )
             Column(
@@ -203,13 +255,20 @@ private fun TreatmentCard(
                 Text(
                     summary,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = muted,
                 )
-                if (!treatment.remindersEnabled) {
+                val endedOn = treatment.endDate?.takeIf { past }
+                if (endedOn != null) {
+                    Text(
+                        stringResource(R.string.treatment_ended, formatDate(context, endedOn)),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = muted,
+                    )
+                } else if (!treatment.remindersEnabled) {
                     Text(
                         stringResource(R.string.treatment_reminders_off),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = muted,
                     )
                 }
             }
@@ -222,6 +281,20 @@ private fun TreatmentCard(
             }
         }
     }
+}
+
+/**
+ * True once a course's end day is behind us. The end date is inclusive and
+ * compared by calendar day, so a treatment whose last dose is today stays in
+ * the active section until midnight; one with no end date never ends, and one
+ * that has not started yet is still ahead, not past.
+ */
+internal fun hasEnded(treatment: TreatmentEntity, now: Long): Boolean {
+    val end = treatment.endDate ?: return false
+    val zone = ZoneId.systemDefault()
+    val endDay = Instant.ofEpochMilli(end).atZone(zone).toLocalDate()
+    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    return endDay.isBefore(today)
 }
 
 @Composable

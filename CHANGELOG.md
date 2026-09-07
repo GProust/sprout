@@ -5,6 +5,11 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 💊 **Finished treatments step out of the way.** The treatments list now keeps
+  the courses that are still running at the top, under **Active**, and gathers
+  the ones that are over below them under **Past**, greyed out and with the day
+  they ended. Nothing is hidden — a past course still opens with a tap, and
+  still shows everything it did before.
 - 📱 **Moving to a new phone keeps things straight.** Sprout now says exactly
   what belongs in an Android backup and in the copy made when you set up a new
   handset: your record and your settings come with you, while the identifier
