@@ -329,7 +329,10 @@ private fun LiveRow(
     onWakeUp: (SleepEntity) -> Unit,
 ) {
     val context = LocalContext.current
-    val nursing = NursingSessionStore.load(context)
+    // The shared session, not a snapshot: the card has to go the moment the
+    // feed is saved, wherever it was saved from, or it offers to reopen a
+    // timer that is no longer running.
+    val nursing = NursingSessionStore.sessions(context).collectAsState().value
     if (nursing == null && sleeping == null) return
 
     // Ticks only while something is actually running.

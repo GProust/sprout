@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,10 +82,8 @@ import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -107,19 +106,16 @@ class FeedingViewModel(
     val feedings = repository.feedings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Restored from the store so a live session survives process death and
-    // stays visible to the home-screen widget.
-    private val _nursing = MutableStateFlow<NursingSession?>(NursingSessionStore.load(context))
-    val nursing: StateFlow<NursingSession?> = _nursing.asStateFlow()
+    /**
+     * The live session, straight from the store rather than a copy of it. There
+     * can be more than one of these ViewModels alive at a time — the widget can
+     * land on a second Feeding screen while the timer is open — and a private
+     * copy each is how the same breastfeed used to be saved more than once.
+     */
+    val nursing: StateFlow<NursingSession?> = NursingSessionStore.sessions(context)
 
-    /** Single point of truth: updates the state, the store, and the widget. */
-    private fun setNursing(session: NursingSession?) {
-        _nursing.value = session
-        if (session == null) {
-            NursingSessionStore.clear(context)
-        } else {
-            NursingSessionStore.save(context, session)
-        }
+    /** The widget draws the running timer, so it follows every change to it. */
+    private fun refreshWidget() {
         viewModelScope.launch { updateSproutWidget(context) }
     }
 
@@ -134,30 +130,47 @@ class FeedingViewModel(
         FeedingReminders.rescheduleActiveBaby(context, repository)
     }
 
-    /** Begin timing a breastfeeding session on [side] (left or right). */
+    /**
+     * Begin timing a breastfeeding session on [side] (left or right). A session
+     * already running is left alone: two ways into the timer opening at once is
+     * not a reason to time the feed twice.
+     */
     fun startNursing(side: BreastSide) {
         val now = System.currentTimeMillis()
-        setNursing(NursingSession(sessionStart = now, currentSide = side, segmentStart = now))
+        NursingSessionStore.startIfIdle(
+            context,
+            NursingSession(sessionStart = now, currentSide = side, segmentStart = now),
+        )
+        refreshWidget()
     }
 
     /** Bank the current breast as a completed segment and switch to the other. */
     fun switchBreast() {
-        val s = _nursing.value ?: return
+        val s = nursing.value ?: return
         val now = System.currentTimeMillis()
         val completed = NursingSegment(s.currentSide, s.segmentStart, now)
         val next = if (s.currentSide == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
-        setNursing(
+        NursingSessionStore.save(
+            context,
             s.copy(
                 currentSide = next,
                 segmentStart = now,
                 segments = s.segments + completed,
             ),
         )
+        refreshWidget()
     }
 
-    /** Finish the session, persist it as a feeding, and clear the timer. */
+    /**
+     * Finish the session and persist it as a feeding.
+     *
+     * The session is *taken* from the store before anything is saved, so that
+     * of everything that might still be showing this timer — a second copy of
+     * the nursing screen left on the back stack, a second tap on Save — only
+     * one is ever handed something to log.
+     */
     fun stopNursing(notes: String = "") {
-        val s = _nursing.value ?: return
+        val s = NursingSessionStore.consume(context) ?: return
         val now = System.currentTimeMillis()
         val all = s.segments + NursingSegment(s.currentSide, s.segmentStart, now)
         val leftMs = all.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
@@ -180,12 +193,13 @@ class FeedingViewModel(
                 notes = notes.ifBlank { null },
             ),
         )
-        setNursing(null)
+        refreshWidget()
     }
 
     /** Discard the running session without saving it. */
     fun cancelNursing() {
-        setNursing(null)
+        NursingSessionStore.consume(context)
+        refreshWidget()
     }
 }
 
@@ -342,10 +356,28 @@ fun NursingScreen(
 ) {
     val session by vm.nursing.collectAsState()
 
-    // Start a session on first entry (or after process death lost the in-memory
-    // one). An already-running session — e.g. resumed from the bar — is kept.
+    // Whether this copy of the screen has already made its start-or-resume
+    // decision. Saved, so it survives the screen sitting on the back stack
+    // while something else is on top of it — a widget tap landing on Feeding,
+    // say. Coming back to a screen that has been here before must never start a
+    // second feed: the timer it was showing may since have been saved from
+    // somewhere else, and starting again is how a tap that looked like
+    // "resume" turned into another breastfeed.
+    var arrived by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
-        if (vm.nursing.value == null) vm.startNursing(side)
+        when {
+            // First time here: start a session unless one is already running
+            // (resumed from the bar, or restored after process death).
+            !arrived -> {
+                arrived = true
+                if (vm.nursing.value == null) vm.startNursing(side)
+            }
+            // Back on a screen whose feed has already been saved — there is
+            // nothing left to show, so step off it rather than sit on a
+            // spinner or start something new.
+            vm.nursing.value == null -> onDone()
+        }
     }
 
     Scaffold(
