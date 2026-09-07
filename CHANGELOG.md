@@ -5,6 +5,13 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🤱 **One breastfeed is logged once.** Starting a feed, leaving the app and
+  coming back through the widget could leave a second copy of the timer behind
+  the screen you landed on — so stopping the feed and then going back a screen
+  put you in front of the very same feed, still running, ready to be saved
+  again. Sprout now keeps a single running feed that every place showing it —
+  the feeding screen, the dashboard card, the widget — sees end at the same
+  moment, and the timer can only be saved by whoever stops it first.
 - 💊 **Finished treatments step out of the way.** The treatments list now keeps
   the courses that are still running at the top, under **Active**, and gathers
   the ones that are over below them under **Past**, greyed out and with the day

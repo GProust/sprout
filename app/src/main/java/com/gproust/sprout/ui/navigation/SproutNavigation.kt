@@ -160,7 +160,29 @@ private fun isBottomDestination(route: String) = bottomDestinations.any { it.rou
  */
 private fun NavController.navigateToKnown(route: String) {
     if (route !in knownRoutes) return
-    if (isBottomDestination(route)) navigateToBottomDestination(route) else navigate(route)
+    if (isBottomDestination(route)) {
+        navigateToBottomDestination(route)
+    } else {
+        // Come back to the screen if it is already open rather than stacking a
+        // second copy of it. A widget tap arriving while the live nursing timer
+        // was on top used to push a second Feeding screen over it and leave the
+        // timer behind, one Back press from saving the same feed again.
+        navigate(route) {
+            popUpTo(route)
+            launchSingleTop = true
+        }
+    }
+}
+
+/**
+ * Opens the live timer with exactly one nursing screen on the stack.
+ *
+ * Anything already sitting above Feeding is a nursing screen from an earlier
+ * trip through here; leaving it there leaves a second timer for the same feed
+ * a Back press away.
+ */
+private fun NavController.navigateToNursing(side: BreastSide) {
+    navigate(Routes.nursing(side)) { popUpTo(Routes.FEEDING) }
 }
 
 /** Babies and the current selection, for the shell's own bar. */
@@ -244,8 +266,13 @@ private fun MainScaffold(
      * owns the live session.
      */
     fun openNursing(side: BreastSide) {
-        navController.navigate(Routes.FEEDING)
-        navController.navigate(Routes.nursing(side))
+        navController.navigate(Routes.FEEDING) {
+            // Reuse the Feeding screen when it is already open: a second copy
+            // of it is a second copy of everything the timer is shown by.
+            popUpTo(Routes.FEEDING)
+            launchSingleTop = true
+        }
+        navController.navigateToNursing(side)
     }
 
     Scaffold(
@@ -295,7 +322,7 @@ private fun MainScaffold(
             composable(Routes.FEEDING) {
                 FeedingScreen(
                     onBack = { navController.popBackStack() },
-                    onOpenNursing = { side -> navController.navigate(Routes.nursing(side)) },
+                    onOpenNursing = { side -> navController.navigateToNursing(side) },
                 )
             }
             composable(
