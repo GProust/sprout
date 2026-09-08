@@ -1,0 +1,1 @@
+Eine Korrektur für den Bericht für die Praxis. Wer nur ein Baby verfolgt, fand die Teilen-Aktion auf einer Seite, die er nie zu sehen bekommt — der Export hatte also gar keinen Zugang. Sie ist jetzt eine Schaltfläche „Bericht teilen“ unten auf der Seite deines Babys, unter den Tageswerten neben „Statistik ansehen“ — an derselben Stelle, ob du ein Baby verfolgst oder drei.

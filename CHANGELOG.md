@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.10.1] — 2026-09-08
 
 - 🩺 **The doctor's record is reachable again if you track one baby.** The share
   action shipped in 1.10.0 sat on the baby's own tab — which a family with a

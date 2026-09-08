@@ -1,0 +1,1 @@
+Poprawka zapisu dla lekarza. Przy jednym dziecku udostępnianie było na stronie, której nigdy nie widzisz — eksport nie miał więc żadnego wejścia. Teraz jest to przycisk „Udostępnij zapis” na dole strony dziecka, pod dzisiejszymi sumami, obok „Zobacz statystyki” — w tym samym miejscu, czy śledzisz jedno dziecko, czy troje.

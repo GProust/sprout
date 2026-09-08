@@ -1,0 +1,1 @@
+Uma correcção do registo para o médico. Se acompanha apenas um bebé, a partilha estava numa página que nunca vê, pelo que a exportação não tinha por onde entrar. Passa a ser um botão «Partilhar um registo» no fim da página do seu bebé, sob os totais do dia, ao lado de «Ver as estatísticas» — no mesmo sítio quer acompanhe um bebé quer três.
