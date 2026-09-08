@@ -580,6 +580,10 @@
     <string name="report_chart_bottle_ml">Volumen en biberón por día (ml)</string>
     <string name="report_chart_breast_hours">Tiempo al pecho por día (horas)</string>
     <string name="report_sleep_line">%1$s veces que se durmió al día · sueño más largo %2$s</string>
+    <string name="report_sleep_places">Dónde durmió: %1$s</string>
+    <string name="report_sleep_positions">Postura: %1$s</string>
+    <string name="report_sleep_share">%1$s: %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s: %2$s</string>
     <string name="report_stool_colours">Color de las heces, cuando se anotó: %1$s</string>
     <string name="report_chart_weight">Peso (kg), sobre la banda de la OMS del percentil 3 al 97</string>
     <string name="report_chart_length">Longitud (cm)</string>

@@ -66,8 +66,9 @@ and the same day rules apply as everywhere else
 the window brings its hours in without adding to the times-settled tally.
 
 **Sprout records the position and says nothing about it.** No warning, no
-colour-coding, no ordering that puts one position above another, no "did you
-know" note under the chart. The app is a record of what happened, not a monitor
+colour-coding, no ordering that puts one position above another (longest first
+is a fact about the period, not a ranking), no "did you know" note under the
+chart, in the app or in the report. The app is a record of what happened, not a monitor
 of what should have; a parent living with a reflux baby, a paediatrician's
 advice, or an unplanned nap on a chest does not need their own log arguing with
 them. Safe-sleep guidance comes from a midwife or a health service, which is
@@ -96,15 +97,27 @@ window each one holds.
   A replica written before they existed merges as sleeps that record nothing,
   and a phone still on the older schema refuses a newer replica outright, as it
   already did.
-- The workbook a parent hands to a doctor
-  ([BDR-12](0012-a-record-for-the-doctor.md)) carries both fields on its sleep
-  sheet, as keys (`back`, `bedside_cot`) beside a `place_name` column holding
-  the parent's own words — the same shape as `stool_colour`, and for the same
-  reason: a sheet of raw rows that quietly drops a recorded field is a worse
-  record than one that has never heard of it. The PDF is unchanged: it
-  summarises rather than lists, and a "where they slept" table there would be
-  the app volunteering an angle on the position, which is exactly what this
-  record says it will not do.
+**The record a parent hands to a doctor carries both**
+([BDR-12](0012-a-record-for-the-doctor.md)).
+
+- The **workbook**'s sleep sheet gains `position`, `place` and `place_name` —
+  keys (`back`, `bedside_cot`) beside the parent's own words for a place they
+  named, the same shape `stool_colour` already set. A sheet of raw rows that
+  quietly drops a recorded field is a worse record than one that has never
+  heard of it.
+- The **PDF** prints them under the sleep chart, as two lines of the same shape
+  as the stool-colour line: each place and each position with the time it came
+  to and the number of sleeps, longest first, and the sleeps that recorded
+  nothing kept whatever else is trimmed. Where a baby sleeps and how they are
+  put down is something a parent gets asked at an appointment, and answering it
+  from the log beats answering it from memory.
+- Printing them is not the app taking a view, and the line between the two is
+  worth keeping in sight: the document repeats what was logged, in the order of
+  how much of the period each thing accounts for, and attaches no threshold, no
+  flag, no colour and no sentence to any of it — which is
+  [BDR-12](0012-a-record-for-the-doctor.md)'s rule, not an exception to it. What
+  the reader makes of "on their tummy: 6 h 10 (4 ×)" is between them and the
+  clinician in front of them.
 - Choosing not to advise is a decision, not an oversight. If Sprout ever does
   carry safe-sleep guidance, it should be a deliberate record of its own — with
   a source, a tone and a place to put it — and not a warning bolted onto a

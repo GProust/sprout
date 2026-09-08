@@ -38,9 +38,13 @@ All notable changes to Sprout are documented here. This project follows
   the share. Sleeps you didn't say anything about are the last line rather
   than being left out, so the shares are shares of *all* the sleep on the card.
   Nothing appears until you have recorded something, and Sprout offers no
-  opinion on any of it: it is your record, not a report card. The spreadsheet
-  you can export carries both on its sleep sheet, so nothing you logged is
-  left out of the copy you hand over.
+  opinion on any of it: it is your record, not a report card.
+- 🩺 **The record you hand to a doctor carries them too.** The PDF report now
+  prints where the sleeps happened and how your baby was lying underneath the
+  sleep chart — each one with the time it came to and how many sleeps it was,
+  and the sleeps you noted nothing for still counted, so nothing reads as more
+  certain than it is. The spreadsheet carries both on its sleep sheet, so
+  nothing you logged is left out of the copy you hand over.
 
 ## [1.9.0] — 2026-09-07
 

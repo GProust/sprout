@@ -580,6 +580,10 @@
     <string name="report_chart_bottle_ml">Flaschenmenge pro Tag (ml)</string>
     <string name="report_chart_breast_hours">Zeit an der Brust pro Tag (Stunden)</string>
     <string name="report_sleep_line">%1$s Einschlafphasen pro Tag · längster Schlaf %2$s</string>
+    <string name="report_sleep_places">Schlafort: %1$s</string>
+    <string name="report_sleep_positions">Position: %1$s</string>
+    <string name="report_sleep_share">%1$s: %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s: %2$s</string>
     <string name="report_stool_colours">Stuhlfarbe, soweit notiert: %1$s</string>
     <string name="report_chart_weight">Gewicht (kg), vor dem WHO-Band der 3. bis 97. Perzentile</string>
     <string name="report_chart_length">Länge (cm)</string>

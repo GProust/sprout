@@ -1175,8 +1175,11 @@ private fun SleepShares(title: String, rows: List<ShareRow>, total: Long, contex
     }
 }
 
-/** What to call a place in the breakdown; a named one is called what it was called. */
-private fun SleepWhere?.label(context: Context): String = when (this) {
+/**
+ * What to call a place in the breakdown; a named one is called what it was
+ * called. Not private: the report prints the same names.
+ */
+fun SleepWhere?.label(context: Context): String = when (this) {
     null -> context.getString(R.string.stats_sleep_not_recorded)
     is SleepWhere.Offered -> place.label(context)
     is SleepWhere.Named -> name

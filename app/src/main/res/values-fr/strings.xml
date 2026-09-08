@@ -639,6 +639,10 @@
     <string name="report_chart_bottle_ml">Volume au biberon par jour (ml)</string>
     <string name="report_chart_breast_hours">Temps au sein par jour (heures)</string>
     <string name="report_sleep_line">%1$s endormissements par jour · plus long sommeil %2$s</string>
+    <string name="report_sleep_places">Lieu du sommeil : %1$s</string>
+    <string name="report_sleep_positions">Position : %1$s</string>
+    <string name="report_sleep_share">%1$s : %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s : %2$s</string>
     <string name="report_stool_colours">Couleur des selles, lorsqu\'elle a été notée : %1$s</string>
     <string name="report_chart_weight">Poids (kg), sur la bande OMS du 3e au 97e percentile</string>
     <string name="report_chart_length">Taille (cm)</string>

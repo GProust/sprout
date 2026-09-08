@@ -580,6 +580,10 @@
     <string name="report_chart_bottle_ml">Volume de biberão por dia (ml)</string>
     <string name="report_chart_breast_hours">Tempo à mama por dia (horas)</string>
     <string name="report_sleep_line">%1$s adormecimentos por dia · sono mais longo %2$s</string>
+    <string name="report_sleep_places">Onde dormiu: %1$s</string>
+    <string name="report_sleep_positions">Posição: %1$s</string>
+    <string name="report_sleep_share">%1$s: %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s: %2$s</string>
     <string name="report_stool_colours">Cor das fezes, quando foi anotada: %1$s</string>
     <string name="report_chart_weight">Peso (kg), sobre a banda da OMS do percentil 3 ao 97</string>
     <string name="report_chart_length">Comprimento (cm)</string>

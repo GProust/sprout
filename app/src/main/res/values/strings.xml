@@ -652,6 +652,10 @@
     <string name="report_chart_bottle_ml">Bottle volume per day (ml)</string>
     <string name="report_chart_breast_hours">Time at the breast per day (hours)</string>
     <string name="report_sleep_line">%1$s times settled per day · longest single sleep %2$s</string>
+    <string name="report_sleep_places">Where they slept: %1$s</string>
+    <string name="report_sleep_positions">How they were lying: %1$s</string>
+    <string name="report_sleep_share">%1$s: %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s: %2$s</string>
     <string name="report_stool_colours">Stool colour, where it was recorded: %1$s</string>
     <string name="report_chart_weight">Weight (kg), against the WHO 3rd–97th centile band</string>
     <string name="report_chart_length">Length (cm)</string>
