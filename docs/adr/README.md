@@ -36,6 +36,7 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0011](0011-what-survives-a-new-phone.md) | What survives a new phone | Accepted (exclusion list amended by [ADR-0012](0012-the-widget-diagnostics-screen-comes-out.md)) |
 | [0012](0012-the-widget-diagnostics-screen-comes-out.md) | The widget diagnostics screen comes out | Accepted |
 | [0013](0013-writing-the-pdf-and-the-workbook-by-hand.md) | Writing the PDF and the workbook by hand | Accepted |
+| [0014](0014-the-way-in-is-an-allow-list.md) | The way in is an allow-list, and untrusted bytes are fuzzed | Accepted |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive

@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 
 /**
  * Getting a replica — or an invitation — from one phone to the other, without a
@@ -58,10 +60,41 @@ object SyncFiles {
         subject,
     )
 
-    /** Reads a file the user picked, or that another app sent us. */
-    fun read(context: Context, uri: Uri): ByteArray =
-        context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+    /**
+     * Reads a file the user picked, or that another app sent us.
+     *
+     * Capped rather than read whole. The intent filters that bring a file here
+     * are broad by necessity, so any app on the phone can hand Sprout a URI and
+     * the size behind it is theirs to choose — and `readBytes` on a stream that
+     * never ends is an out-of-memory kill dressed up as a tap on a file. The
+     * ceiling is [SyncLimits.MAX_FILE_BYTES]; the caller turns anything thrown
+     * here into "this file is not one Sprout can open", which is what it is.
+     */
+    fun read(context: Context, uri: Uri): ByteArray {
+        val stream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalArgumentException("cannot read $uri")
+        return stream.use { readCapped(it) }
+    }
+
+    /**
+     * The cap itself, kept apart from the resolver so it can be tested without
+     * standing up a content provider to be tested against.
+     */
+    internal fun readCapped(input: InputStream): ByteArray {
+        val out = ByteArrayOutputStream()
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        while (true) {
+            val read = input.read(buffer)
+            if (read < 0) break
+            if (out.size() + read > SyncLimits.MAX_FILE_BYTES) {
+                throw IllegalArgumentException(
+                    "a Sprout file is at most ${SyncLimits.MAX_FILE_BYTES} bytes",
+                )
+            }
+            out.write(buffer, 0, read)
+        }
+        return out.toByteArray()
+    }
 
     /**
      * The URI carried by an intent that opened or shared a file with Sprout.

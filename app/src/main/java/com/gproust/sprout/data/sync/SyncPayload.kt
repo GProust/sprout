@@ -119,8 +119,15 @@ object SyncPayloadCodec {
      * @throws SyncPayloadException.Unreadable when it is not a replica, or is damaged.
      */
     fun decode(bytes: ByteArray, currentSchemaVersion: Int): SyncPayload {
+        val text = String(bytes, Charsets.UTF_8)
+        // Before parsing, not around it: nesting deep enough to exhaust the
+        // stack raises an Error, which the catch below would not hold (see
+        // SyncLimits.MAX_JSON_DEPTH). A replica is four levels deep.
+        if (SyncLimits.exceedsMaxJsonDepth(text)) {
+            throw SyncPayloadException.Unreadable("not a Sprout replica: implausibly nested")
+        }
         val root = try {
-            JSONObject(String(bytes, Charsets.UTF_8))
+            JSONObject(text)
         } catch (e: Exception) {
             throw SyncPayloadException.Unreadable("not a Sprout replica: ${e.message}")
         }

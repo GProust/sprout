@@ -20,6 +20,31 @@ MVVM, Room. No accounts, no network calls, no analytics.
 - `CHANGELOG.md` is user-facing release notes, in the voice of the existing
   entries. Docs-only changes don't go in it.
 
+## The way in from outside
+
+The privacy claim is mostly a claim about *absence* — no network, no account, one
+database nothing else can reach — and absence is not what a feature test notices
+going missing. [ADR-0014](docs/adr/0014-the-way-in-is-an-allow-list.md) writes the
+surface down; two tests hold it.
+
+- **`AttackSurfaceTest` pins exact lists** — the permissions, Sprout's own
+  components and which are exported, the FileProvider's terms, every path in
+  `@xml/file_paths`. A legitimate new door is fine and costs one line in the
+  pinned list, in the same commit. A door nobody meant to open fails CI instead.
+- **`UntrustedInputFuzzTest` asserts a property, not examples**: over thousands
+  of mutations, every parser either reads the bytes or throws the exception it
+  documents. Never an `OutOfMemoryError`, an index out of bounds, or a
+  `StackOverflowError` — the manifest offers Sprout for
+  `application/octet-stream`, so *any* app on the phone can hand it a file, and
+  an invitation is parsed with nothing authenticated at all.
+- **`SyncLimits` is checked before parsing, not around it.** Android's
+  `org.json` recurses per nested value, and exhausting the stack raises an
+  `Error` — which every decoder's `catch (e: Exception)` lets straight past.
+  That was a live crash, not a theory. Keep new limits on that side of the
+  parse.
+- **The database stays plaintext**, inside the sandbox and under the platform's
+  own encryption. ADR-0014 says why, and what would have to be true to reopen it.
+
 ## Sharing a baby's record between phones
 
 Shipped, and the one part of the app with rules that are easy to break by
