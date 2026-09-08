@@ -161,6 +161,7 @@ object ReportWorkbook {
         val headers = mutableListOf(
             "date_started", "start_time", "end_time", "duration_minutes",
             "minutes_before_midnight", "minutes_after_midnight",
+            "position", "place", "place_name",
         )
         if (report.options.includeNotes) headers += "notes"
 
@@ -180,11 +181,17 @@ object ReportWorkbook {
                     Cell.Whole(total.minutes()),
                     Cell.Whole(before.minutes()),
                     Cell.Whole((total - before).minutes()),
+                    // Keys, like `stool_colour`: the enum name, in English,
+                    // whatever language the phone is in. `place_name` is the
+                    // parent's own words and is theirs, so it travels as typed.
+                    sleep.position?.let { Cell.Text(it.name.lowercase()) } ?: Cell.Blank,
+                    sleep.place?.let { Cell.Text(it.name.lowercase()) } ?: Cell.Blank,
+                    sleep.placeNote?.takeIf { it.isNotBlank() }?.let { Cell.Text(it) } ?: Cell.Blank,
                 )
                 if (report.options.includeNotes) row += Cell.Text(sleep.notes.orEmpty())
                 row
             },
-            widths = listOf(13, 11, 11, 16, 22, 21, 40),
+            widths = listOf(13, 11, 11, 16, 22, 21, 10, 14, 18, 40),
         )
     }
 

@@ -6,6 +6,8 @@ import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.export.Xlsx
 import com.gproust.sprout.ui.report.ReportOptions
@@ -56,7 +58,13 @@ class ReportWorkbookTest {
                 ),
             ),
             sleeps = listOf(
-                SleepEntity(babyId = 1, startTime = at(today.minusDays(1), 20), endTime = at(today, 6)),
+                SleepEntity(
+                    babyId = 1,
+                    startTime = at(today.minusDays(1), 20),
+                    endTime = at(today, 6),
+                    position = SleepPosition.BACK,
+                    place = SleepPlace.BEDSIDE_COT,
+                ),
             ),
             diapers = listOf(DiaperEntity(babyId = 1, time = at(today, 8), wet = true)),
             growth = listOf(GrowthEntity(babyId = 1, time = at(today, 9), weightGrams = 6100)),
@@ -92,6 +100,20 @@ class ReportWorkbookTest {
         assertEquals(7, daily.rows.size)
         assertTrue(daily.headers.contains("bottle_ml"))
         assertTrue(daily.headers.contains("sleep_minutes"))
+    }
+
+    @Test
+    fun theSleepSheetCarriesWhereAndHowTheyWereLying() {
+        val sleep = sheets().first { it.name == "Sleep" }
+
+        // Keys rather than translated labels, like `stool_colour`: a pivot
+        // table written against them has to survive a change of language.
+        assertTrue(sleep.headers.containsAll(listOf("position", "place", "place_name")))
+        val row = sleep.rows.single()
+        assertEquals(Xlsx.Cell.Text("back"), row[sleep.headers.indexOf("position")])
+        assertEquals(Xlsx.Cell.Text("bedside_cot"), row[sleep.headers.indexOf("place")])
+        // Nothing was named, because the place was one of the offered ones.
+        assertEquals(Xlsx.Cell.Blank, row[sleep.headers.indexOf("place_name")])
     }
 
     @Test

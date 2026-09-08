@@ -1,5 +1,6 @@
 package com.gproust.sprout.ui.sleep
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -35,8 +37,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
+import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.ConfirmDeleteDialog
 import com.gproust.sprout.ui.common.DatePickerField
 import com.gproust.sprout.ui.common.DayHeader
@@ -119,7 +124,7 @@ fun SleepScreen(onBack: () -> Unit = {}) {
             byDay.forEach { (day, entries) ->
                 item(key = "day-$day") { DayHeader(day) }
                 items(entries, key = { it.id }) { entry ->
-                    val subtitle = entry.endTime?.let {
+                    val timing = entry.endTime?.let {
                         stringResource(
                             R.string.sleep_range,
                             formatTime(entry.startTime),
@@ -127,9 +132,16 @@ fun SleepScreen(onBack: () -> Unit = {}) {
                             formatDuration(context, it - entry.startTime),
                         )
                     } ?: stringResource(R.string.sleep_ongoing, formatTime(entry.startTime))
+                    // When and how long, then where and how they were lying if
+                    // that was noted, then the note itself — one line each.
+                    val subtitle = listOfNotNull(
+                        timing,
+                        sleepDetails(context, entry).ifEmpty { null },
+                        entry.notes?.takeIf { it.isNotBlank() },
+                    ).joinToString("\n")
                     EntryCard(
                         title = stringResource(R.string.sleep_entry_title),
-                        subtitle = if (entry.notes.isNullOrBlank()) subtitle else "$subtitle\n${entry.notes}",
+                        subtitle = subtitle,
                         meta = formatTime(entry.startTime),
                         icon = Icons.Filled.Bedtime,
                         onDelete = { deleting = entry },
@@ -147,6 +159,45 @@ fun SleepScreen(onBack: () -> Unit = {}) {
     }
 }
 
+// The next three are not private: the statistics screen names the same places
+// and positions in its sleep breakdown, and shows the same line under a day.
+
+fun SleepPosition.label(context: Context): String = context.getString(
+    when (this) {
+        SleepPosition.BACK -> R.string.sleep_position_back
+        SleepPosition.SIDE -> R.string.sleep_position_side
+        SleepPosition.BELLY -> R.string.sleep_position_belly
+    },
+)
+
+fun SleepPlace.label(context: Context): String = context.getString(
+    when (this) {
+        SleepPlace.OWN_BED -> R.string.sleep_place_own_bed
+        SleepPlace.BEDSIDE_COT -> R.string.sleep_place_bedside_cot
+        SleepPlace.PARENTS_BED -> R.string.sleep_place_parents_bed
+        SleepPlace.ON_A_PARENT -> R.string.sleep_place_on_a_parent
+        SleepPlace.AT_BREAST -> R.string.sleep_place_at_breast
+        SleepPlace.OTHER -> R.string.sleep_place_other
+    },
+)
+
+/**
+ * Where this sleep happened, or null when it doesn't say — the parent's own
+ * name for the place when they gave one, as
+ * [sleepWhere][com.gproust.sprout.ui.stats.sleepWhere] groups it.
+ */
+fun SleepEntity.placeLabel(context: Context): String? {
+    val place = place ?: return null
+    val named = placeNote?.trim().orEmpty()
+    return if (place == SleepPlace.OTHER && named.isNotEmpty()) named else place.label(context)
+}
+
+/** "Their own bed · On their back" — whichever of the two was recorded. */
+fun sleepDetails(context: Context, entry: SleepEntity): String = listOfNotNull(
+    entry.placeLabel(context),
+    entry.position?.label(context),
+).joinToString(context.getString(R.string.sleep_details_separator))
+
 /** The one-tap "they're awake now" shortcut on an ongoing sleep's card. */
 @Composable
 private fun WokeUpButton(onClick: () -> Unit) {
@@ -157,9 +208,13 @@ private fun WokeUpButton(onClick: () -> Unit) {
 
 @Composable
 private fun SleepForm(onAdd: (SleepEntity) -> Unit) {
+    val context = LocalContext.current
     var start by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var end by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var hasEnded by remember { mutableStateOf(true) }
+    var position by remember { mutableStateOf<SleepPosition?>(null) }
+    var place by remember { mutableStateOf<SleepPlace?>(null) }
+    var placeNote by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
     // The night a sleep started. Naps and nights alike are often logged later,
@@ -196,6 +251,37 @@ private fun SleepForm(onAdd: (SleepEntity) -> Unit) {
         TimePickerField(label = stringResource(R.string.picker_to), millis = end, onChange = { end = it })
     }
 
+    // Both are optional and neither is asked twice: tapping the chosen chip
+    // again clears it, so a sleep can be logged in two taps as before.
+    FieldLabel(stringResource(R.string.sleep_place_label))
+    ChoiceChips(
+        options = SleepPlace.entries,
+        selected = place,
+        onSelect = { picked ->
+            place = if (place == picked) null else picked
+            if (place != SleepPlace.OTHER) placeNote = ""
+        },
+        labelOf = { it.label(context) },
+    )
+
+    if (place == SleepPlace.OTHER) {
+        OutlinedTextField(
+            value = placeNote,
+            onValueChange = { placeNote = it },
+            label = { Text(stringResource(R.string.sleep_place_other_hint)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+    }
+
+    FieldLabel(stringResource(R.string.sleep_position_label))
+    ChoiceChips(
+        options = SleepPosition.entries,
+        selected = position,
+        onSelect = { picked -> position = if (position == picked) null else picked },
+        labelOf = { it.label(context) },
+    )
+
     Spacer(Modifier.height(8.dp))
     NotesField(value = notes, onChange = { notes = it })
 
@@ -208,6 +294,11 @@ private fun SleepForm(onAdd: (SleepEntity) -> Unit) {
                     // Both times are picked on the start's day, so a wake time
                     // before the bedtime means the sleep ran past midnight.
                     endTime = if (hasEnded) (if (end < start) nextDay(end) else end) else null,
+                    position = position,
+                    place = place,
+                    // Only "somewhere else" carries a name; the other five are
+                    // named by the app, in whatever language it is showing.
+                    placeNote = if (place == SleepPlace.OTHER) placeNote.trim().ifBlank { null } else null,
                     notes = notes.ifBlank { null },
                 ),
             )

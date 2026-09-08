@@ -177,6 +177,23 @@ class DatabaseMigrationTest {
     }
 
     @Test
+    fun `a sleep logged before v16 says nothing about where it happened`() {
+        createV10Database()
+        val database = openWithMigrations()
+
+        // Nobody can say afterwards how a nap logged last month was taken, so
+        // the v15 -> v16 columns backfill to NULL. The statistics read NULL as
+        // "not recorded" and keep those sleeps out of the breakdown; a default
+        // would have invented a position for every night already logged.
+        database.query("SELECT position, place, placeNote FROM `sleep` WHERE id = 1", null).use { c ->
+            assertTrue("sleep 1 missing", c.moveToFirst())
+            assertTrue("position should be NULL for a pre-v16 sleep", c.isNull(0))
+            assertTrue("place should be NULL for a pre-v16 sleep", c.isNull(1))
+            assertTrue("placeNote should be NULL for a pre-v16 sleep", c.isNull(2))
+        }
+    }
+
+    @Test
     fun `a fresh install creates a schema the entities agree with`() {
         // No pre-existing file: Room creates the current schema directly. This
         // catches an entity change made without a matching migration, which
@@ -186,7 +203,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(15, database.openHelper.writableDatabase.version)
+        assertEquals(16, database.openHelper.writableDatabase.version)
     }
 
     /**

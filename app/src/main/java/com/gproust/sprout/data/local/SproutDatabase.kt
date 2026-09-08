@@ -22,7 +22,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ParentProfileEntity::class,
         TombstoneEntity::class,
     ],
-    version = 15,
+    version = 16,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -336,6 +336,25 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * v15 -> v16: record how a sleep happened — the position the baby was
+         * put down in, and where they slept.
+         *
+         * All three columns are nullable and backfill to NULL, which reads as
+         * "not recorded": nobody can say afterwards how a nap logged last month
+         * was taken, and the statistics keep those sleeps out of the breakdown
+         * rather than guessing at a default. `placeNote` only ever holds
+         * something for `place = 'OTHER'` — the parent's own name for a place
+         * the six offered ones don't cover (BDR-0014).
+         */
+        private val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `sleep` ADD COLUMN `position` TEXT")
+                db.execSQL("ALTER TABLE `sleep` ADD COLUMN `place` TEXT")
+                db.execSQL("ALTER TABLE `sleep` ADD COLUMN `placeNote` TEXT")
+            }
+        }
+
+        /**
          * The full migration chain, in order. Exposed so tests can open a
          * database created by an older release through the very same list the
          * app ships — a migration that is written but never registered here
@@ -346,7 +365,7 @@ abstract class SproutDatabase : RoomDatabase() {
         internal val MIGRATIONS: Array<Migration> = arrayOf(
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
-            MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15,
+            MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
         )
 
         fun getInstance(context: Context): SproutDatabase =

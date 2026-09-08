@@ -88,6 +88,11 @@ that a change can quietly break:
   and the nappy bars' two colours were picked by running a colour-vision check,
   not by eye — the obvious four-hue palettes all failed it. Re-run the check
   before changing one.
+- **A sleep can also say where it happened and how the baby was lying**
+  ([BDR-0014](docs/decisions/0014-what-a-sleep-records-beyond-its-hours.md)).
+  Both are optional, "not recorded" is a line in the breakdown rather than a
+  sleep quietly dropped from it, and the position is reported without comment —
+  no warning, no colour-coding, no ordering that grades it.
 
 ## The record you hand to a doctor
 

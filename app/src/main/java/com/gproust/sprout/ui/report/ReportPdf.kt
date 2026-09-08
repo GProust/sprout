@@ -16,11 +16,13 @@ import com.gproust.sprout.R
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDate
 import com.gproust.sprout.ui.diaper.label
+import com.gproust.sprout.ui.sleep.label
 import com.gproust.sprout.ui.stats.DayStats
 import com.gproust.sprout.ui.stats.GrowthMeasure
 import com.gproust.sprout.ui.stats.WhoPercentiles
 import com.gproust.sprout.ui.stats.WhoPlacement
 import com.gproust.sprout.ui.stats.WhoSex
+import com.gproust.sprout.ui.stats.label
 import com.gproust.sprout.ui.stats.whoBand
 import java.io.OutputStream
 import java.time.LocalDate
@@ -507,7 +509,50 @@ class ReportPdf(
     private fun sleepSection(): Block {
         val hours = report.days.map { it.sleepMillis / 3_600_000f }
         val chartHeight = 92f
-        return Block(30f + 14f + chartHeight + 12f) { canvas, top ->
+        val breakdown = report.sleepBreakdown
+
+        // Where the baby slept and how they were lying, when either was
+        // recorded — laid out rather than drawn as one line, because six
+        // places, one of them named by the parent, will not fit on one.
+        val notes = buildList {
+            if (breakdown.hasPlaces) {
+                add(
+                    layout(
+                        string(
+                            R.string.report_sleep_places,
+                            shareText(
+                                breakdown.byPlace.map {
+                                    Share(it.value.label(context), it.count, it.millis, it.value != null)
+                                },
+                            ),
+                        ),
+                        smallPaint,
+                        contentWidth,
+                    ),
+                )
+            }
+            if (breakdown.hasPositions) {
+                add(
+                    layout(
+                        string(
+                            R.string.report_sleep_positions,
+                            shareText(
+                                breakdown.byPosition.map {
+                                    val name = it.value?.label(context)
+                                        ?: string(R.string.stats_sleep_not_recorded)
+                                    Share(name, it.count, it.millis, it.value != null)
+                                },
+                            ),
+                        ),
+                        smallPaint,
+                        contentWidth,
+                    ),
+                )
+            }
+        }
+        val notesHeight = notes.sumOf { it.height + 6 }.toFloat()
+
+        return Block(30f + 14f + chartHeight + 12f + notesHeight) { canvas, top ->
             drawHeading(
                 canvas,
                 top,
@@ -525,6 +570,37 @@ class ReportPdf(
                 smallPaint,
             )
             drawBars(canvas, top + 44f, chartHeight, listOf(Series(hours, cool)))
+            var y = top + 44f + chartHeight + 6f
+            notes.forEach { line ->
+                drawLayout(canvas, line, margin, y)
+                y += line.height + 6f
+            }
+        }
+    }
+
+    /** One line of the sleep breakdown, reduced to what the page prints. */
+    private class Share(val label: String, val count: Int, val millis: Long, val recorded: Boolean)
+
+    /**
+     * "Their own bed: 7 h 20 (6), bedside cot: 3 h 05 (2), not recorded: 55 min (1)".
+     *
+     * The five longest, as the stool colours take the four commonest — and then
+     * the sleeps that recorded nothing, whatever their size and wherever they
+     * fell. A doctor reading "on their back" against two naps out of thirty is
+     * reading something the record does not say (BDR-0014), so that line is the
+     * one that never gets trimmed. A count of zero — a night that began before
+     * the range and brought only its hours in — is left off rather than
+     * printed as "(0)".
+     */
+    private fun shareText(shares: List<Share>): String {
+        val recorded = shares.filter { it.recorded }.take(5)
+        val silent = shares.filter { !it.recorded }
+        return (recorded + silent).joinToString(", ") { share ->
+            if (share.count == 0) {
+                string(R.string.report_sleep_share_time, share.label, hours(share.millis))
+            } else {
+                string(R.string.report_sleep_share, share.label, hours(share.millis), share.count)
+            }
         }
     }
 

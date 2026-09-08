@@ -4,6 +4,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -356,3 +358,138 @@ private class Builder {
         diaperCount = diaperCount,
     )
 }
+
+// --- how the sleeps happened: where, and how they were lying.
+
+/**
+ * Where a sleep happened, as the breakdown groups it.
+ *
+ * The six offered places group themselves. A place the parent named
+ * ([SleepPlace.OTHER] with a note) groups by that name, case and surrounding
+ * spaces ignored — someone who logs "pram" a dozen times wants to see "pram",
+ * not a dozen sleeps filed under "somewhere else". [SleepPlace.OTHER] with
+ * nothing typed stays [Offered], which is exactly what it says: somewhere else.
+ */
+sealed interface SleepWhere {
+    /** One of the places Sprout offers. */
+    data class Offered(val place: SleepPlace) : SleepWhere
+
+    /** A place the parent named themselves, spelled as they first typed it. */
+    data class Named(val name: String) : SleepWhere
+}
+
+/** How a sleep says where it happened, or null when it doesn't say. */
+fun sleepWhere(entry: SleepEntity): SleepWhere? {
+    val place = entry.place ?: return null
+    if (place != SleepPlace.OTHER) return SleepWhere.Offered(place)
+    val named = entry.placeNote?.trim().orEmpty()
+    return if (named.isEmpty()) SleepWhere.Offered(SleepPlace.OTHER) else SleepWhere.Named(named)
+}
+
+/**
+ * One line of a breakdown: how many sleeps [value] accounts for, and how much
+ * sleep time. A `null` [value] is the sleeps that didn't say.
+ *
+ * The two numbers answer different questions and are counted the way the rest
+ * of the statistics count them ([DayStats]): a sleep is *counted* on the day it
+ * started, so a night begun before the window adds its hours here without
+ * adding to the tally of times settled.
+ */
+data class SleepSlice<T>(val value: T, val count: Int, val millis: Long)
+
+/**
+ * How the window's sleep divides by place and by position.
+ *
+ * Both lists cover every sleep the window saw, the ones with nothing recorded
+ * included as a `null` slice at the end — so the shares add up to the sleep
+ * time the card is already showing rather than to a subset of it. A screen that
+ * quietly dropped the unrecorded ones would report "80% in their own bed" off
+ * two logged naps out of ten.
+ */
+data class SleepBreakdown(
+    val byPlace: List<SleepSlice<SleepWhere?>> = emptyList(),
+    val byPosition: List<SleepSlice<SleepPosition?>> = emptyList(),
+    /** Sleeps that started inside the window. */
+    val totalCount: Int = 0,
+    /** Sleep time inside the window — the same total the daily figures add up to. */
+    val totalMillis: Long = 0L,
+) {
+    /** True when at least one sleep in the window says where it happened. */
+    val hasPlaces: Boolean get() = byPlace.any { it.value != null }
+
+    /** True when at least one sleep in the window says how the baby was lying. */
+    val hasPositions: Boolean get() = byPosition.any { it.value != null }
+}
+
+/**
+ * The breakdown of every sleep touching [from]..[to], inclusive.
+ *
+ * [now] closes a sleep that is still running, as it does everywhere else, so an
+ * ongoing nap counts up to the moment the screen is looking and no further.
+ */
+fun sleepBreakdown(
+    sleeps: List<SleepEntity>,
+    from: LocalDate,
+    to: LocalDate,
+    now: Long,
+    zone: ZoneId = ZoneId.systemDefault(),
+): SleepBreakdown {
+    if (to.isBefore(from)) return SleepBreakdown()
+
+    val windowStart = from.atStartOfDay(zone).toInstant().toEpochMilli()
+    val windowEnd = to.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+
+    val places = LinkedHashMap<String, Tally<SleepWhere?>>()
+    val positions = LinkedHashMap<String, Tally<SleepPosition?>>()
+    var totalCount = 0
+    var totalMillis = 0L
+
+    for (entry in sleeps) {
+        val end = (entry.endTime ?: now).coerceAtLeast(entry.startTime)
+        val millis = (minOf(end, windowEnd) - maxOf(entry.startTime, windowStart)).coerceAtLeast(0L)
+        val startedHere = entry.startTime >= windowStart && entry.startTime < windowEnd
+        if (!startedHere && millis == 0L) continue
+
+        if (startedHere) totalCount++
+        totalMillis += millis
+
+        val where = sleepWhere(entry)
+        places.tally(whereKey(where), where, startedHere, millis)
+        positions.tally(entry.position?.name ?: UNRECORDED, entry.position, startedHere, millis)
+    }
+
+    return SleepBreakdown(
+        byPlace = places.values.ordered(),
+        byPosition = positions.values.ordered(),
+        totalCount = totalCount,
+        totalMillis = totalMillis,
+    )
+}
+
+/** The grouping key of a place; the prefixes keep a named "own bed" out of the offered one. */
+private fun whereKey(where: SleepWhere?): String = when (where) {
+    null -> UNRECORDED
+    is SleepWhere.Offered -> "offered:${where.place.name}"
+    is SleepWhere.Named -> "named:${where.name.lowercase()}"
+}
+
+/** The key of the slice holding everything that didn't say; no enum name is empty. */
+private const val UNRECORDED = ""
+
+private class Tally<T>(val value: T) {
+    var count = 0
+    var millis = 0L
+}
+
+private fun <T> MutableMap<String, Tally<T>>.tally(key: String, value: T, counted: Boolean, millis: Long) {
+    val tally = getOrPut(key) { Tally(value) }
+    if (counted) tally.count++
+    tally.millis += millis
+}
+
+/** Longest first, with the sleeps that said nothing last whatever their size. */
+private fun <T> Collection<Tally<T>>.ordered(): List<SleepSlice<T>> = sortedWith(
+    compareBy<Tally<T>> { it.value == null }
+        .thenByDescending { it.millis }
+        .thenByDescending { it.count },
+).map { SleepSlice(it.value, it.count, it.millis) }

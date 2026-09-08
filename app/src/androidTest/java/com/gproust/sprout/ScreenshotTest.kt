@@ -42,6 +42,8 @@ import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.Recovery
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.data.local.WellbeingEntity
@@ -150,7 +152,33 @@ class ScreenshotTest {
         repo.addPumping(PumpingEntity(time = now - 26 * hour, amountMl = 90, side = BreastSide.LEFT, storage = MilkStorage.FREEZER))
         repo.addPumping(PumpingEntity(time = now - 30 * hour, amountMl = 110, side = BreastSide.RIGHT, storage = MilkStorage.FREEZER))
         repo.addPumping(PumpingEntity(time = now - 28 * hour, amountMl = 60, storage = MilkStorage.USED))
-        repo.addSleep(SleepEntity(startTime = now - 4 * hour, endTime = now - 2 * hour))
+        // Enough sleeps, in enough places, for the statistics card to have a
+        // breakdown to draw — including one that says nothing, which is what a
+        // real record looks like.
+        repo.addSleep(
+            SleepEntity(
+                startTime = now - 4 * hour,
+                endTime = now - 2 * hour,
+                position = SleepPosition.BACK,
+                place = SleepPlace.OWN_BED,
+            ),
+        )
+        repo.addSleep(
+            SleepEntity(
+                startTime = now - 16 * hour,
+                endTime = now - 9 * hour,
+                position = SleepPosition.BACK,
+                place = SleepPlace.BEDSIDE_COT,
+            ),
+        )
+        repo.addSleep(
+            SleepEntity(
+                startTime = now - 27 * hour,
+                endTime = now - 26 * hour,
+                place = SleepPlace.ON_A_PARENT,
+            ),
+        )
+        repo.addSleep(SleepEntity(startTime = now - 31 * hour, endTime = now - 30 * hour))
         repo.addDiaper(DiaperEntity(time = now - hour, wet = true))
         repo.addDiaper(DiaperEntity(time = now - 3 * hour, wet = true, dirty = true, stoolColor = StoolColor.YELLOW))
         repo.addDiaper(DiaperEntity(time = now - 5 * hour, wet = true, dirty = true, stoolColor = StoolColor.GREEN))
@@ -453,6 +481,14 @@ class ScreenshotTest {
         // Statistics: the week's averages, and the weight curve over the WHO band.
         show { StatsScreen() }
         save("08-stats")
+        // The sleep card's own breakdown — where the sleeps happened and how the
+        // baby was lying — which sits below the fold on a phone. Scrolled to the
+        // card *after* it: performScrollToNode stops as soon as its target is on
+        // screen, so scrolling to the breakdown itself leaves it on the bottom
+        // edge with every one of its rows still below.
+        rule.onNode(hasScrollAction()).performScrollToNode(hasText("Diapers"))
+        settle()
+        save("08-stats-2-sleep")
         show { HealthScreen {} }
         save("09-wellbeing")
         // Babies manager: both babies, the active marker, and add/track/delete actions.

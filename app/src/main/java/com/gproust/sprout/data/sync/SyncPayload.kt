@@ -10,6 +10,8 @@ import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TombstoneEntity
 import com.gproust.sprout.data.local.TreatmentEntity
@@ -209,12 +211,20 @@ object SyncPayloadCodec {
         putSync(entity.uid, entity.updatedAt, entity.deletedAt)
         put("startTime", entity.startTime)
         putOrNull("endTime", entity.endTime)
+        putOrNull("position", entity.position?.name)
+        putOrNull("place", entity.place?.name)
+        putOrNull("placeNote", entity.placeNote)
         putOrNull("notes", entity.notes)
     }
 
     private fun sleepFromJson(o: JSONObject) = SleepEntity(
         startTime = o.getLong("startTime"),
         endTime = o.longOrNull("endTime"),
+        // Absent on replicas written before sleeps recorded any of this, which
+        // merge exactly as they did — as sleeps with nothing noted.
+        position = o.stringOrNull("position")?.let { SleepPosition.valueOf(it) },
+        place = o.stringOrNull("place")?.let { SleepPlace.valueOf(it) },
+        placeNote = o.stringOrNull("placeNote"),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),

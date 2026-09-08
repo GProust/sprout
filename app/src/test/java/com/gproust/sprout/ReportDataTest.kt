@@ -6,6 +6,8 @@ import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.ui.report.ReportOptions
@@ -13,6 +15,7 @@ import com.gproust.sprout.ui.report.ReportPeriod
 import com.gproust.sprout.ui.report.buildReport
 import com.gproust.sprout.ui.report.reportRange
 import com.gproust.sprout.ui.report.treatmentCourses
+import com.gproust.sprout.ui.stats.SleepWhere
 import com.gproust.sprout.ui.stats.WhoSex
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,6 +71,64 @@ class ReportDataTest {
         assertEquals(7, content.days.size)
         assertEquals(1, content.daysWithEntries)
         assertEquals(120, content.bottleMlTotal)
+    }
+
+    @Test
+    fun theReportSaysWhereTheySleptAndHowTheyWereLying() {
+        val content = report(
+            sleeps = listOf(
+                SleepEntity(
+                    babyId = 1,
+                    startTime = at(today.minusDays(1), 20),
+                    endTime = at(today, 6),
+                    position = SleepPosition.BACK,
+                    place = SleepPlace.BEDSIDE_COT,
+                ),
+                SleepEntity(
+                    babyId = 1,
+                    startTime = at(today, 9),
+                    endTime = at(today, 10),
+                    position = SleepPosition.BACK,
+                    place = SleepPlace.ON_A_PARENT,
+                ),
+            ),
+        )
+
+        val breakdown = content.sleepBreakdown
+        assertTrue(breakdown.hasPlaces)
+        assertTrue(breakdown.hasPositions)
+        // Ten hours in the bedside cot against one on a parent, longest first.
+        assertEquals(
+            listOf(SleepWhere.Offered(SleepPlace.BEDSIDE_COT), SleepWhere.Offered(SleepPlace.ON_A_PARENT)),
+            breakdown.byPlace.map { it.value },
+        )
+        // Both sleeps were on their back, so the positions are one line of two.
+        assertEquals(listOf(SleepPosition.BACK), breakdown.byPosition.map { it.value })
+        assertEquals(2, breakdown.byPosition.single().count)
+        assertEquals(11 * 3_600_000L, breakdown.totalMillis)
+    }
+
+    @Test
+    fun sleepsThatSaidNothingAreALineOfTheirOwn_notLeftOut() {
+        val content = report(
+            sleeps = listOf(
+                SleepEntity(
+                    babyId = 1,
+                    startTime = at(today, 9),
+                    endTime = at(today, 10),
+                    place = SleepPlace.OWN_BED,
+                ),
+                // Three hours nobody said anything about. A document that
+                // dropped them would report every nap as being in their own
+                // bed (BDR-0014).
+                SleepEntity(babyId = 1, startTime = at(today.minusDays(2), 13), endTime = at(today.minusDays(2), 16)),
+            ),
+        )
+
+        val places = content.sleepBreakdown.byPlace
+        assertNull("the sleeps that said nothing come last", places.last().value)
+        assertEquals(3 * 3_600_000L, places.last().millis)
+        assertEquals(content.sleepBreakdown.totalMillis, places.sumOf { it.millis })
     }
 
     @Test

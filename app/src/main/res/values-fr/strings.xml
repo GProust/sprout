@@ -169,6 +169,19 @@
     <string name="field_end">Fin</string>
     <string name="sleep_range">%1$s – %2$s · %3$s</string>
     <string name="sleep_ongoing">Commencé à %1$s (en cours)</string>
+    <string name="sleep_position_label">Position (facultatif)</string>
+    <string name="sleep_position_back">Sur le dos</string>
+    <string name="sleep_position_side">Sur le côté</string>
+    <string name="sleep_position_belly">Sur le ventre</string>
+    <string name="sleep_place_label">Où (facultatif)</string>
+    <string name="sleep_place_own_bed">Son lit</string>
+    <string name="sleep_place_bedside_cot">Cododo</string>
+    <string name="sleep_place_parents_bed">Lit des parents</string>
+    <string name="sleep_place_on_a_parent">Sur un parent</string>
+    <string name="sleep_place_at_breast">Au sein</string>
+    <string name="sleep_place_other">Ailleurs</string>
+    <string name="sleep_place_other_hint">C\'était où ?</string>
+    <string name="sleep_details_separator">" · "</string>
 
     <!-- Diaper -->
     <string name="screen_diapers">Couches</string>
@@ -504,6 +517,10 @@
     <string name="stats_sleep_title">Sommeil</string>
     <string name="stats_sleep_per_day">Endormi</string>
     <string name="stats_sleeps_per_day">Fois endormi</string>
+    <string name="stats_sleep_where">Lieu du sommeil</string>
+    <string name="stats_sleep_position">Position</string>
+    <string name="stats_sleep_not_recorded">Non renseigné</string>
+    <string name="stats_sleep_share">%1$d × · %2$s</string>
     <string name="stats_diaper_title">Couches</string>
     <string name="stats_diapers_per_day">Changes</string>
     <string name="stats_wet_per_day">Pipis</string>
@@ -622,6 +639,10 @@
     <string name="report_chart_bottle_ml">Volume au biberon par jour (ml)</string>
     <string name="report_chart_breast_hours">Temps au sein par jour (heures)</string>
     <string name="report_sleep_line">%1$s endormissements par jour · plus long sommeil %2$s</string>
+    <string name="report_sleep_places">Lieu du sommeil : %1$s</string>
+    <string name="report_sleep_positions">Position : %1$s</string>
+    <string name="report_sleep_share">%1$s : %2$s (%3$d ×)</string>
+    <string name="report_sleep_share_time">%1$s : %2$s</string>
     <string name="report_stool_colours">Couleur des selles, lorsqu\'elle a été notée : %1$s</string>
     <string name="report_chart_weight">Poids (kg), sur la bande OMS du 3e au 97e percentile</string>
     <string name="report_chart_length">Taille (cm)</string>

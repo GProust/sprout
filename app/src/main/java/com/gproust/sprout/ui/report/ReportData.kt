@@ -10,12 +10,14 @@ import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.ui.stats.DayStats
 import com.gproust.sprout.ui.stats.GrowthMeasure
+import com.gproust.sprout.ui.stats.SleepBreakdown
 import com.gproust.sprout.ui.stats.StatsAverages
 import com.gproust.sprout.ui.stats.WhoPlacement
 import com.gproust.sprout.ui.stats.WhoSex
 import com.gproust.sprout.ui.stats.ageInMonths
 import com.gproust.sprout.ui.stats.averagesOf
 import com.gproust.sprout.ui.stats.dailyStats
+import com.gproust.sprout.ui.stats.sleepBreakdown
 import com.gproust.sprout.ui.stats.whoPlacement
 import java.time.Instant
 import java.time.LocalDate
@@ -110,6 +112,12 @@ data class ReportContent(
     val solidCount: Int,
     val solidsWithGrams: Int,
     val longestSleepMillis: Long,
+    /**
+     * How the range's sleep divides by where it happened and how the baby was
+     * lying, longest first, with the sleeps that recorded neither kept as a
+     * line of their own (BDR-0014).
+     */
+    val sleepBreakdown: SleepBreakdown,
     /** Stool colours seen in the range, commonest first; only where one was recorded. */
     val stoolColours: List<Pair<StoolColor, Int>>,
     /** Measurements over the whole history — a curve is only worth reading over months. */
@@ -201,6 +209,7 @@ fun buildReport(
         longestSleepMillis = sleepsInRange.maxOfOrNull {
             ((it.endTime ?: now) - it.startTime).coerceAtLeast(0L)
         } ?: 0L,
+        sleepBreakdown = sleepBreakdown(sleepsInRange, range.from, range.to, now, zone),
         stoolColours = colours,
         growth = growthReadings(baby.birthDate, growth, options.reference),
         treatments = if (options.includeTreatments) {
