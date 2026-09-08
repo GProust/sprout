@@ -1,0 +1,1 @@
+Una corrección del registro para la consulta. Si sigues a un solo bebé, la acción de compartir estaba en una página que nunca ves, así que la exportación no tenía por dónde entrar. Ahora es un botón «Compartir un registro» al final de la página de tu bebé, bajo los totales del día, junto a «Ver las estadísticas»: el mismo sitio tanto si sigues a uno como a tres.

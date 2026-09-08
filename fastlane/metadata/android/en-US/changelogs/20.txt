@@ -1,0 +1,1 @@
+A fix for the record you hand to a doctor. If you track one baby, the share action sat on a page you never see, so the export had no way in at all. It is now a “Share a record” button at the foot of your baby’s page, under today’s totals beside “See the statistics” — the same place whether you track one baby or three.

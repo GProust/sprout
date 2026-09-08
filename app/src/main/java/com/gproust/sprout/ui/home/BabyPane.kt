@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Monitor
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
@@ -67,6 +68,7 @@ fun BabyPane(
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier,
     header: (@Composable () -> Unit)? = null,
+    onShareRecord: (() -> Unit)? = null,
 ) {
     Column(modifier) {
         if (header != null) {
@@ -98,6 +100,24 @@ fun BabyPane(
                 stringResource(R.string.home_see_stats),
                 modifier = Modifier.padding(start = 8.dp),
             )
+        }
+
+        // The way out to the doctor's record lives here rather than on a top
+        // bar, because this pane is the one thing both arrangements have: a
+        // family with one baby never opens the baby's own tab (BDR-9), and an
+        // action offered only there is an action half the users cannot reach.
+        if (onShareRecord != null) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onShareRecord,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.Share, contentDescription = null)
+                Text(
+                    stringResource(R.string.report_screen_title),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
         }
     }
 }

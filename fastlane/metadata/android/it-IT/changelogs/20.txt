@@ -1,0 +1,1 @@
+Una correzione per il resoconto da dare al medico. Se segui un solo bambino, la condivisione era su una pagina che non vedi mai, quindi l’esportazione non aveva alcun accesso. Ora è un pulsante «Condividi un resoconto» in fondo alla pagina del tuo bambino, sotto i totali del giorno, accanto a «Vedi le statistiche»: lo stesso posto sia con un bambino sia con tre.

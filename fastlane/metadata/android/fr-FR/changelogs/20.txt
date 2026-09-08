@@ -1,0 +1,1 @@
+Correction du relevé pour le médecin. Si vous ne suivez qu’un bébé, le partage se trouvait sur une page que vous ne voyez jamais : l’export n’avait donc aucun accès. C’est désormais un bouton « Partager un relevé » en bas de la page de votre bébé, sous les totaux du jour, à côté de « Voir les statistiques » — au même endroit que vous suiviez un bébé ou trois.

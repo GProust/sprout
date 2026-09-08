@@ -13,6 +13,15 @@ All notable changes to Sprout are documented here. This project follows
   It now checks that a file is a plausible size and shape before reading it, and
   says it is not a Sprout file, which is all it ever was.
 
+## [1.10.1] — 2026-09-08
+
+- 🩺 **The doctor's record is reachable again if you track one baby.** The share
+  action shipped in 1.10.0 sat on the baby's own tab — which a family with a
+  single child never sees, because with nothing to choose between, the dashboard
+  *is* that page. It has moved onto the page itself, under the totals beside
+  "See the statistics", so it is in the same place whether you are tracking one
+  baby or three.
+
 ## [1.10.0] — 2026-09-08
 
 - 🩺 **A record you can hand to a doctor.** The share button on your baby's page
