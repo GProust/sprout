@@ -119,6 +119,24 @@ no new infrastructure.
   starts shipping an exported provider fails `AttackSurfaceTest`, and that is
   the notification, not the noise. The fix is to look, then to widen the list
   deliberately.
+- **It found something on its first run.** The merged manifest carries
+  `ACCESS_NETWORK_STATE` and `FOREGROUND_SERVICE`, neither of which appears
+  anywhere in Sprout's own manifest; the pair is the signature of WorkManager,
+  which the widget library depends on. Neither grants a socket — `INTERNET` is
+  what does that, and it is still absent — and Sprout starts no service, the
+  bounded discovery window of
+  [ADR-0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
+  being the reason it does not have to. They are recorded in the test as
+  inherited rather than removed: stripping a permission a library declares
+  changes what that library may do at runtime, and CI cannot prove the widget
+  survives it.
+
+  **Left open**: whether to strip them anyway with `tools:node="remove"`. It
+  would make the shipped manifest say only what Sprout wants, which is worth
+  something for an app whose privacy claim is checkable in exactly that file —
+  a reader who counts the permissions should not find a foreground service
+  among them. Against that: it is a change to the app, not to a test, and the
+  only proof it is safe would be the widget still working on a device.
 - **A legitimate new door costs a line and a sentence.** Adding a receiver or a
   permission means editing the pinned list in the same commit, which is the
   whole mechanism: the list is where "should this be exported?" gets asked.

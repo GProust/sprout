@@ -83,6 +83,25 @@ class AttackSurfaceTest {
     }
 
     /**
+     * The two the build inherits stay inherited.
+     *
+     * A permission Sprout does not want is one thing when a dependency declares
+     * it and quite another when a line in our own manifest does. This says which
+     * of the two happened, and would notice the day someone typed one in — the
+     * side of the line that is ours to control. Whether to strip them from the
+     * merged manifest is a separate question, and ADR-0014 leaves it open.
+     */
+    @Test
+    fun `the permissions the build inherits are not ones Sprout asks for`() {
+        assertEquals(
+            "Sprout's own manifest must not ask for a permission it only " +
+                "tolerates because a dependency declares it (ADR-0014)",
+            emptySet<String>(),
+            declaredPermissions().intersect(INHERITED_PERMISSIONS),
+        )
+    }
+
+    /**
      * Which of Sprout's own components any other app on the phone can reach.
      *
      * Two, and both have to be. `MainActivity` is exported because a launcher
@@ -281,6 +300,28 @@ class AttackSurfaceTest {
         )
 
         /**
+         * Permissions the merged manifest has that Sprout never asked for.
+         *
+         * Found by this test rather than known in advance: the first version
+         * refused both, and CI said otherwise. They arrive from a dependency's
+         * manifest — the pair is the signature of WorkManager, which the widget
+         * library pulls in — and neither appears anywhere in Sprout's own.
+         *
+         * Neither grants a socket: `INTERNET` is what does that, and it is
+         * absent, asserted here and in `SupportLinksTest`.
+         * `ACCESS_NETWORK_STATE` reads whether there is a connection;
+         * `FOREGROUND_SERVICE` permits one to be started, and Sprout starts
+         * none — the bounded discovery window in ADR-0010 exists precisely so
+         * that it does not have to. Recorded rather than removed, because
+         * stripping a permission a library declares changes what that library
+         * may do at runtime, and CI cannot prove the widget survives it.
+         */
+        val INHERITED_PERMISSIONS = setOf(
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.FOREGROUND_SERVICE",
+        )
+
+        /**
          * Permissions whose presence would contradict something Sprout says.
          *
          * Not "every dangerous permission" — the ones with a decision behind
@@ -293,7 +334,6 @@ class AttackSurfaceTest {
          */
         val REFUSED_PERMISSIONS = setOf(
             "android.permission.INTERNET",
-            "android.permission.ACCESS_NETWORK_STATE",
             "android.permission.ACCESS_WIFI_STATE",
             "android.permission.ACCESS_FINE_LOCATION",
             "android.permission.ACCESS_COARSE_LOCATION",
@@ -301,7 +341,6 @@ class AttackSurfaceTest {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.MANAGE_EXTERNAL_STORAGE",
-            "android.permission.FOREGROUND_SERVICE",
             "android.permission.CAMERA",
             "android.permission.RECORD_AUDIO",
             "android.permission.READ_CONTACTS",
