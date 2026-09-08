@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.10.0] — 2026-09-08
 
 - 🩺 **A record you can hand to a doctor.** The share button on your baby's page
   now makes two files out of what you have already logged: a **PDF report** to
