@@ -52,6 +52,22 @@ enum class StoolColor { YELLOW, GREEN, BROWN, PALE, CLAY, WHITE, BLACK, RED }
  */
 enum class MilkStorage { FRIDGE, FREEZER, ROOM, USED }
 
+/**
+ * How the baby was lying when they were put down.
+ *
+ * Recorded, not judged: Sprout shows what was logged and attaches no advice or
+ * warning to any of the three (BDR-0012). A parent asking "was it the belly
+ * naps that went better?" is reading their own log, not being marked on it.
+ */
+enum class SleepPosition { BACK, SIDE, BELLY }
+
+/**
+ * Where the baby slept. [OTHER] carries the parent's own name for the place in
+ * [SleepEntity.placeNote] — a pram, a car seat, grandmother's arms — because a
+ * list of six can't cover where a baby actually falls asleep.
+ */
+enum class SleepPlace { OWN_BED, BEDSIDE_COT, PARENTS_BED, ON_A_PARENT, AT_BREAST, OTHER }
+
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
@@ -146,6 +162,17 @@ data class SleepEntity(
     @ColumnInfo(defaultValue = "1") val babyId: Long = 0L,
     val startTime: Long,
     val endTime: Long? = null,
+    /** How they were lying, when it was noted; null is "not recorded". */
+    val position: SleepPosition? = null,
+    /** Where they slept, when it was noted; null is "not recorded". */
+    val place: SleepPlace? = null,
+    /**
+     * The parent's own name for the place, for [SleepPlace.OTHER] only. Blank
+     * or null there means "somewhere else" with nothing more said; the
+     * statistics group named places by this text, so it is what a parent typed
+     * rather than anything the app chose.
+     */
+    val placeNote: String? = null,
     val notes: String? = null,
     @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
     @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,

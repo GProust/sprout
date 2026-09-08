@@ -35,5 +35,6 @@ ADR log and are cross-linked from here.
 | [0009](0009-the-dashboard-is-the-household.md) | The dashboard is the household; the active baby scopes the logs | Product / UX | Accepted |
 | [0010](0010-the-bottom-bar-is-four-kinds-of-place.md) | The bottom bar is kinds of place, not kinds of log | Product / UX | Accepted |
 | [0011](0011-donations-are-a-link-out-and-buy-nothing.md) | Donations are a link out, and they buy nothing | Business / Product | Accepted |
+| [0012](0012-what-a-sleep-records-beyond-its-hours.md) | What a sleep records beyond its hours, and why it isn't graded | Product / Domain | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

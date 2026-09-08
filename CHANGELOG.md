@@ -3,6 +3,23 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 😴 **A sleep can say where it happened, and how they were lying.** Logging a
+  nap now offers two optional rows of chips — their own bed, the bedside cot,
+  your bed, on a parent, at the breast, or somewhere else you name yourself;
+  on their back, on their side, on their tummy. Both are entirely optional and
+  tapping the chosen chip again clears it, so a nap is still two taps if that
+  is all you want it to be. What you pick shows on the entry alongside the
+  times.
+- 📊 **The sleep statistics show how those nights divide up.** Under the sleep
+  chart, two new breakdowns say how much of the period was slept in each place
+  and in each position — how many sleeps, how long they came to, and a bar for
+  the share. Sleeps you didn't say anything about are the last line rather
+  than being left out, so the shares are shares of *all* the sleep on the card.
+  Nothing appears until you have recorded something, and Sprout offers no
+  opinion on any of it: it is your record, not a report card.
+
 ## [1.9.0] — 2026-09-07
 
 - 🤱 **One breastfeed is logged once.** Starting a feed, leaving the app and

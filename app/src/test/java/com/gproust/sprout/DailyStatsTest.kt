@@ -6,13 +6,18 @@ import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
+import com.gproust.sprout.ui.stats.SleepWhere
 import com.gproust.sprout.ui.stats.averagesOf
 import com.gproust.sprout.ui.stats.breastfeedMillis
 import com.gproust.sprout.ui.stats.dailyStats
 import com.gproust.sprout.ui.stats.StatsWindow
 import com.gproust.sprout.ui.stats.maxStatsOffset
+import com.gproust.sprout.ui.stats.sleepBreakdown
 import com.gproust.sprout.ui.stats.statsWindow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
@@ -373,6 +378,184 @@ class DailyStatsTest {
         assertEquals(0.0, averages.feedsPerDay, 0.0)
         assertEquals(0L, averages.sleepMillisPerDay)
         assertTrue(averages.bottleMlPerDay == 0)
+    }
+
+    // --- where the sleeps happened, and how they were lying
+
+    private fun breakdown(
+        sleeps: List<SleepEntity>,
+        from: LocalDate = day1,
+        to: LocalDate = day3,
+        now: Long = at(day3, 23, 59),
+    ) = sleepBreakdown(sleeps, from, to, now, zone)
+
+    @Test
+    fun sleepsAreGroupedByPlace_longestFirst() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(startTime = at(day1, 9), endTime = at(day1, 10), place = SleepPlace.ON_A_PARENT),
+                SleepEntity(startTime = at(day2, 20), endTime = at(day2, 23), place = SleepPlace.OWN_BED),
+                SleepEntity(startTime = at(day3, 14), endTime = at(day3, 15), place = SleepPlace.OWN_BED),
+            ),
+        )
+
+        assertEquals(
+            listOf(SleepWhere.Offered(SleepPlace.OWN_BED), SleepWhere.Offered(SleepPlace.ON_A_PARENT)),
+            result.byPlace.map { it.value },
+        )
+        assertEquals(2, result.byPlace[0].count)
+        assertEquals(4 * hour, result.byPlace[0].millis)
+        assertEquals(1, result.byPlace[1].count)
+        assertEquals(hour, result.byPlace[1].millis)
+        assertEquals(3, result.totalCount)
+        assertEquals(5 * hour, result.totalMillis)
+    }
+
+    @Test
+    fun positionsAreGroupedTheSameWay() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(startTime = at(day1, 9), endTime = at(day1, 10), position = SleepPosition.BACK),
+                SleepEntity(startTime = at(day2, 9), endTime = at(day2, 12), position = SleepPosition.BELLY),
+                SleepEntity(startTime = at(day3, 9), endTime = at(day3, 10), position = SleepPosition.BACK),
+            ),
+        )
+
+        assertTrue(result.hasPositions)
+        assertEquals(listOf(SleepPosition.BELLY, SleepPosition.BACK), result.byPosition.map { it.value })
+        assertEquals(3 * hour, result.byPosition[0].millis)
+        assertEquals(2, result.byPosition[1].count)
+    }
+
+    @Test
+    fun sleepsThatSayNothingAreTheLastLine_notDroppedFromTheTotal() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(startTime = at(day1, 9), endTime = at(day1, 10), place = SleepPlace.OWN_BED),
+                // Three hours nobody said anything about — longer than the one
+                // that was recorded, and still last.
+                SleepEntity(startTime = at(day2, 9), endTime = at(day2, 12)),
+            ),
+        )
+
+        assertTrue(result.hasPlaces)
+        assertNull("the unrecorded line comes last", result.byPlace.last().value)
+        assertEquals(3 * hour, result.byPlace.last().millis)
+        // The shares are shares of the sleep the card is already showing.
+        assertEquals(result.totalMillis, result.byPlace.sumOf { it.millis })
+        assertEquals(result.totalCount, result.byPlace.sumOf { it.count })
+    }
+
+    @Test
+    fun nothingRecordedAtAllIsNothingToShow() {
+        val result = breakdown(listOf(SleepEntity(startTime = at(day2, 9), endTime = at(day2, 10))))
+
+        assertTrue("one line, and it is the unrecorded one", result.byPlace.single().value == null)
+        assertTrue(!result.hasPlaces)
+        assertTrue(!result.hasPositions)
+    }
+
+    @Test
+    fun aPlaceTheParentNamedGroupsByThatName_whateverTheSpelling() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(
+                    startTime = at(day1, 9),
+                    endTime = at(day1, 10),
+                    place = SleepPlace.OTHER,
+                    placeNote = "Pram",
+                ),
+                SleepEntity(
+                    startTime = at(day2, 9),
+                    endTime = at(day2, 10),
+                    place = SleepPlace.OTHER,
+                    placeNote = "  pram ",
+                ),
+            ),
+        )
+
+        // One line, spelled the way it was first typed.
+        assertEquals(listOf(SleepWhere.Named("Pram")), result.byPlace.map { it.value })
+        assertEquals(2, result.byPlace.single().count)
+    }
+
+    @Test
+    fun somewhereElseWithNoNameIsJustSomewhereElse() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(
+                    startTime = at(day2, 9),
+                    endTime = at(day2, 10),
+                    place = SleepPlace.OTHER,
+                    placeNote = "   ",
+                ),
+            ),
+        )
+
+        assertEquals(listOf(SleepWhere.Offered(SleepPlace.OTHER)), result.byPlace.map { it.value })
+        assertTrue("a place was recorded, even if it was not named", result.hasPlaces)
+    }
+
+    @Test
+    fun aNightBegunBeforeTheWindowBringsItsHoursButNotItsCount() {
+        val nightBefore = day1.minusDays(1)
+        val result = breakdown(
+            listOf(
+                SleepEntity(
+                    startTime = at(nightBefore, 20),
+                    endTime = at(day1, 6),
+                    place = SleepPlace.PARENTS_BED,
+                ),
+            ),
+        )
+
+        // Six of the ten hours were slept inside the window; the baby settled
+        // outside it, so the times-settled tally leaves it alone — the same
+        // rule the daily figures follow.
+        assertEquals(6 * hour, result.byPlace.single().millis)
+        assertEquals(0, result.byPlace.single().count)
+        assertEquals(0, result.totalCount)
+        assertEquals(6 * hour, result.totalMillis)
+    }
+
+    @Test
+    fun aSleepStillRunningIsCountedUpToNow() {
+        val result = breakdown(
+            listOf(SleepEntity(startTime = at(day3, 8), place = SleepPlace.AT_BREAST)),
+            now = at(day3, 10),
+        )
+
+        assertEquals(2 * hour, result.byPlace.single().millis)
+        assertEquals(1, result.byPlace.single().count)
+    }
+
+    @Test
+    fun sleepsOutsideTheWindowAreNotThere() {
+        val result = breakdown(
+            listOf(
+                SleepEntity(
+                    startTime = at(day3.plusDays(1), 9),
+                    endTime = at(day3.plusDays(1), 10),
+                    place = SleepPlace.OWN_BED,
+                ),
+            ),
+            now = at(day3.plusDays(1), 23),
+        )
+
+        assertTrue(result.byPlace.isEmpty())
+        assertEquals(0L, result.totalMillis)
+    }
+
+    @Test
+    fun anEmptyWindowBreaksNothingDown() {
+        val result = breakdown(
+            listOf(SleepEntity(startTime = at(day2, 9), endTime = at(day2, 10), place = SleepPlace.OWN_BED)),
+            from = day3,
+            to = day1,
+        )
+
+        assertTrue(result.byPlace.isEmpty())
+        assertTrue(result.byPosition.isEmpty())
     }
 
     private fun bottle(date: LocalDate, hour: Int, minute: Int = 0, ml: Int?) = FeedingEntity(

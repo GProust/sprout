@@ -8,6 +8,9 @@ import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.PumpingEntity
+import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.local.SleepPlace
+import com.gproust.sprout.data.local.SleepPosition
 import com.gproust.sprout.data.local.StoolColor
 import com.gproust.sprout.data.local.TombstoneEntity
 import com.gproust.sprout.data.local.TreatmentEntity
@@ -104,6 +107,28 @@ class SyncPayloadTest {
                 ),
             ),
         ),
+        sleeps = listOf(
+            // Everything a sleep can say about itself, the parent's own name
+            // for the place included.
+            BabyScoped(
+                babyUid,
+                SleepEntity(
+                    startTime = 1_700_001_800_000,
+                    endTime = 1_700_005_400_000,
+                    position = SleepPosition.BACK,
+                    place = SleepPlace.OTHER,
+                    placeNote = "the pram",
+                    uid = "sleep-1",
+                    updatedAt = 24,
+                ),
+            ),
+            // A sleep that says none of it — a nap logged in two taps, or one
+            // from a phone that predates the fields.
+            BabyScoped(
+                babyUid,
+                SleepEntity(startTime = 1_700_006_000_000, uid = "sleep-2", updatedAt = 25),
+            ),
+        ),
         diapers = listOf(
             BabyScoped(
                 babyUid,
@@ -156,6 +181,7 @@ class SyncPayloadTest {
         assertEquals(original.createdAt, decoded.createdAt)
         assertEquals(original.babies, decoded.babies)
         assertEquals(original.feedings, decoded.feedings)
+        assertEquals(original.sleeps, decoded.sleeps)
         assertEquals(original.diapers, decoded.diapers)
         assertEquals(original.treatments, decoded.treatments)
         assertEquals(original.pumpings, decoded.pumpings)
@@ -174,6 +200,32 @@ class SyncPayloadTest {
         assertNull("a bottle has no side", bottle.side)
         assertNull(bottle.notes)
         assertTrue(bottle.segments.isEmpty())
+        val nap = decoded.sleeps.single { it.row.uid == "sleep-2" }.row
+        assertNull("nothing was said about how they were lying", nap.position)
+        assertNull("nor about where", nap.place)
+        assertNull(nap.placeNote)
+    }
+
+    @Test
+    fun `a sleep from a phone that never had a place or a position reads as saying nothing`() {
+        // What a replica written by 1.9.0 looks like: a sleep, and no mention
+        // of the three fields at all. It has to merge as a sleep with nothing
+        // recorded rather than fail the whole payload.
+        val json = """
+            {"formatVersion":1,"schemaVersion":15,"householdId":"household-1","deviceId":"device-a",
+             "createdAt":1700000000000,"babies":[],"feedings":[],
+             "sleeps":[{"babyUid":"baby-uid-1","uid":"sleep-old","updatedAt":9,
+                        "startTime":1700000000000,"endTime":1700003600000}],
+             "diapers":[],"growth":[],"treatments":[],"pumpings":[],"tombstones":[]}
+        """.trimIndent()
+
+        val decoded = SyncPayloadCodec.decode(json.toByteArray(), currentSchemaVersion = 16)
+
+        val sleep = decoded.sleeps.single().row
+        assertEquals(1_700_003_600_000L, sleep.endTime)
+        assertNull(sleep.position)
+        assertNull(sleep.place)
+        assertNull(sleep.placeNote)
     }
 
     @Test

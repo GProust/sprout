@@ -29,6 +29,18 @@ class Converters {
     fun stringToStoolColor(value: String?): StoolColor? = value?.let { StoolColor.valueOf(it) }
 
     @TypeConverter
+    fun sleepPositionToString(value: SleepPosition?): String? = value?.name
+
+    @TypeConverter
+    fun stringToSleepPosition(value: String?): SleepPosition? = value?.let { SleepPosition.valueOf(it) }
+
+    @TypeConverter
+    fun sleepPlaceToString(value: SleepPlace?): String? = value?.name
+
+    @TypeConverter
+    fun stringToSleepPlace(value: String?): SleepPlace? = value?.let { SleepPlace.valueOf(it) }
+
+    @TypeConverter
     fun bleedingToString(value: Bleeding?): String? = value?.name
 
     @TypeConverter

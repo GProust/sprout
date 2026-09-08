@@ -173,6 +173,19 @@
     <string name="field_end">End</string>
     <string name="sleep_range">%1$s – %2$s · %3$s</string>
     <string name="sleep_ongoing">Started %1$s (ongoing)</string>
+    <string name="sleep_position_label">How they were lying (optional)</string>
+    <string name="sleep_position_back">On their back</string>
+    <string name="sleep_position_side">On their side</string>
+    <string name="sleep_position_belly">On their tummy</string>
+    <string name="sleep_place_label">Where they slept (optional)</string>
+    <string name="sleep_place_own_bed">Their own bed</string>
+    <string name="sleep_place_bedside_cot">Bedside cot</string>
+    <string name="sleep_place_parents_bed">Parents\' bed</string>
+    <string name="sleep_place_on_a_parent">On a parent</string>
+    <string name="sleep_place_at_breast">At the breast</string>
+    <string name="sleep_place_other">Somewhere else</string>
+    <string name="sleep_place_other_hint">Where was that?</string>
+    <string name="sleep_details_separator"> · </string>
 
     <!-- Diaper -->
     <string name="screen_diapers">Diapers</string>
@@ -517,6 +530,10 @@
     <string name="stats_sleep_title">Sleep</string>
     <string name="stats_sleep_per_day">Asleep</string>
     <string name="stats_sleeps_per_day">Times settled</string>
+    <string name="stats_sleep_where">Where they slept</string>
+    <string name="stats_sleep_position">How they were lying</string>
+    <string name="stats_sleep_not_recorded">Not recorded</string>
+    <string name="stats_sleep_share">%1$d × · %2$s</string>
     <string name="stats_diaper_title">Diapers</string>
     <string name="stats_diapers_per_day">Changes</string>
     <string name="stats_wet_per_day">Wet</string>

@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -66,6 +68,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -86,6 +89,8 @@ import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.diaper.label
 import com.gproust.sprout.ui.diaper.swatch
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.sleep.label
+import com.gproust.sprout.ui.sleep.sleepDetails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -155,6 +160,8 @@ data class StatsUiState(
     val maxOffset: Int = 0,
     val days: List<DayStats> = emptyList(),
     val averages: StatsAverages = StatsAverages(),
+    /** How the window's sleep divides by where it happened, and by position. */
+    val sleepBreakdown: SleepBreakdown = SleepBreakdown(),
     /** Measurements over the whole history, oldest first. */
     val growth: List<GrowthEntity> = emptyList(),
     val feedings: List<FeedingEntity> = emptyList(),
@@ -211,6 +218,7 @@ class StatsViewModel(private val repository: SproutRepository) : ViewModel() {
             maxOffset = ceiling,
             days = days,
             averages = averagesOf(days, today),
+            sleepBreakdown = sleepBreakdown(entries.sleeps, span.from, span.to, now, zone),
             // Growth is shown over the whole history rather than the window: a
             // curve is only worth reading over months, and a fortnight of it
             // would be two dots and no shape.
@@ -435,6 +443,33 @@ private fun SleepCard(
             drawSelection(days, selected, ring)
         }
 
+        // Only shown once something has been recorded: a card that asks about
+        // fields nobody fills in is a nag, and an empty breakdown says nothing
+        // the "times settled" line above hasn't already said.
+        val breakdown = state.sleepBreakdown
+        if (breakdown.hasPlaces) {
+            SleepShares(
+                title = stringResource(R.string.stats_sleep_where),
+                rows = breakdown.byPlace.map { slice ->
+                    ShareRow(slice.value.label(context), slice.count, slice.millis, slice.value != null)
+                },
+                total = breakdown.totalMillis,
+                context = context,
+            )
+        }
+        if (breakdown.hasPositions) {
+            SleepShares(
+                title = stringResource(R.string.stats_sleep_position),
+                rows = breakdown.byPosition.map { slice ->
+                    val label = slice.value?.label(context)
+                        ?: context.getString(R.string.stats_sleep_not_recorded)
+                    ShareRow(label, slice.count, slice.millis, slice.value != null)
+                },
+                total = breakdown.totalMillis,
+                context = context,
+            )
+        }
+
         DayDetail(selectedDay, context, onSelectDay) { day ->
             val sleeps = sleepsOn(state.sleeps, day, state.now)
             if (sleeps.isEmpty()) {
@@ -456,7 +491,16 @@ private fun SleepCard(
                     } else {
                         context.getString(R.string.stats_detail_sleep, formatTime(end), formatDuration(context, whole))
                     }
-                    DetailRow(formatTime(sleep.startTime), line)
+                    DetailRow(formatTime(sleep.startTime), line) {
+                        val details = sleepDetails(context, sleep).ifEmpty { return@DetailRow }
+                        Text(
+                            details,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.padding(start = 6.dp).widthIn(max = 120.dp),
+                        )
+                    }
                 }
             }
         }
@@ -1040,6 +1084,102 @@ private fun DetailRow(time: String, text: String, trailing: @Composable (() -> U
         Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         trailing?.invoke()
     }
+}
+
+/** One line of a sleep breakdown, already worded for the screen. */
+private data class ShareRow(
+    val label: String,
+    val count: Int,
+    val millis: Long,
+    /** False for the "not recorded" line, which is drawn as the gap it is. */
+    val recorded: Boolean,
+)
+
+/**
+ * A breakdown as bars of one colour, longest first.
+ *
+ * Deliberately not a palette: a hue per place would need a colour-vision check
+ * of its own (BDR-0008), and would say that the places differ in kind when the
+ * only thing being compared is how much of the window each one holds. The bar
+ * is the share of [total]; the figures beside it are the sleeps counted and the
+ * time they came to.
+ */
+@Composable
+private fun SleepShares(title: String, rows: List<ShareRow>, total: Long, context: Context) {
+    Spacer(Modifier.height(10.dp))
+    Text(
+        title,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    rows.forEach { row ->
+        val share = if (total > 0L) (row.millis.toFloat() / total).coerceIn(0f, 1f) else 0f
+        // The unrecorded line is drawn in the outline colour rather than the
+        // primary one: it is a gap in the record, not a place the baby slept.
+        val colour = if (row.recorded) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.outline
+        }
+        Column(Modifier.fillMaxWidth().padding(top = 6.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    row.label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (row.recorded) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    // A count of zero is a night that began before the window
+                    // and brought only its hours in; "0 ×" beside them would
+                    // read as a contradiction, so it is simply left off.
+                    if (row.count == 0) {
+                        formatDuration(context, row.millis)
+                    } else {
+                        context.getString(
+                            R.string.stats_sleep_share,
+                            row.count,
+                            formatDuration(context, row.millis),
+                        )
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+            Spacer(Modifier.height(3.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+            ) {
+                if (share > 0f) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(share)
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(colour),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** What to call a place in the breakdown; a named one is called what it was called. */
+private fun SleepWhere?.label(context: Context): String = when (this) {
+    null -> context.getString(R.string.stats_sleep_not_recorded)
+    is SleepWhere.Offered -> place.label(context)
+    is SleepWhere.Named -> name
 }
 
 @Composable

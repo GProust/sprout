@@ -89,6 +89,12 @@ that a change can quietly break:
   not by eye — the obvious four-hue palettes all failed it. Re-run the check
   before changing one.
 
+- **A sleep can also say where it happened and how the baby was lying**
+  ([BDR-0012](docs/decisions/0012-what-a-sleep-records-beyond-its-hours.md)).
+  Both are optional, "not recorded" is a line in the breakdown rather than a
+  sleep quietly dropped from it, and the position is reported without comment —
+  no warning, no colour-coding, no ordering that grades it.
+
 Exporting a report (PDF) and the raw data as a workbook build on these same
 per-day figures, and are deliberately still to come.
 
