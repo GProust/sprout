@@ -615,4 +615,16 @@
     <string name="report_nothing_logged">No se anotó nada en este periodo.</string>
     <string name="report_hours_minutes">%1$d h %2$02d</string>
     <string name="report_footer">%1$s · %2$s – %3$s</string>
+
+    <!-- Proteger con contraseña los archivos exportados (BDR-13) -->
+    <string name="report_protect_label">Protección</string>
+    <string name="report_protect">Proteger con una contraseña</string>
+    <string name="report_protect_hint">Los dos archivos en un zip cifrado</string>
+    <string name="report_password">Contraseña</string>
+    <string name="report_password_short">Al menos %1$d caracteres.</string>
+    <string name="report_password_help">Dale la contraseña al médico en persona o por teléfono, no en el mismo mensaje que el archivo. Sprout no guarda ninguna copia y no puede recuperarla por ti.</string>
+    <string name="report_protect_compat">Cifrado con AES-256. Se abre con 7-Zip, WinZip, Keka o la mayoría de gestores de archivos de Android; el descompresor incluido en Windows y macOS no puede abrirlo.</string>
+    <string name="report_make_protected">Compartir el zip protegido</string>
+    <string name="cd_show_password">Mostrar la contraseña</string>
+    <string name="cd_hide_password">Ocultar la contraseña</string>
 </resources>

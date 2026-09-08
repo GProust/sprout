@@ -89,7 +89,7 @@ that a change can quietly break:
   not by eye — the obvious four-hue palettes all failed it. Re-run the check
   before changing one.
 - **A sleep can also say where it happened and how the baby was lying**
-  ([BDR-0013](docs/decisions/0013-what-a-sleep-records-beyond-its-hours.md)).
+  ([BDR-0014](docs/decisions/0014-what-a-sleep-records-beyond-its-hours.md)).
   Both are optional, "not recorded" is a line in the breakdown rather than a
   sleep quietly dropped from it, and the position is reported without comment —
   no warning, no colour-coding, no ordering that grades it.
@@ -118,6 +118,15 @@ undo:
   schema, not prose: a pivot table written against `bottle_ml` has to keep
   working when the phone changes language. The PDF is translated like everything
   else.
+- **The export can be locked with a password, and only with AES-256**
+  ([BDR-13](docs/decisions/0013-protecting-the-file-that-leaves.md)). Legacy
+  ZipCrypto is the one Windows opens by double-click and is broken against
+  known plaintext — which our archive supplies, since a PDF and an `.xlsx` both
+  start with fixed bytes. It is not a fallback and not an option. The password
+  is never stored, and `EncryptedZipTest` checks the key derivation against the
+  RFC 6070 vectors and a whole entry against a vector from an outside
+  implementation; if you touch that file, those are what stop a silent change
+  from producing an archive nobody can open.
 
 ## Asking for support
 

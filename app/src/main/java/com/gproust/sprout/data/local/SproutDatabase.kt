@@ -344,7 +344,7 @@ abstract class SproutDatabase : RoomDatabase() {
          * was taken, and the statistics keep those sleeps out of the breakdown
          * rather than guessing at a default. `placeNote` only ever holds
          * something for `place = 'OTHER'` — the parent's own name for a place
-         * the six offered ones don't cover (BDR-0013).
+         * the six offered ones don't cover (BDR-0014).
          */
         private val MIGRATION_15_16 = object : Migration(15, 16) {
             override fun migrate(db: SupportSQLiteDatabase) {

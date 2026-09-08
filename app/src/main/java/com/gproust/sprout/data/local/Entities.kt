@@ -56,7 +56,7 @@ enum class MilkStorage { FRIDGE, FREEZER, ROOM, USED }
  * How the baby was lying when they were put down.
  *
  * Recorded, not judged: Sprout shows what was logged and attaches no advice or
- * warning to any of the three (BDR-0013). A parent asking "was it the belly
+ * warning to any of the three (BDR-0014). A parent asking "was it the belly
  * naps that went better?" is reading their own log, not being marked on it.
  */
 enum class SleepPosition { BACK, SIDE, BELLY }
