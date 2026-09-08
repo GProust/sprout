@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -272,6 +274,21 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
 
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.report_screen_title), onBack = onBack) },
+        // The two buttons sit in a bar of their own rather than at the foot of
+        // the list. Everything above them is a choice with a sensible default,
+        // so the common trip through this screen is "open it, tap PDF" — and a
+        // screen whose whole point is one tap should not open with that tap
+        // below the fold, let alone a scroll and a half down once a custom
+        // range has added its two date fields.
+        bottomBar = {
+            if (state.babyName != null) {
+                ExportBar(
+                    working = state.working,
+                    failed = state.failed,
+                    onExport = vm::export,
+                )
+            }
+        },
     ) { padding ->
         if (state.babyName == null) {
             EmptyHint(
@@ -364,13 +381,54 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                 onChange = vm::setIncludeNotes,
             )
 
+            Text(
+                stringResource(R.string.report_privacy_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
+    }
+}
+
+/** The two things this screen exists to produce, always within reach. */
+@Composable
+private fun ExportBar(
+    working: Boolean,
+    failed: Boolean,
+    onExport: (ReportFormat) -> Unit,
+) {
+    Surface(tonalElevation = 3.dp) {
+        Column(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            if (working) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Text(
+                        stringResource(R.string.report_working),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+            if (failed) {
+                Text(
+                    stringResource(R.string.report_failed),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Row(
-                Modifier.fillMaxWidth().padding(top = 16.dp),
+                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Button(
-                    onClick = { vm.export(ReportFormat.PDF) },
-                    enabled = !state.working,
+                    onClick = { onExport(ReportFormat.PDF) },
+                    enabled = !working,
                     modifier = Modifier.weight(1f),
                 ) {
                     Icon(Icons.Filled.Description, contentDescription = null)
@@ -380,8 +438,8 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                     )
                 }
                 OutlinedButton(
-                    onClick = { vm.export(ReportFormat.WORKBOOK) },
-                    enabled = !state.working,
+                    onClick = { onExport(ReportFormat.WORKBOOK) },
+                    enabled = !working,
                     modifier = Modifier.weight(1f),
                 ) {
                     Icon(Icons.Filled.TableChart, contentDescription = null)
@@ -391,35 +449,6 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                     )
                 }
             }
-
-            if (state.working) {
-                Row(
-                    Modifier.fillMaxWidth().padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CircularProgressIndicator(Modifier.padding(2.dp))
-                    Text(
-                        stringResource(R.string.report_working),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
-            if (state.failed) {
-                Text(
-                    stringResource(R.string.report_failed),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 12.dp),
-                )
-            }
-
-            Text(
-                stringResource(R.string.report_privacy_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 16.dp),
-            )
         }
     }
 }
