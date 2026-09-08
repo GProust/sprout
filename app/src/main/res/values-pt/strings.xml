@@ -150,7 +150,7 @@
     <string name="sleep_place_at_breast">Na mama</string>
     <string name="sleep_place_other">Noutro sítio</string>
     <string name="sleep_place_other_hint">Onde foi?</string>
-    <string name="sleep_details_separator"> · </string>
+    <string name="sleep_details_separator">" · "</string>
     <string name="screen_diapers">Fraldas</string>
     <string name="diaper_empty">Ainda não há mudas de fralda registadas.</string>
     <string name="diaper_log_title">Registar uma muda</string>

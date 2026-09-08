@@ -181,7 +181,7 @@
     <string name="sleep_place_at_breast">Au sein</string>
     <string name="sleep_place_other">Ailleurs</string>
     <string name="sleep_place_other_hint">C\'était où ?</string>
-    <string name="sleep_details_separator"> · </string>
+    <string name="sleep_details_separator">" · "</string>
 
     <!-- Diaper -->
     <string name="screen_diapers">Couches</string>

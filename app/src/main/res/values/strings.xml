@@ -185,7 +185,7 @@
     <string name="sleep_place_at_breast">At the breast</string>
     <string name="sleep_place_other">Somewhere else</string>
     <string name="sleep_place_other_hint">Where was that?</string>
-    <string name="sleep_details_separator"> · </string>
+    <string name="sleep_details_separator">" · "</string>
 
     <!-- Diaper -->
     <string name="screen_diapers">Diapers</string>

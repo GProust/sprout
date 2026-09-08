@@ -150,7 +150,7 @@
     <string name="sleep_place_at_breast">Al seno</string>
     <string name="sleep_place_other">Altrove</string>
     <string name="sleep_place_other_hint">Dove di preciso?</string>
-    <string name="sleep_details_separator"> · </string>
+    <string name="sleep_details_separator">" · "</string>
     <string name="screen_diapers">Pannolini</string>
     <string name="diaper_empty">Nessun cambio di pannolino registrato finora.</string>
     <string name="diaper_log_title">Registra un cambio</string>

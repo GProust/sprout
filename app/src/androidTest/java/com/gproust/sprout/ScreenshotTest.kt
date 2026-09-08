@@ -475,6 +475,11 @@ class ScreenshotTest {
         // Statistics: the week's averages, and the weight curve over the WHO band.
         show { StatsScreen() }
         save("08-stats")
+        // The sleep card's own breakdown — where the sleeps happened and how the
+        // baby was lying — which sits below the fold on a phone.
+        rule.onNode(hasScrollAction()).performScrollToNode(hasText("Where they slept"))
+        settle()
+        save("08-stats-2-sleep")
         show { HealthScreen {} }
         save("09-wellbeing")
         // Babies manager: both babies, the active marker, and add/track/delete actions.
