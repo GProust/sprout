@@ -224,6 +224,12 @@ class ScreenshotTest {
         settle()
     }
 
+    /** Scrolls the current screen's list until [text] is on it. */
+    private fun scrollTo(text: String) {
+        rule.onNode(hasScrollAction()).performScrollToNode(hasText(text))
+        settle()
+    }
+
     private fun type(text: String) {
         rule.onNode(hasSetTextAction()).performTextInput(text)
         rule.waitForIdle()
@@ -545,8 +551,12 @@ class ScreenshotTest {
         tap("Custom")
         save("15-report-2-custom")
         // And with a password on it: both files go out as one encrypted zip,
-        // so the two buttons become one (BDR-13).
+        // so the two buttons become one (BDR-13). The protection section sits
+        // below the fold, so scroll to it first — a tap on a node that is off
+        // screen throws, and `am instrument` exits 0 when it does, which is how
+        // this capture went missing without the job going red.
         tap("30 days")
+        scrollTo("Protect with a password")
         tap("Protect with a password")
         type("clinic-2026")
         save("15-report-3-protected")
