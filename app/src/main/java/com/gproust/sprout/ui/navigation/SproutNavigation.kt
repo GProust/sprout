@@ -53,6 +53,7 @@ import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
+import com.gproust.sprout.ui.report.ReportScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
@@ -83,9 +84,13 @@ object Routes {
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
     const val SYNC = "settings/sync"
+    const val REPORT = "report/{babyId}"
 
     /** The live nursing screen for one breast, timer already running. */
     fun nursing(side: BreastSide) = "feeding/nursing/${side.name}"
+
+    /** "Share a record" for one named baby — never for "whichever is active". */
+    fun report(babyId: Long) = "report/$babyId"
 }
 
 private data class BottomDestination(
@@ -312,6 +317,7 @@ private fun MainScaffold(
                 BabyScreen(
                     onNavigate = { route -> navController.navigateToKnown(route) },
                     onQuickFeed = { side -> openNursing(side) },
+                    onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
                 )
             }
             composable(Routes.YOU) {
@@ -378,6 +384,15 @@ private fun MainScaffold(
             }
             composable(Routes.TREATMENTS) {
                 TreatmentsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(
+                Routes.REPORT,
+                arguments = listOf(navArgument("babyId") { type = NavType.LongType }),
+            ) { entry ->
+                ReportScreen(
+                    babyId = entry.arguments?.getLong("babyId") ?: 0L,
+                    onBack = { navController.popBackStack() },
+                )
             }
         }
     }
