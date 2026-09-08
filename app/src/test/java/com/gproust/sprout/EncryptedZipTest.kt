@@ -8,10 +8,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.security.SecureRandom
 import java.time.LocalDateTime
-import java.util.zip.ZipFile
 
 /**
  * The AES-256 archive, checked where hand-written crypto can actually go wrong.
@@ -141,27 +139,51 @@ class EncryptedZipTest {
         assertEquals(0, readInt(bytes, directoryAt + 42)) // first entry's offset
     }
 
+    /**
+     * Both entries are reachable the way a reader reaches them: from the end
+     * record, into the central directory, and out to each local header.
+     *
+     * This walk is written out rather than handed to `java.util.zip.ZipFile`,
+     * which cannot be used here at all: it rejects an archive whose entries
+     * declare compression method 99 before it will list anything, because the
+     * JDK has no AES support and will not open what it cannot decompress. That
+     * is a limitation of that one reader, not of the archive — 7-Zip, WinZip,
+     * Keka, Android's file managers, `unzip` and Python's `zipfile` all read
+     * it — and the app never claims Java can open it. So the navigation is
+     * checked against the format, not against a reader that opted out of it.
+     */
     @Test
-    fun aZipReaderCanListWhatIsInside() {
-        val file = File.createTempFile("sprout-report", ".zip")
-        try {
-            file.writeBytes(
-                archive(
-                    listOf(
-                        EncryptedZip.Entry("report.pdf", ByteArray(4321) { 1 }),
-                        EncryptedZip.Entry("data.xlsx", ByteArray(987) { 2 }),
-                    ),
-                ),
-            )
-            ZipFile(file).use { zip ->
-                val entries = zip.entries().toList()
-                assertEquals(listOf("report.pdf", "data.xlsx"), entries.map { it.name })
-                assertEquals(4321L, entries[0].size)
-                assertEquals(987L, entries[1].size)
-            }
-        } finally {
-            file.delete()
+    fun bothEntriesAreReachableFromTheCentralDirectory() {
+        val names = listOf("report.pdf", "data.xlsx")
+        val sizes = listOf(4321, 987)
+        val bytes = archive(
+            names.zip(sizes) { name, size -> EncryptedZip.Entry(name, ByteArray(size) { 1 }) },
+        )
+
+        val eocd = bytes.size - 22
+        assertEquals(0x06054b50, readInt(bytes, eocd))
+        assertEquals(names.size, readShort(bytes, eocd + 10))
+
+        var cursor = readInt(bytes, eocd + 16)
+        names.forEachIndexed { index, name ->
+            assertEquals(0x02014b50, readInt(bytes, cursor))
+            val nameLength = readShort(bytes, cursor + 28)
+            val extraLength = readShort(bytes, cursor + 30)
+            val commentLength = readShort(bytes, cursor + 32)
+            assertEquals(name, String(bytes, cursor + 46, nameLength, Charsets.UTF_8))
+            assertEquals(sizes[index], readInt(bytes, cursor + 24)) // the size it really was
+
+            // The offset in the directory has to land on that entry's own
+            // local header, or a reader jumps into the middle of the previous
+            // entry's ciphertext.
+            val local = readInt(bytes, cursor + 42)
+            assertEquals(0x04034b50, readInt(bytes, local))
+            assertEquals(name, String(bytes, local + 30, readShort(bytes, local + 26), Charsets.UTF_8))
+
+            cursor += 46 + nameLength + extraLength + commentLength
         }
+        // The directory ends exactly where the end record begins.
+        assertEquals(eocd, cursor)
     }
 
     @Test
