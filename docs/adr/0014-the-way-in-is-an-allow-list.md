@@ -72,11 +72,18 @@ thing: each compiles, passes every other test, and ships.
 **Pin the surface as an exact list, and assert a property over the bytes that
 cross it.**
 
-- `AttackSurfaceTest` reads the merged manifest back and pins the permissions,
-  Sprout's own components and which of them are exported, the FileProvider's
-  terms, and every path in `@xml/file_paths`. The lists are exact. Widening the
-  surface stays allowed; it just cannot happen quietly, because the test fails
-  and the diff has to say so.
+- `AttackSurfaceTest` pins Sprout's own components and which of them are
+  exported, the FileProvider's terms, every path in `@xml/file_paths`, and the
+  permissions the manifest Sprout writes declares. Those lists are exact.
+  Widening the surface stays allowed; it just cannot happen quietly, because the
+  test fails and the diff has to say so.
+- The *merged* manifest is checked differently, and deliberately so. It carries
+  whatever every AndroidX artifact declares, so an exact list there fails on a
+  routine version bump while saying nothing about Sprout. What it is asked
+  instead is the pair of questions that would cost something: that Sprout's five
+  permissions survive the merge, and that nothing anywhere in the build asks for
+  one of the permissions the app tells its users it does not have — a socket of
+  any kind, where the phone is, shared storage, a foreground service.
 - `UntrustedInputFuzzTest` asserts the property the hand-picked negative tests
   could only sample: **over thousands of mutations of a valid file, every parser
   either reads it or throws the exception it documents.** Anything else — an
@@ -115,11 +122,15 @@ no new infrastructure.
 - **A legitimate new door costs a line and a sentence.** Adding a receiver or a
   permission means editing the pinned list in the same commit, which is the
   whole mechanism: the list is where "should this be exported?" gets asked.
-- Third-party components are outside the pin. Compose's debug tooling
-  contributes an exported preview activity, the profile installer an exported
-  receiver, and pinning those would turn every routine bump into a failing build
-  without saying anything about Sprout's own doors. The pull-request checklist
-  carries that question instead.
+- Third-party declarations are outside the exact pin, in both senses. Compose's
+  debug tooling contributes an exported preview activity, the profile installer
+  an exported receiver, and the merged manifest carries permissions no Sprout
+  file mentions — the first version of this test pinned that merged list and
+  failed on exactly that. Pinning a dependency's declarations turns every
+  routine bump into a failing build while saying nothing about Sprout's own
+  doors, so the components pin is scoped to this package and the permission pin
+  reads Sprout's own manifest file. The refusal list above is what still covers
+  the merged result, and the pull-request checklist asks the rest.
 - Sprout will now refuse a file that is implausibly large or implausibly nested,
   instead of being closed by one. No file it has ever written comes close to
   either ceiling — a replica is four levels deep and a few hundred kilobytes.

@@ -27,10 +27,13 @@ database nothing else can reach — and absence is not what a feature test notic
 going missing. [ADR-0014](docs/adr/0014-the-way-in-is-an-allow-list.md) writes the
 surface down; two tests hold it.
 
-- **`AttackSurfaceTest` pins exact lists** — the permissions, Sprout's own
-  components and which are exported, the FileProvider's terms, every path in
-  `@xml/file_paths`. A legitimate new door is fine and costs one line in the
-  pinned list, in the same commit. A door nobody meant to open fails CI instead.
+- **`AttackSurfaceTest` pins exact lists** — Sprout's own components and which
+  are exported, the FileProvider's terms, every path in `@xml/file_paths`, and
+  the permissions Sprout's *own* manifest declares. A legitimate new door is
+  fine and costs one line in the pinned list, in the same commit. A door nobody
+  meant to open fails CI instead. The merged manifest is checked against a
+  refusal list rather than pinned, because it carries every dependency's
+  declarations and would otherwise break on a routine bump.
 - **`UntrustedInputFuzzTest` asserts a property, not examples**: over thousands
   of mutations, every parser either reads the bytes or throws the exception it
   documents. Never an `OutOfMemoryError`, an index out of bounds, or a

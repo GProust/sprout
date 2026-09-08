@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.xmlpull.v1.XmlPullParser
+import java.io.File
 
 /**
  * Every way into Sprout from outside the app, written down (ADR-0014).
@@ -36,25 +37,48 @@ class AttackSurfaceTest {
     private val packageName: String get() = context.packageName
 
     /**
-     * What Sprout asks Android for.
+     * What Sprout asks Android for, read from the manifest Sprout writes.
      *
-     * `INTERNET` is the one that matters most and has its own assertion in
-     * `SupportLinksTest`; this is the rest of the sentence. `ACCESS_FINE_LOCATION`
-     * is absent by design too — `BLUETOOTH_SCAN` is declared `neverForLocation`,
-     * which is what lets the nearby exchange find a phone in the room without
-     * ever being able to say where that room is.
+     * The source file rather than the merged one, because this list is about
+     * authorship: a permission here is one a person typed, and adding a sixth
+     * should cost a line in this test and a sentence in the pull request.
+     * `ACCESS_FINE_LOCATION` is absent by design — `BLUETOOTH_SCAN` is declared
+     * `neverForLocation`, which is what lets the nearby exchange find a phone in
+     * the room without ever being able to say where that room is.
      */
     @Test
-    fun `the app asks for five permissions and no others`() {
+    fun `the manifest Sprout writes asks for five permissions and no others`() {
+        assertEquals(SPROUT_PERMISSIONS, declaredPermissions())
+    }
+
+    /**
+     * And what the *build* ends up asking for, dependencies included.
+     *
+     * Not pinned exactly. The merged manifest carries whatever every AndroidX
+     * artifact declares, so an exact list there fails on a routine version bump
+     * while saying nothing about Sprout — the same reason the component pin is
+     * scoped to this package. What is worth asserting is the part that would
+     * actually cost something: that Sprout's five survive the merge, and that
+     * nothing anywhere in the build quietly asks for a permission the app's
+     * privacy claim says it does not have.
+     *
+     * `INTERNET` is the one that matters most and is asserted on its own in
+     * `SupportLinksTest`. It is here too, because this is the list a reader
+     * checks, and leaving the important one off it would be strange.
+     */
+    @Test
+    fun `nothing in the build asks for a permission Sprout refuses`() {
+        val requested = requestedPermissions()
+
+        assertTrue(
+            "Sprout's own permissions must survive the manifest merge",
+            requested.containsAll(SPROUT_PERMISSIONS),
+        )
         assertEquals(
-            setOf(
-                "android.permission.BLUETOOTH_SCAN",
-                "android.permission.BLUETOOTH_ADVERTISE",
-                "android.permission.BLUETOOTH_CONNECT",
-                "android.permission.POST_NOTIFICATIONS",
-                "android.permission.RECEIVE_BOOT_COMPLETED",
-            ),
-            requestedPermissions(),
+            "a dependency, or a new line in the manifest, asks for something " +
+                "Sprout tells its users it never asks for (PRIVACY.md, ADR-0014)",
+            emptySet<String>(),
+            requested.intersect(REFUSED_PERMISSIONS),
         )
     }
 
@@ -148,6 +172,32 @@ class AttackSurfaceTest {
 
     // --- reading the manifest back ------------------------------------------
 
+    /**
+     * The `<uses-permission>` names in Sprout's own manifest.
+     *
+     * Read as a file, not through the package manager, which only ever sees the
+     * merged result. Robolectric runs with the module directory as its working
+     * directory; the guard below turns a change to that into a failed assertion
+     * rather than a test that passes on an empty list.
+     */
+    private fun declaredPermissions(): Set<String> {
+        val manifest = File("src/main/AndroidManifest.xml")
+        assertTrue(
+            "expected Sprout's manifest at ${manifest.absolutePath}",
+            manifest.isFile,
+        )
+        // `[^>]` spans newlines, so this matches an element whose attributes are
+        // wrapped across lines as well as one written on a single line. It looks
+        // only at `<uses-permission`, which is why `<uses-feature>` below the
+        // Bluetooth block — and the prose in the comments — are not counted.
+        val usesPermission = Regex("<uses-permission[^>]*android:name=\"([^\"]+)\"")
+        val names = usesPermission.findAll(manifest.readText())
+            .map { it.groupValues[1] }
+            .toSet()
+        assertTrue("no permissions were read from the manifest", names.isNotEmpty())
+        return names
+    }
+
     private fun requestedPermissions(): Set<String> {
         @Suppress("DEPRECATION")
         val info = context.packageManager.getPackageInfo(
@@ -217,5 +267,47 @@ class AttackSurfaceTest {
         }
         assertTrue("file_paths.xml was not read", entries.isNotEmpty())
         return entries
+    }
+
+    private companion object {
+
+        /** Every permission Sprout's own manifest declares. */
+        val SPROUT_PERMISSIONS = setOf(
+            "android.permission.BLUETOOTH_SCAN",
+            "android.permission.BLUETOOTH_ADVERTISE",
+            "android.permission.BLUETOOTH_CONNECT",
+            "android.permission.POST_NOTIFICATIONS",
+            "android.permission.RECEIVE_BOOT_COMPLETED",
+        )
+
+        /**
+         * Permissions whose presence would contradict something Sprout says.
+         *
+         * Not "every dangerous permission" — the ones with a decision behind
+         * them. A socket of any kind (ADR-0002, BDR-11); where the phone is,
+         * which `neverForLocation` exists to avoid (ADR-0010); the shared
+         * storage the app deliberately never writes to (ADR-0007); a foreground
+         * service, which the bounded discovery window was chosen instead of
+         * (ADR-0010); and the sensors and personal stores an offline tracker has
+         * no business reading.
+         */
+        val REFUSED_PERMISSIONS = setOf(
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.ACCESS_WIFI_STATE",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_BACKGROUND_LOCATION",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.MANAGE_EXTERNAL_STORAGE",
+            "android.permission.FOREGROUND_SERVICE",
+            "android.permission.CAMERA",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.READ_CONTACTS",
+            "android.permission.GET_ACCOUNTS",
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.QUERY_ALL_PACKAGES",
+        )
     }
 }
