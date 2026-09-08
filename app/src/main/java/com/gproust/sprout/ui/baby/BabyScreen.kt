@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,23 +69,7 @@ fun BabyScreen(
 
     Scaffold(
         topBar = {
-            SproutTopBar(
-                summary?.baby?.name ?: stringResource(R.string.nav_baby),
-                actions = {
-                    // Sharing starts here rather than on the Statistics screen,
-                    // so the baby whose record it is has already been chosen by
-                    // the page it was started from — there is no menu left on
-                    // the wrong name to export the wrong child.
-                    summary?.let { chosen ->
-                        IconButton(onClick = { onShareRecord(chosen.baby.id) }) {
-                            Icon(
-                                Icons.Filled.Share,
-                                contentDescription = stringResource(R.string.report_screen_title),
-                            )
-                        }
-                    }
-                },
-            )
+            SproutTopBar(summary?.baby?.name ?: stringResource(R.string.nav_baby))
         },
     ) { padding ->
         if (summary == null) {
@@ -113,6 +93,7 @@ fun BabyScreen(
                 now = now,
                 onFeed = onQuickFeed,
                 onNavigate = onNavigate,
+                onShareRecord = { onShareRecord(summary.baby.id) },
                 header = {
                     Text(
                         babyAge(context, summary.baby.birthDate, now),

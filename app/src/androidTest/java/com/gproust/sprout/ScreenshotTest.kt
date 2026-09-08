@@ -102,6 +102,9 @@ class ScreenshotTest {
     /** Set in [seed] so captures can reference the first baby (e.g. its reminder override). */
     private var leaId = 0L
 
+    /** Set in [seed] so the last capture can archive the twin and shoot a one-baby home. */
+    private var noahId = 0L
+
     private fun seed() = runBlocking {
         val repo = app.repository
         val now = System.currentTimeMillis()
@@ -111,7 +114,7 @@ class ScreenshotTest {
         // Twins, to show the baby switcher and the babies manager.
         val lea = repo.addBaby("Léa", now - 21 * day)
         leaId = lea
-        repo.addBaby("Noah", now - 21 * day)
+        noahId = repo.addBaby("Noah", now - 21 * day)
         repo.saveParentProfile(
             ParentProfileEntity(
                 1L,
@@ -596,5 +599,17 @@ class ScreenshotTest {
         tap("Protect with a password")
         type("clinic-2026")
         save("15-report-3-protected")
+
+        // Last, because it changes the data every other capture was taken
+        // from: the same dashboard for a family with one baby, which is most
+        // of them. There are no cards to choose between, so the baby's own
+        // pane is shown in place — and this is the arrangement that has to
+        // carry the way out to the doctor's record, because a family with one
+        // baby has no baby tab to find it on. Scrolled to the foot of the
+        // pane, where that button and "See the statistics" sit.
+        runBlocking { app.repository.archiveBaby(noahId) }
+        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
+        scrollTo("Share a record")
+        save("04-home-2-one-baby")
     }
 }
