@@ -476,8 +476,11 @@ class ScreenshotTest {
         show { StatsScreen() }
         save("08-stats")
         // The sleep card's own breakdown — where the sleeps happened and how the
-        // baby was lying — which sits below the fold on a phone.
-        rule.onNode(hasScrollAction()).performScrollToNode(hasText("Where they slept"))
+        // baby was lying — which sits below the fold on a phone. Scrolled to the
+        // card *after* it: performScrollToNode stops as soon as its target is on
+        // screen, so scrolling to the breakdown itself leaves it on the bottom
+        // edge with every one of its rows still below.
+        rule.onNode(hasScrollAction()).performScrollToNode(hasText("Diapers"))
         settle()
         save("08-stats-2-sleep")
         show { HealthScreen {} }
