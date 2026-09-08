@@ -10,17 +10,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -29,16 +36,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.export.EncryptedZip
 import com.gproust.sprout.data.export.ExportFiles
 import com.gproust.sprout.data.export.Xlsx
 import com.gproust.sprout.ui.common.ChoiceChips
@@ -55,12 +70,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
 /** Which file the parent asked for. */
-enum class ReportFormat { PDF, WORKBOOK }
+enum class ReportFormat {
+    PDF,
+    WORKBOOK,
+
+    /**
+     * Both of the above, inside one AES-256 archive (BDR-0013). One file rather
+     * than two, because a password is a thing you have to pass on and nobody
+     * wants to do that twice.
+     */
+    PROTECTED_ZIP,
+}
+
+/** How long a password has to be before the button will do anything. */
+const val MIN_PASSWORD_LENGTH = 6
 
 /**
  * The WHO reference the growth pages are read against, as three chips.
@@ -81,9 +110,24 @@ data class ReportUiState(
     val birthDate: Long? = null,
     val options: ReportOptions = ReportOptions(),
     val range: ReportRange? = null,
+    /** Whether the two files go out as one encrypted archive. */
+    val protect: Boolean = false,
+    /**
+     * The password, for as long as this screen is open.
+     *
+     * It lives here and nowhere else: not in the options that become the
+     * report, not in preferences, not in the file name. Sprout cannot help
+     * anyone who forgets it, and that is the honest position — a tracker that
+     * kept a copy of the password would be a tracker with a copy of the key.
+     */
+    val password: String = "",
     val working: Boolean = false,
     val failed: Boolean = false,
-)
+) {
+    /** True when there is something to export with — a long enough password, if one is wanted. */
+    val canExport: Boolean
+        get() = !protect || password.length >= MIN_PASSWORD_LENGTH
+}
 
 class ReportViewModel(
     private val repository: SproutRepository,
@@ -155,6 +199,16 @@ class ReportViewModel(
         _state.update { it.copy(options = it.options.copy(includeNotes = include)) }
     }
 
+    fun setProtect(protect: Boolean) {
+        // Turning it off forgets the password rather than keeping it warm for a
+        // second try: nothing here should outlive the choice that needed it.
+        _state.update { it.copy(protect = protect, password = if (protect) it.password else "") }
+    }
+
+    fun setPassword(password: String) {
+        _state.update { it.copy(password = password) }
+    }
+
     fun shareConsumed() {
         _share.value = null
     }
@@ -168,27 +222,63 @@ class ReportViewModel(
      */
     fun export(format: ReportFormat) {
         val id = babyId ?: return
-        if (_state.value.working) return
+        if (_state.value.working || !_state.value.canExport) return
         _state.update { it.copy(working = true, failed = false) }
         viewModelScope.launch {
             val result = runCatching {
                 withContext(Dispatchers.IO) {
                     val report = assemble(id)
-                    val name = ExportFiles.fileName(
+                    fun named(extension: String) = ExportFiles.fileName(
                         report.babyName,
                         report.range.from,
                         report.range.to,
-                        if (format == ReportFormat.PDF) "pdf" else "xlsx",
+                        extension,
                     )
-                    val uri = ExportFiles.stage(context, name) { out ->
-                        when (format) {
-                            ReportFormat.PDF -> ReportPdf(context, report, zone).write(out)
-                            ReportFormat.WORKBOOK -> out.write(ReportWorkbook.bytes(report, zone))
+
+                    val uri = when (format) {
+                        ReportFormat.PDF -> ExportFiles.stage(context, named("pdf")) { out ->
+                            ReportPdf(context, report, zone).write(out)
+                        }
+
+                        ReportFormat.WORKBOOK -> ExportFiles.stage(context, named("xlsx")) { out ->
+                            out.write(ReportWorkbook.bytes(report, zone))
+                        }
+
+                        ReportFormat.PROTECTED_ZIP -> {
+                            // Both documents are built in full before either is
+                            // encrypted: the archive's headers carry each entry's
+                            // size, so there is nothing to stream into anyway.
+                            val pdf = ByteArrayOutputStream()
+                                .also { ReportPdf(context, report, zone).write(it) }
+                                .toByteArray()
+                            val password = _state.value.password.toCharArray()
+                            try {
+                                ExportFiles.stage(context, named(EncryptedZip.EXTENSION)) { out ->
+                                    EncryptedZip.write(
+                                        listOf(
+                                            EncryptedZip.Entry(named("pdf"), pdf),
+                                            EncryptedZip.Entry(
+                                                named("xlsx"),
+                                                ReportWorkbook.bytes(report, zone),
+                                            ),
+                                        ),
+                                        password,
+                                        out,
+                                    )
+                                }
+                            } finally {
+                                password.fill('\u0000')
+                            }
                         }
                     }
+
                     ExportFiles.shareIntent(
                         uri,
-                        if (format == ReportFormat.PDF) ExportFiles.PDF_MIME else Xlsx.MIME_TYPE,
+                        when (format) {
+                            ReportFormat.PDF -> ExportFiles.PDF_MIME
+                            ReportFormat.WORKBOOK -> Xlsx.MIME_TYPE
+                            ReportFormat.PROTECTED_ZIP -> EncryptedZip.MIME_TYPE
+                        },
                         context.getString(R.string.report_share_subject, report.babyName),
                     )
                 }
@@ -283,6 +373,8 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
         bottomBar = {
             if (state.babyName != null) {
                 ExportBar(
+                    protect = state.protect,
+                    enabled = state.canExport,
                     working = state.working,
                     failed = state.failed,
                     onExport = vm::export,
@@ -381,6 +473,32 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                 onChange = vm::setIncludeNotes,
             )
 
+            SectionLabel(stringResource(R.string.report_protect_label))
+            ToggleRow(
+                title = stringResource(R.string.report_protect),
+                subtitle = stringResource(R.string.report_protect_hint),
+                checked = state.protect,
+                onChange = vm::setProtect,
+            )
+            if (state.protect) {
+                PasswordField(
+                    password = state.password,
+                    onChange = vm::setPassword,
+                )
+                Text(
+                    stringResource(R.string.report_password_help),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                Text(
+                    stringResource(R.string.report_protect_compat),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+
             Text(
                 stringResource(R.string.report_privacy_note),
                 style = MaterialTheme.typography.bodySmall,
@@ -391,9 +509,11 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
     }
 }
 
-/** The two things this screen exists to produce, always within reach. */
+/** What this screen exists to produce, always within reach. */
 @Composable
 private fun ExportBar(
+    protect: Boolean,
+    enabled: Boolean,
     working: Boolean,
     failed: Boolean,
     onExport: (ReportFormat) -> Unit,
@@ -422,35 +542,91 @@ private fun ExportBar(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            // Protected, the two documents travel as one archive under one
+            // password, so there is one button rather than two.
+            if (protect) {
                 Button(
-                    onClick = { onExport(ReportFormat.PDF) },
-                    enabled = !working,
-                    modifier = Modifier.weight(1f),
+                    onClick = { onExport(ReportFormat.PROTECTED_ZIP) },
+                    enabled = enabled && !working,
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Icon(Icons.Filled.Description, contentDescription = null)
+                    Icon(Icons.Filled.Lock, contentDescription = null)
                     Text(
-                        stringResource(R.string.report_make_pdf),
+                        stringResource(R.string.report_make_protected),
                         modifier = Modifier.padding(start = 8.dp),
                     )
                 }
-                OutlinedButton(
-                    onClick = { onExport(ReportFormat.WORKBOOK) },
-                    enabled = !working,
-                    modifier = Modifier.weight(1f),
+            } else {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Icon(Icons.Filled.TableChart, contentDescription = null)
-                    Text(
-                        stringResource(R.string.report_make_workbook),
-                        modifier = Modifier.padding(start = 8.dp),
-                    )
+                    Button(
+                        onClick = { onExport(ReportFormat.PDF) },
+                        enabled = !working,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Filled.Description, contentDescription = null)
+                        Text(
+                            stringResource(R.string.report_make_pdf),
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = { onExport(ReportFormat.WORKBOOK) },
+                        enabled = !working,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Filled.TableChart, contentDescription = null)
+                        Text(
+                            stringResource(R.string.report_make_workbook),
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+/**
+ * The password, typed by the parent and kept by nobody.
+ *
+ * It can be shown, because a password nobody can read is a password typed
+ * wrongly and then given out wrongly — and this one has to be repeated to
+ * another person to be any use at all.
+ */
+@Composable
+private fun PasswordField(password: String, onChange: (String) -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    val tooShort = password.isNotEmpty() && password.length < MIN_PASSWORD_LENGTH
+    val hint: @Composable (() -> Unit)? = if (tooShort) {
+        { Text(stringResource(R.string.report_password_short, MIN_PASSWORD_LENGTH)) }
+    } else {
+        null
+    }
+    OutlinedTextField(
+        value = password,
+        onValueChange = onChange,
+        label = { Text(stringResource(R.string.report_password)) },
+        singleLine = true,
+        isError = tooShort,
+        supportingText = hint,
+        visualTransformation =
+            if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    if (visible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                    contentDescription = stringResource(
+                        if (visible) R.string.cd_hide_password else R.string.cd_show_password,
+                    ),
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+    )
 }
 
 /**
@@ -486,6 +662,13 @@ private fun RangeSummary(range: ReportRange, context: Context) {
     }
 }
 
+/**
+ * A switch with a label, where the whole row is the switch.
+ *
+ * The row carries the toggle rather than the little control on the right: two
+ * lines of text next to a 32dp target is a row people miss, and a parent doing
+ * this one-handed with a baby on the other arm misses it more.
+ */
 @Composable
 private fun ToggleRow(
     title: String,
@@ -495,7 +678,10 @@ private fun ToggleRow(
 ) {
     Column {
         Row(
-            Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .toggleable(value = checked, onValueChange = onChange, role = Role.Switch)
+                .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -507,7 +693,9 @@ private fun ToggleRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Switch(checked = checked, onCheckedChange = onChange)
+            // Null, because the row above is what handles the tap — a switch
+            // with its own handler here would fire twice.
+            Switch(checked = checked, onCheckedChange = null)
         }
         HorizontalDivider()
     }

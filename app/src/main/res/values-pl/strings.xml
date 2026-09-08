@@ -611,4 +611,16 @@
     <string name="report_nothing_logged">W tym okresie nic nie odnotowano.</string>
     <string name="report_hours_minutes">%1$d h %2$02d</string>
     <string name="report_footer">%1$s · %2$s – %3$s</string>
+
+    <!-- Ochrona wyeksportowanych plików hasłem (BDR-13) -->
+    <string name="report_protect_label">Ochrona</string>
+    <string name="report_protect">Zabezpiecz hasłem</string>
+    <string name="report_protect_hint">Oba pliki w jednym zaszyfrowanym zipie</string>
+    <string name="report_password">Hasło</string>
+    <string name="report_password_short">Co najmniej tyle znaków: %1$d.</string>
+    <string name="report_password_help">Przekaż hasło lekarzowi osobiście albo przez telefon — nie w tej samej wiadomości co plik. Sprout nie przechowuje jego kopii i nie odzyska go za Ciebie.</string>
+    <string name="report_protect_compat">Zaszyfrowane algorytmem AES-256. Otworzy je 7-Zip, WinZip, Keka albo większość menedżerów plików na Androidzie — rozpakowywanie wbudowane w Windowsa i macOS-a sobie z tym nie poradzi.</string>
+    <string name="report_make_protected">Udostępnij zabezpieczony zip</string>
+    <string name="cd_show_password">Pokaż hasło</string>
+    <string name="cd_hide_password">Ukryj hasło</string>
 </resources>

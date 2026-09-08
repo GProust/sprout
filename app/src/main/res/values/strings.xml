@@ -666,4 +666,16 @@
     <string name="report_nothing_logged">Nothing was logged in this period.</string>
     <string name="report_hours_minutes">%1$d h %2$02d</string>
     <string name="report_footer">%1$s · %2$s – %3$s</string>
+
+    <!-- Protecting the exported files with a password (BDR-13) -->
+    <string name="report_protect_label">Protection</string>
+    <string name="report_protect">Protect with a password</string>
+    <string name="report_protect_hint">Both files in one encrypted zip</string>
+    <string name="report_password">Password</string>
+    <string name="report_password_short">At least %1$d characters.</string>
+    <string name="report_password_help">Give the password to the doctor in person or over the phone — not in the same message as the file. Sprout keeps no copy of it and cannot recover it for you.</string>
+    <string name="report_protect_compat">Encrypted with AES-256. It opens with 7-Zip, WinZip, Keka or most Android file managers — the unzip built into Windows and macOS cannot open it.</string>
+    <string name="report_make_protected">Share protected zip</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_hide_password">Hide password</string>
 </resources>

@@ -594,4 +594,16 @@
     <string name="report_nothing_logged">In diesem Zeitraum wurde nichts notiert.</string>
     <string name="report_hours_minutes">%1$d h %2$02d</string>
     <string name="report_footer">%1$s · %2$s – %3$s</string>
+
+    <!-- Die exportierten Dateien mit einem Passwort schützen (BDR-13) -->
+    <string name="report_protect_label">Schutz</string>
+    <string name="report_protect">Mit einem Passwort schützen</string>
+    <string name="report_protect_hint">Beide Dateien in einem verschlüsselten Zip</string>
+    <string name="report_password">Passwort</string>
+    <string name="report_password_short">Mindestens %1$d Zeichen.</string>
+    <string name="report_password_help">Gib das Passwort in der Praxis oder am Telefon weiter — nicht in derselben Nachricht wie die Datei. Sprout behält keine Kopie davon und kann es nicht wiederherstellen.</string>
+    <string name="report_protect_compat">Mit AES-256 verschlüsselt. Es öffnet sich mit 7-Zip, WinZip, Keka oder den meisten Android-Dateimanagern — das in Windows und macOS eingebaute Entpacken kann es nicht öffnen.</string>
+    <string name="report_make_protected">Geschütztes Zip teilen</string>
+    <string name="cd_show_password">Passwort anzeigen</string>
+    <string name="cd_hide_password">Passwort verbergen</string>
 </resources>

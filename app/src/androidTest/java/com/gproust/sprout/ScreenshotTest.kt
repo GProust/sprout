@@ -544,5 +544,11 @@ class ScreenshotTest {
         // date fields appear.
         tap("Custom")
         save("15-report-2-custom")
+        // And with a password on it: both files go out as one encrypted zip,
+        // so the two buttons become one (BDR-13).
+        tap("30 days")
+        tap("Protect with a password")
+        type("clinic-2026")
+        save("15-report-3-protected")
     }
 }

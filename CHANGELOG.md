@@ -25,6 +25,15 @@ All notable changes to Sprout are documented here. This project follows
   a single centile instead of a span if you want one. It applies to that one file
   and is then forgotten: Sprout still never asks your baby's sex, and still
   stores none.
+- 🔐 **Lock the report with a password.** The share screen can now put the PDF
+  and the spreadsheet into a single zip encrypted with **AES-256**, using a
+  password you choose — for when the file is going to sit in a message thread or
+  an inbox rather than being handed over in person. Sprout keeps no copy of the
+  password: give it to the doctor by phone or face to face, not in the same
+  message as the file, and know that nobody can open the file for you if you
+  forget it. The screen says which tools open it before you make it — 7-Zip,
+  WinZip, Keka and most Android file managers do; the unzip built into Windows
+  and macOS does not.
 
 ## [1.9.0] — 2026-09-07
 

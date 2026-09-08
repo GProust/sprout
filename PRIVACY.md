@@ -70,6 +70,13 @@ choose the period it covers.
   hand it to.
 - **The file is not kept.** It waits in the app's private cache until you choose
   where to send it, and the next report you make replaces it.
+- **You can lock it with a password.** Switch on "Protect with a password" and
+  both files go out as a single zip encrypted with AES-256, using a password you
+  type. Sprout keeps no copy of that password — not in your settings, not
+  anywhere — so nobody, us included, can open the file for you if you forget it.
+  Give the password to the doctor in person or by phone rather than in the same
+  message as the file, and bear in mind what it does not cover: once they open
+  it, the decrypted copy is theirs and lives under their own arrangements.
 
 ## Children's data
 
@@ -144,6 +151,15 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-08 (2)
+
+- Added **password protection for the exported files**. Both files can now go
+  out as one zip encrypted with AES-256, under a password you type. The section
+  above says what that protects and what it does not, and that Sprout keeps no
+  copy of the password and cannot recover it. Nothing else changed: the files
+  are still made on your phone, still go nowhere until you choose where, and the
+  app still has no internet permission.
 
 ### 2026-09-08
 

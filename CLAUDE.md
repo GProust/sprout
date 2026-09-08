@@ -113,6 +113,15 @@ undo:
   schema, not prose: a pivot table written against `bottle_ml` has to keep
   working when the phone changes language. The PDF is translated like everything
   else.
+- **The export can be locked with a password, and only with AES-256**
+  ([BDR-13](docs/decisions/0013-protecting-the-file-that-leaves.md)). Legacy
+  ZipCrypto is the one Windows opens by double-click and is broken against
+  known plaintext — which our archive supplies, since a PDF and an `.xlsx` both
+  start with fixed bytes. It is not a fallback and not an option. The password
+  is never stored, and `EncryptedZipTest` checks the key derivation against the
+  RFC 6070 vectors and a whole entry against a vector from an outside
+  implementation; if you touch that file, those are what stop a silent change
+  from producing an archive nobody can open.
 
 ## Asking for support
 
