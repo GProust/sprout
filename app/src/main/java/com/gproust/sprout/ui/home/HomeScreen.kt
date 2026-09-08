@@ -191,6 +191,7 @@ class HomeViewModel(
 fun HomeScreen(
     onNavigate: (String) -> Unit,
     onQuickFeed: (BreastSide) -> Unit,
+    onShareRecord: (Long) -> Unit = {},
 ) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
@@ -269,6 +270,7 @@ fun HomeScreen(
                     now = now,
                     onFeed = { side -> withBaby(single.baby.id) { onQuickFeed(side) } },
                     onNavigate = onNavigate,
+                    onShareRecord = { onShareRecord(single.baby.id) },
                     header = {
                         Text(
                             single.baby.name,

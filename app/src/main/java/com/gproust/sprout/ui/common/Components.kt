@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -70,7 +69,6 @@ import java.time.ZoneOffset
 fun SproutTopBar(
     title: String,
     onBack: (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = { Text(title) },
@@ -84,7 +82,6 @@ fun SproutTopBar(
                 }
             }
         },
-        actions = actions,
     )
 }
 

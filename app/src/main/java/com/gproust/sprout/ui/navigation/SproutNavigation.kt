@@ -311,6 +311,7 @@ private fun MainScaffold(
                 HomeScreen(
                     onNavigate = { route -> navController.navigateToKnown(route) },
                     onQuickFeed = { side -> openNursing(side) },
+                    onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
                 )
             }
             composable(Routes.BABY) {
