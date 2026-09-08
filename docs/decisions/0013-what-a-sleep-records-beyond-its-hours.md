@@ -1,4 +1,4 @@
-# BDR-12. A sleep can record where it happened and how the baby was lying — and Sprout does not grade the answer
+# BDR-13. A sleep can record where it happened and how the baby was lying — and Sprout does not grade the answer
 
 Date: 2026-09-08
 Type: Product / Domain
@@ -96,6 +96,15 @@ window each one holds.
   A replica written before they existed merges as sleeps that record nothing,
   and a phone still on the older schema refuses a newer replica outright, as it
   already did.
+- The workbook a parent hands to a doctor
+  ([BDR-12](0012-a-record-for-the-doctor.md)) carries both fields on its sleep
+  sheet, as keys (`back`, `bedside_cot`) beside a `place_name` column holding
+  the parent's own words — the same shape as `stool_colour`, and for the same
+  reason: a sheet of raw rows that quietly drops a recorded field is a worse
+  record than one that has never heard of it. The PDF is unchanged: it
+  summarises rather than lists, and a "where they slept" table there would be
+  the app volunteering an angle on the position, which is exactly what this
+  record says it will not do.
 - Choosing not to advise is a decision, not an oversight. If Sprout ever does
   carry safe-sleep guidance, it should be a deliberate record of its own — with
   a source, a tone and a place to put it — and not a warning bolted onto a

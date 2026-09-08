@@ -35,6 +35,7 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md) | Automatic exchange over Bluetooth, while the app is open | Accepted |
 | [0011](0011-what-survives-a-new-phone.md) | What survives a new phone | Accepted (exclusion list amended by [ADR-0012](0012-the-widget-diagnostics-screen-comes-out.md)) |
 | [0012](0012-the-widget-diagnostics-screen-comes-out.md) | The widget diagnostics screen comes out | Accepted |
+| [0013](0013-writing-the-pdf-and-the-workbook-by-hand.md) | Writing the PDF and the workbook by hand | Accepted |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive

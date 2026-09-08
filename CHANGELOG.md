@@ -5,6 +5,26 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🩺 **A record you can hand to a doctor.** The share button on your baby's page
+  now makes two files out of what you have already logged: a **PDF report** to
+  print or pass across the desk, and a **spreadsheet** with one sheet for each
+  kind of entry, for whoever wants the rows. Pick the period — the last 7, 30 or
+  90 days, everything since the birth, or two dates of your own — and Sprout
+  totals the feeds, the sleep and the nappies day by day, draws the week's shape
+  as charts, plots weight, length and head circumference against the WHO curves,
+  and lays the treatments out as a timeline over the same dates. It says what was
+  logged and stops there: there is no verdict in it anywhere, and the page says
+  as much.
+- 🔒 **Both files are made on your phone**, and go nowhere until you choose where
+  to send them. Sprout still has no internet permission and still cannot make a
+  network request of its own. Your notes stay out of the file unless you switch
+  them on, and your own check-ins and pumping log are never in it — they are
+  yours, not your baby's.
+- 📏 **The growth curves can be read against one reference.** The report offers
+  the same both / girls / boys choice the Statistics screen has, so a doctor gets
+  a single centile instead of a span if you want one. It applies to that one file
+  and is then forgotten: Sprout still never asks your baby's sex, and still
+  stores none.
 - 😴 **A sleep can say where it happened, and how they were lying.** Logging a
   nap now offers two optional rows of chips — their own bed, the bedside cot,
   your bed, on a parent, at the breast, or somewhere else you name yourself;
@@ -18,7 +38,9 @@ All notable changes to Sprout are documented here. This project follows
   the share. Sleeps you didn't say anything about are the last line rather
   than being left out, so the shares are shares of *all* the sleep on the card.
   Nothing appears until you have recorded something, and Sprout offers no
-  opinion on any of it: it is your record, not a report card.
+  opinion on any of it: it is your record, not a report card. The spreadsheet
+  you can export carries both on its sleep sheet, so nothing you logged is
+  left out of the copy you hand over.
 
 ## [1.9.0] — 2026-09-07
 

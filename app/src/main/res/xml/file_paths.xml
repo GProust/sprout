@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  What the FileProvider is allowed to hand out. Only the one cache directory
-  Sprout stages sync files in — never the database, and never the rest of the
-  app's storage.
+  What the FileProvider is allowed to hand out: the two cache directories Sprout
+  stages outgoing files in — never the database, and never the rest of the app's
+  storage.
+
+  `sync` holds an invitation or a replica on its way to another phone (ADR-0007);
+  `reports` holds the PDF or workbook a parent is sending to a doctor (BDR-12).
+  Both are staging areas that the app empties as it writes the next file: they
+  are couriers, not copies to keep.
 -->
 <paths>
     <cache-path name="sync" path="sync/" />
+    <cache-path name="reports" path="reports/" />
 </paths>

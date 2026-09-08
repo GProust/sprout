@@ -88,15 +88,36 @@ that a change can quietly break:
   and the nappy bars' two colours were picked by running a colour-vision check,
   not by eye — the obvious four-hue palettes all failed it. Re-run the check
   before changing one.
-
 - **A sleep can also say where it happened and how the baby was lying**
-  ([BDR-0012](docs/decisions/0012-what-a-sleep-records-beyond-its-hours.md)).
+  ([BDR-0013](docs/decisions/0013-what-a-sleep-records-beyond-its-hours.md)).
   Both are optional, "not recorded" is a line in the breakdown rather than a
   sleep quietly dropped from it, and the position is reported without comment —
   no warning, no colour-coding, no ordering that grades it.
 
-Exporting a report (PDF) and the raw data as a workbook build on these same
-per-day figures, and are deliberately still to come.
+## The record you hand to a doctor
+
+Shipped, on top of those same per-day figures: a **PDF report** and an **`.xlsx`
+workbook**, made over a range the parent picks, from the share action on the
+baby's own page. The **why** is in
+[BDR-12](docs/decisions/0012-a-record-for-the-doctor.md) (what it says, and what
+it refuses to say) and [ADR-0013](docs/adr/0013-writing-the-pdf-and-the-workbook-by-hand.md)
+(both formats written by hand, no dependency). Four things a change can quietly
+undo:
+
+- **The document interprets nothing.** No threshold, no flag, no colour meaning
+  "low", no sentence that reads as an assessment. A screen that over-reads a
+  centile is a bad moment; a printed page that does gets photocopied.
+- **The WHO reference choice is never stored.** The export offers both / girls /
+  boys and forgets it immediately — the other switches persist, this one resets.
+  Remembering it would be keeping a baby's sex on the device by the back door,
+  which is the field BDR-0008 decided not to have.
+- **`ReportContent` is assembled once and rendered twice.** The PDF and the
+  workbook are two renderings of one object, so the document and the spreadsheet
+  cannot disagree. Add a figure there, not in a renderer.
+- **The workbook's column names are English and stay English.** They are a data
+  schema, not prose: a pivot table written against `bottle_ml` has to keep
+  working when the phone changes language. The PDF is translated like everything
+  else.
 
 ## Asking for support
 

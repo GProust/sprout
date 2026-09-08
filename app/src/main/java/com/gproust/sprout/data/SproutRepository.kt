@@ -320,6 +320,28 @@ class SproutRepository(
     /** All active treatments (across babies) that want reminders — for (re)scheduling alarms. */
     suspend fun treatmentsWithReminders(): List<TreatmentEntity> = db.treatmentDao().activeWithReminders()
 
+    // Reading one named baby's whole log, for a report (BDR-0012)
+    //
+    // The screens above always follow the *active* baby, which is right for
+    // logging and wrong for exporting: a report says whose record it is on its
+    // front page, and the baby it names is the one whose page it was started
+    // from. These read that baby by id instead, once, rather than observing.
+
+    suspend fun feedingsForBabyOnce(babyId: Long): List<FeedingEntity> =
+        db.feedingDao().observeForBaby(babyId).first()
+
+    suspend fun sleepsForBabyOnce(babyId: Long): List<SleepEntity> =
+        db.sleepDao().observeForBaby(babyId).first()
+
+    suspend fun diapersForBabyOnce(babyId: Long): List<DiaperEntity> =
+        db.diaperDao().observeForBaby(babyId).first()
+
+    suspend fun growthForBabyOnce(babyId: Long): List<GrowthEntity> =
+        db.growthDao().observeForBaby(babyId).first()
+
+    suspend fun treatmentsForBabyOnce(babyId: Long): List<TreatmentEntity> =
+        db.treatmentDao().observeForBaby(babyId).first()
+
     // Pumping (expressed milk — the parent's stash, not a baby's log)
     val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()
     suspend fun addPumping(entity: PumpingEntity) = db.pumpingDao().insert(entity.stamped())

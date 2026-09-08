@@ -126,9 +126,10 @@
         </activity>
 
         <!--
-          Hands a staged sync file to the share sheet. Scoped to one cache
-          directory (@xml/file_paths) and not exported, so the URI is only ever
-          readable by the app the user picked, for as long as the grant lasts.
+          Hands a staged file to the share sheet — a sync invitation or replica,
+          or a report for a doctor. Scoped to the two cache directories in
+          @xml/file_paths and not exported, so the URI is only ever readable by
+          the app the user picked, for as long as the grant lasts.
         -->
         <provider
             android:name="androidx.core.content.FileProvider"

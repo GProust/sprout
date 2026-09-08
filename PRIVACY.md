@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-09-06 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-08 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -42,6 +42,34 @@ claiming to be the same one.
 own secure hardware, so the copy in a backup cannot be opened anywhere else.
 A new phone therefore starts unpaired: to share again, ask a phone that is
 already in your household for a fresh invitation.
+
+## Sharing a record with a doctor
+
+Sprout can turn what you have logged over a stretch of days into two files: a
+**PDF report** to hand over or print, and a **spreadsheet** with one sheet per
+kind of entry. You start it from the share button on your baby's page, and you
+choose the period it covers.
+
+- **The files are made on your phone.** Sprout has no internet permission and
+  cannot send them anywhere. It writes the file and hands it to Android's share
+  sheet — the same one every app uses — and *you* choose where it goes.
+- **What is in them** is your baby's record: feeding, sleep, nappies, growth
+  measurements and the treatments you set up, over the period you picked. The
+  free text you type on entries (the "notes") is **left out unless you switch it
+  on**.
+- **Your own check-ins and your pumping log are never included.** They belong to
+  you rather than to your baby, and a report for a paediatric appointment is not
+  where they go.
+- **Sprout still never asks your baby's sex.** Growth centiles are printed
+  against both WHO references as a span. You can choose to read them against one
+  reference instead, and that choice is used for that one file and then
+  forgotten — it is not saved, not synced, and not remembered the next time.
+- **Once you send it, it is out of our hands.** The moment the file reaches a
+  messaging app, a mail client or a cloud drive, it lives under *that* service's
+  policy, not this one. A health record is worth a thought about which app you
+  hand it to.
+- **The file is not kept.** It waits in the app's private cache until you choose
+  where to send it, and the next report you make replaces it.
 
 ## Children's data
 
@@ -116,6 +144,20 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-08
+
+- Added the section on **sharing a record with a doctor**. Sprout can now make a
+  PDF report and a spreadsheet from what you have logged, over a period you
+  choose. Both files are written on your phone and go nowhere until you pick
+  where to send them — the app still has no internet permission and still makes
+  no network request of its own. The section says what is in the files, that
+  your notes are left out unless you switch them on, that your own check-ins and
+  pumping log are never included, and that once you send a file it lives under
+  the policy of whichever app you sent it with.
+- Restated, because a printed page travels further than a screen: choosing to
+  read the growth curves against one WHO reference is used for that one file and
+  then forgotten. Sprout still never asks your baby's sex and still stores none.
 
 ### 2026-09-06
 

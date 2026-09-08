@@ -63,6 +63,7 @@ import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
+import com.gproust.sprout.ui.report.ReportScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
@@ -561,5 +562,15 @@ class ScreenshotTest {
         // still running (back on the left), so the widget shows the ongoing
         // side with its ticking chronometer.
         saveWidget("14-widget-nursing")
+
+        // Sharing a record with a doctor (BDR-12). Léa is three weeks old, so
+        // the 30-day preset shows the clamp doing its work: the summary reads
+        // the range that will actually be covered, not the one asked for.
+        show { ReportScreen(babyId = leaId, onBack = {}) }
+        save("15-report")
+        // The same screen with a custom range picked, which is where the two
+        // date fields appear.
+        tap("Custom")
+        save("15-report-2-custom")
     }
 }
