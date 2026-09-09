@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🛡️ **A file that isn't a Sprout file can no longer close the app.** Sprout
+  offers itself for almost any file you tap, because an invitation arriving
+  through a messaging app carries nothing else to recognise it by — so a
+  deliberately malformed file could be handed to it by any app on the phone, and
+  one particular shape of nonsense would stop Sprout instead of being refused.
+  It now checks that a file is a plausible size and shape before reading it, and
+  says it is not a Sprout file, which is all it ever was.
+
 ## [1.10.1] — 2026-09-08
 
 - 🩺 **The doctor's record is reachable again if you track one baby.** The share

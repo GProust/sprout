@@ -116,6 +116,20 @@ android {
     }
 }
 
+// CI is the only place these tests ever run (ADR-0006), so a failure has to be
+// diagnosable from the log alone: Gradle's default prints the exception's class
+// and line and stops, which for an assertEquals means the failing test names
+// itself and takes what it actually saw with it. There is no rerunning it
+// locally to find out.
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showCauses = true
+        showStackTraces = true
+    }
+}
+
 // Where Room writes the exported schema JSON (see `exportSchema` on
 // SproutDatabase). These are committed, so a schema change is visible in review
 // rather than only at runtime on a user's device.

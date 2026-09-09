@@ -61,8 +61,13 @@ object SyncInvitationCodec {
      * @throws SyncInvitationException.Expired if it is past its window.
      */
     fun decode(bytes: ByteArray, now: Long): SyncInvitation {
+        val text = String(bytes, Charsets.UTF_8)
+        // Before parsing, not around it: nesting deep enough to exhaust the
+        // stack raises an Error, which the catch below would not hold (see
+        // SyncLimits.MAX_JSON_DEPTH). An invitation is three levels deep.
+        if (SyncLimits.exceedsMaxJsonDepth(text)) throw SyncInvitationException.Unreadable()
         val root = try {
-            JSONObject(String(bytes, Charsets.UTF_8))
+            JSONObject(text)
         } catch (e: Exception) {
             throw SyncInvitationException.Unreadable()
         }
