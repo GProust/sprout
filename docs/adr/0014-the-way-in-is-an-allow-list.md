@@ -78,11 +78,14 @@ cross it.**
   Widening the surface stays allowed; it just cannot happen quietly, because the
   test fails and the diff has to say so.
 - The *merged* manifest is pinned exactly too, to the permission. That is the
-  list a user is actually shown: Android displays what the installed package
-  requests, so a permission a library drags in sits on that screen beside the
-  five we chose and is indistinguishable there. An app whose privacy claim is
-  "check the list yourself" has to know the whole list, or the claim covers only
-  the half we wrote.
+  list an audit of Sprout reads. Not at install — Android stopped showing a
+  permission screen there in 6.0, and Settings lists only the runtime groups —
+  but on the Play listing under *App permissions*, where `ACCESS_NETWORK_STATE`
+  reads "view network connections" beside the five we chose, and in every tool
+  that inspects an APK. What those show is what the *package* requests, not what
+  our manifest file says. `PRIVACY.md` invites a reader to check the claim for
+  themselves; this is the list they land on, and an app that issues that
+  invitation has to know the whole of it.
 
   **That pin is expected to fail on a dependency bump, and that is the point.**
   A library that starts asking for something new announces it in one line of a

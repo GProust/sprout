@@ -55,12 +55,14 @@ class AttackSurfaceTest {
      * And what the *build* ends up asking for, dependencies included — pinned
      * exactly, to the permission.
      *
-     * This is the list a user actually sees. Android shows them what the
-     * installed package requests, not what our manifest file says, so a
-     * permission a library drags in is on the screen beside the five we chose
-     * and is indistinguishable there. An app whose privacy claim is "check the
-     * permission list yourself" has to know that list precisely, or the claim is
-     * only about the half of it we wrote.
+     * This is the list anyone auditing Sprout reads. Not at install — Android
+     * stopped showing a permission screen there in 6.0, and Settings lists only
+     * the runtime groups — but on the Play listing under *App permissions*,
+     * where `ACCESS_NETWORK_STATE` reads "view network connections" beside the
+     * five we chose, and in every tool that inspects an APK. What those show is
+     * what the *package* requests, not what our manifest file says. An app whose
+     * privacy claim is "check it yourself" has to know that whole list, or the
+     * claim covers only the half we wrote.
      *
      * **This test is meant to fail on a dependency bump.** That is not noise, it
      * is the notification: a library that starts asking for something new gets
@@ -73,7 +75,8 @@ class AttackSurfaceTest {
     fun `the whole build asks for exactly these permissions and no others`() {
         assertEquals(
             "the permissions the installed app requests have changed. This is " +
-                "the list a user is shown, so it is not updated on autopilot: " +
+                "the list an audit of Sprout reads, so it is not updated on " +
+                "autopilot: " +
                 "see what appeared or vanished, decide whether Sprout can live " +
                 "with it, then record it here with the reason (ADR-0014)",
             SPROUT_PERMISSIONS + INHERITED_PERMISSIONS + dynamicReceiverPermission(),

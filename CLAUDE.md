@@ -34,9 +34,10 @@ surface down; two tests hold it.
   one line in the pinned list, in the same commit. A door nobody meant to open
   fails CI instead.
 - **The merged permission pin is meant to fail on a dependency bump.** That is
-  the notification, not the noise — it is the list Android shows a user at
-  install time, and a library that starts asking for something new says so
-  nowhere else. Read what appeared, decide, and record it with a reason; do not
+  the notification, not the noise — it is the list an audit reads (the Play
+  listing's *App permissions*, and any tool that inspects the APK; not the
+  install screen, which Android dropped in 6.0), and a library that starts
+  asking for something new says so nowhere else. Read what appeared, decide, and record it with a reason; do not
   edit the list until the build is green. Beneath it a refusal list (INTERNET,
   location, shared storage, …) fails even if someone does, and
   `SupportLinksTest` guards INTERNET a third time.
