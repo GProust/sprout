@@ -1,5 +1,5 @@
 [versions]
-agp = "9.3.2"
+agp = "9.4.0"
 # Compose compiler plugin must match the Kotlin compiler AGP's built-in Kotlin bundles
 # (see kotlin-gradle-plugin in AGP's POM when bumping agp).
 kotlin = "2.2.10"
