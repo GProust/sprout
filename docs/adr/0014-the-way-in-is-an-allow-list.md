@@ -77,13 +77,25 @@ cross it.**
   permissions the manifest Sprout writes declares. Those lists are exact.
   Widening the surface stays allowed; it just cannot happen quietly, because the
   test fails and the diff has to say so.
-- The *merged* manifest is checked differently, and deliberately so. It carries
-  whatever every AndroidX artifact declares, so an exact list there fails on a
-  routine version bump while saying nothing about Sprout. What it is asked
-  instead is the pair of questions that would cost something: that Sprout's five
-  permissions survive the merge, and that nothing anywhere in the build asks for
-  one of the permissions the app tells its users it does not have — a socket of
-  any kind, where the phone is, shared storage, a foreground service.
+- The *merged* manifest is pinned exactly too, to the permission. That is the
+  list a user is actually shown: Android displays what the installed package
+  requests, so a permission a library drags in sits on that screen beside the
+  five we chose and is indistinguishable there. An app whose privacy claim is
+  "check the list yourself" has to know the whole list, or the claim covers only
+  the half we wrote.
+
+  **That pin is expected to fail on a dependency bump, and that is the point.**
+  A library that starts asking for something new announces it in one line of a
+  Dependabot diff and nowhere else. The failure is the announcement. What it
+  asks for is a decision — live with it and record it with a reason, or stop the
+  dependency bringing it in — not a list edited until the build goes green.
+- Underneath both pins sits a refusal list that no edit to a pin can satisfy:
+  a socket of any kind, where the phone is, shared storage, the sensors and
+  personal stores an offline tracker has no business reading. A pin can be made
+  to pass by adding a line to it, which is what someone in a hurry does to a red
+  build; this cannot. `INTERNET` is guarded three times over — here, by the pin,
+  and by `SupportLinksTest` for its own reasons — which is not too many for the
+  single claim the whole app rests on.
 - `UntrustedInputFuzzTest` asserts the property the hand-picked negative tests
   could only sample: **over thousands of mutations of a valid file, every parser
   either reads it or throws the exception it documents.** Anything else — an
@@ -140,15 +152,20 @@ no new infrastructure.
 - **A legitimate new door costs a line and a sentence.** Adding a receiver or a
   permission means editing the pinned list in the same commit, which is the
   whole mechanism: the list is where "should this be exported?" gets asked.
-- Third-party declarations are outside the exact pin, in both senses. Compose's
-  debug tooling contributes an exported preview activity, the profile installer
-  an exported receiver, and the merged manifest carries permissions no Sprout
-  file mentions — the first version of this test pinned that merged list and
-  failed on exactly that. Pinning a dependency's declarations turns every
-  routine bump into a failing build while saying nothing about Sprout's own
-  doors, so the components pin is scoped to this package and the permission pin
-  reads Sprout's own manifest file. The refusal list above is what still covers
-  the merged result, and the pull-request checklist asks the rest.
+- Third-party *components* are outside the exact pin; third-party
+  *permissions* are not. The asymmetry is deliberate, and it is about what a
+  user can see. Compose's debug tooling contributes an exported preview activity
+  and the profile installer an exported receiver — neither reaches a release
+  build's user, and pinning them would turn every routine bump into a failing
+  build over something nobody is shown. A permission is the opposite: it appears
+  on the install screen with no note saying which library asked for it. So the
+  components pin is scoped to this package, and the permissions are pinned
+  twice — once as Sprout's own manifest file, once as the whole merged result —
+  because the second list is the one a user reads.
+- **A weekly dependency bump can now turn CI red over a manifest we did not
+  write.** That is the accepted cost, and the failure message says what to do
+  rather than just showing a diff. The alternative was finding out from a user
+  who read the install screen more carefully than we did.
 - Sprout will now refuse a file that is implausibly large or implausibly nested,
   instead of being closed by one. No file it has ever written comes close to
   either ceiling — a replica is four levels deep and a few hundred kilobytes.

@@ -29,11 +29,17 @@ surface down; two tests hold it.
 
 - **`AttackSurfaceTest` pins exact lists** — Sprout's own components and which
   are exported, the FileProvider's terms, every path in `@xml/file_paths`, and
-  the permissions Sprout's *own* manifest declares. A legitimate new door is
-  fine and costs one line in the pinned list, in the same commit. A door nobody
-  meant to open fails CI instead. The merged manifest is checked against a
-  refusal list rather than pinned, because it carries every dependency's
-  declarations and would otherwise break on a routine bump.
+  the permissions, *twice*: once as Sprout's own manifest declares them, once as
+  the whole merged build requests them. A legitimate new door is fine and costs
+  one line in the pinned list, in the same commit. A door nobody meant to open
+  fails CI instead.
+- **The merged permission pin is meant to fail on a dependency bump.** That is
+  the notification, not the noise — it is the list Android shows a user at
+  install time, and a library that starts asking for something new says so
+  nowhere else. Read what appeared, decide, and record it with a reason; do not
+  edit the list until the build is green. Beneath it a refusal list (INTERNET,
+  location, shared storage, …) fails even if someone does, and
+  `SupportLinksTest` guards INTERNET a third time.
 - **`UntrustedInputFuzzTest` asserts a property, not examples**: over thousands
   of mutations, every parser either reads the bytes or throws the exception it
   documents. Never an `OutOfMemoryError`, an index out of bounds, or a

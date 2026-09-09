@@ -52,33 +52,56 @@ class AttackSurfaceTest {
     }
 
     /**
-     * And what the *build* ends up asking for, dependencies included.
+     * And what the *build* ends up asking for, dependencies included — pinned
+     * exactly, to the permission.
      *
-     * Not pinned exactly. The merged manifest carries whatever every AndroidX
-     * artifact declares, so an exact list there fails on a routine version bump
-     * while saying nothing about Sprout — the same reason the component pin is
-     * scoped to this package. What is worth asserting is the part that would
-     * actually cost something: that Sprout's five survive the merge, and that
-     * nothing anywhere in the build quietly asks for a permission the app's
-     * privacy claim says it does not have.
+     * This is the list a user actually sees. Android shows them what the
+     * installed package requests, not what our manifest file says, so a
+     * permission a library drags in is on the screen beside the five we chose
+     * and is indistinguishable there. An app whose privacy claim is "check the
+     * permission list yourself" has to know that list precisely, or the claim is
+     * only about the half of it we wrote.
      *
-     * `INTERNET` is the one that matters most and is asserted on its own in
-     * `SupportLinksTest`. It is here too, because this is the list a reader
-     * checks, and leaving the important one off it would be strange.
+     * **This test is meant to fail on a dependency bump.** That is not noise, it
+     * is the notification: a library that starts asking for something new gets
+     * one line in a Dependabot diff and no other announcement. When it fails,
+     * read what appeared, decide whether Sprout can live with it, and either
+     * pin it into [INHERITED_PERMISSIONS] with a reason or stop the dependency
+     * bringing it in. The list is where that decision gets recorded.
+     */
+    @Test
+    fun `the whole build asks for exactly these permissions and no others`() {
+        assertEquals(
+            "the permissions the installed app requests have changed. This is " +
+                "the list a user is shown, so it is not updated on autopilot: " +
+                "see what appeared or vanished, decide whether Sprout can live " +
+                "with it, then record it here with the reason (ADR-0014)",
+            SPROUT_PERMISSIONS + INHERITED_PERMISSIONS,
+            requestedPermissions(),
+        )
+    }
+
+    /**
+     * And the ones that can never be on that list, whatever it says.
+     *
+     * Redundant with the pin above on the day it is written, and deliberately
+     * so: the pin can be made to pass by adding a line to it, which is exactly
+     * what someone in a hurry does to a red build. This cannot. `INTERNET`
+     * appearing here fails whether or not the pin was updated to expect it, and
+     * says why rather than just showing a diff.
+     *
+     * Three layers guard that one permission, then: this, the pin above, and
+     * `SupportLinksTest`, which asserts its absence for its own reasons. That is
+     * not too many for the single claim the whole app rests on — no socket, ever
+     * ([ADR-0002](docs/adr/0002-local-first-on-device-storage.md), BDR-11).
      */
     @Test
     fun `nothing in the build asks for a permission Sprout refuses`() {
-        val requested = requestedPermissions()
-
-        assertTrue(
-            "Sprout's own permissions must survive the manifest merge",
-            requested.containsAll(SPROUT_PERMISSIONS),
-        )
         assertEquals(
             "a dependency, or a new line in the manifest, asks for something " +
                 "Sprout tells its users it never asks for (PRIVACY.md, ADR-0014)",
             emptySet<String>(),
-            requested.intersect(REFUSED_PERMISSIONS),
+            requestedPermissions().intersect(REFUSED_PERMISSIONS),
         )
     }
 
