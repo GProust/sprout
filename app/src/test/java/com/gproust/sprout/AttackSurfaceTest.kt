@@ -76,7 +76,7 @@ class AttackSurfaceTest {
                 "the list a user is shown, so it is not updated on autopilot: " +
                 "see what appeared or vanished, decide whether Sprout can live " +
                 "with it, then record it here with the reason (ADR-0014)",
-            SPROUT_PERMISSIONS + INHERITED_PERMISSIONS,
+            SPROUT_PERMISSIONS + INHERITED_PERMISSIONS + dynamicReceiverPermission(),
             requestedPermissions(),
         )
     }
@@ -240,6 +240,10 @@ class AttackSurfaceTest {
         return names
     }
 
+    /** AndroidX Core's signature-level self-guard, under this build's id. */
+    private fun dynamicReceiverPermission(): String =
+        "$packageName.$DYNAMIC_RECEIVER_PERMISSION"
+
     private fun requestedPermissions(): Set<String> {
         @Suppress("DEPRECATION")
         val info = context.packageManager.getPackageInfo(
@@ -325,24 +329,50 @@ class AttackSurfaceTest {
         /**
          * Permissions the merged manifest has that Sprout never asked for.
          *
-         * Found by this test rather than known in advance: the first version
-         * refused both, and CI said otherwise. They arrive from a dependency's
-         * manifest — the pair is the signature of WorkManager, which the widget
-         * library pulls in — and neither appears anywhere in Sprout's own.
+         * Found by this test rather than known in advance, and twice over: the
+         * first version refused two of them and CI named those, then the exact
+         * pin below named the third. All three are the signature of WorkManager,
+         * which the widget library pulls in, and none appears anywhere in
+         * Sprout's own manifest.
          *
-         * Neither grants a socket: `INTERNET` is what does that, and it is
-         * absent, asserted here and in `SupportLinksTest`.
-         * `ACCESS_NETWORK_STATE` reads whether there is a connection;
-         * `FOREGROUND_SERVICE` permits one to be started, and Sprout starts
-         * none — the bounded discovery window in ADR-0010 exists precisely so
-         * that it does not have to. Recorded rather than removed, because
-         * stripping a permission a library declares changes what that library
-         * may do at runtime, and CI cannot prove the widget survives it.
+         * None grants a socket: `INTERNET` is what does that, and it is absent,
+         * asserted here and in `SupportLinksTest`. `ACCESS_NETWORK_STATE` reads
+         * whether there is a connection. `WAKE_LOCK` holds the CPU awake while a
+         * job runs, and Sprout queues no jobs — its reminders are `AlarmManager`
+         * alarms. `FOREGROUND_SERVICE` permits one to be started, and Sprout
+         * starts none: the bounded discovery window in ADR-0010 exists precisely
+         * so that it does not have to.
+         *
+         * All three are dormant, in other words — the machinery that would use
+         * them is present in the build and never asked to do anything. Recorded
+         * rather than removed, because stripping a permission a library declares
+         * changes what that library may do at runtime, and CI cannot prove the
+         * widget survives it.
          */
         val INHERITED_PERMISSIONS = setOf(
             "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.WAKE_LOCK",
             "android.permission.FOREGROUND_SERVICE",
         )
+
+        /**
+         * The one permission in the list that is Sprout's own name, and the one
+         * that makes the app *safer* rather than reaching further.
+         *
+         * AndroidX Core declares `${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`
+         * at `signature` level and then asks for it. It is how
+         * `ContextCompat.registerReceiver` keeps a runtime receiver marked
+         * not-exported genuinely unreachable on API levels that had no flag for
+         * it: the receiver is guarded by a permission only a build signed with
+         * Sprout's key can hold. It grants nothing outside the app and cannot be
+         * granted to anything else.
+         *
+         * Held apart from [INHERITED_PERMISSIONS] because it is not a platform
+         * permission and its name is built from the application id — spelling it
+         * out would make this test pass for the wrong reason if that id ever
+         * changed.
+         */
+        const val DYNAMIC_RECEIVER_PERMISSION = "DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
 
         /**
          * Permissions whose presence would contradict something Sprout says.
