@@ -1,4 +1,8 @@
 import SproutData
+// `EncryptedZip` is SproutKit's — it is bytes in, bytes out, with no database in
+// it, so it lives on the side of the split that has an opposite number on
+// Android.
+import SproutKit
 import SwiftUI
 
 /// Which file the parent asked for.
