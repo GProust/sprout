@@ -32,6 +32,16 @@ enum SproutColor {
     static let onSurfaceVariant = Color(light: 0x5C645E, dark: 0xA8B0AA)
     static let outline = Color(light: 0xA5ADA7, dark: 0x707872)
 
+    /// The "nothing here" ground: the empty column in a bar chart, the unfilled
+    /// part of a share bar.
+    ///
+    /// Android inherits Material 3's baseline `surfaceVariant`, which is a purple
+    /// grey and would sit badly against this palette's green tint. iOS has no
+    /// baseline to inherit (ADR-0015), so it is derived here instead — one step
+    /// in from the background towards the outline, in both appearances.
+    static let surfaceVariant = Color(light: 0xE3E9E5, dark: 0x2E3630)
+    static let outlineVariant = Color(light: 0xD3DAD6, dark: 0x3C443E)
+
     /// Destructive actions only. Never used to grade a logged value — nothing a
     /// parent records is wrong (BDR-0014).
     static let danger = Color(light: 0xB3261E, dark: 0xF2B8B5)
