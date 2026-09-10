@@ -61,6 +61,8 @@ struct RootView: View {
                 .tabItem { Label(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") }
             NavigationStack { DiaperScreen() }
                 .tabItem { Label(Str.t("nav_diaper"), systemImage: "figure.child") }
+            NavigationStack { GrowthScreen() }
+                .tabItem { Label(Str.t("nav_growth"), systemImage: "ruler") }
         }
         .tint(SproutColor.primary)
     }

@@ -32,6 +32,7 @@ final class ScreenshotTests: XCTestCase {
 
         try capture(app, tab: "nav_sleep_tab", named: "01-sleep", language: language)
         try capture(app, tab: "nav_diaper_tab", named: "02-diaper", language: language)
+        try capture(app, tab: "nav_growth_tab", named: "03-growth", language: language)
     }
 
     /// Selects a tab, waits for it to settle, and files the image.
@@ -68,6 +69,7 @@ final class ScreenshotTests: XCTestCase {
         switch identifier {
         case "nav_sleep_tab": return 0
         case "nav_diaper_tab": return 1
+        case "nav_growth_tab": return 2
         default: return 0
         }
     }
