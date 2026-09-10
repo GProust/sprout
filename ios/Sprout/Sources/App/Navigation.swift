@@ -56,8 +56,20 @@ enum Tab: Hashable, CaseIterable {
 /// screen opened from Home stays on Home's stack, and switching to Trends and
 /// back finds it where it was left.
 struct RootView: View {
+    /// What to show right after launch (`ui/startup/StartupViewModel.kt`).
+    ///
+    /// Only the first run stops on anything. The daily check-in waits on the
+    /// dashboard rather than gating the app, so opening Sprout mid-feed always
+    /// lands straight on the main screen (BDR-0006).
+    private enum Startup: Equatable {
+        case loading
+        case onboarding
+        case main
+    }
+
     @Environment(\.sprout) private var sprout
     @State private var model: HomeViewModel?
+    @State private var startup: Startup = .loading
     @State private var selection: Tab = .home
     @State private var homePath: [LogDestination] = []
     @State private var babyPath: [LogDestination] = []
@@ -65,7 +77,35 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if let model { tabs(model) } else { Color.clear }
+            switch startup {
+            case .onboarding:
+                OnboardingScreen { answers in
+                    // The observation below carries the app forward; there is no
+                    // navigation to perform, because the profile appearing *is*
+                    // the app no longer being on its first run.
+                    //
+                    // A throw here leaves the parent on the last step with the
+                    // button still live, which is the right affordance: the only
+                    // way these two writes fail is a database that is already
+                    // broken, and `SproutApp` says so at launch when it is.
+                    // Tapping again is a retry.
+                    try? completeOnboarding(answers, into: sprout.repository)
+                }
+            case .main:
+                if let model { tabs(model) } else { Color.clear }
+            case .loading:
+                // Not a spinner: the profile read takes a frame or two, and a
+                // spinner that flashes is worse than a beat of the background.
+                Color.clear.sproutStyle()
+            }
+        }
+        // The gate. Android asks the same question of the same flow, and the
+        // answer is the same: a phone with no parent profile has never been set
+        // up, whatever else is in the database.
+        .task {
+            await observe(sprout.repository.parentProfile) { profile in
+                startup = profile == nil ? .onboarding : .main
+            }
         }
         .task {
             let model = model ?? HomeViewModel(repository: sprout.repository)

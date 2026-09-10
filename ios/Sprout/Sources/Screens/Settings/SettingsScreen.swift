@@ -154,6 +154,13 @@ struct SettingsScreen: View {
                         .foregroundStyle(SproutColor.onSurfaceVariant)
                 }
             }
+            // `children: .combine` before the identifier, and that order is the
+            // whole fix: a `NavigationLink` whose label is two `Text`s becomes
+            // two elements in the accessibility tree, and the identifier lands
+            // on neither — the screenshot run looked for it for ten seconds and
+            // did not find it. Combining makes the row one element for the
+            // identifier to attach to, and reads better to VoiceOver besides.
+            .accessibilityElement(children: .combine)
             .accessibilityIdentifier("settings-sync")
         }
     }

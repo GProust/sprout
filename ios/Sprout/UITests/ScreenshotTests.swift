@@ -77,9 +77,55 @@ final class ScreenshotTests: XCTestCase {
         // `Form` is a cell on some iOS versions and a button on others, and
         // which one it is today is not something worth pinning a run to.
         let sync = app.descendants(matching: .any).matching(identifier: "settings-sync").firstMatch
-        XCTAssertTrue(sync.waitForExistence(timeout: 10), "no sharing row in settings")
+        XCTAssertTrue(
+            sync.waitForExistence(timeout: 10),
+            // With the shape of the screen, so a failure says what to query for
+            // next rather than only that the query was wrong.
+            """
+            no sharing row in settings —             cells: \(app.cells.count), buttons: \(app.buttons.count),             staticTexts: \(app.staticTexts.count)
+            """
+        )
         sync.tap()
         try file(app, named: "13-sync", language: language)
+    }
+
+    /// The first run, which no seeded capture can reach.
+    ///
+    /// Seeding a profile is exactly what makes onboarding not appear, so this is
+    /// a second launch with nothing in the database — the only way to photograph
+    /// the four screens every parent actually starts on.
+    func testCaptureFirstRun() throws {
+        let language = ProcessInfo.processInfo.environment["SPROUT_LANGUAGE"] ?? "en"
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-sprout-screenshots-empty",
+            "-AppleLanguages", "(\(language))",
+            "-AppleLocale", language,
+        ]
+        app.launch()
+
+        let start = app.buttons["onboarding-start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 60), "the app did not open on onboarding")
+        try file(app, named: "00-onboarding-1-welcome", language: language)
+
+        // Through the three steps that ask something. Each is filed before it is
+        // answered, so the captures show what a parent is asked rather than what
+        // this test typed.
+        start.tap()
+        try file(app, named: "00-onboarding-2-about-you", language: language)
+
+        // The name is the one required answer, so it has to be given before
+        // *Next* will move.
+        let fields = app.textFields
+        if fields.firstMatch.waitForExistence(timeout: 5) {
+            fields.firstMatch.tap()
+            fields.firstMatch.typeText("Alex")
+        }
+        app.buttons["onboarding-next"].firstMatch.tap()
+        try file(app, named: "00-onboarding-3-baby", language: language)
+
+        app.buttons["onboarding-next"].firstMatch.tap()
+        try file(app, named: "00-onboarding-4-care", language: language)
     }
 
     /// The grid's tiles, in the order they are drawn. Every one of them is a

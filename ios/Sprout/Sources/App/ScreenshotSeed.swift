@@ -17,6 +17,12 @@ enum ScreenshotSeed {
 
     static let launchArgument = "-sprout-screenshots"
 
+    /// The same fixed app, with **nothing seeded**, so the first-run flow can be
+    /// captured too. Onboarding is the one screen every parent sees and no
+    /// seeded run ever reaches, because seeding is exactly what makes it not
+    /// appear.
+    static let emptyLaunchArgument = "-sprout-screenshots-empty"
+
     /// Fixed, so the captures are reproducible.
     ///
     /// Every screenshot in every language has to show the same numbers, or the
@@ -28,14 +34,20 @@ enum ScreenshotSeed {
     static let now: Int64 = 1_781_534_400_000
 
     static var isRequested: Bool {
-        ProcessInfo.processInfo.arguments.contains(launchArgument)
+        let arguments = ProcessInfo.processInfo.arguments
+        return arguments.contains(launchArgument) || arguments.contains(emptyLaunchArgument)
     }
 
-    /// An in-memory app with a plausible couple of days already logged.
+    private static var isEmptyRequested: Bool {
+        ProcessInfo.processInfo.arguments.contains(emptyLaunchArgument)
+    }
+
+    /// An in-memory app with a plausible couple of days already logged — or with
+    /// nothing at all, for the first-run capture.
     static func environment() throws -> AppEnvironment {
         Clock.now = { now }
         let environment = try AppEnvironment.inMemory()
-        try seed(environment.repository)
+        if !isEmptyRequested { try seed(environment.repository) }
         return environment
     }
 
