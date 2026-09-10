@@ -353,14 +353,29 @@ public enum EncryptedZip {
         return field
     }()
 
+    /// MS-DOS date and time, as the zip format stores them.
+    ///
+    /// Spelled out one named `Int` at a time rather than as two expressions.
+    /// `(parts.hour ?? 0) << 11 | …` inside a `UInt16(_:)` is a chain of
+    /// defaulted optionals, shifts, ors and an integer conversion, and Swift's
+    /// type checker gives up on it — "unable to type-check this expression in
+    /// reasonable time", which is a compile error and not a warning.
     private static func dosDateTime(_ at: Date) -> (time: UInt16, date: UInt16) {
         let parts = Calendar(identifier: .gregorian).dateComponents(
             [.year, .month, .day, .hour, .minute, .second], from: at
         )
-        let time = UInt16((parts.hour ?? 0) << 11 | (parts.minute ?? 0) << 5 | (parts.second ?? 0) / 2)
-        let year = max((parts.year ?? 1980) - 1980, 0)
-        let date = UInt16(year << 9 | (parts.month ?? 1) << 5 | (parts.day ?? 1))
-        return (time, date)
+        let hour: Int = parts.hour ?? 0
+        let minute: Int = parts.minute ?? 0
+        let second: Int = parts.second ?? 0
+        let year: Int = max((parts.year ?? 1980) - 1980, 0)
+        let month: Int = parts.month ?? 1
+        let dayOfMonth: Int = parts.day ?? 1
+
+        // Two seconds per unit is the format's own resolution, not a rounding
+        // choice of ours.
+        let packedTime: Int = (hour << 11) | (minute << 5) | (second / 2)
+        let packedDate: Int = (year << 9) | (month << 5) | dayOfMonth
+        return (UInt16(packedTime), UInt16(packedDate))
     }
 }
 
