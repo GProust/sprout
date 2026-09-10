@@ -33,11 +33,11 @@ public struct SyncPayload: Equatable, Sendable {
     /// half-applied.
     public var schemaVersion: Int
     public var babies: [Baby] = []
-    public var feedings: [BabyScoped<Feeding>] = []
-    public var sleeps: [BabyScoped<Sleep>] = []
-    public var diapers: [BabyScoped<Diaper>] = []
-    public var growth: [BabyScoped<Growth>] = []
-    public var treatments: [BabyScoped<Treatment>] = []
+    public var feedings: [BabyScopedRow<Feeding>] = []
+    public var sleeps: [BabyScopedRow<Sleep>] = []
+    public var diapers: [BabyScopedRow<Diaper>] = []
+    public var growth: [BabyScopedRow<Growth>] = []
+    public var treatments: [BabyScopedRow<Treatment>] = []
     public var pumpings: [Pumping] = []
     public var tombstones: [Tombstone] = []
 
@@ -56,14 +56,19 @@ public struct SyncPayload: Equatable, Sendable {
     }
 
     /// How many rows this payload is offering, tombstones included.
+    ///
+    /// Summed in named steps rather than one chain: eight generic `.count`s in a
+    /// single expression is enough to exhaust the type-checker's budget, and it
+    /// says so as an error rather than a warning.
     public var rowCount: Int {
-        babies.count + feedings.count + sleeps.count + diapers.count
-            + growth.count + treatments.count + pumpings.count + tombstones.count
+        let logs: Int = feedings.count + sleeps.count + diapers.count
+        let more: Int = growth.count + treatments.count + pumpings.count
+        return babies.count + logs + more + tombstones.count
     }
 }
 
 /// A log with the uid — never the local id — of the baby it belongs to.
-public struct BabyScoped<Row: Equatable & Sendable>: Equatable, Sendable {
+public struct BabyScopedRow<Row: Equatable & Sendable>: Equatable, Sendable {
     public let babyUid: String
     public let row: Row
 
@@ -96,12 +101,12 @@ public enum SyncPayloadCodec {
     // MARK: - Encoding
 
     public static func encode(_ payload: SyncPayload) throws -> Data {
-        var root: [String: Any] = [
-            "formatVersion": syncFormatVersion,
-            "schemaVersion": payload.schemaVersion,
-            "householdId": payload.householdId,
-            "deviceId": payload.deviceId,
-            "createdAt": payload.createdAt,
+        // Assembled key by key rather than as one literal. A thirteen-entry
+        // `[String: Any]` literal whose values are generic `map`s over a generic
+        // `scoped` is one expression as far as the type-checker is concerned,
+        // and it is the shape that exhausts its budget — which Swift reports as
+        // an error, not a warning, so the build simply stops.
+        let rows: [String: [[String: Any]]] = [
             "babies": payload.babies.map(baby),
             "feedings": payload.feedings.map { scoped($0, feeding) },
             "sleeps": payload.sleeps.map { scoped($0, sleep) },
@@ -111,6 +116,14 @@ public enum SyncPayloadCodec {
             "pumpings": payload.pumpings.map(pumping),
             "tombstones": payload.tombstones.map(tombstone),
         ]
+
+        var root: [String: Any] = [:]
+        root["formatVersion"] = syncFormatVersion
+        root["schemaVersion"] = payload.schemaVersion
+        root["householdId"] = payload.householdId
+        root["deviceId"] = payload.deviceId
+        root["createdAt"] = payload.createdAt
+        for (key, value) in rows { root[key] = value }
         if !payload.deviceName.trimmingCharacters(in: .whitespaces).isEmpty {
             root["deviceName"] = payload.deviceName
         }
@@ -202,7 +215,7 @@ private extension SyncPayloadCodec {
     }
 
     static func scoped<Row>(
-        _ scoped: BabyScoped<Row>,
+        _ scoped: BabyScopedRow<Row>,
         _ encode: (Row) -> [String: Any]
     ) -> [String: Any] {
         var json = encode(scoped.row)
@@ -213,11 +226,11 @@ private extension SyncPayloadCodec {
     static func scopedFrom<Row>(
         _ json: [String: Any],
         _ decode: ([String: Any]) throws -> Row
-    ) throws -> BabyScoped<Row> {
+    ) throws -> BabyScopedRow<Row> {
         guard let babyUid = json["babyUid"] as? String else {
             throw SyncPayloadError.unreadable("a log with no baby")
         }
-        return BabyScoped(babyUid: babyUid, row: try decode(json))
+        return BabyScopedRow(babyUid: babyUid, row: try decode(json))
     }
 
     // MARK: Baby
@@ -509,7 +522,12 @@ private extension Dictionary where Key == String, Value == Any {
 private extension Dictionary where Key == String, Value == Any {
     /// Writes `value` only when there is one. A `null` in the document is a key
     /// Android would never have written.
-    mutating func put(_ key: String, _ value: Any?) {
+    ///
+    /// Generic rather than taking `Any?`: passing a `String?` to an `Any?`
+    /// parameter is one of the places Swift can wrap the optional instead of
+    /// converting it, and a `.some(nil)` here would write the `null` this whole
+    /// convention exists to avoid.
+    mutating func put<T>(_ key: String, _ value: T?) {
         guard let value else { return }
         self[key] = value
     }
