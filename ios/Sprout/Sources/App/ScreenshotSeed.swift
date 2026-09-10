@@ -52,8 +52,44 @@ enum ScreenshotSeed {
         // young enough that the logs below are a plausible day.
         _ = try repository.addBaby(name: "Robin", birthDate: now - 22 * day)
 
+        try seedFeeds(repository)
         try seedSleeps(repository)
         try seedDiapers(repository)
+    }
+
+    private static func seedFeeds(_ repository: SproutRepository) throws {
+        // A session that switched sides, so the per-side breakdown has
+        // something to break down; then a bottle and a plain one, which is what
+        // most rows look like.
+        try repository.addFeeding(
+            Feeding(
+                type: .BREAST,
+                side: .BOTH,
+                startTime: now - 2 * hour,
+                endTime: now - 2 * hour + 22 * minute,
+                leftDurationMs: 14 * minute,
+                rightDurationMs: 8 * minute,
+                segments: [
+                    NursingSegment(side: .LEFT, startTime: now - 2 * hour, endTime: now - 2 * hour + 14 * minute),
+                    NursingSegment(
+                        side: .RIGHT,
+                        startTime: now - 2 * hour + 14 * minute,
+                        endTime: now - 2 * hour + 22 * minute
+                    ),
+                ]
+            )
+        )
+        try repository.addFeeding(
+            Feeding(type: .BOTTLE, amountMl: 90, startTime: now - 5 * hour, notes: "Expressed")
+        )
+        try repository.addFeeding(
+            Feeding(
+                type: .BREAST,
+                side: .LEFT,
+                startTime: now - 8 * hour,
+                endTime: now - 8 * hour + 18 * minute
+            )
+        )
     }
 
     private static func seedSleeps(_ repository: SproutRepository) throws {

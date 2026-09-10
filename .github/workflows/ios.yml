@@ -155,6 +155,7 @@ jobs:
         run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
 
       - name: Capture
+        id: capture
         run: |
           set -o pipefail
           xcodebuild test \
@@ -167,7 +168,9 @@ jobs:
 
       # Attachments live inside the .xcresult bundle.
       - name: Pull the images out of the result bundle
-        if: always()
+        # Not on a cancelled run: a superseded build has no screenshots by
+        # definition, and reporting that as a failure hides the real ones.
+        if: always() && steps.capture.conclusion != 'cancelled'
         run: |
           BUNDLE="$RUNNER_TEMP/screenshots.xcresult"
           OUT="$RUNNER_TEMP/screenshots"
@@ -187,7 +190,7 @@ jobs:
           fi
 
       - name: Upload the screenshots
-        if: always()
+        if: always() && steps.capture.conclusion != 'cancelled'
         uses: actions/upload-artifact@v7
         with:
           name: ios-screenshots

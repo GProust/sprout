@@ -31,9 +31,10 @@ final class ScreenshotTests: XCTestCase {
         app.launch()
 
         try capture(app, tab: "nav_home_tab", named: "01-home", language: language)
-        try capture(app, tab: "nav_sleep_tab", named: "02-sleep", language: language)
-        try capture(app, tab: "nav_diaper_tab", named: "03-diaper", language: language)
-        try capture(app, tab: "nav_growth_tab", named: "04-growth", language: language)
+        try capture(app, tab: "nav_feed_tab", named: "02-feeding", language: language)
+        try capture(app, tab: "nav_sleep_tab", named: "03-sleep", language: language)
+        try capture(app, tab: "nav_diaper_tab", named: "04-diaper", language: language)
+        try capture(app, tab: "nav_growth_tab", named: "05-growth", language: language)
     }
 
     /// Selects a tab, waits for it to settle, and files the image.
@@ -73,9 +74,10 @@ final class ScreenshotTests: XCTestCase {
     private func tabIndex(for identifier: String) -> Int {
         switch identifier {
         case "nav_home_tab": return 0
-        case "nav_sleep_tab": return 1
-        case "nav_diaper_tab": return 2
-        case "nav_growth_tab": return 3
+        case "nav_feed_tab": return 1
+        case "nav_sleep_tab": return 2
+        case "nav_diaper_tab": return 3
+        case "nav_growth_tab": return 4
         default: return 0
         }
     }

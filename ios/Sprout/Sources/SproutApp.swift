@@ -59,6 +59,8 @@ struct RootView: View {
         TabView {
             NavigationStack { HomeScreen() }
                 .tabItem { Label(Str.t("nav_home"), systemImage: "house.fill") }
+            NavigationStack { FeedingScreen() }
+                .tabItem { Label(Str.t("nav_feed"), systemImage: "drop.fill") }
             NavigationStack { SleepScreen() }
                 .tabItem { Label(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") }
             NavigationStack { DiaperScreen() }
