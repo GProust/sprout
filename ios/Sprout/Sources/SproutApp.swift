@@ -57,6 +57,8 @@ struct RootView: View {
         // syntax would drop phones that are three years old, which is not a
         // trade this app makes.
         TabView {
+            NavigationStack { HomeScreen() }
+                .tabItem { Label(Str.t("nav_home"), systemImage: "house.fill") }
             NavigationStack { SleepScreen() }
                 .tabItem { Label(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") }
             NavigationStack { DiaperScreen() }
