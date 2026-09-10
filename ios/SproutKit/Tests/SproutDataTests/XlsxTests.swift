@@ -11,6 +11,19 @@ import XCTest
 /// does not want to own — and the parts are read back.
 final class XlsxTests: XCTestCase {
 
+    /// The archive's parts, by the name they have *inside* it.
+    ///
+    /// Two things here are less obvious than they look, and both cost a red run
+    /// to find:
+    ///
+    /// - **The base path is resolved first.** `temporaryDirectory` is `/var/…`,
+    ///   which is a symlink to `/private/var/…`, and the enumerator hands back
+    ///   the resolved form — so stripping the unresolved prefix silently matches
+    ///   nothing and every part comes back under its absolute path instead.
+    /// - **`.rels` is not a path extension.** Foundation reads a leading dot as
+    ///   the start of the name, so `_rels/.rels` has no extension at all;
+    ///   filtering on one drops the part that tells a reader where the workbook
+    ///   is.
     private func parts(of workbook: Data) throws -> [String: String] {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
@@ -27,13 +40,22 @@ final class XlsxTests: XCTestCase {
         unzip.waitUntilExit()
         XCTAssertEqual(unzip.terminationStatus, 0, "unzip refused the archive")
 
+        let base = directory.resolvingSymlinksInPath().path + "/"
         var found: [String: String] = [:]
         let enumerator = FileManager.default.enumerator(at: directory, includingPropertiesForKeys: nil)
         while let url = enumerator?.nextObject() as? URL {
-            guard url.pathExtension == "xml" || url.pathExtension == "rels" else { continue }
-            let name = url.path.replacingOccurrences(of: directory.path + "/", with: "")
-            found[name] = try String(contentsOf: url, encoding: .utf8)
+            let path = url.resolvingSymlinksInPath().path
+            guard path.hasPrefix(base) else { continue }
+            let name = String(path.dropFirst(base.count))
+            guard name != "book.xlsx" else { continue }
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else { continue }
+            found[name] = text
         }
+
+        // A harness that quietly finds nothing turns every assertion below into
+        // "missing", which says nothing about the workbook. It was doing exactly
+        // that until the two notes above were true.
+        XCTAssertFalse(found.isEmpty, "the archive extracted to nothing — this is the harness, not the file")
         return found
     }
 
