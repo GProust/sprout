@@ -9,6 +9,7 @@ import SwiftUI
 @main
 struct SproutApp: App {
 
+    @Environment(\.scenePhase) private var scenePhase
     @State private var environment: AppEnvironment?
     @State private var failure: String?
 
@@ -52,6 +53,23 @@ struct SproutApp: App {
             // looking at its bytes.
             .onOpenURL { url in
                 environment?.pendingSyncFile = url
+            }
+            // The two moments the reminder schedule is rebuilt (ADR-0019).
+            //
+            // They bracket every write there is, which is why there is no hook
+            // threaded through the screens that write: going to the background
+            // re-arms from the feed just logged, and coming back catches a
+            // household exchange, a passing midnight, and the bounded schedules
+            // that need topping up.
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active || phase == .background else { return }
+                guard let environment else { return }
+                Task {
+                    await ReminderScheduler.rebuild(
+                        repository: environment.repository,
+                        settings: environment.settingsStore
+                    )
+                }
             }
         }
     }

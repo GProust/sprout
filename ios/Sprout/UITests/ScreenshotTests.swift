@@ -104,28 +104,36 @@ final class ScreenshotTests: XCTestCase {
         ]
         app.launch()
 
+        // Onboarding is not inside the shell, so there is no navigation bar to
+        // wait for — each step is anchored on its own button instead.
         let start = app.buttons["onboarding-start"]
         XCTAssertTrue(start.waitForExistence(timeout: 60), "the app did not open on onboarding")
-        try file(app, named: "00-onboarding-1-welcome", language: language)
+        try file(app, named: "00-onboarding-1-welcome", language: language, waitingFor: start)
 
         // Through the three steps that ask something. Each is filed before it is
         // answered, so the captures show what a parent is asked rather than what
         // this test typed.
+        let next = app.buttons["onboarding-next"]
         start.tap()
-        try file(app, named: "00-onboarding-2-about-you", language: language)
+        try file(app, named: "00-onboarding-2-about-you", language: language, waitingFor: next)
 
         // The name is the one required answer, so it has to be given before
         // *Next* will move.
-        let fields = app.textFields
-        if fields.firstMatch.waitForExistence(timeout: 5) {
-            fields.firstMatch.tap()
-            fields.firstMatch.typeText("Alex")
-        }
-        app.buttons["onboarding-next"].firstMatch.tap()
-        try file(app, named: "00-onboarding-3-baby", language: language)
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 10), "no name field on the About you step")
+        field.tap()
+        field.typeText("Alex")
 
-        app.buttons["onboarding-next"].firstMatch.tap()
-        try file(app, named: "00-onboarding-4-care", language: language)
+        next.tap()
+        try file(app, named: "00-onboarding-3-baby", language: language, waitingFor: next)
+
+        next.tap()
+        try file(
+            app,
+            named: "00-onboarding-4-care",
+            language: language,
+            waitingFor: app.buttons["onboarding-finish"]
+        )
     }
 
     /// The grid's tiles, in the order they are drawn. Every one of them is a
@@ -179,7 +187,17 @@ final class ScreenshotTests: XCTestCase {
     }
 
     /// Waits for whatever is on screen to be on screen, then files the image.
-    private func file(_ app: XCUIApplication, named name: String, language: String) throws {
+    ///
+    /// - Parameter anchor: what to wait for. Defaults to the navigation bar,
+    ///   which every screen *inside the shell* has — but onboarding runs before
+    ///   the shell exists and has none, so a run that waited for one there sat
+    ///   for fifteen seconds and filed nothing.
+    private func file(
+        _ app: XCUIApplication,
+        named name: String,
+        language: String,
+        waitingFor anchor: XCUIElement? = nil
+    ) throws {
         // Wait for something rather than sleeping: a fixed delay is either
         // wasted time or a flake, depending on how the runner is feeling.
         //
@@ -188,7 +206,7 @@ final class ScreenshotTests: XCTestCase {
         // waiting on a thing only some screens have turns "this screen has no
         // list" into "the whole capture failed".
         XCTAssertTrue(
-            app.navigationBars.firstMatch.waitForExistence(timeout: 15),
+            (anchor ?? app.navigationBars.firstMatch).waitForExistence(timeout: 15),
             "\(name): the screen never appeared"
         )
 

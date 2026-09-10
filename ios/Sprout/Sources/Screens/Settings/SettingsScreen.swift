@@ -25,14 +25,22 @@ struct SettingsScreen: View {
     @State private var profile: ParentProfile?
     @State private var noBrowser = false
 
+    // Read once and held, because the store behind them is not observable — a
+    // plain key-value store, deliberately (ADR-0018). The screen is the only
+    // thing that writes them, so it is also the only thing that has to know.
+    @State private var feedingReminders = false
+    @State private var feedingInterval = FeedingReminderSettings.defaultIntervalMinutes
+    @State private var growthSpurtAlerts = false
+    /// Shown when iOS has been asked and said no. There is nothing to do about
+    /// it from here — only Settings can change it — so the switch goes back off
+    /// rather than sitting on while nothing arrives.
+    @State private var notificationsRefused = false
+
     var body: some View {
         Form {
             languageSection
 
-            Section {
-                NotYetOnIOS(Str.t("settings_feeding_reminders"), Str.t("settings_feeding_reminders_desc"))
-                NotYetOnIOS(Str.t("settings_growth_spurts"), Str.t("settings_growth_spurts_desc"))
-            }
+            remindersSection
 
             if let profile {
                 checkInSection(profile)
@@ -46,6 +54,11 @@ struct SettingsScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .alert(Str.t("settings_support_no_browser"), isPresented: $noBrowser) {
             Button(Str.t("action_close"), role: .cancel) {}
+        }
+        .onAppear {
+            feedingReminders = FeedingReminderSettings.isEnabled(sprout.settingsStore)
+            feedingInterval = FeedingReminderSettings.intervalMinutes(sprout.settingsStore)
+            growthSpurtAlerts = GrowthSpurtSettings.isEnabled(sprout.settingsStore)
         }
         .task {
             await observe(sprout.repository.parentProfile) { profile = $0 }
@@ -142,6 +155,112 @@ struct SettingsScreen: View {
         }
     }
 
+    // MARK: - Reminders
+
+    /// The three reminder settings (ADR-0019).
+    ///
+    /// Turning one on is the *only* moment Sprout asks iOS for permission to
+    /// notify. A phone whose owner wants no reminders is never asked at all.
+    private var remindersSection: some View {
+        Section {
+            Toggle(isOn: Binding(
+                get: { feedingReminders },
+                set: { setFeedingReminders($0) }
+            )) {
+                settingLabel(
+                    Str.t("settings_feeding_reminders"),
+                    Str.t("settings_feeding_reminders_desc")
+                )
+            }
+
+            if feedingReminders {
+                Picker(Str.t("settings_feeding_interval_label"), selection: Binding(
+                    get: { feedingInterval },
+                    set: { setFeedingInterval($0) }
+                )) {
+                    ForEach(FeedingReminderSettings.intervalChoices, id: \.self) { minutes in
+                        Text(SproutFormat.duration(millis: Int64(minutes) * 60_000).text)
+                            .tag(minutes)
+                    }
+                }
+            }
+
+            Toggle(isOn: Binding(
+                get: { growthSpurtAlerts },
+                set: { setGrowthSpurtAlerts($0) }
+            )) {
+                settingLabel(
+                    Str.t("settings_growth_spurts"),
+                    Str.t("settings_growth_spurts_desc")
+                )
+            }
+        } footer: {
+            if notificationsRefused {
+                // Untranslated for the reason `NotYetOnIOS` gives: the catalog is
+                // generated from Android's resources and CI checks the two match,
+                // and Android has no such line because it never needs one — its
+                // permission is granted at install time or asked once by the OS.
+                Text("Notifications are off for Sprout in iOS Settings.")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func settingLabel(_ title: String, _ detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(SproutColor.onSurfaceVariant)
+        }
+    }
+
+    private func setFeedingReminders(_ on: Bool) {
+        // Optimistic, then corrected: the switch moves under the finger and goes
+        // back if iOS refuses, rather than waiting on a prompt to animate.
+        feedingReminders = on
+        Task { await apply(on) { FeedingReminderSettings.setEnabled($0, in: sprout.settingsStore) } }
+    }
+
+    private func setGrowthSpurtAlerts(_ on: Bool) {
+        growthSpurtAlerts = on
+        Task { await apply(on) { GrowthSpurtSettings.setEnabled($0, in: sprout.settingsStore) } }
+    }
+
+    private func setFeedingInterval(_ minutes: Int) {
+        feedingInterval = minutes
+        FeedingReminderSettings.setIntervalMinutes(minutes, in: sprout.settingsStore)
+        Task { await rebuildSchedule() }
+    }
+
+    /// Stores a switch, asking iOS for permission first when it is going on.
+    private func apply(_ on: Bool, _ store: @escaping (Bool) -> Void) async {
+        if on {
+            // Spelled out rather than `await !f()`: Swift will not have `await`
+            // sitting to the right of an operator, and the negated form is the
+            // one that reads.
+            let granted = await ReminderScheduler.requestAuthorization()
+            if !granted {
+                notificationsRefused = true
+                // Back to whatever is actually stored, so the switch cannot sit
+                // on while iOS drops everything it would send.
+                feedingReminders = FeedingReminderSettings.isEnabled(sprout.settingsStore)
+                growthSpurtAlerts = GrowthSpurtSettings.isEnabled(sprout.settingsStore)
+                return
+            }
+        }
+        notificationsRefused = false
+        store(on)
+        await rebuildSchedule()
+    }
+
+    private func rebuildSchedule() async {
+        await ReminderScheduler.rebuild(
+            repository: sprout.repository,
+            settings: sprout.settingsStore
+        )
+    }
+
     // MARK: - Sharing
 
     private var sharingSection: some View {
@@ -149,19 +268,18 @@ struct SettingsScreen: View {
             NavigationLink(value: LogDestination.sync) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(Str.t("screen_sync"))
+                        // On the `Text`, not on the `NavigationLink`, and not on
+                        // a combined element either — two screenshot runs proved
+                        // that a link's own identifier does not reach the
+                        // accessibility tree from inside a `Form`. A `Text` maps
+                        // straight to a static-text element that SwiftUI does not
+                        // restructure, and tapping one taps the row it sits in.
+                        .accessibilityIdentifier("settings-sync")
                     Text(Str.t("settings_sync_hint"))
                         .font(.caption)
                         .foregroundStyle(SproutColor.onSurfaceVariant)
                 }
             }
-            // `children: .combine` before the identifier, and that order is the
-            // whole fix: a `NavigationLink` whose label is two `Text`s becomes
-            // two elements in the accessibility tree, and the identifier lands
-            // on neither — the screenshot run looked for it for ten seconds and
-            // did not find it. Combining makes the row one element for the
-            // identifier to attach to, and reads better to VoiceOver besides.
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("settings-sync")
         }
     }
 

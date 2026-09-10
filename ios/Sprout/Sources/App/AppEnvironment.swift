@@ -22,6 +22,9 @@ final class AppEnvironment {
     /// `pairingStore` because this device's own id lives in it, and a replica
     /// carries that id.
     let deviceStore: any DeviceLocalStore
+    /// The ordinary settings, which a backup carries (ADR-0018) — the reminder
+    /// switches live here, and so does the household id.
+    let settingsStore: any DeviceLocalStore
 
     /// A file another app has just handed Sprout, waiting to be opened.
     ///
@@ -39,6 +42,7 @@ final class AppEnvironment {
         self.repository = repository
         self.engine = engine
         self.deviceStore = deviceStore
+        self.settingsStore = settings
         self.pairingStore = PairingStore(settings: settings, deviceOnly: deviceStore)
         self.householdDevices = HouseholdDevices(settings: settings)
     }
