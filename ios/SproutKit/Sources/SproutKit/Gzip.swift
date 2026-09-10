@@ -110,7 +110,7 @@ enum Gzip {
     /// destination big enough for the result, and for decoding that is exactly
     /// the number an untrusted file gets to claim. Feeding it through the
     /// stream API means the output grows as it is produced instead.
-    private static func raw(
+    static func raw(
         _ data: Data,
         operation: compression_stream_operation,
         hint: Int
