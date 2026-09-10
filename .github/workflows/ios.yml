@@ -156,10 +156,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-      # Attachments live inside the .xcresult bundle. `export attachments` is
-      # the Xcode 16 command; the older toolchains want `--legacy`, so try both
-      # and, if neither works, print the bundle's shape rather than failing with
-      # nothing to go on.
+      # Attachments live inside the .xcresult bundle.
       - name: Pull the images out of the result bundle
         if: always()
         run: |
@@ -168,18 +165,17 @@ jobs:
           mkdir -p "$OUT"
           [ -d "$BUNDLE" ] || { echo "::error::no result bundle at $BUNDLE"; exit 1; }
 
-          if xcrun xcresulttool export attachments --path "$BUNDLE" --output-path "$OUT" 2>/dev/null; then
-            echo "exported with the current xcresulttool"
-          elif xcrun xcresulttool export attachments --legacy --path "$BUNDLE" --output-path "$OUT" 2>/dev/null; then
-            echo "exported with --legacy"
-          else
-            echo "::warning::could not export attachments; listing the bundle so the next run knows why"
-            xcrun xcresulttool get --path "$BUNDLE" --format json 2>/dev/null | head -c 4000 || true
-            ls -R "$BUNDLE" | head -50
-          fi
+          xcrun xcresulttool export attachments --path "$BUNDLE" --output-path "$OUT"
 
           echo "captured:"
           find "$OUT" -type f | sort
+
+          # A run that captured nothing but still went green would be the worst
+          # outcome here: it reads as "the screens are fine" when nobody looked.
+          if [ -z "$(find "$OUT" -name '*.png' -print -quit)" ]; then
+            echo "::error::no screenshots in the result bundle — the UI test did not reach a screen"
+            exit 1
+          fi
 
       - name: Upload the screenshots
         if: always()

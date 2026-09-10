@@ -41,16 +41,41 @@ targets:
         product: SproutKit
       - package: SproutKit
         product: SproutData
+    # Generated rather than hand-written. A plist assembled by hand is missing
+    # CFBundleIdentifier and CFBundleExecutable until the day something tries to
+    # *launch* the app — it builds perfectly without them — and the failure then
+    # arrives as "the bundle identifier couldn't be read" from a test runner,
+    # nowhere near the file that caused it. XcodeGen fills in the standard keys
+    # and these are the ones Sprout actually decides.
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: Sprout
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        # The seven languages Sprout speaks (BDR-0004). Listing them is what
+        # gives the user the per-app language picker in iOS Settings, which is
+        # why AppLocale.kt has no counterpart on this side.
+        CFBundleLocalizations: [en, fr, de, es, it, pl, pt]
+        # ADR-0010 and ADR-0016: the radio is used only while the app is open.
+        # No background mode is declared and none should be — that would be a
+        # claim this app does not make.
+        NSBluetoothAlwaysUsageDescription: >-
+          Sprout uses Bluetooth only while it is open, to sync this baby's record
+          with the other phones in your household. Nothing is sent anywhere else.
+        # Deliberately absent, and the absence is the point (ADR-0014): no
+        # NSAppTransportSecurity, no URL scheme, no networking usage string,
+        # because there is no networking. That is the iOS equivalent of Android's
+        # missing INTERNET permission.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout
-        INFOPLIST_FILE: Sources/Info.plist
         CODE_SIGN_ENTITLEMENTS: Sources/Sprout.entitlements
         MARKETING_VERSION: '0.1.0'
         CURRENT_PROJECT_VERSION: '1'
         TARGETED_DEVICE_FAMILY: '1,2'
-        # No launch storyboard: the app is SwiftUI end to end.
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
 
   SproutUITests:
     type: bundle.ui-testing
@@ -59,6 +84,9 @@ targets:
       - path: UITests
     dependencies:
       - target: Sprout
+    info:
+      path: UITests/Info.plist
+      properties: {}
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout.uitests
