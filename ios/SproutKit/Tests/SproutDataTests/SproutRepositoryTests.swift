@@ -80,7 +80,8 @@ final class SproutRepositoryTests: XCTestCase {
     func testDeletingFlagsTheRowRatherThanRemovingIt() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let feeding = try XCTUnwrap(try queue.read { db in try Feeding.fetchOne(db) })
+        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let feeding = try XCTUnwrap(stored)
 
         try repository.deleteFeeding(feeding)
 
@@ -94,7 +95,8 @@ final class SproutRepositoryTests: XCTestCase {
     func testDeletedRowsAreNotRead() async throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let feeding = try XCTUnwrap(try queue.read { db in try Feeding.fetchOne(db) })
+        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
         for try await feedings in repository.feedings {
@@ -179,7 +181,8 @@ final class SproutRepositoryTests: XCTestCase {
     func testCompactionErasesRowsPastTheRetentionWindow() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let feeding = try XCTUnwrap(try queue.read { db in try Feeding.fetchOne(db) })
+        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
         // A repository whose clock is well past the retention window.
@@ -195,7 +198,8 @@ final class SproutRepositoryTests: XCTestCase {
     func testCompactionLeavesRecentDeletionsAlone() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let feeding = try XCTUnwrap(try queue.read { db in try Feeding.fetchOne(db) })
+        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
         try repository.compactTombstones()
@@ -214,9 +218,8 @@ final class SproutRepositoryTests: XCTestCase {
         let babyId = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock - 10_000))
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let newest = try XCTUnwrap(
-            try queue.read { db in try Feeding.order(Column("startTime").desc).fetchOne(db) }
-        )
+        let latest = try queue.read { db in try Feeding.order(Column("startTime").desc).fetchOne(db) }
+        let newest = try XCTUnwrap(latest)
 
         XCTAssertEqual(try repository.lastFeedTime(babyId: babyId), clock)
 

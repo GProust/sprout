@@ -164,7 +164,8 @@ final class CodingTests: XCTestCase {
             )
         )
 
-        let stored = try XCTUnwrap(try queue.read { db in try Feeding.fetchOne(db) })
+        let row = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try XCTUnwrap(row)
         XCTAssertEqual(stored.nursingSegments.count, 2)
         XCTAssertEqual(stored.nursingSegments.first?.durationMs, 1_000)
     }

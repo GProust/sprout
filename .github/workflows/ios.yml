@@ -79,6 +79,11 @@ jobs:
           fi
           echo "Committed string catalog matches Android."
 
+      # A mistyped key builds fine and renders as the key itself, which survives
+      # review until somebody opens that screen in that language.
+      - name: Every string key the app uses is in the catalog
+        run: python3 ios/tools/check_string_keys.py
+
   sproutkit:
     name: SproutKit
     runs-on: macos-15
