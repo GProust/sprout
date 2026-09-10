@@ -18,6 +18,24 @@ public enum SproutDatabase {
     /// The Android schema version this starts from.
     public static let initialAndroidSchemaVersion = 16
 
+    /// Migrations registered after the Android schema, in the order they run.
+    ///
+    /// The list exists so that ``schemaVersion`` cannot drift from it: adding a
+    /// migration here moves the number a replica carries, with nothing else to
+    /// remember to edit.
+    static let migrationsAfterAndroidSchema: [(name: String, migrate: @Sendable (Database) throws -> Void)] = []
+
+    /// The schema version this build speaks, in **Android's** numbering.
+    ///
+    /// It travels in every replica and is what the other phone compares against,
+    /// so the two apps have to count in the same units. Android reads it off the
+    /// database; GRDB names its migrations rather than numbering them, so here it
+    /// is derived from the list above instead — which is the same thing said a
+    /// different way, not a constant beside it that could disagree.
+    public static var schemaVersion: Int {
+        initialAndroidSchemaVersion + migrationsAfterAndroidSchema.count
+    }
+
     /// Opens the database at `path`, creating and migrating it as needed.
     public static func open(atPath path: String) throws -> DatabaseQueue {
         var configuration = Configuration()
@@ -43,6 +61,10 @@ public enum SproutDatabase {
             for statement in schemaV16 {
                 try db.execute(sql: statement)
             }
+        }
+
+        for step in migrationsAfterAndroidSchema {
+            migrator.registerMigration(step.name, migrate: step.migrate)
         }
 
         return migrator

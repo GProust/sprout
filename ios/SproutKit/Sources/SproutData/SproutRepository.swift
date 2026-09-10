@@ -317,7 +317,7 @@ public final class SproutRepository: @unchecked Sendable {
     }
 
     public func addFeeding(_ feeding: Feeding, for babyId: Int64) throws {
-        try insert(feeding, babyId: babyId)
+        try upsert(feeding, babyId: babyId)
         Task { await onWidgetDataChanged() }
     }
 
@@ -328,7 +328,7 @@ public final class SproutRepository: @unchecked Sendable {
 
     public func addSleep(_ sleep: Sleep) throws {
         guard let babyId = try activeBabyIdNow() else { return }
-        try insert(sleep, babyId: babyId)
+        try upsert(sleep, babyId: babyId)
     }
 
     public func updateSleep(_ sleep: Sleep) throws {
@@ -344,14 +344,14 @@ public final class SproutRepository: @unchecked Sendable {
 
     public func addDiaper(_ diaper: Diaper) throws {
         guard let babyId = try activeBabyIdNow() else { return }
-        try insert(diaper, babyId: babyId)
+        try upsert(diaper, babyId: babyId)
     }
 
     public func deleteDiaper(_ diaper: Diaper) throws { try softDelete(diaper) }
 
     public func addGrowth(_ growth: Growth) throws {
         guard let babyId = try activeBabyIdNow() else { return }
-        try insert(growth, babyId: babyId)
+        try upsert(growth, babyId: babyId)
     }
 
     public func deleteGrowth(_ growth: Growth) throws { try softDelete(growth) }
@@ -566,18 +566,28 @@ public final class SproutRepository: @unchecked Sendable {
 
     // MARK: - Plumbing
 
-    /// Stamps and inserts a row that belongs to a baby.
+    /// Stamps and writes a row that belongs to a baby.
     ///
     /// This is the only place `babyId`, `uid` and `updatedAt` are set. A record
-    /// inserted anywhere else is an unstamped row, which then loses every merge.
-    private func insert<T: SyncableRecord & BabyScoped>(_ record: T, babyId: Int64) throws {
+    /// written anywhere else is an unstamped row, which then loses every merge.
+    ///
+    /// `save` and not `insert`, for the same reason as the parent-scoped one
+    /// below: the Android DAO this mirrors is `OnConflictStrategy.REPLACE`, so a
+    /// record handed back with its `id` already set is an edit of that row rather
+    /// than a second row. `insert` would collide on the primary key — and every
+    /// caller writes `try? repository.addFeeding(…)`, so the correction would go
+    /// nowhere and say nothing.
+    ///
+    /// The uid is kept when there is one, so an edit stays the same row to the
+    /// other phone and merges as the later write.
+    private func upsert<T: SyncableRecord & BabyScoped>(_ record: T, babyId: Int64) throws {
         let timestamp = now()
         try database.write { db in
             var copy = record
             copy.babyId = babyId
             if copy.uid.isEmpty { copy.uid = newUid() }
             copy.updatedAt = timestamp
-            try copy.insert(db)
+            try copy.save(db)
         }
     }
 
