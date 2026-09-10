@@ -30,6 +30,15 @@ enum Tab: Hashable, CaseIterable {
         }
     }
 
+    /// The Baby tab wears the selected child's name once there is one, which is
+    /// the whole reason that tab exists: "Baby" beside a bar that already says
+    /// Home and You names nothing, and with two children the answer to "whose
+    /// screen is this" has to be on the tab itself.
+    func label(activeBabyName: String?) -> String {
+        guard self == .baby, let name = activeBabyName, !name.isEmpty else { return label }
+        return name
+    }
+
     var systemImage: String {
         switch self {
         case .home: return "house.fill"
@@ -83,7 +92,12 @@ struct RootView: View {
                     BabyScreen(model: model, onOpen: open(_:))
                         .navigationDestination(for: LogDestination.self, destination: screen(for:))
                 }
-                .tabItem { Label(Tab.baby.label, systemImage: Tab.baby.systemImage) }
+                .tabItem {
+                    Label(
+                        Tab.baby.label(activeBabyName: model.selectedBaby?.baby.name),
+                        systemImage: Tab.baby.systemImage
+                    )
+                }
                 .tag(Tab.baby)
             }
 
@@ -132,6 +146,9 @@ struct RootView: View {
         case .checkIn: DailyCheckInScreen()
         case .report: ReportScreen()
         case .stats: StatsScreen()
+        case .profile: ProfileScreen()
+        case .settings: SettingsScreen()
+        case .sync: SyncScreen()
         }
     }
 }

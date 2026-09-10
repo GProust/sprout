@@ -168,6 +168,10 @@ struct QuickFeed: View {
 enum LogDestination: String, Hashable {
     case feeding, pumping, sleep, diaper, growth, treatments, wellbeing
     case stats, checkIn, report
+    /// Not logs — the two the dashboard's toolbar opens, and the sync screen
+    /// behind Settings. They travel through the same push so there is one way
+    /// into a screen rather than two.
+    case profile, settings, sync
 
     /// The tile's accessibility identifier, and the only handle the screenshot
     /// run has on it. An identifier and not the visible label, because the

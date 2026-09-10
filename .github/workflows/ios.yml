@@ -141,7 +141,7 @@ jobs:
           # Assigned, not echoed inline: `echo "x=$(cmd)"` exits 0 even when cmd
           # failed, and an empty destination is a confusing error two steps later.
           set -euo pipefail
-          udid="$(ios/tools/pick_simulator.sh)"
+          udid="$(python3 ios/tools/pick_simulator.py)"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
       # `build-for-testing`, not `build`: plain `build` compiles the app target
@@ -177,7 +177,7 @@ jobs:
           # Assigned, not echoed inline: `echo "x=$(cmd)"` exits 0 even when cmd
           # failed, and an empty destination is a confusing error two steps later.
           set -euo pipefail
-          udid="$(ios/tools/pick_simulator.sh)"
+          udid="$(python3 ios/tools/pick_simulator.py)"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
       - name: Capture

@@ -179,7 +179,7 @@ struct HomeScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.regular) {
                 if !model.hasProfile {
-                    NoBabyYet()
+                    NoBabyYet { onOpen(.profile) }
                 } else {
                     if let parent = model.parentName, !parent.isEmpty {
                         Text(
@@ -250,6 +250,22 @@ struct HomeScreen: View {
         }
         .navigationTitle(Str.t("app_name"))
         .navigationBarTitleDisplayMode(.inline)
+        // The two ways out of the dashboard that are not logs, in the same
+        // corner Android puts them.
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { onOpen(.profile) } label: {
+                    Image(systemName: "person.crop.circle")
+                }
+                .accessibilityLabel(Str.t("screen_babies"))
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { onOpen(.settings) } label: {
+                    Image(systemName: "gearshape")
+                }
+                .accessibilityLabel(Str.t("cd_settings"))
+            }
+        }
         .sproutStyle()
         // A minute is as fine as "2 h ago" needs; anything shorter spends
         // battery redrawing the same words.
@@ -320,7 +336,12 @@ private struct LiveSleepRow: View {
 }
 
 /// Before onboarding has run.
+///
+/// With a way in, not just a sentence: an empty dashboard that only *describes*
+/// what is missing leaves the one thing to do on this screen somewhere else.
 private struct NoBabyYet: View {
+    let onSetUp: () -> Void
+
     var body: some View {
         VStack(spacing: Spacing.snug) {
             Text(Str.t("home_welcome_no_profile"))
@@ -329,6 +350,9 @@ private struct NoBabyYet: View {
                 .font(.callout)
                 .foregroundStyle(SproutColor.onSurfaceVariant)
                 .multilineTextAlignment(.center)
+            Button(Str.t("screen_babies"), action: onSetUp)
+                .buttonStyle(.borderedProminent)
+                .padding(.top, Spacing.tight)
         }
         .frame(maxWidth: .infinity)
         .padding(Spacing.section)
