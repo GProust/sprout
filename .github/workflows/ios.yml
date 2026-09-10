@@ -17,17 +17,34 @@ on:
     branches: [ main ]
     paths:
       - 'ios/**'
+      # What this workflow itself writes back, and the store listing text.
+      # Neither can change what the app renders, and capturing on a macOS
+      # runner to prove that a PNG is still a PNG is fifteen minutes for
+      # nothing. screenshots.yml keeps Android out of the same loop with its
+      # "Detect UI changes" gate.
+      - '!ios/screenshots/**'
+      - '!ios/fastlane/**'
       - 'spec/**'
       - 'android/app/src/main/res/values*/strings.xml'
       - '.github/workflows/ios.yml'
   pull_request:
     branches: [ main ]
+    # Duplicated rather than anchored: GitHub Actions' support for YAML aliases
+    # is not something to find out about from a workflow that silently stops
+    # running.
     paths:
       - 'ios/**'
+      - '!ios/screenshots/**'
+      - '!ios/fastlane/**'
       - 'spec/**'
       - 'android/app/src/main/res/values*/strings.xml'
       - '.github/workflows/ios.yml'
   workflow_dispatch:
+
+# Lets the screenshots job push the captured images back to the PR branch, the
+# way screenshots.yml does for Android.
+permissions:
+  contents: write
 
 concurrency:
   # A push supersedes the run before it. Without this a few pushes in a row have
@@ -168,13 +185,31 @@ jobs:
   screenshots:
     name: Screenshots
     runs-on: macos-15
-    # Every screen, captured on a simulator and attached to the run — the iOS
-    # counterpart of screenshots.yml. A pull request is far easier to review when
-    # you can see what changed than when you can only read what changed, and
-    # nobody on this project has a Mac to look at the app on.
+    # Every screen, captured on a simulator and **committed to the repository** —
+    # the iOS counterpart of screenshots.yml, down to the same promote-only-if-it
+    # -moved rule. A pull request is far easier to review when you can see what
+    # changed than when you can only read what changed, and nobody on this
+    # project has a Mac to look at the app on.
+    env:
+      # Where the committed set lives, beside android/screenshots/.
+      OUTDIR: ios/screenshots
+      # The fresh capture, before anything is promoted into OUTDIR.
+      STAGEDIR: .screenshots-new
+      # Same rule and the same numbers as Android's, and for the same reason: a
+      # capture is never byte-identical to the last one, so committing on any
+      # byte difference means a churn commit on nearly every pull request.
+      # Resist raising the threshold to swallow a residue — a changed word in a
+      # list row is itself well under 1% of the screen, so a threshold loose
+      # enough to hide the noise is loose enough to hide a regression.
+      DIFF_THRESHOLD_PCT: "0.05"
+      DIFF_FUZZ: "3%"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # The branch itself, not the merge commit a pull_request checkout
+          # gives: the commit below has to be pushable somewhere.
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Generate the project
         run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
@@ -200,7 +235,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-      # Attachments live inside the .xcresult bundle.
+      # Attachments live inside the .xcresult bundle, under UUIDs.
       - name: Pull the images out of the result bundle
         # Not on a cancelled run: a superseded build has no screenshots by
         # definition, and reporting that as a failure hides the real ones.
@@ -213,9 +248,6 @@ jobs:
 
           xcrun xcresulttool export attachments --path "$BUNDLE" --output-path "$OUT"
 
-          echo "captured:"
-          find "$OUT" -type f | sort
-
           # A run that captured nothing but still went green would be the worst
           # outcome here: it reads as "the screens are fine" when nobody looked.
           if [ -z "$(find "$OUT" -name '*.png' -print -quit)" ]; then
@@ -223,10 +255,88 @@ jobs:
             exit 1
           fi
 
+          # `01-home.png`, not `FB94A33F-….png`. Also drops the UI hierarchy
+          # dumps, the debug descriptions and the screen recording, which are
+          # useful on a failure and not something to commit.
+          python3 ios/tools/name_screenshots.py "$OUT" "$STAGEDIR"
+
+      # A capture is never byte-identical to the last one — text antialiasing
+      # and the simulator's renderer vary between runs — so compare visually and
+      # keep the committed PNG whenever the change is below the threshold.
+      # Lifted from screenshots.yml, because the two sets should move for the
+      # same reasons.
+      - name: Promote only visibly-changed screenshots
+        if: always() && steps.capture.conclusion != 'cancelled'
+        run: |
+          set -euo pipefail
+          command -v compare >/dev/null 2>&1 || brew install imagemagick
+          mkdir -p "$OUTDIR"
+          promoted=0; added=0; kept=0
+          for new in "$STAGEDIR"/*.png; do
+            [ -e "$new" ] || continue
+            name=$(basename "$new")
+            cur="$OUTDIR/$name"
+            if [ ! -f "$cur" ]; then
+              cp "$new" "$cur"; added=$((added+1)); echo "  + $name (new)"; continue
+            fi
+            if [ "$(identify -format '%wx%h' "$cur")" != "$(identify -format '%wx%h' "$new")" ]; then
+              cp "$new" "$cur"; promoted=$((promoted+1)); echo "  ~ $name (dimensions changed)"; continue
+            fi
+            px=$(identify -format '%[fx:w*h]' "$cur")
+            raw=$(compare -metric AE -fuzz "$DIFF_FUZZ" "$cur" "$new" null: 2>&1 || true)
+            n=${raw%% *}
+            case "$n" in (*[!0-9.eE+-]*|'') n=$px ;; esac
+            pct=$(awk -v d="$n" -v p="$px" 'BEGIN{printf "%.4f", (p>0 ? d*100/p : 100)}')
+            if awk -v a="$pct" -v b="$DIFF_THRESHOLD_PCT" 'BEGIN{exit !(a>b)}'; then
+              cp "$new" "$cur"; promoted=$((promoted+1)); echo "  ~ $name (${pct}% of pixels differ)"
+            else
+              kept=$((kept+1)); echo "    $name unchanged (${pct}% <= ${DIFF_THRESHOLD_PCT}%)"
+            fi
+          done
+          echo "Promoted $promoted, added $added, kept $kept unchanged."
+
+      # The fresh capture, not the promoted set — so a run that promotes nothing
+      # still lets you inspect what the simulator actually rendered. The result
+      # bundle goes up too: on a failure its hierarchy dumps are the evidence.
       - name: Upload the screenshots
         if: always() && steps.capture.conclusion != 'cancelled'
         uses: actions/upload-artifact@v7
         with:
           name: ios-screenshots
-          path: ${{ runner.temp }}/screenshots/**
+          path: |
+            ${{ env.STAGEDIR }}/*.png
+            ${{ runner.temp }}/screenshots/**
+          # STAGEDIR is dot-prefixed, so it counts as hidden and would be
+          # silently skipped without this.
+          include-hidden-files: true
           if-no-files-found: warn
+
+      - name: Commit screenshots to the PR branch
+        if: >-
+          always() && steps.capture.conclusion == 'success'
+          && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+        run: |
+          find "$OUTDIR" -type f ! -name '*.png' -delete || true
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A "$OUTDIR"
+          if git diff --cached --quiet; then
+            echo "No screenshot changes to commit."
+          else
+            branch="${{ github.head_ref || github.ref_name }}"
+            # [skip ci] keeps this PNG-only commit from starting another round of
+            # workflows — including this one, which would otherwise capture,
+            # commit and capture again. The parent commit has already been
+            # checked and this one only changes images. See screenshots.yml for
+            # why dropping the marker is worse than carrying it.
+            git commit -m "ci: update iOS screenshots [skip ci]"
+            # The branch can have moved since checkout. This commit only touches
+            # PNGs, so replaying it on top is safe and beats failing the job on a
+            # rejected push. --autostash because the build leaves other files
+            # modified; we only publish $OUTDIR, so log the rest rather than
+            # silently discarding it.
+            echo "Working tree state before rebase:"
+            git status --porcelain
+            git pull --rebase --autostash origin "$branch"
+            git push origin HEAD:"$branch"
+          fi

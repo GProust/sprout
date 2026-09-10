@@ -5,8 +5,9 @@ analytics. Two apps, one product:
 
 ```
 android/   Kotlin, Compose + Material 3, MVVM, Room. Ships on Play.
-ios/       Swift + SwiftUI (ADR-0015). SproutKit is the wire formats; the
-           screens are not written yet.
+ios/       Swift + SwiftUI (ADR-0015). SproutKit is the wire formats,
+           SproutData the database; every screen the navigation reaches is
+           written. `screenshots/` and `fastlane/` mirror Android's.
 spec/      What the two must agree on, and the vectors that prove they do.
 docs/      ADRs and BDRs — shared, and the source of truth for both.
 ```

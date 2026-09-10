@@ -1,0 +1,1 @@
+First version for iPhone — track feeding (with a live breastfeeding timer), sleep, diapers and growth, plus daily postpartum check-ins, statistics read against the WHO growth curves, and a record you can hand to a doctor. Share a baby's record with the other parent by sending a file — no account, no cloud. Fully offline; your data never leaves the device.

@@ -269,9 +269,10 @@ That is deliberate — it keeps CI the build verifier on this side too
 
 | Job | Runner | What it proves |
 |-----|--------|----------------|
-| `Specification` | `ubuntu-latest` | `spec/vectors/` is exactly what `generate.mjs` produces |
-| `SproutKit` | `macos-15` | the wire formats build **and match the vectors** |
-| `App` | `macos-15` | the project spec, entitlements and `Info.plist` are coherent, and the app compiles for the simulator |
+| `Specification & strings` | `ubuntu-latest` | `spec/vectors/` is exactly what `generate.mjs` produces, the string catalog is exactly what Android's resources produce, every key the app uses exists, and nothing in the app can open a connection |
+| `SproutKit` | `macos-15` | the wire formats and the data layer build **and match the vectors** |
+| `App` | `macos-15` | the project spec, entitlements and `Info.plist` are coherent, and the app and its UI tests compile for the simulator |
+| `Screenshots` | `macos-15` | every screen renders — and the images land in [`ios/screenshots/`](../ios/screenshots) |
 
 A simulator build needs no signing identity, which is why `App` passes
 `CODE_SIGNING_ALLOWED=NO`. macOS runners are **free on this repository** because
@@ -283,11 +284,70 @@ what the `paths:` filters in `ci.yml` and `ios.yml` exist to keep in check.
 - **Run on a real radio.** The Bluetooth exchange
   ([ADR-0016](adr/0016-a-transport-both-platforms-can-speak.md)) is testable over
   a pipe and not otherwise. Two physical phones are the only proof.
-- **Take an App Store screenshot.** The Android listing is captured on an
-  emulator by `screenshots.yml`; the iOS equivalent needs a Mac, and there is no
-  reason to build one until there are screens worth capturing.
 - **Produce anything installable.** Not a TestFlight build, not an `.ipa`, not
   something you can put on your own phone.
+- **Capture the *listing* screenshots.** The review set below is captured on
+  whatever simulator the runner happens to ship. App Store Connect wants
+  specific device sizes, which means naming those simulators and a job of its
+  own — the counterpart of `screenshots.yml`'s `tablet-7` / `tablet-10` runs.
+  Not built, because there is nothing to upload it to yet.
+
+### The review screenshots, in the repository
+
+`ios/screenshots/` holds one PNG per screen, committed by the `Screenshots`
+job — the same arrangement as [`android/screenshots/`](../android/screenshots),
+and for the same reason: a pull request is easier to review when the diff shows
+what changed on screen, and nobody on this project has a Mac to look at the app
+on.
+
+The two jobs share their rules, deliberately:
+
+- **Only visibly-changed images are promoted.** A capture is never
+  byte-identical to the last one — text antialiasing and the renderer vary
+  between runs — so committing on any byte difference means a churn commit on
+  nearly every pull request. The threshold is the same 0.05% of pixels, and it
+  should not be raised to swallow a residue: a changed word in a list row is
+  itself well under 1% of the screen.
+- **The commit carries `[skip ci]`**, or the run would capture, commit, and
+  capture again.
+- **The clock is frozen.** Android pins the emulator's; iOS pins its own
+  through `ScreenshotSeed.now`, because the app reads every "now" through
+  `Clock`. Without that, "5 min ago" renders differently on every run and every
+  image is "changed".
+- **`ios/screenshots/` and `ios/fastlane/` are excluded from the workflow's
+  `paths:`.** Neither can change what the app renders, and a macOS runner
+  proving that a PNG is still a PNG is fifteen minutes for nothing.
+
+Names come out of the `.xcresult` bundle as UUIDs, so
+[`ios/tools/name_screenshots.py`](../ios/tools/name_screenshots.py) reads the
+manifest and turns them back into `01-home.png`. It fails loudly when it names
+nothing — a capture that quietly committed an empty set would read as "the
+screens are fine" when nobody looked.
+
+### The release notes, in the repository
+
+`ios/fastlane/metadata/<locale>/changelogs/<build>.txt`, one file per build,
+exactly as [`android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt`](../android/fastlane/metadata/android)
+does. Same seven languages, same voice, written for the person reading the
+store listing rather than the person reading the diff.
+
+Two differences, both Apple's rather than ours:
+
+- **The locale codes are not Google Play's.** App Store Connect has no region on
+  Italian or Polish, so `it-IT` and `pl-PL` become `it` and `pl`. The other five
+  match.
+- **`deliver` reads one `release_notes.txt` per locale, not a directory.** The
+  numbered files are the history — worth keeping, and the shape the other app
+  already uses — so the release step, when there is one, copies the highest
+  build's file into place rather than the notes being edited in situ and lost.
+
+The rest of the listing — title, subtitle, description, keywords — is
+**deliberately not duplicated here**. Android's already exists in all seven
+languages, and a second copy of the same marketing text is a second thing to
+keep in step; the App Store's field limits differ enough (a 30-character
+subtitle against Play's 80-character short description) that it wants
+generating from one source rather than copying, the way the string catalog
+already is. Not needed until there is a listing to fill in.
 
 ### What publishing will need, when the screens land
 
