@@ -175,7 +175,53 @@ guess is close.
 
 ---
 
-## 7. What a document may not do
+## 7. The replica document
+
+The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON.
+
+```json
+{
+  "formatVersion": 1,
+  "schemaVersion": 16,
+  "householdId": "…", "deviceId": "…", "deviceName": "…",
+  "createdAt": 1757400000000,
+  "babies": [], "feedings": [], "sleeps": [], "diapers": [],
+  "growth": [], "treatments": [], "pumpings": [], "tombstones": []
+}
+```
+
+- **`formatVersion` is this document's, `schemaVersion` is the sender's
+  database.** A reader refuses either being above its own — distinguishably,
+  because "your partner's phone is newer than yours" is a different sentence from
+  "this file is damaged". Both missing is unreadable, not version 0.
+- **Local ids never travel.** `id` is a per-device counter and would mean
+  something else on the other phone. Rows are named by `uid` and nothing else,
+  and a baby-scoped row carries `babyUid` — resolved to a local id at merge time.
+- **The parent's own data never travels.** No `wellbeing`, no `parent_profile`.
+  `pumpings` is present only when the sender's stash switch is on.
+- **Soft-deleted rows are included, flagged.** That is how a deletion reaches the
+  other phone instead of being undone by it. `tombstones` carries `uid`, `entity`
+  and `deletedAt` for rows that were erased outright.
+- **A null is an absent key.** `org.json`'s `put(key, null)` removes the key, so
+  a writer must omit rather than write `null`, and a reader must treat absent and
+  null alike. An implementation that writes `"deletedAt": null` produces a
+  document Android reads identically — but one that *requires* the key does not.
+- **Unknown keys are ignored and absent lists are empty.** That is what lets a
+  field be added without a version bump: a replica written before sleeps recorded
+  a position merges exactly as it did, as a sleep with nothing noted.
+- **Enums travel as their names**, upper-case, exactly as the database stores
+  them: `BREAST`, `OWN_BED`, `FRIDGE`. Never an ordinal — a reordered enum would
+  silently rewrite history.
+- **Two fields are packed strings, not arrays**, because that is how Room stores
+  them: a treatment's `timesOfDay` is minutes joined by `,`, and a feeding's
+  `segments` is `SIDE,start,end` triples joined by `;`. Empty is `""`.
+
+**Vector:** `replica.json` — a document with one of every row type, and the
+absent-versus-null cases spelled out.
+
+---
+
+## 8. What a document may not do
 
 Checked **before** parsing, not around it
 ([ADR-0014](../docs/adr/0014-the-way-in-is-an-allow-list.md)):

@@ -189,6 +189,147 @@ write('invitation.json', {
   ],
 })
 
+// --------------------------------------------------------- the replica document
+
+// The plaintext inside a sealed replica (§7). Written out here rather than by
+// either app, for the reason at the top of this file: what has to agree is the
+// *document*, and a vector one phone produced would only ever prove the other
+// agrees with that phone.
+//
+// Every row carries one of each awkwardness the format has: a null that must be
+// written as an absent key, an enum that travels as its name, and the two fields
+// Room packs into strings.
+const replica = {
+  formatVersion: 1,
+  schemaVersion: 16,
+  householdId: 'household-vector',
+  deviceId: 'device-vector',
+  deviceName: "Vector's phone",
+  createdAt: 1_757_400_000_000,
+  babies: [
+    {
+      uid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      updatedAt: 1_757_400_000_000,
+      name: 'Robin',
+      birthDate: 1_755_000_000_000,
+      archived: false,
+      // feedingReminderEnabled / feedingReminderIntervalMinutes absent: null is
+      // written by leaving the key out, never as `null`.
+    },
+  ],
+  feedings: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'c9f0f895-fb98-4b6f-9b0e-1a2b3c4d5e6f',
+      updatedAt: 1_757_400_060_000,
+      type: 'BREAST',
+      side: 'BOTH',
+      startTime: 1_757_400_000_000,
+      endTime: 1_757_400_780_000,
+      leftDurationMs: 540_000,
+      rightDurationMs: 240_000,
+      // Room packs the segments: SIDE,start,end triples joined by ';'.
+      segments: 'LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000',
+    },
+  ],
+  sleeps: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: '45c48cce-2e2d-4fbd-aa1f-dd0eaf14a7c9',
+      updatedAt: 1_757_403_600_000,
+      startTime: 1_757_390_000_000,
+      endTime: 1_757_403_600_000,
+      position: 'BACK',
+      place: 'OTHER',
+      placeNote: 'pram',
+    },
+  ],
+  diapers: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'd3d94468-02a4-4cbe-b9dd-e0e5cbb2dbc0',
+      updatedAt: 1_757_401_000_000,
+      time: 1_757_401_000_000,
+      wet: true,
+      dirty: true,
+      stoolColor: 'YELLOW',
+    },
+  ],
+  growth: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: '6512bd43-d9ca-4e6f-9b3a-5c8b9f0a1d2e',
+      updatedAt: 1_757_402_000_000,
+      time: 1_757_402_000_000,
+      weightGrams: 4200,
+      // heightMm and headMm absent: nobody measured them, which is not zero.
+    },
+  ],
+  treatments: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'c20ad4d7-6fe9-4779-8c7e-3b1a2f4d5e60',
+      updatedAt: 1_757_402_500_000,
+      name: 'Vitamin D',
+      dose: '400 IU',
+      intervalDays: 1,
+      // Minutes since midnight, joined by ',' — 09:00 and 21:00.
+      timesOfDay: '540,1260',
+      startDate: 1_755_000_000_000,
+      remindersEnabled: true,
+      active: true,
+    },
+  ],
+  pumpings: [
+    {
+      uid: 'aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d',
+      updatedAt: 1_757_404_000_000,
+      time: 1_757_404_000_000,
+      amountMl: 120,
+      storage: 'FRIDGE',
+    },
+  ],
+  tombstones: [
+    {
+      uid: '9bf31c7f-f062-4a17-bd23-6a1e7f8c9d0a',
+      entity: 'feeding',
+      deletedAt: 1_757_405_000_000,
+    },
+  ],
+}
+
+// One row that was soft-deleted, so `deletedAt` is exercised as a value as well
+// as an absence.
+replica.diapers.push({
+  babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+  uid: '1ff1de77-4005-4b9d-b3f1-2c3d4e5f6a7b',
+  updatedAt: 1_757_406_000_000,
+  deletedAt: 1_757_406_000_000,
+  time: 1_757_405_500_000,
+  wet: true,
+  dirty: false,
+})
+
+write('replica.json', {
+  note:
+    'Decode documentJson and every field must come back as listed. ' +
+    'Absent keys are nulls: a writer omits them, a reader treats absent and null alike.',
+  formatVersion: 1,
+  schemaVersion: 16,
+  documentJson: JSON.stringify(replica),
+  document: replica,
+  rowCount:
+    replica.babies.length + replica.feedings.length + replica.sleeps.length +
+    replica.diapers.length + replica.growth.length + replica.treatments.length +
+    replica.pumpings.length + replica.tombstones.length,
+  refuses: [
+    { name: 'a newer document format', json: JSON.stringify({ ...replica, formatVersion: 2 }), reason: 'tooNew' },
+    { name: 'a newer database schema', json: JSON.stringify({ ...replica, schemaVersion: 99 }), reason: 'tooNew' },
+    { name: 'no versions at all', json: JSON.stringify({ householdId: 'x' }), reason: 'unreadable' },
+    { name: 'not JSON', json: 'not a replica at all', reason: 'unreadable' },
+  ],
+})
+
 // ------------------------------------------------------------- nesting depth
 
 const nest = (depth) => '['.repeat(depth) + ']'.repeat(depth)

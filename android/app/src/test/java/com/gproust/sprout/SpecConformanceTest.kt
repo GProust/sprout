@@ -7,12 +7,16 @@ import com.gproust.sprout.data.sync.SyncInvitation
 import com.gproust.sprout.data.sync.SyncInvitationCodec
 import com.gproust.sprout.data.sync.SyncInvitationException
 import com.gproust.sprout.data.sync.SyncLimits
+import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.sync.SyncPayloadCodec
+import com.gproust.sprout.data.sync.SyncPayloadException
 import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.HouseholdBeacon
 import com.gproust.sprout.data.sync.nearby.SyncSession
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -194,6 +198,75 @@ class SpecConformanceTest {
                     SyncInvitationCodec.decode(bytes, now)
                 }
                 else -> throw AssertionError("unknown expectation $expect in case $name")
+            }
+        }
+    }
+
+    /**
+     * The replica document, against a vector Node wrote.
+     *
+     * The sealing envelope has been pinned since the spec existed; the plaintext
+     * inside it had not been, which left the one place a hand-written port can
+     * differ by a single key and nothing say so — two phones in a household
+     * simply stop syncing, and nothing errors when that happens. This closes it
+     * from the Android side; `SyncPayloadTests` closes it from the other.
+     */
+    @Test
+    fun `the replica document matches the spec`() {
+        val v = vector("replica.json")
+        val payload = SyncPayloadCodec.decode(
+            v.getString("documentJson").toByteArray(Charsets.UTF_8),
+            currentSchemaVersion = v.getInt("schemaVersion"),
+        )
+
+        assertEquals("household-vector", payload.householdId)
+        assertEquals("device-vector", payload.deviceId)
+        assertEquals("Vector's phone", payload.deviceName)
+        assertEquals(v.getInt("rowCount"), payload.rowCount)
+
+        // The two fields Room packs into strings have to unpack to the same
+        // values on both sides: a platform that read them as anything else would
+        // write a document the other could not use.
+        val segments = payload.feedings.first().row.segments
+        assertEquals(2, segments.size)
+        assertEquals(BreastSide.LEFT, segments.first().side)
+        assertEquals(1_757_400_000_000L, segments.first().startTime)
+        assertEquals(listOf(540, 1260), payload.treatments.first().row.timesOfDay)
+
+        // A measure nobody took is an absent key, not a zero.
+        assertNull(payload.growth.first().row.heightMm)
+        assertNull(payload.babies.first().feedingReminderEnabled)
+
+        // And a row that *was* deleted carries the flag, which is how a deletion
+        // reaches the other phone instead of being undone by it.
+        assertEquals(
+            1_757_406_000_000L,
+            payload.diapers.first { it.row.deletedAt != null }.row.deletedAt,
+        )
+    }
+
+    /** Each refusal is its own case: "newer" and "damaged" are different sentences. */
+    @Test
+    fun `the replica refusals match the spec`() {
+        val refusals = vector("replica.json").getJSONArray("refuses")
+        for (i in 0 until refusals.length()) {
+            val case = refusals.getJSONObject(i)
+            val name = case.getString("name")
+            val thrown = try {
+                SyncPayloadCodec.decode(
+                    case.getString("json").toByteArray(Charsets.UTF_8),
+                    currentSchemaVersion = 16,
+                )
+                null
+            } catch (e: SyncPayloadException) {
+                e
+            }
+
+            assertTrue("$name: should not have decoded", thrown != null)
+            when (case.getString("reason")) {
+                "tooNew" -> assertTrue(name, thrown is SyncPayloadException.TooNew)
+                "unreadable" -> assertTrue(name, thrown is SyncPayloadException.Unreadable)
+                else -> error("unknown reason in the vector")
             }
         }
     }
