@@ -57,27 +57,6 @@ struct BabyPane<Header: View>: View {
     }
 }
 
-extension BabyPane where Header == EmptyView {
-    init(
-        summary: BabySummary,
-        tracksWellbeing: Bool,
-        now: Int64,
-        onFeed: @escaping (BreastSide) -> Void,
-        onOpen: @escaping (LogDestination) -> Void,
-        onShareRecord: (() -> Void)? = nil
-    ) {
-        self.init(
-            summary: summary,
-            tracksWellbeing: tracksWellbeing,
-            now: now,
-            onFeed: onFeed,
-            onOpen: onOpen,
-            onShareRecord: onShareRecord,
-            header: { EmptyView() }
-        )
-    }
-}
-
 /// One baby's line on a household dashboard: the same answers as ``BabyPane``,
 /// minus the log grid, plus a way in to the full thing.
 ///
@@ -186,9 +165,14 @@ struct QuickFeed: View {
 }
 
 /// Where a log tile goes.
-enum LogDestination: Hashable {
+enum LogDestination: String, Hashable {
     case feeding, pumping, sleep, diaper, growth, treatments, wellbeing
     case stats, checkIn, report
+
+    /// The tile's accessibility identifier, and the only handle the screenshot
+    /// run has on it. An identifier and not the visible label, because the
+    /// capture walks the same grid in seven languages.
+    var tileIdentifier: String { "log-tile-\(rawValue)" }
 }
 
 /// The five baby logs plus the parent's two, as equals.
@@ -201,19 +185,30 @@ struct LogGrid: View {
     let tracksWellbeing: Bool
     let onOpen: (LogDestination) -> Void
 
-    private var tiles: [(String, String, LogDestination)] {
-        var tiles: [(String, String, LogDestination)] = [
-            (Str.t("nav_feed"), "drop.fill", .feeding),
-            (Str.t("screen_pumping"), "drop.triangle.fill", .pumping),
-            (Str.t("nav_sleep"), "moon.zzz.fill", .sleep),
-            (Str.t("nav_diaper"), "figure.child", .diaper),
-            (Str.t("nav_growth"), "ruler", .growth),
-            (Str.t("screen_treatments"), "pills.fill", .treatments),
+    /// A named type rather than a tuple: `ForEach` cannot destructure a tuple
+    /// element into closure parameters, and `\.2` is not a key path Swift will
+    /// form.
+    private struct Tile: Identifiable {
+        let label: String
+        let symbol: String
+        let destination: LogDestination
+
+        var id: LogDestination { destination }
+    }
+
+    private var tiles: [Tile] {
+        var tiles: [Tile] = [
+            Tile(label: Str.t("nav_feed"), symbol: "drop.fill", destination: .feeding),
+            Tile(label: Str.t("screen_pumping"), symbol: "drop.triangle.fill", destination: .pumping),
+            Tile(label: Str.t("nav_sleep"), symbol: "moon.zzz.fill", destination: .sleep),
+            Tile(label: Str.t("nav_diaper"), symbol: "figure.child", destination: .diaper),
+            Tile(label: Str.t("nav_growth"), symbol: "ruler", destination: .growth),
+            Tile(label: Str.t("screen_treatments"), symbol: "pills.fill", destination: .treatments),
         ]
         // Dropped for a parent who has turned their own tracking off; the
         // history stays, untouched.
         if tracksWellbeing {
-            tiles.append((Str.t("screen_wellbeing"), "heart.fill", .wellbeing))
+            tiles.append(Tile(label: Str.t("screen_wellbeing"), symbol: "heart.fill", destination: .wellbeing))
         }
         return tiles
     }
@@ -226,15 +221,15 @@ struct LogGrid: View {
             columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.tight), count: 3),
             spacing: Spacing.tight
         ) {
-            ForEach(tiles, id: \.2) { label, symbol, destination in
+            ForEach(tiles) { tile in
                 Button {
-                    onOpen(destination)
+                    onOpen(tile.destination)
                 } label: {
                     VStack(spacing: Spacing.hairline + 2) {
-                        Image(systemName: symbol)
+                        Image(systemName: tile.symbol)
                             .font(.title3)
                             .foregroundStyle(SproutColor.primary)
-                        Text(label)
+                        Text(tile.label)
                             .font(.caption)
                             .foregroundStyle(SproutColor.onSurface)
                             .lineLimit(2)
@@ -249,6 +244,7 @@ struct LogGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(tile.destination.tileIdentifier)
             }
         }
     }

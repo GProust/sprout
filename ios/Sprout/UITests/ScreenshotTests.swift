@@ -30,11 +30,48 @@ final class ScreenshotTests: XCTestCase {
         ]
         app.launch()
 
-        // The four tabs (BDR-0010), then the logs that are reached by pushing
-        // from the dashboard's grid rather than by a tab of their own.
+        // The dashboard, then each log opened from its grid. The logs are
+        // *pushed* from that grid rather than given a tab, which is the whole of
+        // BDR-0010 — so a run that photographed only the tabs would miss every
+        // screen the change moved.
         try capture(app, tab: 0, named: "01-home", language: language)
-        try capture(app, tab: 1, named: "02-trends", language: language)
-        try capture(app, tab: 2, named: "03-you", language: language)
+        for (index, log) in Self.logs.enumerated() {
+            try captureLog(app, tile: log, named: "0\(index + 2)-\(log)", language: language)
+        }
+
+        // Then the other tabs. Three in total with the seeded single baby: the
+        // baby's own tab appears only from two children up, because with one the
+        // dashboard already is that view.
+        try capture(app, tab: 1, named: "07-trends", language: language)
+        try capture(app, tab: 2, named: "08-you", language: language)
+    }
+
+    /// The grid's tiles, in the order they are drawn. `treatments` and
+    /// `wellbeing` are left out while their screens are still placeholders —
+    /// there is nothing to see, and the two would only be noise in a set the
+    /// point of which is spotting a change.
+    private static let logs = ["feeding", "pumping", "sleep", "diaper", "growth"]
+
+    /// Opens one log from the dashboard's grid, files it, and comes back.
+    private func captureLog(
+        _ app: XCUIApplication,
+        tile: String,
+        named name: String,
+        language: String
+    ) throws {
+        let button = app.buttons["log-tile-\(tile)"]
+        XCTAssertTrue(
+            button.waitForExistence(timeout: 15),
+            "\(name): no \(tile) tile on the dashboard"
+        )
+        button.tap()
+
+        try file(app, named: name, language: language)
+
+        // Back to the dashboard, ready for the next tile. The back button is
+        // the navigation bar's first, and its label is the previous screen's
+        // title — which is why it is taken by position and not by name.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
     }
 
     /// Selects a tab, waits for it to settle, and files the image.
@@ -55,6 +92,11 @@ final class ScreenshotTests: XCTestCase {
         )
         button.tap()
 
+        try file(app, named: name, language: language)
+    }
+
+    /// Waits for whatever is on screen to be on screen, then files the image.
+    private func file(_ app: XCUIApplication, named name: String, language: String) throws {
         // Wait for something rather than sleeping: a fixed delay is either
         // wasted time or a flake, depending on how the runner is feeling.
         //
@@ -76,5 +118,4 @@ final class ScreenshotTests: XCTestCase {
         add(attachment)
     }
 
-    }
 }

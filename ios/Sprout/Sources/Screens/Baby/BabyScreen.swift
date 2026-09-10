@@ -64,7 +64,7 @@ struct YouScreen: View {
                 YouEntry(
                     systemImage: "drop.triangle.fill",
                     title: Str.t("screen_pumping"),
-                    body: Str.t("you_pumping_body")
+                    detail: Str.t("you_pumping_body")
                 ) { onOpen(.pumping) }
 
                 // Hidden for a parent who has turned their own tracking off, the
@@ -73,13 +73,13 @@ struct YouScreen: View {
                     YouEntry(
                         systemImage: "heart.fill",
                         title: Str.t("screen_wellbeing"),
-                        body: Str.t("you_wellbeing_body")
+                        detail: Str.t("you_wellbeing_body")
                     ) { onOpen(.wellbeing) }
 
                     YouEntry(
                         systemImage: "heart.text.square.fill",
                         title: Str.t("home_checkin_title"),
-                        body: model.checkInPending
+                        detail: model.checkInPending
                             ? Str.t("home_checkin_body")
                             : Str.t("you_checkin_done")
                     ) { onOpen(.checkIn) }
@@ -96,7 +96,9 @@ struct YouScreen: View {
 private struct YouEntry: View {
     let systemImage: String
     let title: String
-    let body: String
+    /// Not `body` — that name is already taken by the view's own, and a stored
+    /// property called `body` shadows it into a compile error.
+    let detail: String
     let action: () -> Void
 
     var body: some View {
@@ -110,7 +112,7 @@ private struct YouEntry: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(SproutColor.onSurface)
-                    Text(self.body)
+                    Text(detail)
                         .font(.callout)
                         .foregroundStyle(SproutColor.onSurfaceVariant)
                         .multilineTextAlignment(.leading)

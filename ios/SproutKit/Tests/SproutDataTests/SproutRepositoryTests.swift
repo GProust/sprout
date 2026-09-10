@@ -184,6 +184,31 @@ final class SproutRepositoryTests: XCTestCase {
         }
     }
 
+    /// Moving a batch of milk to `USED` hands the *same* row back, and it has to
+    /// stay one row.
+    ///
+    /// Room's DAO inserts with `OnConflictStrategy.REPLACE`, so on Android this
+    /// is an update; a plain GRDB `insert` would collide on the primary key
+    /// instead, the write would be dropped, and the stash would keep counting
+    /// milk the parent had already given.
+    func testMarkingMilkUsedEditsTheBatchRatherThanAddingOne() throws {
+        _ = try makeBaby()
+        try repository.addPumping(Pumping(time: clock, amountMl: 120, storage: .FRIDGE))
+        var stored = try XCTUnwrap(try read { db in try Pumping.fetchOne(db) })
+        let uid = stored.uid
+
+        stored.storage = .USED
+        try repository.addPumping(stored)
+
+        try read { db in
+            XCTAssertEqual(try Pumping.fetchCount(db), 1, "an edit, not a second session")
+            let after = try XCTUnwrap(try Pumping.fetchOne(db))
+            XCTAssertEqual(after.storage, .USED)
+            XCTAssertEqual(after.amountMl, 120, "only where it went changed")
+            XCTAssertEqual(after.uid, uid, "the same row keeps its identity across a merge")
+        }
+    }
+
     // MARK: - Tombstones
 
     func testCompactionErasesRowsPastTheRetentionWindow() throws {

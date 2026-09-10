@@ -399,7 +399,7 @@ public final class SproutRepository: @unchecked Sendable {
     }
 
     public func addPumping(_ pumping: Pumping) throws {
-        try insert(pumping)
+        try upsert(pumping)
     }
 
     public func deletePumping(_ pumping: Pumping) throws { try softDelete(pumping) }
@@ -493,13 +493,18 @@ public final class SproutRepository: @unchecked Sendable {
     }
 
     /// The same, for a row that belongs to the parent rather than to a baby.
-    private func insert<T: SyncableRecord>(_ record: T) throws {
+    ///
+    /// `save` and not `insert`, matching Room's `OnConflictStrategy.REPLACE` on
+    /// the Android DAO: a record handed back with its `id` already set is an
+    /// edit of that row, not a second row. Moving a batch of milk to `USED` is
+    /// exactly that, and `insert` would collide on the primary key and lose it.
+    private func upsert<T: SyncableRecord>(_ record: T) throws {
         let timestamp = now()
         try database.write { db in
             var copy = record
             if copy.uid.isEmpty { copy.uid = newUid() }
             copy.updatedAt = timestamp
-            try copy.insert(db)
+            try copy.save(db)
         }
     }
 

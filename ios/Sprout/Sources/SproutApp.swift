@@ -3,9 +3,9 @@ import SwiftUI
 
 /// The iOS app (ADR-0015).
 ///
-/// The screens land in batches, verified by CI and reviewed as screenshots. What
-/// is here now is the shell and the two simplest tracking screens; the tabs
-/// below name the rest, and each becomes real as it is ported.
+/// The screens land in batches, verified by CI and reviewed as screenshots. The
+/// shell is ``RootView``; the screens still to come are named by ``NotYetPorted``
+/// rather than left blank, so a capture says which is missing.
 @main
 struct SproutApp: App {
 
