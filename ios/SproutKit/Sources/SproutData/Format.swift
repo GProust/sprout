@@ -42,6 +42,30 @@ public enum SproutFormat {
         calendar.isDate(date(from: a), inSameDayAs: date(from: b))
     }
 
+    /// The same date a year on. Calendar arithmetic, so it lands on the same day
+    /// of the month rather than 365 days later.
+    public static func plusOneYear(_ epochMillis: Int64) -> Int64 {
+        let next = calendar.date(byAdding: .year, value: 1, to: date(from: epochMillis))
+        return millis(from: next ?? date(from: epochMillis))
+    }
+
+    /// `epochMillis` moved to a given time of day, keeping its date.
+    public static func settingTime(hour: Int, minute: Int, on epochMillis: Int64) -> Int64 {
+        let point = calendar.date(
+            bySettingHour: hour,
+            minute: minute,
+            second: 0,
+            of: date(from: epochMillis)
+        )
+        return millis(from: point ?? date(from: epochMillis))
+    }
+
+    /// The wall-clock hour and minute of an instant, in local time.
+    public static func hourAndMinute(_ epochMillis: Int64) -> (hour: Int, minute: Int) {
+        let parts = calendar.dateComponents([.hour, .minute], from: date(from: epochMillis))
+        return (parts.hour ?? 0, parts.minute ?? 0)
+    }
+
     /// Which day a timestamp reads as, relative to `now`.
     public enum DayLabel: Equatable, Sendable {
         case today

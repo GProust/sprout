@@ -404,6 +404,12 @@ public struct Treatment: Codable, FetchableRecord, Identifiable, Equatable, Sync
 
     public var reminderTimes: [Int] { IntListCoding.decode(timesOfDay) }
 
+    /// Written through the same encoding it is read with, so an editor cannot
+    /// store a list Room would decode differently.
+    public mutating func setReminderTimes(_ minutes: [Int]) {
+        timesOfDay = IntListCoding.encode(minutes)
+    }
+
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }
 

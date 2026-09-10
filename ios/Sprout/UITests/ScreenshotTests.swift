@@ -36,14 +36,14 @@ final class ScreenshotTests: XCTestCase {
         // screen the change moved.
         try capture(app, tab: 0, named: "01-home", language: language)
         for (index, log) in Self.logs.enumerated() {
-            try captureLog(app, tile: log, named: "0\(index + 2)-\(log)", language: language)
+            try captureLog(app, tile: log, named: String(format: "%02d-%@", index + 2, log), language: language)
         }
 
         // Then the other tabs. Three in total with the seeded single baby: the
         // baby's own tab appears only from two children up, because with one the
         // dashboard already is that view.
-        try capture(app, tab: 1, named: "08-trends", language: language)
-        try capture(app, tab: 2, named: "09-you", language: language)
+        try capture(app, tab: 1, named: "09-trends", language: language)
+        try capture(app, tab: 2, named: "10-you", language: language)
 
         // And the check-in, which is reached from the You tab rather than the
         // grid — the one screen a parent is *offered* rather than goes looking
@@ -51,14 +51,16 @@ final class ScreenshotTests: XCTestCase {
         let checkIn = app.buttons.matching(identifier: "you-entry-checkin").firstMatch
         if checkIn.waitForExistence(timeout: 5) {
             checkIn.tap()
-            try file(app, named: "10-checkin", language: language)
+            try file(app, named: "11-checkin", language: language)
         }
     }
 
-    /// The grid's tiles, in the order they are drawn. `treatments` is left out
-    /// while its screen is still a placeholder — there is nothing to see, and it
-    /// would only be noise in a set whose point is spotting a change.
-    private static let logs = ["feeding", "pumping", "sleep", "diaper", "growth", "wellbeing"]
+    /// The grid's tiles, in the order they are drawn. Every one of them is a
+    /// real screen now, which is the point of BDR-0010: treatments used to be
+    /// the one that could not fit in the bar.
+    private static let logs = [
+        "feeding", "pumping", "sleep", "diaper", "growth", "treatments", "wellbeing",
+    ]
 
     /// Opens one log from the dashboard's grid, files it, and comes back.
     private func captureLog(

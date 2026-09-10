@@ -304,17 +304,44 @@ struct DateTimeField: View {
     let label: String
     @Binding var millis: Int64
 
-    private var date: Binding<Date> {
-        Binding(
-            get: { SproutFormat.date(from: millis) },
-            set: { millis = SproutFormat.millis(from: $0) }
-        )
-    }
-
     var body: some View {
-        DatePicker(label, selection: date, displayedComponents: [.date, .hourAndMinute])
+        DatePicker(label, selection: dateBinding($millis), displayedComponents: [.date, .hourAndMinute])
             .font(.callout)
     }
+}
+
+/// A day on its own, for the things that have one — a treatment's start, the end
+/// of a course. Offering an hour there would be asking for a precision the
+/// answer does not have.
+struct DateField: View {
+    let label: String
+    @Binding var millis: Int64
+
+    var body: some View {
+        DatePicker(label, selection: dateBinding($millis), displayedComponents: [.date])
+            .font(.callout)
+    }
+}
+
+/// A time of day on its own, for a reminder that repeats and therefore belongs
+/// to no particular date.
+struct TimeField: View {
+    let label: String
+    @Binding var millis: Int64
+
+    var body: some View {
+        DatePicker(label, selection: dateBinding($millis), displayedComponents: [.hourAndMinute])
+            .font(.callout)
+    }
+}
+
+/// `DatePicker` speaks `Date`; everything Sprout stores is epoch milliseconds,
+/// because that is what Room holds on the other side.
+private func dateBinding(_ millis: Binding<Int64>) -> Binding<Date> {
+    Binding(
+        get: { SproutFormat.date(from: millis.wrappedValue) },
+        set: { millis.wrappedValue = SproutFormat.millis(from: $0) }
+    )
 }
 
 // MARK: - Actions
