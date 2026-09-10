@@ -165,9 +165,16 @@ struct QuickFeed: View {
 }
 
 /// Where a log tile goes.
-enum LogDestination: String, Hashable {
+///
+/// Not a raw-value enum, because one case carries something: **the report names
+/// the baby it is for.** Android routes it as `report/{babyId}` for the same
+/// reason, and its own comment says why — "never for whichever is active". The
+/// export is reached from one baby's page, and a menu left on another name must
+/// not be able to send the wrong child's record.
+enum LogDestination: Hashable {
     case feeding, pumping, sleep, diaper, growth, treatments, wellbeing
-    case stats, checkIn, report
+    case stats, checkIn
+    case report(Int64)
     /// Not logs — the two the dashboard's toolbar opens, and the sync screen
     /// behind Settings. They travel through the same push so there is one way
     /// into a screen rather than two.
@@ -176,7 +183,25 @@ enum LogDestination: String, Hashable {
     /// The tile's accessibility identifier, and the only handle the screenshot
     /// run has on it. An identifier and not the visible label, because the
     /// capture walks the same grid in seven languages.
-    var tileIdentifier: String { "log-tile-\(rawValue)" }
+    var tileIdentifier: String { "log-tile-\(name)" }
+
+    private var name: String {
+        switch self {
+        case .feeding: return "feeding"
+        case .pumping: return "pumping"
+        case .sleep: return "sleep"
+        case .diaper: return "diaper"
+        case .growth: return "growth"
+        case .treatments: return "treatments"
+        case .wellbeing: return "wellbeing"
+        case .stats: return "stats"
+        case .checkIn: return "checkIn"
+        case .report: return "report"
+        case .profile: return "profile"
+        case .settings: return "settings"
+        case .sync: return "sync"
+        }
+    }
 }
 
 /// The five baby logs plus the parent's two, as equals.

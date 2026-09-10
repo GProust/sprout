@@ -171,10 +171,22 @@ final class XlsxTests: XCTestCase {
         let found = try parts(of: try Xlsx.write([awkward]))
         let workbook = try XCTUnwrap(found["xl/workbook.xml"])
 
+        // The name attribute itself, not the whole document: the namespaces are
+        // URLs and are full of slashes.
+        let name = try XCTUnwrap(
+            workbook.range(of: "name=\"").map { start in
+                let rest = workbook[start.upperBound...]
+                return String(rest.prefix(while: { $0 != "\"" }))
+            }
+        )
+
         for illegal in [":", "\\", "/", "?", "*", "[", "]"] {
-            XCTAssertFalse(workbook.contains("name=\"\(illegal)"), "sheet name kept \(illegal)")
+            XCTAssertFalse(name.contains(illegal), "sheet name kept \(illegal)")
         }
-        XCTAssertTrue(workbook.contains("Feeds   sleeps  everything  2026"), workbook)
+        XCTAssertLessThanOrEqual(name.count, 31, "Excel refuses the whole file over 31")
+        // The cut lands mid-"2026", which is the point: the rule is a length,
+        // not a word boundary.
+        XCTAssertEqual(name, "Feeds   sleeps  everything  202")
     }
 
     func testTwoSheetsAreBothDeclaredAndBothPresent() throws {

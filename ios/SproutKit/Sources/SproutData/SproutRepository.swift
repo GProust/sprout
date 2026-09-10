@@ -507,6 +507,46 @@ public final class SproutRepository: @unchecked Sendable {
         Task { await onWidgetDataChanged() }
     }
 
+    // MARK: - One baby's whole history, read once
+
+    /// The report needs every row for one named baby, not a stream and not the
+    /// active one.
+    ///
+    /// **By id rather than by the active selection**, because the export is
+    /// reached from a particular baby's page and a menu left on the wrong name
+    /// must not be able to send the wrong child's record.
+    public func feedingsForBabyOnce(_ babyId: Int64) throws -> [Feeding] {
+        try allForBaby(babyId, ordered: "startTime")
+    }
+
+    public func sleepsForBabyOnce(_ babyId: Int64) throws -> [Sleep] {
+        try allForBaby(babyId, ordered: "startTime")
+    }
+
+    public func diapersForBabyOnce(_ babyId: Int64) throws -> [Diaper] {
+        try allForBaby(babyId, ordered: "time")
+    }
+
+    public func growthForBabyOnce(_ babyId: Int64) throws -> [Growth] {
+        try allForBaby(babyId, ordered: "time")
+    }
+
+    public func treatmentsForBabyOnce(_ babyId: Int64) throws -> [Treatment] {
+        try allForBaby(babyId, ordered: "startDate")
+    }
+
+    private func allForBaby<T: FetchableRecord & TableRecord>(
+        _ babyId: Int64,
+        ordered column: String
+    ) throws -> [T] {
+        try database.read { db in
+            try T
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .order(Column(column))
+                .fetchAll(db)
+        }
+    }
+
     // MARK: - Tombstones
 
     /// Erases tombstones past the retention window, and with them the soft-deleted

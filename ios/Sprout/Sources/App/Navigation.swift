@@ -144,7 +144,7 @@ struct RootView: View {
         case .treatments: TreatmentsScreen()
         case .wellbeing: HealthScreen()
         case .checkIn: DailyCheckInScreen()
-        case .report: ReportScreen()
+        case .report(let babyId): ReportScreen(babyId: babyId)
         case .stats: StatsScreen()
         case .profile: ProfileScreen()
         case .settings: SettingsScreen()

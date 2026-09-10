@@ -212,7 +212,7 @@ struct HomeScreen: View {
                             now: model.now,
                             onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
-                            onShareRecord: { onOpen(.report) },
+                            onShareRecord: { if let id = single.baby.id { onOpen(.report(id)) } },
                             header: {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(single.baby.name)

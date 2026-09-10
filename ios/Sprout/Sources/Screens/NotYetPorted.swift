@@ -45,10 +45,6 @@ struct NotYetPorted: View {
 // The gaps, each named so a screenshot says which screen is missing rather than
 // showing an empty one.
 
-struct ReportScreen: View {
-    var body: some View { NotYetPorted(title: Str.t("report_screen_title"), androidLines: 708) }
-}
-
 struct SyncScreen: View {
     var body: some View { NotYetPorted(title: Str.t("screen_sync"), androidLines: 802) }
 }
