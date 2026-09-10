@@ -552,20 +552,3 @@ private struct ToggleRow: View {
     }
 }
 
-/// A URL that `sheet(item:)` can key on.
-private struct SharedFile: Identifiable {
-    let url: URL
-    var id: String { url.path }
-}
-
-/// The system share sheet. The file leaves through whichever app the parent
-/// picks — Sprout never sends it anywhere itself.
-private struct ShareSheet: UIViewControllerRepresentable {
-    let url: URL
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [url], applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
-}

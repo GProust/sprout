@@ -13,9 +13,45 @@ import SwiftUI
 final class AppEnvironment {
 
     let repository: SproutRepository
+    /// The merge, and the replicas that feed it (ADR-0007).
+    let engine: SyncEngine
+    /// Who this phone is paired with, and the phones it has heard from.
+    let pairingStore: PairingStore
+    let householdDevices: HouseholdDevices
+    /// The store a backup leaves alone (ADR-0018). Held here as well as inside
+    /// `pairingStore` because this device's own id lives in it, and a replica
+    /// carries that id.
+    let deviceStore: any DeviceLocalStore
 
-    private init(repository: SproutRepository) {
+    /// A file another app has just handed Sprout, waiting to be opened.
+    ///
+    /// It lands here rather than in the sync screen's model because it arrives
+    /// before that screen exists: the app has to be pushed to it first. Cleared
+    /// by whoever consumes it, so a second tap on the same file works.
+    var pendingSyncFile: URL?
+
+    private init(
+        repository: SproutRepository,
+        engine: SyncEngine,
+        settings: any DeviceLocalStore,
+        deviceStore: any DeviceLocalStore
+    ) {
         self.repository = repository
+        self.engine = engine
+        self.deviceStore = deviceStore
+        self.pairingStore = PairingStore(settings: settings, deviceOnly: deviceStore)
+        self.householdDevices = HouseholdDevices(settings: settings)
+    }
+
+    @MainActor
+    func makeSyncViewModel() -> SyncViewModel {
+        SyncViewModel(
+            repository: repository,
+            engine: engine,
+            pairingStore: pairingStore,
+            householdDevices: householdDevices,
+            deviceStore: deviceStore
+        )
     }
 
     /// The real thing, on disk.
@@ -31,12 +67,30 @@ final class AppEnvironment {
             create: true
         )
         let queue = try SproutDatabase.open(atPath: directory.appendingPathComponent("sprout.db").path)
-        return AppEnvironment(repository: SproutRepository(database: queue))
+        return AppEnvironment(
+            repository: SproutRepository(database: queue),
+            engine: SyncEngine(database: queue),
+            // The two stores of ADR-0018, chosen by whether a backup should
+            // carry the value.
+            settings: UserDefaultsStore(),
+            deviceStore: KeychainStore()
+        )
     }
 
     /// An empty in-memory app, for previews and for the screenshot run.
+    ///
+    /// In-memory stores as well as an in-memory database: a preview that wrote
+    /// to the real keychain would leave a household secret behind on whatever
+    /// machine rendered it, and a screenshot run has to start from the same
+    /// state every time or the captures are not a set.
     static func inMemory() throws -> AppEnvironment {
-        AppEnvironment(repository: SproutRepository(database: try SproutDatabase.inMemory()))
+        let queue = try SproutDatabase.inMemory()
+        return AppEnvironment(
+            repository: SproutRepository(database: queue),
+            engine: SyncEngine(database: queue),
+            settings: InMemoryStore(),
+            deviceStore: InMemoryStore()
+        )
     }
 }
 

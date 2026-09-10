@@ -4,8 +4,8 @@ import SwiftUI
 /// The iOS app (ADR-0015).
 ///
 /// The screens land in batches, verified by CI and reviewed as screenshots. The
-/// shell is ``RootView``; the screens still to come are named by ``NotYetPorted``
-/// rather than left blank, so a capture says which is missing.
+/// shell is ``RootView``, and every screen behind it is now a real one — the
+/// placeholder that named the missing ones is gone, which is what it was for.
 @main
 struct SproutApp: App {
 
@@ -44,6 +44,14 @@ struct SproutApp: App {
                     // over with an empty screen.
                     failure = String(describing: error)
                 }
+            }
+            // A `.sprout` file another app handed us — from Mail, Messages, or
+            // wherever the parents already talk to each other (ADR-0008). It is
+            // the same door the manifest declares on Android, and it opens onto
+            // the same screen: everything about the file is decided there, by
+            // looking at its bytes.
+            .onOpenURL { url in
+                environment?.pendingSyncFile = url
             }
         }
     }

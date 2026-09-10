@@ -53,6 +53,33 @@ final class ScreenshotTests: XCTestCase {
             checkIn.tap()
             try file(app, named: "11-checkin", language: language)
         }
+
+        try captureSettingsAndSharing(app, language: language)
+    }
+
+    /// Settings, and the sharing screen behind it.
+    ///
+    /// Two taps deep from the dashboard rather than a tab, so it is the one pair
+    /// of screens a capture would otherwise never reach — and sharing is the
+    /// part of the app with the most to explain, which makes it the part most
+    /// worth looking at.
+    private func captureSettingsAndSharing(_ app: XCUIApplication, language: String) throws {
+        // Back to the dashboard, but not filed again — "01-home" already is
+        // that picture.
+        app.tabBars.buttons.element(boundBy: 0).tap()
+
+        let gear = app.buttons["home-settings"]
+        XCTAssertTrue(gear.waitForExistence(timeout: 15), "no settings button on the dashboard")
+        gear.tap()
+        try file(app, named: "12-settings", language: language)
+
+        // By `descendants` rather than `buttons`: a `NavigationLink` inside a
+        // `Form` is a cell on some iOS versions and a button on others, and
+        // which one it is today is not something worth pinning a run to.
+        let sync = app.descendants(matching: .any).matching(identifier: "settings-sync").firstMatch
+        XCTAssertTrue(sync.waitForExistence(timeout: 10), "no sharing row in settings")
+        sync.tap()
+        try file(app, named: "13-sync", language: language)
     }
 
     /// The grid's tiles, in the order they are drawn. Every one of them is a

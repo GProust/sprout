@@ -264,6 +264,9 @@ struct HomeScreen: View {
                     Image(systemName: "gearshape")
                 }
                 .accessibilityLabel(Str.t("cd_settings"))
+                // By identifier and not by label: the screenshot run repeats in
+                // seven languages, and a label is a different word in each.
+                .accessibilityIdentifier("home-settings")
             }
         }
         .sproutStyle()

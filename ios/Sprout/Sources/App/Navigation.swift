@@ -72,6 +72,16 @@ struct RootView: View {
             self.model = model
             await model.observeEverything()
         }
+        // A file handed to Sprout by another app opens the sharing screen,
+        // wherever in the app the parents happen to be. The screen itself reads
+        // the file; this only gets them there.
+        .onChange(of: sprout.pendingSyncFile) { _, url in
+            guard url != nil else { return }
+            selection = .home
+            // Settings underneath, so the back arrow lands where the screen
+            // would have been reached from rather than on the dashboard.
+            homePath = [.settings, .sync]
+        }
     }
 
     @ViewBuilder

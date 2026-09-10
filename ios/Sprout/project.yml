@@ -65,6 +65,24 @@ targets:
         NSBluetoothAlwaysUsageDescription: >-
           Sprout uses Bluetooth only while it is open, to sync this baby's record
           with the other phones in your household. Nothing is sent anywhere else.
+        # The one way in from outside (ADR-0014). Android's manifest offers
+        # Sprout for a file another app hands it; this is the same door, and it
+        # is the same size: one type, ours, and nothing else. A replica arriving
+        # through it is parsed with nothing authenticated at all, which is why
+        # `SyncFiles.read` caps what it will read and `SyncLimits` is checked
+        # before the parse rather than around it.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.gproust.sprout.sync
+            UTTypeDescription: Sprout record
+            UTTypeConformsTo: [public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [sprout]
+              public.mime-type: [application/vnd.sprout.sync]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Sprout record
+            LSHandlerRank: Owner
+            CFBundleTypeRole: Viewer
+            LSItemContentTypes: [com.gproust.sprout.sync]
         # Deliberately absent, and the absence is the point (ADR-0014): no
         # NSAppTransportSecurity, no URL scheme, no networking usage string,
         # because there is no networking. That is the iOS equivalent of Android's

@@ -154,6 +154,7 @@ struct SettingsScreen: View {
                         .foregroundStyle(SproutColor.onSurfaceVariant)
                 }
             }
+            .accessibilityIdentifier("settings-sync")
         }
     }
 
@@ -235,40 +236,3 @@ private struct QuestionToggle: View {
     }
 }
 
-/// A setting Android has and this app does not, said out loud.
-///
-/// The alternative was a switch that stores a preference and schedules nothing,
-/// which reads as a promise. Both of these need a notification scheduler that is
-/// not written on this side yet.
-///
-/// The note is **deliberately not translated**, for the reason `DatabaseFailureView`
-/// gives: the string catalog is generated from Android's resources and CI checks
-/// the two match, so a key that exists only here cannot be added without
-/// inventing seven translations nobody wrote. English is the honest option for a
-/// line that should disappear when the scheduler lands.
-private struct NotYetOnIOS: View {
-    let title: String
-    let detail: String
-
-    init(_ title: String, _ detail: String) {
-        self.title = title
-        self.detail = detail
-    }
-
-    var body: some View {
-        HStack(alignment: .top, spacing: Spacing.snug) {
-            Image(systemName: "hammer.fill")
-                .foregroundStyle(SproutColor.onSurfaceVariant)
-                .font(.footnote)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).foregroundStyle(SproutColor.onSurfaceVariant)
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(SproutColor.onSurfaceVariant)
-                Text("Not on iPhone yet.")
-                    .font(.caption.italic())
-                    .foregroundStyle(SproutColor.onSurfaceVariant)
-            }
-        }
-    }
-}
