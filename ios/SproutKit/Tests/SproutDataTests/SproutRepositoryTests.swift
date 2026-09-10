@@ -209,6 +209,75 @@ final class SproutRepositoryTests: XCTestCase {
         }
     }
 
+    // MARK: - Permanently deleting a baby
+
+    /// The second of the two deletion paths (ADR-0007): the rows go, their uids
+    /// stay. Without the tombstones a partner's copy resurrects every one of them
+    /// at the next merge, forever.
+    func testPermanentlyDeletingABabyLeavesTombstonesAndNoRows() throws {
+        let robin = try makeBaby("Robin")
+        try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
+        try repository.addSleep(Sleep(startTime: clock))
+        try repository.addDiaper(Diaper(time: clock, wet: true))
+        try repository.addGrowth(Growth(time: clock, weightGrams: 4200))
+
+        let babyUid = try XCTUnwrap(try repository.activeBabies().first?.uid)
+        let feedingUid = try XCTUnwrap(try read { db in try Feeding.fetchOne(db)?.uid })
+
+        try repository.deleteBaby(id: robin)
+
+        try read { db in
+            XCTAssertEqual(try Baby.fetchCount(db), 0, "the rows are gone, not flagged")
+            XCTAssertEqual(try Feeding.fetchCount(db), 0)
+            XCTAssertEqual(try Sleep.fetchCount(db), 0)
+            XCTAssertEqual(try Diaper.fetchCount(db), 0)
+            XCTAssertEqual(try Growth.fetchCount(db), 0)
+
+            let tombstones = try Tombstone.fetchAll(db)
+            XCTAssertEqual(tombstones.count, 5, "one per erased row, the baby included")
+            XCTAssertTrue(tombstones.contains { $0.uid == babyUid && $0.entity == "baby" })
+            XCTAssertTrue(tombstones.contains { $0.uid == feedingUid && $0.entity == "feeding" })
+            XCTAssertTrue(tombstones.allSatisfy { $0.deletedAt == self.clock })
+        }
+    }
+
+    /// Erasing whoever is selected has to hand the selection on, or the app opens
+    /// on a baby that no longer exists.
+    func testPermanentlyDeletingTheActiveBabyPassesTheSelectionOn() throws {
+        let robin = try makeBaby("Robin")
+        let sam = try makeBaby("Sam")
+
+        try repository.deleteBaby(id: robin)
+
+        XCTAssertEqual(try repository.activeBabyIdNow(), sam)
+        XCTAssertEqual(try repository.activeBabies().map(\.name), ["Sam"])
+    }
+
+    /// Deleting the last baby leaves no selection rather than a stale one.
+    func testDeletingTheLastBabyLeavesNoSelection() throws {
+        let robin = try makeBaby("Robin")
+
+        try repository.deleteBaby(id: robin)
+
+        XCTAssertNil(try repository.activeBabyIdNow())
+    }
+
+    /// One baby's deletion must not take another's history with it.
+    func testAnotherBabysHistorySurvives() throws {
+        let robin = try makeBaby("Robin")
+        let sam = try makeBaby("Sam")
+        try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
+        try repository.setActiveBaby(id: sam)
+        try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 120, startTime: clock))
+
+        try repository.deleteBaby(id: robin)
+
+        try read { db in
+            XCTAssertEqual(try Feeding.fetchAll(db).map(\.amountMl), [120], "Sam's feed only")
+            XCTAssertEqual(try Baby.fetchAll(db).map(\.name), ["Sam"])
+        }
+    }
+
     // MARK: - Tombstones
 
     func testCompactionErasesRowsPastTheRetentionWindow() throws {

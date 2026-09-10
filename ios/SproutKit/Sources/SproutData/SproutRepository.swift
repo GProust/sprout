@@ -458,6 +458,55 @@ public final class SproutRepository: @unchecked Sendable {
         return try lastBreastFeed(babyId: babyId, since: since)
     }
 
+    /// **Permanently delete a baby**: the second of the two deletion paths.
+    ///
+    /// An ordinary delete flags the row and keeps it. This erases the rows and
+    /// keeps only their uids in `tombstone`, so the deletion still travels to the
+    /// other phones without the data lingering on this one — which is the whole
+    /// point of the pair. A partner's copy would otherwise resurrect every row at
+    /// the next merge, forever.
+    ///
+    /// One transaction, tombstones written before the purge: a crash between the
+    /// two would otherwise erase rows nothing remembers deleting.
+    public func deleteBaby(id: Int64) throws {
+        let timestamp = now()
+        try database.write { db in
+            func uids(_ table: String) throws -> [String] {
+                try String.fetchAll(db, sql: "SELECT uid FROM \(table) WHERE babyId = ?", arguments: [id])
+            }
+
+            var tombstones: [Tombstone] = []
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment"] {
+                tombstones += try uids(table).map {
+                    Tombstone(uid: $0, entity: table, deletedAt: timestamp)
+                }
+            }
+            if let babyUid = try String.fetchOne(
+                db, sql: "SELECT uid FROM baby WHERE id = ?", arguments: [id]
+            ) {
+                tombstones.append(Tombstone(uid: babyUid, entity: "baby", deletedAt: timestamp))
+            }
+            for tombstone in tombstones { try tombstone.insert(db) }
+
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment"] {
+                try db.execute(sql: "DELETE FROM \(table) WHERE babyId = ?", arguments: [id])
+            }
+            try db.execute(sql: "DELETE FROM baby WHERE id = ?", arguments: [id])
+
+            // The selection has to go somewhere, or the app opens on a baby that
+            // no longer exists.
+            if var profile = try ParentProfile.fetchOne(db, key: ParentProfile.singletonId),
+               profile.activeBabyId == id {
+                profile.activeBabyId = try Baby
+                    .filter(Column("archived") == false && Column("deletedAt") == nil)
+                    .order(Column("birthDate"))
+                    .fetchOne(db)?.id
+                try profile.update(db)
+            }
+        }
+        Task { await onWidgetDataChanged() }
+    }
+
     // MARK: - Tombstones
 
     /// Erases tombstones past the retention window, and with them the soft-deleted
