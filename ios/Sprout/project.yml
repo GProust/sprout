@@ -52,12 +52,27 @@ targets:
         # No launch storyboard: the app is SwiftUI end to end.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
 
+  SproutUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: Sprout
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout.uitests
+        TEST_TARGET_NAME: Sprout
+
 schemes:
   Sprout:
     build:
       targets:
         Sprout: all
+        SproutUITests: [test]
     run:
       config: Debug
     test:
       config: Debug
+      targets:
+        - SproutUITests

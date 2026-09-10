@@ -28,6 +28,15 @@ struct SproutApp: App {
             .task {
                 guard environment == nil, failure == nil else { return }
                 do {
+                    #if DEBUG
+                    // The screenshot run gets a fixed in-memory database and a
+                    // frozen clock. Compiled out of Release entirely — see
+                    // ScreenshotSeed.
+                    if ScreenshotSeed.isRequested {
+                        environment = try ScreenshotSeed.environment()
+                        return
+                    }
+                    #endif
                     environment = try AppEnvironment.onDisk()
                 } catch {
                     // ADR-0002: there is no server copy of any of this, so a
@@ -43,13 +52,15 @@ struct SproutApp: App {
 /// The four places the app is organised into (BDR-0010).
 struct RootView: View {
     var body: some View {
+        // `.tabItem`, not the `Tab` builder: that one is iOS 18 and the
+        // deployment target is 17 (ADR-0015). Raising the floor to buy nicer
+        // syntax would drop phones that are three years old, which is not a
+        // trade this app makes.
         TabView {
-            Tab(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") {
-                NavigationStack { SleepScreen() }
-            }
-            Tab(Str.t("nav_diaper"), systemImage: "figure.child") {
-                NavigationStack { DiaperScreen() }
-            }
+            NavigationStack { SleepScreen() }
+                .tabItem { Label(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") }
+            NavigationStack { DiaperScreen() }
+                .tabItem { Label(Str.t("nav_diaper"), systemImage: "figure.child") }
         }
         .tint(SproutColor.primary)
     }

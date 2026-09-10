@@ -130,3 +130,61 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
+
+  screenshots:
+    name: Screenshots
+    runs-on: macos-15
+    # Every screen, captured on a simulator and attached to the run — the iOS
+    # counterpart of screenshots.yml. A pull request is far easier to review when
+    # you can see what changed than when you can only read what changed, and
+    # nobody on this project has a Mac to look at the app on.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Generate the project
+        run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
+
+      - name: Capture
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ios/Sprout/Sprout.xcodeproj \
+            -scheme Sprout \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -resultBundlePath "$RUNNER_TEMP/screenshots.xcresult" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      # Attachments live inside the .xcresult bundle. `export attachments` is
+      # the Xcode 16 command; the older toolchains want `--legacy`, so try both
+      # and, if neither works, print the bundle's shape rather than failing with
+      # nothing to go on.
+      - name: Pull the images out of the result bundle
+        if: always()
+        run: |
+          BUNDLE="$RUNNER_TEMP/screenshots.xcresult"
+          OUT="$RUNNER_TEMP/screenshots"
+          mkdir -p "$OUT"
+          [ -d "$BUNDLE" ] || { echo "::error::no result bundle at $BUNDLE"; exit 1; }
+
+          if xcrun xcresulttool export attachments --path "$BUNDLE" --output-path "$OUT" 2>/dev/null; then
+            echo "exported with the current xcresulttool"
+          elif xcrun xcresulttool export attachments --legacy --path "$BUNDLE" --output-path "$OUT" 2>/dev/null; then
+            echo "exported with --legacy"
+          else
+            echo "::warning::could not export attachments; listing the bundle so the next run knows why"
+            xcrun xcresulttool get --path "$BUNDLE" --format json 2>/dev/null | head -c 4000 || true
+            ls -R "$BUNDLE" | head -50
+          fi
+
+          echo "captured:"
+          find "$OUT" -type f | sort
+
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-screenshots
+          path: ${{ runner.temp }}/screenshots/**
+          if-no-files-found: warn
