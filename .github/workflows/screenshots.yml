@@ -139,8 +139,17 @@ jobs:
           # (instead of Gradle's connectedAndroidTest, which uninstalls the app
           # afterwards and wipes the captured screenshots) so the app stays
           # installed and `run-as` can read its internal files.
+          #
+          # The first line is `||` and not `&&`, and it waits twice. `adb root`
+          # restarts adbd, which drops the very connection it answered on — so it
+          # exits non-zero, `&&` skipped the wait that was meant to cover exactly
+          # that, and `|| true` swallowed the whole thing. Everything after it
+          # then raced adbd coming back: usually it won, and on the run that lost
+          # eight commands hit "device offline" inside 150 ms and the first one
+          # without a `|| true` failed the job. Waiting for the device *and* for
+          # the boot flag is what makes the rest of the script deterministic.
           script: |
-            adb root && adb wait-for-device || true
+            adb root || true; adb wait-for-device; adb shell 'while [ "$(getprop sys.boot_completed)" != 1 ]; do sleep 1; done'
             adb shell settings put global auto_time 0 || true
             adb shell settings put global auto_time_zone 0 || true
             adb shell setprop persist.sys.timezone UTC || true
