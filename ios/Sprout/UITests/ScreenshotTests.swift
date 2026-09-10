@@ -42,15 +42,23 @@ final class ScreenshotTests: XCTestCase {
         // Then the other tabs. Three in total with the seeded single baby: the
         // baby's own tab appears only from two children up, because with one the
         // dashboard already is that view.
-        try capture(app, tab: 1, named: "07-trends", language: language)
-        try capture(app, tab: 2, named: "08-you", language: language)
+        try capture(app, tab: 1, named: "08-trends", language: language)
+        try capture(app, tab: 2, named: "09-you", language: language)
+
+        // And the check-in, which is reached from the You tab rather than the
+        // grid — the one screen a parent is *offered* rather than goes looking
+        // for, so worth seeing as it is offered (BDR-0006).
+        let checkIn = app.buttons.matching(identifier: "you-entry-checkin").firstMatch
+        if checkIn.waitForExistence(timeout: 5) {
+            checkIn.tap()
+            try file(app, named: "10-checkin", language: language)
+        }
     }
 
-    /// The grid's tiles, in the order they are drawn. `treatments` and
-    /// `wellbeing` are left out while their screens are still placeholders —
-    /// there is nothing to see, and the two would only be noise in a set the
-    /// point of which is spotting a change.
-    private static let logs = ["feeding", "pumping", "sleep", "diaper", "growth"]
+    /// The grid's tiles, in the order they are drawn. `treatments` is left out
+    /// while its screen is still a placeholder — there is nothing to see, and it
+    /// would only be noise in a set whose point is spotting a change.
+    private static let logs = ["feeding", "pumping", "sleep", "diaper", "growth", "wellbeing"]
 
     /// Opens one log from the dashboard's grid, files it, and comes back.
     private func captureLog(

@@ -83,6 +83,7 @@ struct YouScreen: View {
                             ? Str.t("home_checkin_body")
                             : Str.t("you_checkin_done")
                     ) { onOpen(.checkIn) }
+                    .accessibilityIdentifier("you-entry-checkin")
                 }
             }
             .padding(Spacing.regular)

@@ -119,9 +119,9 @@ jobs:
   app:
     name: App
     runs-on: macos-15
-    # The app target is a shell until the screens land. Building it still proves
-    # the project spec, the entitlements and the Info.plist are coherent, which
-    # is what a project assembled without Xcode is most likely to get wrong.
+    # Compiles the app and its UI test target. It also proves the project spec,
+    # the entitlements and the Info.plist are coherent, which is what a project
+    # assembled without Xcode is most likely to get wrong.
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -131,12 +131,29 @@ jobs:
       - name: Generate the project
         run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
 
+      # Whatever iPhone this image happens to ship, by UDID. A hardcoded model
+      # name is a dependency on the runner image that fails the day it changes —
+      # and it fails differently in each job, because `build` quietly degrades to
+      # a placeholder destination while `test` needs a device it can boot.
+      - name: Choose a simulator
+        id: sim
+        run: |
+          # Assigned, not echoed inline: `echo "x=$(cmd)"` exits 0 even when cmd
+          # failed, and an empty destination is a confusing error two steps later.
+          set -euo pipefail
+          udid="$(ios/tools/pick_simulator.sh)"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+      # `build-for-testing`, not `build`: plain `build` compiles the app target
+      # and nothing else, so a syntax error in the UI tests reached CI only via
+      # the screenshot job — the slow one, and the one that fails for unrelated
+      # reasons. This compiles both and answers in a minute.
       - name: Build for the simulator
         run: |
-          xcodebuild build \
+          xcodebuild build-for-testing \
             -project ios/Sprout/Sprout.xcodeproj \
             -scheme Sprout \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
@@ -154,6 +171,15 @@ jobs:
       - name: Generate the project
         run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
 
+      - name: Choose a simulator
+        id: sim
+        run: |
+          # Assigned, not echoed inline: `echo "x=$(cmd)"` exits 0 even when cmd
+          # failed, and an empty destination is a confusing error two steps later.
+          set -euo pipefail
+          udid="$(ios/tools/pick_simulator.sh)"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
       - name: Capture
         id: capture
         run: |
@@ -161,7 +187,7 @@ jobs:
           xcodebuild test \
             -project ios/Sprout/Sprout.xcodeproj \
             -scheme Sprout \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath "$RUNNER_TEMP/screenshots.xcresult" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO

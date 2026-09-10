@@ -49,14 +49,6 @@ struct TreatmentsScreen: View {
     var body: some View { NotYetPorted(title: Str.t("screen_treatments"), androidLines: 511) }
 }
 
-struct HealthScreen: View {
-    var body: some View { NotYetPorted(title: Str.t("screen_wellbeing"), androidLines: 241) }
-}
-
-struct DailyCheckInScreen: View {
-    var body: some View { NotYetPorted(title: Str.t("home_checkin_title"), androidLines: 331) }
-}
-
 struct ReportScreen: View {
     var body: some View { NotYetPorted(title: Str.t("report_screen_title"), androidLines: 708) }
 }

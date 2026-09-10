@@ -182,3 +182,83 @@ extension MilkStorage {
         }
     }
 }
+
+// MARK: - The parent's own labels
+
+/// The mood scale, from `ui/common/HealthLabels.kt`.
+///
+/// Emoji rather than words, and the same five on both platforms: a face is read
+/// at a glance and needs no translation, which matters for the one screen a
+/// parent uses while too tired to read.
+func moodEmoji(_ mood: Int) -> String {
+    switch mood {
+    case 1: return "😢"
+    case 2: return "🙁"
+    case 3: return "😐"
+    case 4: return "🙂"
+    default: return "😄"
+    }
+}
+
+extension Bleeding {
+    var label: String {
+        switch self {
+        case .NONE: return Str.t("bleeding_none")
+        case .LIGHT: return Str.t("bleeding_light")
+        case .MODERATE: return Str.t("bleeding_moderate")
+        case .HEAVY: return Str.t("bleeding_heavy")
+        }
+    }
+}
+
+extension BreastState {
+    var label: String {
+        switch self {
+        case .NORMAL: return Str.t("breast_normal")
+        case .TENDER: return Str.t("breast_tender")
+        case .ENGORGED: return Str.t("breast_engorged")
+        case .PAINFUL: return Str.t("breast_painful")
+        }
+    }
+}
+
+extension Recovery {
+    var label: String {
+        switch self {
+        case .GREAT: return Str.t("recovery_great")
+        case .GOOD: return Str.t("recovery_good")
+        case .SORE: return Str.t("recovery_sore")
+        case .PAINFUL: return Str.t("recovery_painful")
+        }
+    }
+}
+
+extension DeliveryType {
+    var label: String {
+        switch self {
+        case .VAGINAL: return Str.t("delivery_vaginal")
+        case .CESAREAN: return Str.t("delivery_cesarean")
+        }
+    }
+}
+
+/// The healing question, worded for the delivery — and worded generically when
+/// the parent did not say, which is a real answer and not a gap. Asking a
+/// caesarean question of someone who had a vaginal birth is the kind of small
+/// wrongness this screen cannot afford.
+func healingQuestion(_ deliveryType: DeliveryType?) -> String {
+    switch deliveryType {
+    case .CESAREAN: return Str.t("healing_q_cesarean")
+    case .VAGINAL: return Str.t("healing_q_vaginal")
+    case nil: return Str.t("healing_q_generic")
+    }
+}
+
+/// The same question as a short field label.
+func healingFieldLabel(_ deliveryType: DeliveryType?) -> String {
+    switch deliveryType {
+    case .CESAREAN: return Str.t("healing_label_cesarean")
+    case .VAGINAL: return Str.t("healing_label_vaginal")
+    case nil: return Str.t("healing_label_generic")
+    }
+}

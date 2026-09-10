@@ -120,12 +120,16 @@ final class HomeViewModel {
 
     /// Whether today's check-in is still waiting.
     ///
-    /// It waits on the dashboard rather than opening at launch (BDR-0006) —
-    /// nothing to dismiss during a 3 a.m. feed.
+    /// Through ``shouldOfferCheckIn`` rather than re-deciding it here: when it is
+    /// offered is a product rule (BDR-0006) with a test on each platform, and a
+    /// second copy of it on a screen is how the two quietly come apart.
     private static func isCheckInPending(_ profile: ParentProfile?) -> Bool {
-        guard let profile, profile.trackWellbeing else { return false }
-        guard let last = profile.lastCheckIn else { return true }
-        return !SproutFormat.isSameDay(last, Clock.millis)
+        guard let profile else { return false }
+        return shouldOfferCheckIn(
+            trackWellbeing: profile.trackWellbeing,
+            lastCheckIn: profile.lastCheckIn,
+            now: Clock.millis
+        )
     }
 
     /// "Not today": put the check-in away until tomorrow, saving nothing.
@@ -237,7 +241,7 @@ struct HomeScreen: View {
                     if model.checkInPending {
                         CheckInCard(
                             onCheckIn: { onOpen(.checkIn) },
-                            onDismiss: model.dismissCheckIn
+                            onDismiss: { model.dismissCheckIn() }
                         )
                     }
                 }
