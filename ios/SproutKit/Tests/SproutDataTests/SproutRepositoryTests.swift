@@ -23,6 +23,14 @@ final class SproutRepositoryTests: XCTestCase {
         try repository.addBaby(name: name, birthDate: clock - 20 * 24 * 60 * 60 * 1000)
     }
 
+    /// GRDB has both a sync and an async `read`, and inside an `async` test the
+    /// compiler reaches for the async one. Going through a non-async function
+    /// leaves only one candidate, so the tests read the same whether or not they
+    /// are async.
+    private func read<T>(_ block: (Database) throws -> T) throws -> T {
+        try queue.read(block)
+    }
+
     // MARK: - Stamping
 
     func testAddingABabyStampsAUidAndTimestamp() throws {
@@ -53,7 +61,7 @@ final class SproutRepositoryTests: XCTestCase {
         try repository.addDiaper(Diaper(time: clock, wet: true))
         try repository.addGrowth(Growth(time: clock, weightGrams: 4200))
 
-        try queue.read { db in
+        try read { db in
             XCTAssertEqual(try Feeding.fetchOne(db)?.babyId, babyId)
             XCTAssertEqual(try Sleep.fetchOne(db)?.babyId, babyId)
             XCTAssertEqual(try Diaper.fetchOne(db)?.babyId, babyId)
@@ -72,7 +80,7 @@ final class SproutRepositoryTests: XCTestCase {
     func testALogWithoutAnActiveBabyIsNotWritten() throws {
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
 
-        try queue.read { db in XCTAssertEqual(try Feeding.fetchCount(db), 0) }
+        try read { db in XCTAssertEqual(try Feeding.fetchCount(db), 0) }
     }
 
     // MARK: - Soft deletes
@@ -80,12 +88,12 @@ final class SproutRepositoryTests: XCTestCase {
     func testDeletingFlagsTheRowRatherThanRemovingIt() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try read { db in try Feeding.fetchOne(db) }
         let feeding = try XCTUnwrap(stored)
 
         try repository.deleteFeeding(feeding)
 
-        try queue.read { db in
+        try read { db in
             let row = try XCTUnwrap(try Feeding.fetchOne(db))
             XCTAssertNotNil(row.deletedAt, "the row must stay, flagged")
             XCTAssertEqual(row.updatedAt, clock, "or the deletion loses to an older edit")
@@ -95,7 +103,7 @@ final class SproutRepositoryTests: XCTestCase {
     func testDeletedRowsAreNotRead() async throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try read { db in try Feeding.fetchOne(db) }
         let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
@@ -153,7 +161,7 @@ final class SproutRepositoryTests: XCTestCase {
 
         try repository.archiveBaby(id: robin)
 
-        try queue.read { db in
+        try read { db in
             XCTAssertEqual(try Feeding.fetchCount(db), 1, "stop tracking is not delete")
         }
         try repository.restoreBaby(id: robin)
@@ -181,7 +189,7 @@ final class SproutRepositoryTests: XCTestCase {
     func testCompactionErasesRowsPastTheRetentionWindow() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try read { db in try Feeding.fetchOne(db) }
         let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
@@ -190,7 +198,7 @@ final class SproutRepositoryTests: XCTestCase {
         let future = SproutRepository(database: queue, now: { later })
         try future.compactTombstones()
 
-        try queue.read { db in
+        try read { db in
             XCTAssertEqual(try Feeding.fetchCount(db), 0, "past retention the row goes for good")
         }
     }
@@ -198,13 +206,13 @@ final class SproutRepositoryTests: XCTestCase {
     func testCompactionLeavesRecentDeletionsAlone() throws {
         _ = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let stored = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try read { db in try Feeding.fetchOne(db) }
         let feeding = try XCTUnwrap(stored)
         try repository.deleteFeeding(feeding)
 
         try repository.compactTombstones()
 
-        try queue.read { db in
+        try read { db in
             XCTAssertEqual(
                 try Feeding.fetchCount(db), 1,
                 "a partner who has not synced this week still needs to hear about it"
@@ -218,7 +226,7 @@ final class SproutRepositoryTests: XCTestCase {
         let babyId = try makeBaby()
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock - 10_000))
         try repository.addFeeding(Feeding(type: .BOTTLE, amountMl: 90, startTime: clock))
-        let latest = try queue.read { db in try Feeding.order(Column("startTime").desc).fetchOne(db) }
+        let latest = try read { db in try Feeding.order(Column("startTime").desc).fetchOne(db) }
         let newest = try XCTUnwrap(latest)
 
         XCTAssertEqual(try repository.lastFeedTime(babyId: babyId), clock)
