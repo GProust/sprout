@@ -42,17 +42,21 @@ final class ScreenshotTests: XCTestCase {
         named name: String,
         language: String
     ) throws {
+        // A cold simulator can take a while to get the first frame up, and that
+        // is not the same event as a screen that never renders. The tab bar gets
+        // a generous wait once; everything after it is quick, so a real hang
+        // fails fast and says which screen it was on.
         let button = app.tabBars.buttons.element(boundBy: tabIndex(for: identifier))
         XCTAssertTrue(
-            button.waitForExistence(timeout: 10),
-            "the tab bar never appeared — the app probably failed to launch"
+            button.waitForExistence(timeout: 60),
+            "\(name): the tab bar never appeared — the app failed to launch"
         )
         button.tap()
 
         // Wait for a cell rather than sleeping: a fixed delay is either wasted
         // time or a flake, depending on how the runner is feeling.
         XCTAssertTrue(
-            app.scrollViews.firstMatch.waitForExistence(timeout: 10),
+            app.scrollViews.firstMatch.waitForExistence(timeout: 15),
             "\(name): the screen's list never appeared"
         )
 

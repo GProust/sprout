@@ -29,6 +29,15 @@ on:
       - '.github/workflows/ios.yml'
   workflow_dispatch:
 
+concurrency:
+  # A push supersedes the run before it. Without this a few pushes in a row have
+  # three Macs each building the same app, competing for runners and answering
+  # about commits nobody is waiting on any more — which is how the screenshot
+  # job ended up looking like it had hung when it was really just queued behind
+  # its own predecessors.
+  group: ios-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   spec:
     name: Specification & strings
