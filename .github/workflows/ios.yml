@@ -93,6 +93,14 @@ jobs:
       - name: Every string key the app uses is in the catalog
         run: python3 ios/tools/check_string_keys.py
 
+      # ADR-0014's claim is about *absence*, and absence is not what a feature
+      # test notices going missing. Android keeps it by not declaring INTERNET —
+      # the OS refuses the socket. iOS has no such permission, so the only way to
+      # make the same promise here is to check that the code which would open a
+      # connection does not exist.
+      - name: Sprout cannot reach the network
+        run: python3 ios/tools/check_no_network.py
+
   sproutkit:
     name: SproutKit
     runs-on: macos-15
