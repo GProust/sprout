@@ -345,14 +345,12 @@ struct DetailEmpty: View {
 // MARK: - The sleep breakdown
 
 /// One line of a breakdown, already worded for the screen.
-struct ShareRow: Identifiable {
+struct ShareRow {
     let label: String
     let count: Int
     let millis: Int64
     /// False for the "not recorded" line, which is drawn as the gap it is.
     let recorded: Bool
-
-    var id: String { label + (recorded ? "" : "\u{0}") }
 }
 
 /// A breakdown as bars of one colour, longest first.
@@ -372,7 +370,12 @@ struct SleepShares: View {
                 .foregroundStyle(SproutColor.onSurfaceVariant)
                 .padding(.top, Spacing.snug)
 
-            ForEach(rows) { row in
+            // Keyed by position rather than by label: the rows are already in
+            // the order the breakdown put them, and a label is not an identity —
+            // a place a parent named "Not recorded" would collide with the line
+            // for the sleeps that said nothing.
+            ForEach(rows.indices, id: \.self) { index in
+                let row = rows[index]
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(row.label)
