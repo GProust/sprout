@@ -37,10 +37,27 @@ The alphabet omits `0`/`O` and `1`/`I` deliberately: it gets read aloud at 3 a.m
 
 ---
 
-## 2. A sealed replica
+## 2. Row identifiers
+
+Every row that syncs carries a `uid` — the name it goes by on every phone, since
+the local `id` is a per-device counter.
+
+```
+uid = UUID v4, lowercase, hyphenated   e.g. "3f2b9c10-5d7a-4e21-8b6f-0a1c2d3e4f50"
+```
+
+**Lowercase is load-bearing.** The merge matches rows by exact string comparison,
+so a uid that differs only in case is a different row: every merge would
+duplicate instead of update, silently, for as long as the two phones keep
+meeting. Android gets this free from `UUID.randomUUID().toString()`; Swift's
+`UUID().uuidString` is uppercase and must be lowered.
+
+---
+
+## 3. A sealed replica
 
 What leaves the phone, whatever carries it — a messaging app, Quick Share, or
-the direct exchange in §4.
+the direct exchange in §5.
 
 ```
 "SPRT" | version:1 | nonce:12 | AES-256-GCM(gzip(plaintext)) || tag:16
@@ -75,7 +92,7 @@ byte rewritten. Both must fail the tag.
 
 ---
 
-## 3. The invitation
+## 4. The invitation
 
 A JSON document, deliberately **not** encrypted: there is no shared key yet, and
 pretending otherwise would be theatre. What narrows the window is that it
@@ -102,7 +119,7 @@ expires and is accepted once.
 
 ---
 
-## 4. The direct exchange
+## 5. The direct exchange
 
 Once two phones are connected, over any stream (see
 [ADR-0016](../docs/adr/0016-a-transport-both-platforms-can-speak.md) for what
@@ -112,7 +129,7 @@ carries it):
 "SPRTS" | version:1 | length:int32 | payload
 ```
 
-The payload is exactly a sealed replica from §2 — this layer has no crypto of
+The payload is exactly a sealed replica from §3 — this layer has no crypto of
 its own to get wrong.
 
 - `length` is a **big-endian signed** int32. A negative value, or one above
@@ -127,7 +144,7 @@ its own to get wrong.
 
 ---
 
-## 5. The advertisement
+## 6. The advertisement
 
 How a phone recognises its own household over the air, without broadcasting
 anything an onlooker could follow from one week to the next
@@ -158,7 +175,7 @@ guess is close.
 
 ---
 
-## 6. What a document may not do
+## 7. What a document may not do
 
 Checked **before** parsing, not around it
 ([ADR-0014](../docs/adr/0014-the-way-in-is-an-allow-list.md)):

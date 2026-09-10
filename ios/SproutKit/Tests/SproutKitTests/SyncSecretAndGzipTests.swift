@@ -119,3 +119,36 @@ final class GzipTests: XCTestCase {
         XCTAssertThrowsError(try Gzip.decompress(Data(compressed), limit: SyncLimits.maxFileBytes))
     }
 }
+
+final class SyncIdentityTests: XCTestCase {
+
+    /// Android generates these with `UUID.randomUUID().toString()`, which is
+    /// lowercase, and the merge matches rows by exact string. An uppercase uid
+    /// is a row no Android phone recognises as the same entry — every merge
+    /// would duplicate instead of update, silently.
+    func testUidsAreLowercase() {
+        for _ in 0..<50 {
+            let uid = newUid()
+            XCTAssertEqual(uid, uid.lowercased())
+        }
+    }
+
+    func testUidsLookLikeAHyphenatedUuid() {
+        let uid = newUid()
+
+        XCTAssertEqual(uid.count, 36)
+        XCTAssertEqual(uid.split(separator: "-").map(\.count), [8, 4, 4, 4, 12])
+        XCTAssertNotNil(UUID(uuidString: uid))
+    }
+
+    func testUidsAreNotReused() {
+        XCTAssertEqual(Set((0..<500).map { _ in newUid() }).count, 500)
+    }
+
+    /// Both apps compact tombstones on the same clock, or one phone erases a
+    /// deletion the other is still expecting to hear about.
+    func testTombstoneRetentionMatchesAndroid() {
+        XCTAssertEqual(tombstoneRetentionDays, 180)
+        XCTAssertEqual(tombstoneRetentionMs, 180 * 24 * 60 * 60 * 1000)
+    }
+}

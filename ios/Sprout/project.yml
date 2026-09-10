@@ -38,6 +38,9 @@ targets:
       - path: Sources
     dependencies:
       - package: SproutKit
+        product: SproutKit
+      - package: SproutKit
+        product: SproutData
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout

@@ -18,18 +18,20 @@ on:
     paths:
       - 'ios/**'
       - 'spec/**'
+      - 'android/app/src/main/res/values*/strings.xml'
       - '.github/workflows/ios.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'ios/**'
       - 'spec/**'
+      - 'android/app/src/main/res/values*/strings.xml'
       - '.github/workflows/ios.yml'
   workflow_dispatch:
 
 jobs:
   spec:
-    name: Specification
+    name: Specification & strings
     # No Mac needed to check that the vectors are what the generator produces,
     # so this runs on Linux and gives a fast answer before the Mac starts.
     runs-on: ubuntu-latest
@@ -58,6 +60,24 @@ jobs:
             exit 1
           fi
           echo "Committed vectors match the generator."
+
+      # The string catalog is generated from Android's resources, for the same
+      # reason as the vectors: one source, so the two apps cannot drift on copy.
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: The committed strings are the ones Android's resources produce
+        run: |
+          python3 ios/tools/strings_from_android.py
+          if [ -n "$(git status --porcelain -- ios/Sprout/Sources/Localizable.xcstrings)" ]; then
+            echo "::error::Localizable.xcstrings differs from the Android string resources."
+            echo "Re-run 'python3 ios/tools/strings_from_android.py' and commit the result."
+            git diff --stat -- ios/Sprout/Sources/Localizable.xcstrings
+            exit 1
+          fi
+          echo "Committed string catalog matches Android."
 
   sproutkit:
     name: SproutKit
