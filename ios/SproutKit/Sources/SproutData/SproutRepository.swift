@@ -261,6 +261,43 @@ public final class SproutRepository: @unchecked Sendable {
         observe { db in try Wellbeing.order(Column("time").desc).fetchAll(db) }
     }
 
+    // MARK: - The whole household
+
+    // The dashboard summarises every tracked baby at once (BDR-0009), so these
+    // are not scoped to the active one. They are summaries rather than logs, so
+    // they are bounded by a window instead of returning a baby's whole history
+    // — the log screens are still where that lives.
+
+    /// Every tracked baby's feeds since `since`.
+    public func householdFeedings(since: Int64) -> AsyncValueObservation<[Feeding]> {
+        observe { db in
+            try Feeding
+                .filter(Column("startTime") >= since && Column("deletedAt") == nil)
+                .order(Column("startTime").desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Every tracked baby's sleeps since `since`.
+    public func householdSleeps(since: Int64) -> AsyncValueObservation<[Sleep]> {
+        observe { db in
+            try Sleep
+                .filter(Column("startTime") >= since && Column("deletedAt") == nil)
+                .order(Column("startTime").desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Every tracked baby's nappies since `since`.
+    public func householdDiapers(since: Int64) -> AsyncValueObservation<[Diaper]> {
+        observe { db in
+            try Diaper
+                .filter(Column("time") >= since && Column("deletedAt") == nil)
+                .order(Column("time").desc)
+                .fetchAll(db)
+        }
+    }
+
     /// Sleeps still running, across every tracked baby — the dashboard shows
     /// them whichever baby is selected.
     public var ongoingSleeps: AsyncValueObservation<[Sleep]> {
