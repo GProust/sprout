@@ -78,12 +78,8 @@ final class ScreenshotTests: XCTestCase {
         // which one it is today is not something worth pinning a run to.
         let sync = app.descendants(matching: .any).matching(identifier: "settings-sync").firstMatch
         XCTAssertTrue(
-            sync.waitForExistence(timeout: 10),
-            // With the shape of the screen, so a failure says what to query for
-            // next rather than only that the query was wrong.
-            """
-            no sharing row in settings —             cells: \(app.cells.count), buttons: \(app.buttons.count),             staticTexts: \(app.staticTexts.count)
-            """
+            scroll(app, to: sync),
+            "no sharing row in settings, even after scrolling to the bottom"
         )
         sync.tap()
         try file(app, named: "13-sync", language: language)
@@ -184,6 +180,26 @@ final class ScreenshotTests: XCTestCase {
         button.tap()
 
         try file(app, named: name, language: language)
+    }
+
+    /// Scrolls until `element` is in the accessibility tree, or gives up.
+    ///
+    /// Sharing is the fifth of six sections in Settings, so on a phone it starts
+    /// below the fold — and the captured image of that screen shows its top. A
+    /// SwiftUI `Form` is a `List`, and a `List` builds rows lazily, so a row that
+    /// has not been scrolled to may not be in the tree to query at all.
+    ///
+    /// That is the likelier reading of two runs that could not find the row's
+    /// identifier no matter where the identifier was put — likelier, not proven,
+    /// because the run's accessibility dump is inside an artifact this
+    /// environment cannot fetch. Either way scrolling first is correct: it costs
+    /// nothing when the row is already visible.
+    private func scroll(_ app: XCUIApplication, to element: XCUIElement, swipes: Int = 6) -> Bool {
+        for _ in 0..<swipes {
+            if element.exists { return true }
+            app.swipeUp()
+        }
+        return element.exists
     }
 
     /// Waits for whatever is on screen to be on screen, then files the image.
