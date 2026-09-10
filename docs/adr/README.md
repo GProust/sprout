@@ -40,6 +40,7 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0015](0015-native-ios-in-this-repository.md) | Native iOS, in this repository | Accepted |
 | [0016](0016-a-transport-both-platforms-can-speak.md) | A transport both platforms can speak | Accepted (Android implementation Proposed) |
 | [0017](0017-grdb-for-the-ios-database.md) | GRDB for the iOS database, and Room's schema as the source | Accepted |
+| [0018](0018-where-ios-keeps-what-must-not-travel.md) | Where iOS keeps what must not travel | Accepted |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive

@@ -38,6 +38,9 @@ let package = Package(
             ]
         ),
         .testTarget(name: "SproutKitTests", dependencies: ["SproutKit"]),
-        .testTarget(name: "SproutDataTests", dependencies: ["SproutData"]),
+        // SproutKit as well as SproutData: `Pairing` carries a `SyncSecret`, which
+        // is SproutKit's, and a transitive module is not something to rely on
+        // being importable.
+        .testTarget(name: "SproutDataTests", dependencies: ["SproutData", "SproutKit"]),
     ]
 )
