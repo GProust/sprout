@@ -1,82 +1,93 @@
-import SproutKit
+import SproutData
 import SwiftUI
 
 /// The iOS app (ADR-0015).
 ///
-/// A shell, on purpose. What has landed so far is `SproutKit` — the formats two
-/// phones exchange, checked against `spec/vectors/` on every run — because that
-/// is the part whose correctness a Linux CI runner can actually prove. The
-/// screens come next, and they need a Mac to look at: a SwiftUI view that
-/// compiles is not a SwiftUI view that reads well at 3 a.m. one-handed, and
-/// nobody should pretend otherwise from a machine that cannot render it.
-///
-/// The order is deliberate rather than convenient. Getting the wire format wrong
-/// is the expensive mistake — two phones that quietly stop syncing, and a parent
-/// who finds out weeks later — and it is the one mistake that is cheapest to
-/// catch before any UI exists to distract from it.
+/// The screens land in batches, verified by CI and reviewed as screenshots. What
+/// is here now is the shell and the two simplest tracking screens; the tabs
+/// below name the rest, and each becomes real as it is ported.
 @main
 struct SproutApp: App {
+
+    @State private var environment: AppEnvironment?
+    @State private var failure: String?
+
     var body: some Scene {
         WindowGroup {
-            GroundworkView()
+            Group {
+                if let environment {
+                    RootView().environment(\.sprout, environment)
+                } else if let failure {
+                    DatabaseFailureView(message: failure)
+                } else {
+                    // The database opens in milliseconds; this is here so the
+                    // first frame is never an empty white window.
+                    ProgressView().sproutStyle()
+                }
+            }
+            .task {
+                guard environment == nil, failure == nil else { return }
+                do {
+                    environment = try AppEnvironment.onDisk()
+                } catch {
+                    // ADR-0002: there is no server copy of any of this, so a
+                    // database that will not open is not something to paper
+                    // over with an empty screen.
+                    failure = String(describing: error)
+                }
+            }
         }
     }
 }
 
-/// Stands in for the dashboard until the screens land, and does one useful
-/// thing on the way: proves at runtime that SproutKit is linked and agrees with
-/// the specification, rather than only in a test target.
-struct GroundworkView: View {
+/// The four places the app is organised into (BDR-0010).
+struct RootView: View {
+    var body: some View {
+        TabView {
+            Tab(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") {
+                NavigationStack { SleepScreen() }
+            }
+            Tab(Str.t("nav_diaper"), systemImage: "figure.child") {
+                NavigationStack { DiaperScreen() }
+            }
+        }
+        .tint(SproutColor.primary)
+    }
+}
 
-    private let check = SelfCheck.run()
+/// Shown when the database cannot be opened.
+///
+/// It says what happened rather than pretending the app is empty: an empty
+/// dashboard and a database that failed to open look identical to a parent, and
+/// only one of them means "your history is still there".
+///
+/// Deliberately **not** translated. Android has no counterpart — Room throws and
+/// the process goes — so there is no key for this in the shared catalog, and
+/// inventing one would mean seven translations I cannot write. English here is
+/// the honest option; if this screen ever proves reachable in practice it earns
+/// a real string on both sides.
+struct DatabaseFailureView: View {
+    let message: String
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("🌱")
-                .font(.system(size: 64))
-            Text("Sprout")
-                .font(.largeTitle.weight(.semibold))
-            Text(check.summary)
-                .font(.callout)
-                .foregroundStyle(check.passed ? .secondary : Color.red)
+        VStack(spacing: Spacing.regular) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.largeTitle)
+                .foregroundStyle(SproutColor.danger)
+            Text("Sprout could not open its database.")
+                .font(.headline)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(SproutColor.onSurfaceVariant)
+                .multilineTextAlignment(.center)
         }
+        .padding(Spacing.section)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
-    }
-}
-
-/// A round trip through the sealed-replica format, run on launch.
-///
-/// Not a substitute for `SproutKitTests` — it uses a throwaway secret and
-/// proves only that the pieces are wired together in a built app, where the
-/// tests prove they match the format.
-enum SelfCheck {
-
-    struct Result {
-        let passed: Bool
-        let summary: String
-    }
-
-    static func run() -> Result {
-        do {
-            let secret = SyncSecret.random()
-            let payload = Data(#"{"formatVersion":1}"#.utf8)
-            let opened = try SyncCrypto.open(try SyncCrypto.seal(payload, secret: secret), secret: secret)
-            guard opened == payload else {
-                return Result(passed: false, summary: "SproutKit sealed a replica it could not reopen.")
-            }
-            return Result(
-                passed: true,
-                summary: "SproutKit is linked and the replica format round-trips.\nThe screens are next."
-            )
-        } catch {
-            return Result(passed: false, summary: "SproutKit failed its self-check: \(error)")
-        }
+        .sproutStyle()
     }
 }
 
 #Preview {
-    GroundworkView()
+    RootView()
 }
