@@ -1,0 +1,107 @@
+name: iOS
+
+# The iOS build, and the guard on the shared specification.
+#
+# Everything here runs without an Apple Developer account, without a signing
+# certificate and without a physical device: SproutKit is bytes in, bytes out,
+# and a simulator build needs no identity. That is deliberate — it keeps CI the
+# build verifier for iOS the way ADR-0006 made it for Android, so a change can
+# be proven correct from a machine that is not a Mac.
+#
+# What CI still cannot do: run on a real radio, take an App Store screenshot, or
+# produce anything installable. Those need a Mac and, for the last one, the
+# credentials listed in docs/RELEASING.md.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ios/**'
+      - 'spec/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ios/**'
+      - 'spec/**'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+jobs:
+  spec:
+    name: Specification
+    # No Mac needed to check that the vectors are what the generator produces,
+    # so this runs on Linux and gives a fast answer before the Mac starts.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      # The vectors are the only thing standing between "both apps compile" and
+      # "both apps agree". Regenerating them must be a no-op: if it is not, the
+      # committed vectors were hand-edited or a change to the generator was not
+      # carried through, and in either case the two apps are being checked
+      # against something nobody derived.
+      - name: The committed vectors are the ones the generator produces
+        run: |
+          node spec/vectors/generate.mjs
+          if [ -n "$(git status --porcelain -- spec/vectors)" ]; then
+            echo "::error::spec/vectors differs from what generate.mjs produces."
+            echo "Re-run 'node spec/vectors/generate.mjs' and commit the result."
+            git status --porcelain -- spec/vectors
+            git diff -- spec/vectors
+            exit 1
+          fi
+          echo "Committed vectors match the generator."
+
+  sproutkit:
+    name: SproutKit
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: ios/SproutKit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show the toolchain
+        run: swift --version && xcodebuild -version
+
+      - name: Build
+        run: swift build --build-tests
+
+      # These read spec/vectors/ straight from the working tree, so a green run
+      # here means this app agrees with the format — the same files
+      # SpecConformanceTest holds the Android app to.
+      - name: Test
+        run: swift test --skip-build
+
+  app:
+    name: App
+    runs-on: macos-15
+    # The app target is a shell until the screens land. Building it still proves
+    # the project spec, the entitlements and the Info.plist are coherent, which
+    # is what a project assembled without Xcode is most likely to get wrong.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The .xcodeproj is generated, not committed: project.yml is the reviewable
+      # artefact. See ios/Sprout/project.yml.
+      - name: Generate the project
+        run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
+
+      - name: Build for the simulator
+        run: |
+          xcodebuild build \
+            -project ios/Sprout/Sprout.xcodeproj \
+            -scheme Sprout \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO

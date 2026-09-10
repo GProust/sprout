@@ -1,0 +1,60 @@
+# The Xcode project, as a spec rather than as a .pbxproj.
+#
+# XcodeGen generates Sprout.xcodeproj from this file, and the generated project
+# is not committed (see .gitignore). A hand-maintained .pbxproj is thousands of
+# lines of machine-written XML that no reviewer reads, merges badly, and hides
+# exactly the settings worth arguing about — the entitlements, the deployment
+# target, the capabilities. Those are all visible here.
+#
+#   brew install xcodegen
+#   cd ios/Sprout && xcodegen generate && open Sprout.xcodeproj
+
+name: Sprout
+
+options:
+  bundleIdPrefix: com.gproust
+  deploymentTarget:
+    iOS: '17.0'
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: '5.9'
+    # ADR-0002 and ADR-0014: Sprout makes no network calls, so nothing here
+    # should ever need an exception. Left at the default deny.
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: complete
+
+packages:
+  SproutKit:
+    path: ../SproutKit
+
+targets:
+  Sprout:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: SproutKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout
+        INFOPLIST_FILE: Sources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/Sprout.entitlements
+        MARKETING_VERSION: '0.1.0'
+        CURRENT_PROJECT_VERSION: '1'
+        TARGETED_DEVICE_FAMILY: '1,2'
+        # No launch storyboard: the app is SwiftUI end to end.
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+
+schemes:
+  Sprout:
+    build:
+      targets:
+        Sprout: all
+    run:
+      config: Debug
+    test:
+      config: Debug

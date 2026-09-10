@@ -4,9 +4,10 @@ This guide is the end-to-end process for shipping Sprout to users. It covers
 **Google Play** (the main Android "app store") and **GitHub Releases** for
 direct APK downloads.
 
-> **Note on the iOS App Store:** Sprout is a native Android app (Kotlin +
-> Jetpack Compose). It cannot be published to Apple's App Store without being
-> rewritten for iOS. "App store" below therefore means **Google Play**.
+> **Note on the iOS App Store:** this guide covers **Google Play** only. The iOS
+> app ([ADR-0015](adr/0015-native-ios-in-this-repository.md)) is not shippable
+> yet — see [§8](#8-ios-what-is-not-needed-yet-and-what-will-be) for what it
+> already builds without, and what publishing it will require.
 
 ---
 
@@ -26,7 +27,7 @@ sometimes a D-U-N-S/address check) can take a few days, so start this early.
 
 ## 1. Pick the version
 
-Versioning lives in [`app/build.gradle.kts`](../app/build.gradle.kts):
+Versioning lives in [`android/app/build.gradle.kts`](../android/app/build.gradle.kts):
 
 ```kotlin
 versionCode = 1      // integer, MUST increase with every Play upload
@@ -45,7 +46,7 @@ The same run also finishes the paperwork, in that one commit:
   `## [<version>] — <date>`. So the only manual part is keeping entries under
   `[Unreleased]` as pull requests land — the release dates them.
 - The "What's new" text typed into the run form is written to
-  `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` for each
+  `android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` for each
   of the 7 listed languages (§4).
 
 ---
@@ -90,6 +91,8 @@ backup. Treat them like the keys to your house.
 
 ## 3. Build the release artifact
 
+> Run every Gradle command in this section from **`android/`**.
+
 Google Play requires an **Android App Bundle (`.aab`)**:
 
 ```bash
@@ -111,7 +114,7 @@ Before publishing, sanity-check the build:
 ```
 
 > **R8 minification is ON** for release builds (`isMinifyEnabled` +
-> `isShrinkResources` in `app/build.gradle.kts`), so **exercise the release
+> `isShrinkResources` in `android/app/build.gradle.kts`), so **exercise the release
 > build on a device before promoting to production** — open every screen,
 > add/edit/delete records — to confirm Room and Compose still behave. The
 > internal testing track is the natural place for this. Add keep rules to
@@ -127,7 +130,7 @@ Before publishing, sanity-check the build:
 
 ## 4. Prepare the store listing
 
-Listing text lives in `fastlane/metadata/android/en-US/` so it is version-
+Listing text lives in `android/fastlane/metadata/android/en-US/` so it is version-
 controlled and reusable:
 
 - `title.txt` — app name (≤ 30 chars)
@@ -136,13 +139,13 @@ controlled and reusable:
 - `changelogs/<versionCode>.txt` — "What's new" for that release (≤ 500 chars,
   plain text — Play renders no markdown). Written by the release workflow from
   what you type into its form; the same layout exists per language under
-  `fastlane/metadata/android/<locale>/`.
+  `android/fastlane/metadata/android/<locale>/`.
 
 You also need **graphic assets** (uploaded in the Console, not stored here):
 
 | Asset | Spec |
 |-------|------|
-| App icon | 512×512 PNG (already in `app/src/main/res/mipmap-*`) |
+| App icon | 512×512 PNG (already in `android/app/src/main/res/mipmap-*`) |
 | Feature graphic | 1024×500 PNG/JPG |
 | Phone screenshots | 2–8 images (use the [`screenshots/`](../screenshots) the CI pipeline generates) |
 
@@ -252,3 +255,58 @@ the notes without bumping again.
 - [ ] Release workflow run (Actions → Release) with the version + release notes — commits the bump, changelog and notes, builds the signed `.aab`, tags, publishes the GitHub Release
 - [ ] Installed and smoke-tested the release APK on a device
 - [ ] Production rollout started in Play Console
+
+---
+
+## 8. iOS: what is *not* needed yet, and what will be
+
+The iOS app ([ADR-0015](adr/0015-native-ios-in-this-repository.md)) is built by
+CI on every push, and none of it needs an Apple account, a certificate or a Mac.
+That is deliberate — it keeps CI the build verifier on this side too
+([ADR-0006](adr/0006-ci-as-build-verifier-and-screenshots.md)).
+
+### What CI does today, with no credentials at all
+
+| Job | Runner | What it proves |
+|-----|--------|----------------|
+| `Specification` | `ubuntu-latest` | `spec/vectors/` is exactly what `generate.mjs` produces |
+| `SproutKit` | `macos-15` | the wire formats build **and match the vectors** |
+| `App` | `macos-15` | the project spec, entitlements and `Info.plist` are coherent, and the app compiles for the simulator |
+
+A simulator build needs no signing identity, which is why `App` passes
+`CODE_SIGNING_ALLOWED=NO`. macOS runners are **free on this repository** because
+it is public; on a private repo they bill at ten times the Linux rate, which is
+what the `paths:` filters in `ci.yml` and `ios.yml` exist to keep in check.
+
+### What CI cannot do, ever
+
+- **Run on a real radio.** The Bluetooth exchange
+  ([ADR-0016](adr/0016-a-transport-both-platforms-can-speak.md)) is testable over
+  a pipe and not otherwise. Two physical phones are the only proof.
+- **Take an App Store screenshot.** The Android listing is captured on an
+  emulator by `screenshots.yml`; the iOS equivalent needs a Mac, and there is no
+  reason to build one until there are screens worth capturing.
+- **Produce anything installable.** Not a TestFlight build, not an `.ipa`, not
+  something you can put on your own phone.
+
+### What publishing will need, when the screens land
+
+None of this is required to keep developing, and none of it should be bought
+before the Phase 0 spike says the app is worth shipping.
+
+| What | Why | Cost |
+|------|-----|------|
+| **A Mac** | Xcode runs nowhere else. Apple Silicon; Intel Macs stop getting macOS | second-hand from ~CHF 350 |
+| **Apple Developer Program** | required to sign anything that runs on a device | **$99/year** |
+| **A distribution certificate + provisioning profile** | signs the build | free with the above |
+| **An App Store Connect API key** | lets CI upload to TestFlight without a human | free with the above |
+| **A privacy manifest + App Privacy answers** | Apple requires both for a health-adjacent app | free — and short, since [`PRIVACY.md`](../PRIVACY.md) is "collects nothing" |
+
+The last one is the least work here and the most work for most apps: every
+answer on the App Privacy card is *Data Not Collected*, because there is no
+network call to collect anything with.
+
+When those exist, they become repository secrets alongside the Android ones
+already listed in [`release.yml`](../.github/workflows/release.yml) — an
+`APP_STORE_CONNECT_KEY_ID`, `_ISSUER_ID` and `_PRIVATE_KEY` — and a fourth job
+archives and uploads. Not before.

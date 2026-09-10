@@ -17,3 +17,13 @@ keystore.properties
 
 # Fresh screenshot capture staging dir (see .github/workflows/screenshots.yml)
 .screenshots-new/
+
+# iOS
+# The Xcode project is generated from ios/Sprout/project.yml by XcodeGen; the
+# spec is what gets reviewed, not the thousands of lines it expands into.
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+.swiftpm/
+ios/**/.build/

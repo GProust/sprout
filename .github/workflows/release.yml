@@ -8,7 +8,7 @@ name: Release
 #     (skipped when versionName already matches, e.g. re-running a release);
 #   * CHANGELOG.md's "## [Unreleased]" heading becomes "## [version] — date";
 #   * the "What's new" text typed into the form is written to
-#     fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
+#     android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
 #     every listed language.
 # It then builds from that commit, tags it with the version, and publishes a
 # GitHub Release with the APK attached. Leave the version empty to only build
@@ -39,7 +39,7 @@ on:
       # One "What's new" box per language listed on Play (max 500 characters
       # each, plain text — Play renders no markdown). Dots are not allowed in
       # input names, so the locale separator is an underscore: notes_en_US
-      # writes to fastlane/metadata/android/en-US/changelogs/<versionCode>.txt.
+      # writes to android/fastlane/metadata/android/en-US/changelogs/<versionCode>.txt.
       notes_en_US:
         description: 'Play release notes, English (max 500 chars). Required with a version; also the fallback for any language left empty.'
         required: false
@@ -101,7 +101,7 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo "::error::'$VERSION' is not a valid version (expected e.g. 1.3.0)"; exit 1; }
-          FILE=app/build.gradle.kts
+          FILE=android/app/build.gradle.kts
           CURRENT_NAME=$(sed -n 's/^[[:space:]]*versionName = "\(.*\)".*/\1/p' "$FILE")
           CURRENT_CODE=$(sed -n 's/^[[:space:]]*versionCode = \([0-9]*\).*/\1/p' "$FILE")
           if [ -z "$CURRENT_NAME" ] || [ -z "$CURRENT_CODE" ]; then
@@ -199,7 +199,7 @@ jobs:
                       "using the English text so the listing is not left empty."
                   )
               path = pathlib.Path(
-                  f"fastlane/metadata/android/{loc.replace('_', '-')}/changelogs/{code}.txt"
+                  f"android/fastlane/metadata/android/{loc.replace('_', '-')}/changelogs/{code}.txt"
               )
               path.parent.mkdir(parents=True, exist_ok=True)
               path.write_text(text + "\n", encoding="utf-8")
@@ -218,7 +218,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app/build.gradle.kts CHANGELOG.md fastlane/metadata
+          git add android/app/build.gradle.kts CHANGELOG.md android/fastlane/metadata
           if git diff --cached --quiet; then
             echo "Version, changelog and release notes are already up to date; nothing to commit."
           else
@@ -247,6 +247,7 @@ jobs:
           SPROUT_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           SPROUT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew bundleRelease assembleRelease
+        working-directory: android
 
       # Play warns on every upload that the bundle has native code without debug
       # symbols. That is expected — the one native lib comes from an AndroidX
@@ -254,7 +255,7 @@ jobs:
       # what is actually in the bundle instead of leaving it to be re-diagnosed.
       - name: Report the bundle's native libraries and debug symbols
         run: |
-          AAB=app/build/outputs/bundle/release/app-release.aab
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
           echo "Native libraries:"
           unzip -l "$AAB" | grep -E '\.so$' || echo "  none"
           echo "Native debug symbols packaged for Play:"
@@ -266,8 +267,8 @@ jobs:
         with:
           name: sprout-release
           path: |
-            app/build/outputs/bundle/release/app-release.aab
-            app/build/outputs/apk/release/app-release*.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release*.apk
           if-no-files-found: error
 
       - name: Create GitHub Release with the APK
@@ -277,5 +278,5 @@ jobs:
           tag_name: ${{ inputs.version }}
           # Tag the release-prep commit, not the commit the workflow started from.
           target_commitish: ${{ steps.commit.outputs.sha }}
-          files: app/build/outputs/apk/release/app-release*.apk
+          files: android/app/build/outputs/apk/release/app-release*.apk
           generate_release_notes: true

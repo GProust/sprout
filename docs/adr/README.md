@@ -26,17 +26,19 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0001](0001-use-architecture-decision-records.md) | Use decision records (ADRs and BDRs) | Accepted |
 | [0002](0002-local-first-on-device-storage.md) | Local-first, on-device storage | Accepted |
 | [0003](0003-no-first-party-backend-user-owned-sync.md) | No first-party backend; sync through user-owned storage | Accepted (mechanism finalized in [ADR-0007](0007-partner-sync-by-direct-device-to-device-exchange.md)) |
-| [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted |
+| [0004](0004-native-android-compose-mvvm-room.md) | Native Android with Compose, MVVM and Room | Accepted (its "Android only" consequence reopened by [ADR-0015](0015-native-ios-in-this-repository.md)) |
 | [0005](0005-localization-with-android-resources.md) | Localization with Android string resources | Accepted |
 | [0006](0006-ci-as-build-verifier-and-screenshots.md) | CI as the build verifier, with screenshots in PRs | Accepted |
 | [0007](0007-partner-sync-by-direct-device-to-device-exchange.md) | Partner sync by direct device-to-device exchange | Accepted (amended by [ADR-0008](0008-pairing-by-invitation-and-the-first-merge.md), [ADR-0009](0009-the-household-is-a-group-not-a-pair.md) and [ADR-0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)) |
 | [0008](0008-pairing-by-invitation-and-the-first-merge.md) | Pairing by invitation, and what the first merge does | Accepted (extended to households by [ADR-0009](0009-the-household-is-a-group-not-a-pair.md)) |
 | [0009](0009-the-household-is-a-group-not-a-pair.md) | The household is a group, not a pair | Accepted |
-| [0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md) | Automatic exchange over Bluetooth, while the app is open | Accepted |
+| [0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md) | Automatic exchange over Bluetooth, while the app is open | Accepted (transport and advertisement amended by [ADR-0016](0016-a-transport-both-platforms-can-speak.md)) |
 | [0011](0011-what-survives-a-new-phone.md) | What survives a new phone | Accepted (exclusion list amended by [ADR-0012](0012-the-widget-diagnostics-screen-comes-out.md)) |
 | [0012](0012-the-widget-diagnostics-screen-comes-out.md) | The widget diagnostics screen comes out | Accepted |
 | [0013](0013-writing-the-pdf-and-the-workbook-by-hand.md) | Writing the PDF and the workbook by hand | Accepted |
 | [0014](0014-the-way-in-is-an-allow-list.md) | The way in is an allow-list, and untrusted bytes are fuzzed | Accepted |
+| [0015](0015-native-ios-in-this-repository.md) | Native iOS, in this repository | Accepted |
+| [0016](0016-a-transport-both-platforms-can-speak.md) | A transport both platforms can speak | Accepted (Android implementation Proposed) |
 
 > Product, domain, and business decisions live in the
 > [Business & Product Decision Records](../decisions/) — including the inclusive

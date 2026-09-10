@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sprout</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<!--
+	  The seven languages Sprout speaks (BDR-0004). Listing them here is what
+	  gives the user the per-app language picker in iOS Settings, which is why
+	  the in-app one from AppLocale.kt has no counterpart on this side.
+	-->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>fr</string>
+		<string>de</string>
+		<string>es</string>
+		<string>it</string>
+		<string>pl</string>
+		<string>pt</string>
+	</array>
+	<!--
+	  ADR-0010 and ADR-0016: the radio is used only while the app is open, to
+	  find the other phones of this household. No background mode is declared,
+	  and none should be: a background BLE mode would be a claim this app does
+	  not make.
+
+	  There is deliberately NO NSAppTransportSecurity block, no URL scheme and
+	  no networking usage string, because there is no networking at all
+	  (ADR-0002). Their absence is the iOS equivalent of Android's missing
+	  INTERNET permission, and SproutAttackSurfaceTests pins it.
+	-->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Sprout uses Bluetooth only while it is open, to sync this baby's record with the other phones in your household. Nothing is sent anywhere else.</string>
+</dict>
+</plist>
