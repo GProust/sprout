@@ -45,11 +45,21 @@ final class EncryptedZipTests: XCTestCase {
     }
 
     private func short(_ bytes: Data, _ at: Int) -> Int {
-        Int(bytes[at]) | Int(bytes[at + 1]) << 8
+        let low = Int(bytes[at])
+        let high = Int(bytes[at + 1])
+        return low | (high << 8)
     }
 
+    /// Assembled a byte at a time, for the reason `EncryptedZip.dosDateTime`
+    /// carries: four `Int(_:)` conversions chained through shifts and ors is
+    /// more than Swift's type checker will work through, and it fails the build
+    /// rather than warning.
     private func int(_ bytes: Data, _ at: Int) -> Int {
-        Int(bytes[at]) | Int(bytes[at + 1]) << 8 | Int(bytes[at + 2]) << 16 | Int(bytes[at + 3]) << 24
+        var value = 0
+        for offset in (0..<4).reversed() {
+            value = (value << 8) | Int(bytes[at + offset])
+        }
+        return value
     }
 
     private let localHeaderBytes = 30
@@ -240,21 +250,10 @@ final class EncryptedZipTests: XCTestCase {
         let bytes = try archive([EncryptedZip.Entry(name: "r.bin", bytes: Data([1]))])
 
         // 14:30:08 packs as hour<<11 | minute<<5 | second/2.
-        XCTAssertEqual(short(bytes, 10), 14 << 11 | 30 << 5 | 4)
+        let expectedTime: Int = (14 << 11) | (30 << 5) | 4
+        XCTAssertEqual(short(bytes, 10), expectedTime)
         // 2026-09-08 packs as (year-1980)<<9 | month<<5 | day.
-        XCTAssertEqual(short(bytes, 12), (2026 - 1980) << 9 | 9 << 5 | 8)
-    }
-}
-
-private extension Data {
-    init(hex: String) {
-        var bytes: [UInt8] = []
-        var index = hex.startIndex
-        while index < hex.endIndex {
-            let next = hex.index(index, offsetBy: 2)
-            bytes.append(UInt8(hex[index..<next], radix: 16) ?? 0)
-            index = next
-        }
-        self.init(bytes)
+        let expectedDate: Int = (46 << 9) | (9 << 5) | 8
+        XCTAssertEqual(short(bytes, 12), expectedDate)
     }
 }
