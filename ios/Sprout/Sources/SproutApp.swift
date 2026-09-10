@@ -49,29 +49,6 @@ struct SproutApp: App {
     }
 }
 
-/// The four places the app is organised into (BDR-0010).
-struct RootView: View {
-    var body: some View {
-        // `.tabItem`, not the `Tab` builder: that one is iOS 18 and the
-        // deployment target is 17 (ADR-0015). Raising the floor to buy nicer
-        // syntax would drop phones that are three years old, which is not a
-        // trade this app makes.
-        TabView {
-            NavigationStack { HomeScreen() }
-                .tabItem { Label(Str.t("nav_home"), systemImage: "house.fill") }
-            NavigationStack { FeedingScreen() }
-                .tabItem { Label(Str.t("nav_feed"), systemImage: "drop.fill") }
-            NavigationStack { SleepScreen() }
-                .tabItem { Label(Str.t("nav_sleep"), systemImage: "moon.zzz.fill") }
-            NavigationStack { DiaperScreen() }
-                .tabItem { Label(Str.t("nav_diaper"), systemImage: "figure.child") }
-            NavigationStack { GrowthScreen() }
-                .tabItem { Label(Str.t("nav_growth"), systemImage: "ruler") }
-        }
-        .tint(SproutColor.primary)
-    }
-}
-
 /// Shown when the database cannot be opened.
 ///
 /// It says what happened rather than pretending the app is empty: an empty

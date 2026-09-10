@@ -14,6 +14,11 @@ final class HomeViewModel {
     var parentName: String?
     var babies: [BabySummary] = []
     var hasProfile = false
+    /// The parent's own tracking, which decides whether the wellbeing tile and
+    /// the You tab's two lower entries are there at all (BDR-0010).
+    var tracksWellbeing = true
+    var checkInPending = false
+    private(set) var activeBabyId: Int64?
 
     /// Coarse enough for "2 h ago". The screen re-reads it on a timer rather
     /// than per frame; nothing here needs a second hand.
@@ -47,6 +52,10 @@ final class HomeViewModel {
             group.addTask {
                 await observe(repository.parentProfile) { [weak self] profile in
                     self?.parentName = profile?.name
+                    self?.tracksWellbeing = profile?.trackWellbeing ?? true
+                    self?.activeBabyId = profile?.activeBabyId
+                    self?.checkInPending = Self.isCheckInPending(profile)
+                    self?.recompute()
                 }
             }
             group.addTask {
@@ -101,6 +110,41 @@ final class HomeViewModel {
         )
     }
 
+    /// The baby the Baby tab is showing.
+    ///
+    /// Falls back to the first tracked baby: a selection can go stale when the
+    /// baby it named is archived or deleted from another screen.
+    var selectedBaby: BabySummary? {
+        babies.first { $0.baby.id == activeBabyId } ?? babies.first
+    }
+
+    /// Whether today's check-in is still waiting.
+    ///
+    /// It waits on the dashboard rather than opening at launch (BDR-0006) —
+    /// nothing to dismiss during a 3 a.m. feed.
+    private static func isCheckInPending(_ profile: ParentProfile?) -> Bool {
+        guard let profile, profile.trackWellbeing else { return false }
+        guard let last = profile.lastCheckIn else { return true }
+        return !SproutFormat.isSameDay(last, Clock.millis)
+    }
+
+    /// "Not today": put the check-in away until tomorrow, saving nothing.
+    func dismissCheckIn() {
+        try? repository.updateParentLastCheckIn(Clock.millis)
+    }
+
+    /// Start a feed on the baby whose card was tapped.
+    ///
+    /// The selection is set first and the timer started after, because every
+    /// write resolves the active baby as it inserts — a feed started from a card
+    /// has to land on that card's baby, not on whoever was selected before.
+    func startFeed(for baby: Baby, on side: BreastSide) {
+        select(baby)
+        NursingSessionStore.shared.startIfIdle(
+            NursingSession(sessionStart: Clock.millis, currentSide: side, segmentStart: Clock.millis)
+        )
+    }
+
     func tick() {
         now = Clock.millis
         recompute()
@@ -122,25 +166,12 @@ final class HomeViewModel {
     }
 }
 
+/// The household dashboard.
 struct HomeScreen: View {
-    @Environment(\.sprout) private var sprout
-    @State private var model: HomeViewModel?
+    let model: HomeViewModel
+    let onOpen: (LogDestination) -> Void
 
     var body: some View {
-        Group {
-            if let model { content(model) } else { Color.clear }
-        }
-        .navigationTitle(Str.t("app_name"))
-        .navigationBarTitleDisplayMode(.inline)
-        .task {
-            let model = model ?? HomeViewModel(repository: sprout.repository)
-            self.model = model
-            await model.observeEverything()
-        }
-    }
-
-    @ViewBuilder
-    private func content(_ model: HomeViewModel) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.regular) {
                 if !model.hasProfile {
@@ -158,8 +189,8 @@ struct HomeScreen: View {
                         .foregroundStyle(SproutColor.primary)
                     }
 
-                    // A baby who is asleep right now is the one thing on this
-                    // screen that changes without anyone touching it.
+                    // A baby asleep right now is the one thing on this screen
+                    // that changes without anyone touching it.
                     if let sleeping = model.babies.first(where: { $0.ongoingSleep != nil }),
                        let sleep = sleeping.ongoingSleep {
                         LiveSleepRow(name: sleeping.baby.name, sleep: sleep, now: model.now) {
@@ -167,16 +198,57 @@ struct HomeScreen: View {
                         }
                     }
 
-                    ForEach(model.babies) { summary in
-                        BabyCard(summary: summary, now: model.now)
+                    if let single = model.babies.count == 1 ? model.babies.first : nil {
+                        // One baby: nothing to disambiguate, so the dashboard
+                        // *is* the baby view and nothing is a tap further away
+                        // than it used to be (BDR-0009).
+                        BabyPane(
+                            summary: single,
+                            tracksWellbeing: model.tracksWellbeing,
+                            now: model.now,
+                            onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
+                            onOpen: onOpen,
+                            onShareRecord: { onOpen(.report) },
+                            header: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(single.baby.name)
+                                        .font(.title2.weight(.bold))
+                                        .foregroundStyle(SproutColor.onSurface)
+                                    Text(SproutFormat.age(birthDate: single.baby.birthDate, now: model.now).text)
+                                        .font(.callout)
+                                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        )
+                    } else {
+                        // Two or more: a card each, and the full pane moves to
+                        // the baby's own tab.
+                        ForEach(model.babies) { summary in
+                            BabyCardView(
+                                summary: summary,
+                                now: model.now,
+                                onOpen: { model.select(summary.baby) },
+                                onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) }
+                            )
+                        }
+                    }
+
+                    if model.checkInPending {
+                        CheckInCard(
+                            onCheckIn: { onOpen(.checkIn) },
+                            onDismiss: model.dismissCheckIn
+                        )
                     }
                 }
             }
             .padding(Spacing.regular)
         }
+        .navigationTitle(Str.t("app_name"))
+        .navigationBarTitleDisplayMode(.inline)
         .sproutStyle()
-        // A minute is as fine as "2 h ago" needs; anything shorter is spending
-        // battery to redraw the same words.
+        // A minute is as fine as "2 h ago" needs; anything shorter spends
+        // battery redrawing the same words.
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(60))
@@ -186,79 +258,33 @@ struct HomeScreen: View {
     }
 }
 
-/// One baby's figures for today, and when each thing last happened.
-private struct BabyCard: View {
-    let summary: BabySummary
-    let now: Int64
+/// The daily check-in, waiting rather than interrupting (BDR-0006).
+///
+/// It sits on the dashboard instead of opening at launch, and "not today" puts
+/// it away without saving anything — there is nothing to dismiss during a 3 a.m.
+/// feed.
+private struct CheckInCard: View {
+    let onCheckIn: () -> Void
+    let onDismiss: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.snug) {
-            Text(summary.baby.name)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(SproutColor.onSurface)
-            Text(SproutFormat.age(birthDate: summary.baby.birthDate, now: now).text)
+        VStack(alignment: .leading, spacing: Spacing.tight) {
+            Text(Str.t("home_checkin_title"))
+                .font(.subheadline.weight(.semibold))
+            Text(Str.t("home_checkin_body"))
                 .font(.callout)
                 .foregroundStyle(SproutColor.onSurfaceVariant)
-
-            SectionLabel(Str.t("home_today"))
-
-            HStack(spacing: Spacing.snug) {
-                StatCard(
-                    label: Str.t("stat_feeds"),
-                    value: "\(summary.feedsToday)",
-                    systemImage: "drop.fill"
-                )
-                StatCard(
-                    label: Str.t("stat_sleep"),
-                    value: SproutFormat.duration(millis: summary.sleepTodayMs).text,
-                    systemImage: "moon.zzz.fill"
-                )
-                StatCard(
-                    label: Str.t("stat_diapers"),
-                    value: "\(summary.diapersToday)",
-                    systemImage: "figure.child"
-                )
+            HStack {
+                Button(Str.t("home_checkin_action"), action: onCheckIn)
+                    .buttonStyle(.borderedProminent)
+                Button(Str.t("home_checkin_dismiss"), action: onDismiss)
+                    .buttonStyle(.bordered)
             }
-
-            // "Fed 20 min ago · Slept 1 h ago · Nappy 40 min ago" — only the
-            // ones that have ever happened.
-            FlowLayout(spacing: Spacing.tight) {
-                if let fed = summary.lastFeed {
-                    Chip(text: Str.t("home_chip_fed", SproutFormat.relative(fed, now: now).text))
-                }
-                if let slept = summary.lastSleep {
-                    Chip(text: Str.t("home_chip_slept", SproutFormat.relative(slept, now: now).text))
-                }
-                if let nappy = summary.lastDiaper {
-                    Chip(text: Str.t("home_chip_nappy", SproutFormat.relative(nappy, now: now).text))
-                }
-                if let side = summary.nextSide {
-                    Chip(text: side.label, emphasised: true)
-                }
-            }
+            .padding(.top, Spacing.hairline)
         }
         .padding(Spacing.regular)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(SproutColor.surface, in: RoundedRectangle(cornerRadius: Radius.card))
-    }
-}
-
-private struct Chip: View {
-    let text: String
-    var emphasised = false
-
-    var body: some View {
-        Text(text)
-            .font(.footnote)
-            .padding(.horizontal, Spacing.snug)
-            .padding(.vertical, Spacing.hairline + 2)
-            .background(
-                emphasised ? SproutColor.primaryContainer : SproutColor.background,
-                in: Capsule()
-            )
-            .foregroundStyle(
-                emphasised ? SproutColor.onPrimaryContainer : SproutColor.onSurfaceVariant
-            )
     }
 }
 

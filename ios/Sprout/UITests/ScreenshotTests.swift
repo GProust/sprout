@@ -30,17 +30,17 @@ final class ScreenshotTests: XCTestCase {
         ]
         app.launch()
 
-        try capture(app, tab: "nav_home_tab", named: "01-home", language: language)
-        try capture(app, tab: "nav_feed_tab", named: "02-feeding", language: language)
-        try capture(app, tab: "nav_sleep_tab", named: "03-sleep", language: language)
-        try capture(app, tab: "nav_diaper_tab", named: "04-diaper", language: language)
-        try capture(app, tab: "nav_growth_tab", named: "05-growth", language: language)
+        // The four tabs (BDR-0010), then the logs that are reached by pushing
+        // from the dashboard's grid rather than by a tab of their own.
+        try capture(app, tab: 0, named: "01-home", language: language)
+        try capture(app, tab: 1, named: "02-trends", language: language)
+        try capture(app, tab: 2, named: "03-you", language: language)
     }
 
     /// Selects a tab, waits for it to settle, and files the image.
     private func capture(
         _ app: XCUIApplication,
-        tab identifier: String,
+        tab index: Int,
         named name: String,
         language: String
     ) throws {
@@ -48,18 +48,23 @@ final class ScreenshotTests: XCTestCase {
         // is not the same event as a screen that never renders. The tab bar gets
         // a generous wait once; everything after it is quick, so a real hang
         // fails fast and says which screen it was on.
-        let button = app.tabBars.buttons.element(boundBy: tabIndex(for: identifier))
+        let button = app.tabBars.buttons.element(boundBy: index)
         XCTAssertTrue(
             button.waitForExistence(timeout: 60),
             "\(name): the tab bar never appeared — the app failed to launch"
         )
         button.tap()
 
-        // Wait for a cell rather than sleeping: a fixed delay is either wasted
-        // time or a flake, depending on how the runner is feeling.
+        // Wait for something rather than sleeping: a fixed delay is either
+        // wasted time or a flake, depending on how the runner is feeling.
+        //
+        // The navigation bar, not a scroll view. Not every screen has a list —
+        // the tabs whose screens are not ported yet show a placeholder — and
+        // waiting on a thing only some screens have turns "this screen has no
+        // list" into "the whole capture failed".
         XCTAssertTrue(
-            app.scrollViews.firstMatch.waitForExistence(timeout: 15),
-            "\(name): the screen's list never appeared"
+            app.navigationBars.firstMatch.waitForExistence(timeout: 15),
+            "\(name): the screen never appeared"
         )
 
         let screenshot = XCUIScreen.main.screenshot()
@@ -71,14 +76,5 @@ final class ScreenshotTests: XCTestCase {
         add(attachment)
     }
 
-    private func tabIndex(for identifier: String) -> Int {
-        switch identifier {
-        case "nav_home_tab": return 0
-        case "nav_feed_tab": return 1
-        case "nav_sleep_tab": return 2
-        case "nav_diaper_tab": return 3
-        case "nav_growth_tab": return 4
-        default: return 0
-        }
     }
 }
