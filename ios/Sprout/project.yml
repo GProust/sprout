@@ -1,0 +1,128 @@
+# The Xcode project, as a spec rather than as a .pbxproj.
+#
+# XcodeGen generates Sprout.xcodeproj from this file, and the generated project
+# is not committed (see .gitignore). A hand-maintained .pbxproj is thousands of
+# lines of machine-written XML that no reviewer reads, merges badly, and hides
+# exactly the settings worth arguing about — the entitlements, the deployment
+# target, the capabilities. Those are all visible here.
+#
+#   brew install xcodegen
+#   cd ios/Sprout && xcodegen generate && open Sprout.xcodeproj
+
+name: Sprout
+
+options:
+  bundleIdPrefix: com.gproust
+  deploymentTarget:
+    iOS: '17.0'
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: '5.9'
+    # ADR-0002 and ADR-0014: Sprout makes no network calls, so nothing here
+    # should ever need an exception. Left at the default deny.
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: complete
+
+packages:
+  SproutKit:
+    path: ../SproutKit
+
+targets:
+  Sprout:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: SproutKit
+        product: SproutKit
+      - package: SproutKit
+        product: SproutData
+    # Generated rather than hand-written. A plist assembled by hand is missing
+    # CFBundleIdentifier and CFBundleExecutable until the day something tries to
+    # *launch* the app — it builds perfectly without them — and the failure then
+    # arrives as "the bundle identifier couldn't be read" from a test runner,
+    # nowhere near the file that caused it. XcodeGen fills in the standard keys
+    # and these are the ones Sprout actually decides.
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: Sprout
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        # The seven languages Sprout speaks (BDR-0004). Listing them is what
+        # gives the user the per-app language picker in iOS Settings, which is
+        # why AppLocale.kt has no counterpart on this side.
+        CFBundleLocalizations: [en, fr, de, es, it, pl, pt]
+        # ADR-0010 and ADR-0016: the radio is used only while the app is open.
+        # No background mode is declared and none should be — that would be a
+        # claim this app does not make.
+        NSBluetoothAlwaysUsageDescription: >-
+          Sprout uses Bluetooth only while it is open, to sync this baby's record
+          with the other phones in your household. Nothing is sent anywhere else.
+        # The one way in from outside (ADR-0014). Android's manifest offers
+        # Sprout for a file another app hands it; this is the same door, and it
+        # is the same size: one type, ours, and nothing else. A replica arriving
+        # through it is parsed with nothing authenticated at all, which is why
+        # `SyncFiles.read` caps what it will read and `SyncLimits` is checked
+        # before the parse rather than around it.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.gproust.sprout.sync
+            UTTypeDescription: Sprout record
+            UTTypeConformsTo: [public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [sprout]
+              public.mime-type: [application/vnd.sprout.sync]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Sprout record
+            LSHandlerRank: Owner
+            CFBundleTypeRole: Viewer
+            LSItemContentTypes: [com.gproust.sprout.sync]
+        # Deliberately absent, and the absence is the point (ADR-0014): no
+        # NSAppTransportSecurity, no URL scheme, no networking usage string,
+        # because there is no networking. That is the iOS equivalent of Android's
+        # missing INTERNET permission.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout
+        CODE_SIGN_ENTITLEMENTS: Sources/Sprout.entitlements
+        # The icon is rendered from Android's launcher vector by
+        # ios/tools/make_app_icon.py — one product, one icon, and CI checks the
+        # committed PNG is still what that vector produces.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: '0.1.0'
+        CURRENT_PROJECT_VERSION: '1'
+        TARGETED_DEVICE_FAMILY: '1,2'
+
+  SproutUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: Sprout
+    info:
+      path: UITests/Info.plist
+      properties: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout.uitests
+        TEST_TARGET_NAME: Sprout
+
+schemes:
+  Sprout:
+    build:
+      targets:
+        Sprout: all
+        SproutUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SproutUITests

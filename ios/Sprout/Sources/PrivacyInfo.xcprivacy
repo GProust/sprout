@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Apple's privacy manifest, required at upload since 2024. It is the App
+	  Store's version of the claim PRIVACY.md makes and ADR-0014 keeps: Sprout
+	  collects nothing, tracks nothing, and has no network to send it over.
+
+	  The two collection answers are empty because they are empty — not because
+	  the fields were left blank. There is no analytics SDK, no crash reporter,
+	  no advertising identifier, and no code in the app that can open a socket
+	  (`ios/tools/check_no_network.py` fails the build if that stops being true).
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!--
+	  "Required reason" APIs: ones Apple asks you to justify because they have
+	  been used to fingerprint a device. Both of ours are the mundane case — our
+	  own data, inside our own container.
+	-->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<!-- The reminder switches and the household id (ADR-0018). -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- CA92.1 — access info from the app itself. -->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+		<dict>
+			<!--
+			  SQLite, through GRDB (ADR-0017), stats the database file it owns.
+			  Declared rather than argued about: the cost of naming it is one
+			  entry, and the cost of missing one is a rejected upload.
+			-->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- C617.1 — timestamps of files inside the app's own container. -->
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
