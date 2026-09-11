@@ -19,6 +19,7 @@ direct APK downloads.
 | **JDK 17 + Android SDK** (via Android Studio) | Build the release artifact | Free |
 | **An upload keystore** | Sign the app (see §2) | Free |
 | **A public Privacy Policy URL** | Play requires one — we ship [`PRIVACY.md`](../PRIVACY.md) | Free |
+| **A Play service account** (only to automate the upload) | Play has no "API key"; §9 says where it actually lives | Free |
 
 Sign up at <https://play.google.com/console>. Account verification (identity +
 sometimes a D-U-N-S/address check) can take a few days, so start this early.
@@ -392,3 +393,82 @@ When those exist, they become repository secrets alongside the Android ones
 already listed in [`release.yml`](../.github/workflows/release.yml) — an
 `APP_STORE_CONNECT_KEY_ID`, `_ISSUER_ID` and `_PRIVATE_KEY` — and a fourth job
 archives and uploads. Not before.
+
+---
+
+## 9. The credentials publishing needs, and where they go
+
+Every secret below lives in exactly one place: **GitHub → Settings → Secrets and
+variables → Actions → New repository secret**. None of them belongs in the
+repository, in a chat, in an issue, or in a commit — a secret that has been
+pasted somewhere is a secret to rotate, not one to reuse.
+
+### Google Play has no "API key", and that is the confusing part
+
+There is no page in the Play Console that hands you a key. Play's API is
+authenticated by a **Google Cloud service account** — a robot user with its own
+email address and a JSON private key — and creating one spans two consoles:
+
+1. **Play Console → Setup → API access.** Link a Google Cloud project (it offers
+   to make one). This page is the bridge between the two consoles and is the
+   only reason to visit it.
+2. **Google Cloud Console → IAM & Admin → Service Accounts → Create.** Give it a
+   name like `sprout-release`. Grant it no project roles — it needs none;
+   its power comes from Play, not from Google Cloud.
+3. **That service account → Keys → Add key → Create new key → JSON.** The file
+   downloads once and is never shown again. *This file is the credential.*
+4. **Back in Play Console → Users and permissions → Invite new user**, paste the
+   service account's `…iam.gserviceaccount.com` address, and give it **Release
+   manager** on the Sprout app only. Account-wide access is not needed.
+
+| Secret | Value |
+|---|---|
+| `PLAY_SERVICE_ACCOUNT_JSON` | the whole JSON file, pasted as-is (it is text; no base64) |
+
+**What it can do:** upload and roll out releases for Sprout. It cannot change
+the payments profile or add users. If it ever leaks, delete the key in Google
+Cloud Console — the service account survives and a new key takes its place.
+
+### App Store Connect does call it a key
+
+1. **App Store Connect → Users and Access → Integrations → App Store Connect
+   API** (older accounts: a *Keys* tab).
+2. **Generate API Key**, role **App Manager**.
+3. The `.p8` file downloads **once** — Apple will not show it again. The **Key
+   ID** is beside it in the table and the **Issuer ID** is above the table,
+   shared by every key on the account.
+
+| Secret | Value |
+|---|---|
+| `APP_STORE_CONNECT_KEY_ID` | the 10-character Key ID, e.g. `2X9R4HXF34` |
+| `APP_STORE_CONNECT_ISSUER_ID` | the UUID above the key table |
+| `APP_STORE_CONNECT_PRIVATE_KEY` | the contents of the `.p8`, `BEGIN`/`END` lines included |
+
+The names follow the ones already in
+[`release.yml`](../.github/workflows/release.yml) — screaming snake case, no
+prefix, one secret per value.
+
+**Signing is separate from all of this.** The API key authenticates *uploads*; it
+does not sign the build. Either let Xcode manage signing with that same key, or
+add a distribution certificate and provisioning profile as two more secrets. That
+choice is not made yet and does not need to be until there is an Apple account.
+
+### What is still not automated, and what it would take
+
+Both stores' metadata already sits in fastlane's own layout —
+`android/fastlane/metadata/android/<locale>/` is exactly what `supply` reads, and
+`ios/fastlane/metadata/<locale>/` is what `deliver` reads. **fastlane itself is
+not set up**: there is no `Fastfile`, no `Gemfile`, and `release.yml` builds and
+signs the Android artifact but uploads it by hand (§5).
+
+So the work, when the credentials exist, is:
+
+- **Play:** add `supply` and one job. The metadata and the release notes are
+  already in the right directories, which is most of what that job would
+  otherwise need.
+- **App Store:** add `deliver` (listing) and `pilot` (TestFlight), plus the step
+  that copies `changelogs/<build>.txt` into `release_notes.txt` — see §8.
+
+Neither is worth writing before the accounts exist, because neither can be
+tested. What *can* be done first is everything that needs no account at all,
+which §8 lists and which is already done.
