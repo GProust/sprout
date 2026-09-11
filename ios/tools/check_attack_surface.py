@@ -9,12 +9,17 @@ a sibling, and this is it.
 It runs in two layers, for the same reason the Kotlin one checks both Sprout's
 own manifest and the whole merged build:
 
-* **The source layer** reads `project.yml` and `Sprout.entitlements` — what we
-  wrote down. Cheap, needs no Mac, runs on every push.
+* **The source layer** (no arguments) reads `project.yml` and
+  `Sprout.entitlements` — what we wrote down. Cheap, needs no Mac, runs on every
+  push.
 * **The built layer** (`--app`) reads the `Info.plist` Xcode actually produced
   and the libraries the binary actually links. That is the half that catches
   something a dependency dragged in, which is the whole point of Android's
   merged-permission pin.
+
+The two are separate modes rather than one cumulative run, and deliberately: the
+built layer needs nothing but the standard library, because the macOS runners
+refuse `pip install` (PEP 668) and a check that cannot run is not a check.
 
 A legitimate new door is fine and costs one line in the list below, in the same
 commit. A door nobody meant to open fails CI instead.
@@ -26,12 +31,6 @@ import pathlib
 import plistlib
 import subprocess
 import sys
-
-try:
-    import yaml
-except ImportError:  # pragma: no cover - the CI runner installs it
-    print("error: PyYAML is needed (pip install pyyaml)", file=sys.stderr)
-    sys.exit(2)
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "ios" / "Sprout" / "project.yml"
@@ -55,12 +54,13 @@ INFO_PLIST_KEYS = {
 # Keys Xcode adds to the built plist on its own. Not decisions of ours, so the
 # built layer ignores them rather than demanding they be pinned.
 BUILD_ADDED_KEYS = {
-    "BuildMachineOSBuild", "CFBundleExecutable", "CFBundleIdentifier",
-    "CFBundleInfoDictionaryVersion", "CFBundleName", "CFBundlePackageType",
+    "BuildMachineOSBuild", "CFBundleDevelopmentRegion", "CFBundleExecutable",
+    "CFBundleIdentifier", "CFBundleInfoDictionaryVersion", "CFBundleName",
+    "CFBundleNumericVersion", "CFBundlePackageType", "CFBundleSignature",
     "CFBundleSupportedPlatforms", "DTCompiler", "DTPlatformBuild",
     "DTPlatformName", "DTPlatformVersion", "DTSDKBuild", "DTSDKName",
     "DTXcode", "DTXcodeBuild", "LSMinimumSystemVersion", "MinimumOSVersion",
-    "UIDeviceFamily", "UIRequiredDeviceCapabilities",
+    "UIDeviceFamily", "UILaunchScreen~ipad", "UIRequiredDeviceCapabilities",
 }
 
 # The refusal list. Present at any depth and the build fails, whatever else the
@@ -210,34 +210,45 @@ def check_linked_frameworks(app: pathlib.Path, fail: Failures) -> None:
             fail.add(f"the binary links {framework} — {why}")
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--app",
-        type=pathlib.Path,
-        help="a built Sprout.app, to check what the build actually produced",
-    )
-    args = parser.parse_args()
-
-    fail = Failures()
+def check_source(fail: Failures) -> None:
+    # Imported here, not at the top: the built layer must not need it.
+    import yaml
 
     project = yaml.safe_load(PROJECT.read_text())
     check_info(project["targets"]["Sprout"]["info"]["properties"], "project.yml", fail, pin=True)
     check_entitlements(fail)
 
-    if args.app:
-        plist = args.app / "Info.plist"
-        if not plist.is_file():
-            fail.add(f"no Info.plist at {plist}")
-        else:
-            with plist.open("rb") as handle:
-                built = plistlib.load(handle)
-            # Xcode's own keys are not ours to pin; everything else must be.
-            ours = {k: v for k, v in built.items() if k not in BUILD_ADDED_KEYS}
-            check_info(ours, "the built Info.plist", fail, pin=True)
-        check_linked_frameworks(args.app, fail)
 
-    what = "the built app" if args.app else "project.yml and the entitlements"
+def check_built(app: pathlib.Path, fail: Failures) -> None:
+    plist = app / "Info.plist"
+    if not plist.is_file():
+        fail.add(f"no Info.plist at {plist}")
+    else:
+        with plist.open("rb") as handle:
+            built = plistlib.load(handle)
+        # Xcode's own keys are not ours to pin; everything else must be.
+        ours = {k: v for k, v in built.items() if k not in BUILD_ADDED_KEYS}
+        check_info(ours, "the built Info.plist", fail, pin=True)
+    check_linked_frameworks(app, fail)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--app",
+        type=pathlib.Path,
+        help="a built Sprout.app; checks what the build produced instead of what "
+             "the source declares",
+    )
+    args = parser.parse_args()
+
+    fail = Failures()
+    if args.app:
+        check_built(args.app, fail)
+        what = "the built app"
+    else:
+        check_source(fail)
+        what = "project.yml and the entitlements"
     return 0 if fail.report(what) else 1
 
 

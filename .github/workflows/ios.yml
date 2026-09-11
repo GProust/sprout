@@ -197,9 +197,10 @@ jobs:
       # requests them — because a dependency can add one and say so nowhere else.
       # This is that second pin: the Info.plist Xcode actually wrote, and the
       # libraries the binary actually links.
+      # Standard library and `otool` only — the macOS runners refuse
+      # `pip install` (PEP 668), and a check that cannot run is not a check.
       - name: The built app opens no door the source did not
         run: |
-          pip3 install --quiet pyyaml
           python3 ios/tools/check_attack_surface.py \
             --app "$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/Sprout.app"
 
