@@ -223,6 +223,29 @@ jobs:
           udid="$(python3 ios/tools/pick_simulator.py)"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
+      # Android pins the emulator's clock; this is the same problem and the same
+      # answer. The status bar is part of every capture, and its clock ticks —
+      # the first run produced one screenshot reading 5:47 and the next 5:48, so
+      # the images differ from each other *within* a run, never mind between
+      # them. At roughly 0.1% of the frame that is above the promote threshold,
+      # which would recommit all seventeen on every pull request.
+      #
+      # 9:41 is Apple's own, and is what every App Store screenshot shows.
+      - name: Freeze the status bar
+        run: |
+          set -euo pipefail
+          udid="${{ steps.sim.outputs.udid }}"
+          xcrun simctl boot "$udid" 2>/dev/null || true
+          xcrun simctl bootstatus "$udid" -b
+          # Not fatal: the promote threshold is the backstop, and a simctl quirk
+          # on some future runner image should not stop the screens being seen.
+          xcrun simctl status_bar "$udid" override \
+            --time "9:41" \
+            --batteryState charged --batteryLevel 100 \
+            --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            || echo "::warning::could not freeze the status bar; expect churn in the committed set"
+
       - name: Capture
         id: capture
         run: |

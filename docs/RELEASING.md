@@ -310,10 +310,14 @@ The two jobs share their rules, deliberately:
   itself well under 1% of the screen.
 - **The commit carries `[skip ci]`**, or the run would capture, commit, and
   capture again.
-- **The clock is frozen.** Android pins the emulator's; iOS pins its own
-  through `ScreenshotSeed.now`, because the app reads every "now" through
-  `Clock`. Without that, "5 min ago" renders differently on every run and every
-  image is "changed".
+- **Two clocks are frozen, not one.** Android pins the emulator's, which covers
+  both. iOS needs both pinned separately: `ScreenshotSeed.now` for the app,
+  because every "now" it renders goes through `Clock`; and
+  `simctl status_bar override` for the status bar, which is in every capture and
+  ticks on its own. The first run showed the cost of missing the second — one
+  screenshot read 5:47 and the next 5:48, so the images differed from each other
+  *within* a single run. At roughly 0.1% of the frame that clears the promote
+  threshold, and all seventeen would be recommitted on every pull request.
 - **`ios/screenshots/` and `ios/fastlane/` are excluded from the workflow's
   `paths:`.** Neither can change what the app renders, and a macOS runner
   proving that a PNG is still a PNG is fifteen minutes for nothing.
