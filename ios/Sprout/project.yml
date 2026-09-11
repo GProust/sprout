@@ -91,6 +91,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout
         CODE_SIGN_ENTITLEMENTS: Sources/Sprout.entitlements
+        # The icon is rendered from Android's launcher vector by
+        # ios/tools/make_app_icon.py — one product, one icon, and CI checks the
+        # committed PNG is still what that vector produces.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: '0.1.0'
         CURRENT_PROJECT_VERSION: '1'
         TARGETED_DEVICE_FAMILY: '1,2'

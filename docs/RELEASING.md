@@ -364,11 +364,29 @@ before the Phase 0 spike says the app is worth shipping.
 | **Apple Developer Program** | required to sign anything that runs on a device | **$99/year** |
 | **A distribution certificate + provisioning profile** | signs the build | free with the above |
 | **An App Store Connect API key** | lets CI upload to TestFlight without a human | free with the above |
-| **A privacy manifest + App Privacy answers** | Apple requires both for a health-adjacent app | free — and short, since [`PRIVACY.md`](../PRIVACY.md) is "collects nothing" |
+| **App Privacy answers** in App Store Connect | Apple requires them | free — every answer is *Data Not Collected* |
+| **An export-compliance answer** | the export is AES-256 (BDR-13) | free — "exempt, standard cryptography" |
 
-The last one is the least work here and the most work for most apps: every
-answer on the App Privacy card is *Data Not Collected*, because there is no
-network call to collect anything with.
+Those two are the least work here and the most work for most apps: every answer
+on the App Privacy card is *Data Not Collected*, because there is no network call
+to collect anything with.
+
+### Two things the upload refuses without, and both are in the repository
+
+- **`ios/Sprout/Sources/PrivacyInfo.xcprivacy`.** Apple's privacy manifest,
+  required since 2024. Tracking and collection are empty because they are empty.
+  Two "required reason" APIs are declared: `UserDefaults` (the reminder switches
+  and the household id, reason `CA92.1`) and file timestamps (SQLite stats the
+  database it owns, reason `C617.1`). If a later App Store Connect check names a
+  category we have not declared, it says exactly which — one entry each, and
+  cheaper than guessing now.
+- **The app icon**, at `Sources/Assets.xcassets/AppIcon.appiconset/`. It is
+  **generated from Android's launcher vector** by
+  [`ios/tools/make_app_icon.py`](../ios/tools/make_app_icon.py), for the same
+  reason the string catalog is generated from Android's resources: one product,
+  one icon, and no second copy to drift. CI re-renders and compares on every
+  push. 1024×1024 with no alpha channel, because an icon with transparency is
+  rejected at upload.
 
 When those exist, they become repository secrets alongside the Android ones
 already listed in [`release.yml`](../.github/workflows/release.yml) — an

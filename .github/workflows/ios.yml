@@ -118,6 +118,14 @@ jobs:
       - name: Sprout cannot reach the network
         run: python3 ios/tools/check_no_network.py
 
+      # The icon is generated from Android's launcher vector, for the same
+      # reason the string catalog is generated from Android's resources: one
+      # product, one icon, and no second copy to drift.
+      - name: The committed icon is the one Android's vector renders
+        run: |
+          pip install --quiet pillow
+          python3 ios/tools/make_app_icon.py --check
+
       # ADR-0014's pin, for the second app. `check_no_network.py` proves there is
       # no code that opens a connection; this proves nothing *declares* a way in
       # either — the counterpart of Android's AttackSurfaceTest, which ADR-0015

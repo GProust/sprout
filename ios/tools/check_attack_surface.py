@@ -61,6 +61,8 @@ BUILD_ADDED_KEYS = {
     "DTPlatformName", "DTPlatformVersion", "DTSDKBuild", "DTSDKName",
     "DTXcode", "DTXcodeBuild", "LSMinimumSystemVersion", "MinimumOSVersion",
     "UIDeviceFamily", "UILaunchScreen~ipad", "UIRequiredDeviceCapabilities",
+    # Written by the asset catalog compiler once there is an app icon.
+    "CFBundleIconName", "CFBundleIcons", "CFBundleIcons~ipad",
 }
 
 # The refusal list. Present at any depth and the build fails, whatever else the
