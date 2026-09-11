@@ -118,6 +118,15 @@ jobs:
       - name: Sprout cannot reach the network
         run: python3 ios/tools/check_no_network.py
 
+      # ADR-0014's pin, for the second app. `check_no_network.py` proves there is
+      # no code that opens a connection; this proves nothing *declares* a way in
+      # either — the counterpart of Android's AttackSurfaceTest, which ADR-0015
+      # says the privacy claim needs or it is only checked on one platform.
+      - name: The way in is what it says it is
+        run: |
+          pip install --quiet pyyaml
+          python3 ios/tools/check_attack_surface.py
+
   sproutkit:
     name: SproutKit
     runs-on: macos-15
@@ -179,8 +188,20 @@ jobs:
             -project ios/Sprout/Sprout.xcodeproj \
             -scheme Sprout \
             -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
+
+      # The half the source check cannot do. Android pins its permissions twice —
+      # once as its own manifest declares them, once as the whole merged build
+      # requests them — because a dependency can add one and say so nowhere else.
+      # This is that second pin: the Info.plist Xcode actually wrote, and the
+      # libraries the binary actually links.
+      - name: The built app opens no door the source did not
+        run: |
+          pip3 install --quiet pyyaml
+          python3 ios/tools/check_attack_surface.py \
+            --app "$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/Sprout.app"
 
   screenshots:
     name: Screenshots
