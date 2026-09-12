@@ -407,19 +407,34 @@ pasted somewhere is a secret to rotate, not one to reuse.
 
 There is no page in the Play Console that hands you a key. Play's API is
 authenticated by a **Google Cloud service account** — a robot user with its own
-email address and a JSON private key — and creating one spans two consoles:
+email address and a JSON private key — and creating one spans two consoles.
 
-1. **Play Console → Setup → API access.** Link a Google Cloud project (it offers
-   to make one). This page is the bridge between the two consoles and is the
-   only reason to visit it.
+**Menu paths here go stale**, so the reliable entry point is the deep link
+<https://play.google.com/console/api-access>, which resolves to the right page
+for whichever developer account you are signed into. If it does not resolve, the
+account is not ready rather than the page being hidden — see the note at the end
+of this section.
+
+1. **<https://play.google.com/console/api-access>.** Link a Google Cloud project
+   (it offers to make one). This is the only reason to visit the page: it is the
+   bridge between the two consoles, and it is what enables the Google Play
+   Android Developer API for that project.
 2. **Google Cloud Console → IAM & Admin → Service Accounts → Create.** Give it a
-   name like `sprout-release`. Grant it no project roles — it needs none;
-   its power comes from Play, not from Google Cloud.
+   name like `sprout-release`. Grant it no project roles — it needs none; its
+   power comes from Play, not from Google Cloud.
 3. **That service account → Keys → Add key → Create new key → JSON.** The file
    downloads once and is never shown again. *This file is the credential.*
-4. **Back in Play Console → Users and permissions → Invite new user**, paste the
-   service account's `…iam.gserviceaccount.com` address, and give it **Release
-   manager** on the Sprout app only. Account-wide access is not needed.
+4. **Play Console → Users and permissions → Invite new user**, paste the service
+   account's `…iam.gserviceaccount.com` address, and give it **Release manager**
+   on the Sprout app only. Account-wide access is not needed. This item is in the
+   account-level navigation and is there from the start.
+
+**If `api-access` does not resolve, or the navigation is shorter than the above
+expects,** the developer account is new: Play hides most of the console until
+identity verification finishes and the first app exists. Nothing is lost —
+steps 2 and 3 happen in Google Cloud Console and can be done at any time, and
+step 4 needs only the app to exist. Do those, and come back to step 1 when the
+console opens up.
 
 | Secret | Value |
 |---|---|
