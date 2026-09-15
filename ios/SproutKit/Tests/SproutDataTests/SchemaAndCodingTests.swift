@@ -5,32 +5,66 @@ import XCTest
 /// The iOS schema against Room's exported one.
 ///
 /// This is the check that stops the two databases drifting apart in a way only a
-/// sync would reveal. It reads `android/app/schemas/…/16.json` directly — the
-/// file Android's own CI already refuses to let go stale.
+/// sync would reveal. It reads `android/app/schemas/…/<version>.json` directly —
+/// the files Android's own CI already refuses to let go stale.
+///
+/// **The version it reads is this build's, not a literal.** Reading a fixed
+/// `16.json` was right while 16 was the only schema there was, and would have
+/// gone quiet the moment a table was added after it: the new tables appear in no
+/// file the test opens, so nothing compares them to anything. Reading
+/// ``SproutDatabase/schemaVersion`` instead means adding a migration here
+/// without committing Room's export for it fails, which is the same rule the
+/// spec has about vectors — the schema lands with the change.
 final class SchemaTests: XCTestCase {
 
-    private static let androidSchema: [String: Any]? = {
+    private static let schemaDirectory: URL = {
         var url = URL(fileURLWithPath: #filePath)
         for _ in 0..<5 { url.deleteLastPathComponent() }
-        url.appendPathComponent(
-            "android/app/schemas/com.gproust.sprout.data.local.SproutDatabase/16.json"
-        )
+        url.appendPathComponent("android/app/schemas/com.gproust.sprout.data.local.SproutDatabase")
+        return url
+    }()
+
+    private static func schema(version: Int) -> [String: Any]? {
+        let url = schemaDirectory.appendingPathComponent("\(version).json")
         guard let data = try? Data(contentsOf: url),
               let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else { return nil }
         return root["database"] as? [String: Any]
-    }()
-
-    func testTheAndroidSchemaIsReadable() throws {
-        XCTAssertNotNil(Self.androidSchema, "android/app/schemas/…/16.json not found")
     }
 
-    func testVersionMatchesTheOneWeStartedFrom() throws {
+    /// Room's export for the schema this build actually speaks.
+    private static let androidSchema: [String: Any]? = schema(version: SproutDatabase.schemaVersion)
+
+    func testTheAndroidSchemaIsReadable() throws {
+        XCTAssertNotNil(
+            Self.androidSchema,
+            """
+            android/app/schemas/…/\(SproutDatabase.schemaVersion).json not found. \
+            Room writes it during the Android build; commit it with the migration \
+            that produced it.
+            """
+        )
+    }
+
+    func testVersionMatchesTheOneWeSpeak() throws {
         let database = try XCTUnwrap(Self.androidSchema)
         XCTAssertEqual(
             (database["version"] as? NSNumber)?.intValue,
-            SproutDatabase.initialAndroidSchemaVersion,
-            "Android's schema moved; add a migration rather than editing schemaV16"
+            SproutDatabase.schemaVersion,
+            "the exported schema is numbered differently from the one this build speaks"
+        )
+    }
+
+    /// The schema iOS starts from is still the one `schemaV16` reproduces.
+    ///
+    /// Separate from the check above, because the two say different things: that
+    /// one is about where this build has got to, this one is about where it
+    /// began. Editing `schemaV16` to follow a change on Android — rather than
+    /// adding a migration — is the mistake it exists to catch.
+    func testTheStartingSchemaIsStillThere() throws {
+        XCTAssertNotNil(
+            Self.schema(version: SproutDatabase.initialAndroidSchemaVersion),
+            "android/app/schemas/…/16.json not found"
         )
     }
 

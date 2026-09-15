@@ -201,7 +201,7 @@ write('invitation.json', {
 // Room packs into strings.
 const replica = {
   formatVersion: 1,
-  schemaVersion: 16,
+  schemaVersion: 17,
   householdId: 'household-vector',
   deviceId: 'device-vector',
   deviceName: "Vector's phone",
@@ -280,6 +280,48 @@ const replica = {
       active: true,
     },
   ],
+  // As-needed medicine (BDR-15), and the doses that were actually given. The
+  // dose names its medicine by that medicine's `uid` — a stored column on both
+  // platforms, not something resolved at merge time.
+  medicines: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'e4da3b7f-bbce-4f8c-a2b1-9d0e1f2a3b4c',
+      updatedAt: 1_757_402_600_000,
+      name: 'Paracetamol',
+      dose: '2.5 ml',
+      minIntervalMinutes: 360,
+      comfortIntervalMinutes: 480,
+      maxPerDay: 4,
+      remindWhenDue: true,
+      remindAtComfort: false,
+      active: true,
+    },
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: '1679091c-5a88-4faf-bc2d-0e1f2a3b4c5d',
+      updatedAt: 1_757_402_700_000,
+      name: 'Ibuprofen',
+      minIntervalMinutes: 360,
+      remindWhenDue: false,
+      remindAtComfort: false,
+      active: true,
+      // dose, comfortIntervalMinutes and maxPerDay absent: a medicine with only
+      // a minimum gap has no amber band and no daily cap, which is a real
+      // configuration and not an incomplete one.
+    },
+  ],
+  medicineDoses: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6c',
+      updatedAt: 1_757_402_800_000,
+      // The medicine's uid, never its local id.
+      medicineUid: 'e4da3b7f-bbce-4f8c-a2b1-9d0e1f2a3b4c',
+      time: 1_757_402_800_000,
+      notes: 'after the 38.4 reading',
+    },
+  ],
   pumpings: [
     {
       uid: 'aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d',
@@ -315,12 +357,13 @@ write('replica.json', {
     'Decode documentJson and every field must come back as listed. ' +
     'Absent keys are nulls: a writer omits them, a reader treats absent and null alike.',
   formatVersion: 1,
-  schemaVersion: 16,
+  schemaVersion: 17,
   documentJson: JSON.stringify(replica),
   document: replica,
   rowCount:
     replica.babies.length + replica.feedings.length + replica.sleeps.length +
     replica.diapers.length + replica.growth.length + replica.treatments.length +
+    replica.medicines.length + replica.medicineDoses.length +
     replica.pumpings.length + replica.tombstones.length,
   refuses: [
     { name: 'a newer document format', json: JSON.stringify({ ...replica, formatVersion: 2 }), reason: 'tooNew' },

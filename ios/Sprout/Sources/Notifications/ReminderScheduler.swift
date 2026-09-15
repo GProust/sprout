@@ -122,11 +122,18 @@ enum ReminderScheduler {
                 namesNeeded: namesNeeded,
                 now: now
             )
+            requests += try medicineRequests(
+                babyId: babyId,
+                babyName: baby.name,
+                repository: repository,
+                namesNeeded: namesNeeded,
+                now: now
+            )
         }
         return requests
     }
 
-    // MARK: - The three kinds
+    // MARK: - The four kinds
 
     private static func feedingRequests(
         baby: Baby,
@@ -259,6 +266,52 @@ enum ReminderScheduler {
                 request(id: "\(identifier).\(occurrence)", content: content, at: trigger, now: now)
             )
             after = trigger
+        }
+        return requests
+    }
+
+    /// The "you can give it again" reminders for the as-needed medicines
+    /// (BDR-15).
+    ///
+    /// One per medicine, because there is only ever one moment to wait for: the
+    /// wait runs from the last dose, so a new dose *replaces* the reminder
+    /// rather than adding to it. It is a one-shot at an absolute moment and
+    /// never a repeating trigger — "six hours after whenever the last dose was"
+    /// is not a calendar rule.
+    ///
+    /// The content is written here rather than when it fires, as everything on
+    /// this platform is (ADR-0019). The stale case is the narrow one that
+    /// applies to all of them: a dose given on the other phone and merged in
+    /// while this one stays in the background. Opening Sprout rebuilds the whole
+    /// schedule, and a merge only happens with the app open (ADR-0010).
+    private static func medicineRequests(
+        babyId: Int64,
+        babyName: String,
+        repository: SproutRepository,
+        namesNeeded: Bool,
+        now: Int64
+    ) throws -> [UNNotificationRequest] {
+        var requests: [UNNotificationRequest] = []
+
+        for medicine in try repository.medicinesForBabyOnce(babyId) {
+            guard medicine.remindWhenDue, let id = medicine.id else { continue }
+            let doses = try repository.recentDoses(of: medicine.uid, withinMs: medicineDayMs)
+            // `nil` covers every reason there is nothing to schedule: never
+            // given, already available, or the switch turned off.
+            guard let trigger = nextMedicineReminder(medicine: medicine, doses: doses, now: now)
+            else { continue }
+
+            let content = UNMutableNotificationContent()
+            content.title = medicine.dose.map { Str.t("treatment_title_dose", medicine.name, $0) }
+                ?? medicine.name
+            content.body = namesNeeded
+                ? Str.t("medicine_notif_text_baby", babyName)
+                : Str.t("medicine_notif_text")
+            content.sound = .default
+
+            requests.append(
+                request(id: "\(prefix)medicine.\(id)", content: content, at: trigger, now: now)
+            )
         }
         return requests
     }

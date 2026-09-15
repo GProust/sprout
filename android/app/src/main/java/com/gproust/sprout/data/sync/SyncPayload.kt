@@ -7,6 +7,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.SleepEntity
@@ -58,13 +60,16 @@ data class SyncPayload(
     val diapers: List<BabyScoped<DiaperEntity>> = emptyList(),
     val growth: List<BabyScoped<GrowthEntity>> = emptyList(),
     val treatments: List<BabyScoped<TreatmentEntity>> = emptyList(),
+    val medicines: List<BabyScoped<MedicineEntity>> = emptyList(),
+    val medicineDoses: List<BabyScoped<MedicineDoseEntity>> = emptyList(),
     val pumpings: List<PumpingEntity> = emptyList(),
     val tombstones: List<TombstoneEntity> = emptyList(),
 ) {
     /** How many rows this payload is offering, tombstones included. */
     val rowCount: Int
         get() = babies.size + feedings.size + sleeps.size + diapers.size +
-            growth.size + treatments.size + pumpings.size + tombstones.size
+            growth.size + treatments.size + medicines.size + medicineDoses.size +
+            pumpings.size + tombstones.size
 }
 
 /** A log with the uid — never the local id — of the baby it belongs to. */
@@ -108,6 +113,8 @@ object SyncPayloadCodec {
         put("diapers", payload.diapers.map { it.toJson(::diaperToJson) }.toJsonArray())
         put("growth", payload.growth.map { it.toJson(::growthToJson) }.toJsonArray())
         put("treatments", payload.treatments.map { it.toJson(::treatmentToJson) }.toJsonArray())
+        put("medicines", payload.medicines.map { it.toJson(::medicineToJson) }.toJsonArray())
+        put("medicineDoses", payload.medicineDoses.map { it.toJson(::medicineDoseToJson) }.toJsonArray())
         put("pumpings", payload.pumpings.map(::pumpingToJson).toJsonArray())
         put("tombstones", payload.tombstones.map(::tombstoneToJson).toJsonArray())
     }.toString().toByteArray(Charsets.UTF_8)
@@ -152,6 +159,8 @@ object SyncPayloadCodec {
                 diapers = root.list("diapers") { it.babyScoped(::diaperFromJson) },
                 growth = root.list("growth") { it.babyScoped(::growthFromJson) },
                 treatments = root.list("treatments") { it.babyScoped(::treatmentFromJson) },
+                medicines = root.list("medicines") { it.babyScoped(::medicineFromJson) },
+                medicineDoses = root.list("medicineDoses") { it.babyScoped(::medicineDoseFromJson) },
                 pumpings = root.list("pumpings", ::pumpingFromJson),
                 tombstones = root.list("tombstones", ::tombstoneFromJson),
             )
@@ -300,6 +309,55 @@ object SyncPayloadCodec {
         endDate = o.longOrNull("endDate"),
         remindersEnabled = o.getBoolean("remindersEnabled"),
         active = o.getBoolean("active"),
+        notes = o.stringOrNull("notes"),
+        uid = o.getString("uid"),
+        updatedAt = o.getLong("updatedAt"),
+        deletedAt = o.longOrNull("deletedAt"),
+    )
+
+    private fun medicineToJson(entity: MedicineEntity) = JSONObject().apply {
+        putSync(entity.uid, entity.updatedAt, entity.deletedAt)
+        put("name", entity.name)
+        putOrNull("dose", entity.dose)
+        put("minIntervalMinutes", entity.minIntervalMinutes)
+        putOrNull("comfortIntervalMinutes", entity.comfortIntervalMinutes)
+        putOrNull("maxPerDay", entity.maxPerDay)
+        put("remindWhenDue", entity.remindWhenDue)
+        put("remindAtComfort", entity.remindAtComfort)
+        put("active", entity.active)
+        putOrNull("notes", entity.notes)
+    }
+
+    private fun medicineFromJson(o: JSONObject) = MedicineEntity(
+        name = o.getString("name"),
+        dose = o.stringOrNull("dose"),
+        minIntervalMinutes = o.getInt("minIntervalMinutes"),
+        comfortIntervalMinutes = o.intOrNull("comfortIntervalMinutes"),
+        maxPerDay = o.intOrNull("maxPerDay"),
+        // Defaulted rather than required: both switches arrived with this table,
+        // but defaulting them costs nothing and is what keeps a field addable
+        // later without a version bump.
+        remindWhenDue = o.optBoolean("remindWhenDue", false),
+        remindAtComfort = o.optBoolean("remindAtComfort", false),
+        active = o.getBoolean("active"),
+        notes = o.stringOrNull("notes"),
+        uid = o.getString("uid"),
+        updatedAt = o.getLong("updatedAt"),
+        deletedAt = o.longOrNull("deletedAt"),
+    )
+
+    private fun medicineDoseToJson(entity: MedicineDoseEntity) = JSONObject().apply {
+        putSync(entity.uid, entity.updatedAt, entity.deletedAt)
+        // The medicine's uid, not its local id: `id` counts from 1 on every
+        // phone and would name a different medicine on the other one.
+        put("medicineUid", entity.medicineUid)
+        put("time", entity.time)
+        putOrNull("notes", entity.notes)
+    }
+
+    private fun medicineDoseFromJson(o: JSONObject) = MedicineDoseEntity(
+        medicineUid = o.getString("medicineUid"),
+        time = o.getLong("time"),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),

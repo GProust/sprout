@@ -359,6 +359,118 @@ interface TreatmentDao {
 }
 
 @Dao
+interface MedicineDao {
+    /** Active as-needed medicines for a baby (BDR-15). */
+    @Query(
+        "SELECT * FROM medicine WHERE babyId = :babyId AND active = 1 " +
+            "AND deletedAt IS NULL ORDER BY name ASC",
+    )
+    fun observeForBaby(babyId: Long): Flow<List<MedicineEntity>>
+
+    @Query("SELECT * FROM medicine WHERE id = :id AND deletedAt IS NULL LIMIT 1")
+    suspend fun getById(id: Long): MedicineEntity?
+
+    /**
+     * Every active medicine that wants a reminder — what the alarms are
+     * (re)built from, after a reboot or after a dose is logged.
+     */
+    @Query("SELECT * FROM medicine WHERE active = 1 AND remindWhenDue = 1 AND deletedAt IS NULL")
+    suspend fun activeWithReminders(): List<MedicineEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: MedicineEntity): Long
+
+    @Update
+    suspend fun update(entity: MedicineEntity)
+
+    @Query("UPDATE medicine SET deletedAt = :now, updatedAt = :now WHERE id = :id")
+    suspend fun softDelete(id: Long, now: Long)
+
+    @Query("SELECT uid FROM medicine WHERE babyId = :babyId")
+    suspend fun uidsForBaby(babyId: Long): List<String>
+
+    @Query("DELETE FROM medicine WHERE babyId = :babyId")
+    suspend fun purgeForBaby(babyId: Long)
+
+    @Query("DELETE FROM medicine WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
+    suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007). `allForSync` deliberately does *not* filter
+    // `deletedAt`: a soft-deleted row is how the deletion travels.
+
+    @Query("SELECT * FROM medicine")
+    suspend fun allForSync(): List<MedicineEntity>
+
+    @Query("SELECT * FROM medicine WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): MedicineEntity?
+
+    @Query("DELETE FROM medicine WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
+}
+
+@Dao
+interface MedicineDoseDao {
+    /**
+     * Every dose of a baby's medicines, newest first.
+     *
+     * All of them in one stream rather than one query per medicine: the screen
+     * shows every medicine's state at once, and a dozen flows that all change
+     * together is a dozen recompositions where one will do.
+     */
+    @Query("SELECT * FROM medicine_dose WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY time DESC")
+    fun observeForBaby(babyId: Long): Flow<List<MedicineDoseEntity>>
+
+    /**
+     * The doses of one medicine since [since], newest first — what the traffic
+     * light and the daily count are computed from.
+     */
+    @Query(
+        "SELECT * FROM medicine_dose WHERE medicineUid = :medicineUid AND time >= :since " +
+            "AND deletedAt IS NULL ORDER BY time DESC",
+    )
+    suspend fun recentFor(medicineUid: String, since: Long): List<MedicineDoseEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: MedicineDoseEntity): Long
+
+    @Update
+    suspend fun update(entity: MedicineDoseEntity)
+
+    @Query("UPDATE medicine_dose SET deletedAt = :now, updatedAt = :now WHERE id = :id")
+    suspend fun softDelete(id: Long, now: Long)
+
+    /**
+     * Soft-deletes every dose of a medicine, so that removing the medicine does
+     * not leave its doses behind for a merge to reattach to a medicine created
+     * later under the same name.
+     */
+    @Query("UPDATE medicine_dose SET deletedAt = :now, updatedAt = :now WHERE medicineUid = :medicineUid AND deletedAt IS NULL")
+    suspend fun softDeleteForMedicine(medicineUid: String, now: Long)
+
+    @Query("SELECT uid FROM medicine_dose WHERE babyId = :babyId")
+    suspend fun uidsForBaby(babyId: Long): List<String>
+
+    @Query("DELETE FROM medicine_dose WHERE babyId = :babyId")
+    suspend fun purgeForBaby(babyId: Long)
+
+    @Query("DELETE FROM medicine_dose WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
+    suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007).
+
+    @Query("SELECT * FROM medicine_dose")
+    suspend fun allForSync(): List<MedicineDoseEntity>
+
+    @Query("SELECT * FROM medicine_dose WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): MedicineDoseEntity?
+
+    @Query("DELETE FROM medicine_dose WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+
+}
+
+@Dao
 interface PumpingDao {
     /** Every pumping session, newest first (the parent's, not a baby's). */
     @Query("SELECT * FROM pumping WHERE deletedAt IS NULL ORDER BY time DESC")

@@ -192,6 +192,7 @@ struct RootView: View {
         case .growth: GrowthScreen()
         case .pumping: PumpingScreen()
         case .treatments: TreatmentsScreen()
+        case .medicines: MedicinesScreen()
         case .wellbeing: HealthScreen()
         case .checkIn: DailyCheckInScreen()
         case .report(let babyId): ReportScreen(babyId: babyId)

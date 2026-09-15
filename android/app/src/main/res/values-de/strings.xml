@@ -314,6 +314,48 @@
     <string name="treatment_notif_text">Es ist Zeit für diese Dosis.</string>
     <string name="treatment_notif_text_baby">Es ist Zeit für die Dosis von %1$s.</string>
 
+    <string name="screen_medicines">Bei Bedarf</string>
+    <string name="medicine_empty">Noch nichts eingerichtet. Füge mit + ein Medikament hinzu — einen Namen und den Abstand, den du zwischen zwei Gaben einhalten sollst.</string>
+    <string name="medicine_add">Medikament hinzufügen</string>
+    <string name="medicine_new">Neues Medikament</string>
+    <string name="medicine_edit">Medikament bearbeiten</string>
+    <string name="medicine_delete_title">%1$s entfernen?</string>
+    <string name="medicine_delete_body">Das Medikament und die dazu erfassten Gaben werden endgültig entfernt. Das lässt sich nicht rückgängig machen.</string>
+    <string name="medicine_name">Name (z. B. Paracetamol)</string>
+    <string name="medicine_dose">Dosis (optional, z. B. 2,5 ml)</string>
+    <string name="medicine_intervals">Abstand zwischen zwei Gaben</string>
+    <string name="medicine_intervals_hint">Von der ärztlichen Verordnung oder dem Beipackzettel. Sprout kennt weder dieses Medikament noch dein Baby — es zählt nur die Stunden, die du hier einträgst.</string>
+    <string name="medicine_min_interval">Mindestens</string>
+    <string name="medicine_comfort_interval">Üblicherweise (optional)</string>
+    <string name="medicine_hours_suffix">Stunden</string>
+    <string name="medicine_max_per_day">Höchstzahl der Gaben in 24 Stunden (optional)</string>
+    <string name="medicine_doses_suffix">Gaben</string>
+    <string name="medicine_remind">Erinnere mich, wenn ich wieder geben darf</string>
+    <string name="medicine_remind_at">Erinnere mich nach</string>
+    <string name="medicine_remind_at_min">Dem Mindestabstand</string>
+    <string name="medicine_remind_at_comfort">Dem üblichen Abstand</string>
+    <string name="medicine_give">Gabe erfassen</string>
+    <string name="medicine_history">Erfasste Gaben</string>
+    <string name="medicine_never_given">Noch nicht gegeben</string>
+    <string name="medicine_last_dose">Letzte Gabe %1$s</string>
+    <string name="medicine_day_count">%1$d von %2$d in den letzten 24 Std.</string>
+    <string name="medicine_day_count_plain">%1$d in den letzten 24 Std.</string>
+    <string name="medicine_state_too_soon">Zu früh — noch %1$s</string>
+    <string name="medicine_state_daily_max">Tagesmaximum erreicht — noch %1$s</string>
+    <string name="medicine_state_early">Möglich — %1$s vor dem üblichen Abstand</string>
+    <string name="medicine_state_ready">Kann gegeben werden</string>
+    <string name="medicine_every">Alle %1$s</string>
+    <string name="medicine_every_range">Alle %1$s bis %2$s</string>
+    <string name="medicine_dose_edit">Gabe bearbeiten</string>
+    <string name="medicine_dose_time">Zeitpunkt der Gabe</string>
+    <string name="medicine_of">Gabe von %1$s</string>
+
+    <!-- Benachrichtigungen für Bedarfsmedikamente -->
+    <string name="medicine_channel_name">Medikamenten-Erinnerungen</string>
+    <string name="medicine_channel_desc">Erinnerungen, dass ein Bedarfsmedikament wieder gegeben werden kann</string>
+    <string name="medicine_notif_text">Das kann jetzt wieder gegeben werden.</string>
+    <string name="medicine_notif_text_baby">Das kann %1$s jetzt wieder gegeben werden.</string>
+
     <!-- Mahlzeit-Erinnerungen -->
     <string name="settings_feeding_reminders">Mahlzeit-Erinnerungen</string>
     <string name="settings_feeding_reminders_desc">Erinnere mich, wenn die letzte Mahlzeit zu lange her ist.</string>

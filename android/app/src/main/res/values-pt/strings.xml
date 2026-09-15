@@ -314,6 +314,48 @@
     <string name="treatment_notif_text">Está na hora desta dose.</string>
     <string name="treatment_notif_text_baby">Está na hora da dose de %1$s.</string>
 
+    <string name="screen_medicines">Se for preciso</string>
+    <string name="medicine_empty">Ainda não há nada configurado. Adicione um medicamento com o botão + — um nome e o intervalo que lhe indicaram entre tomas.</string>
+    <string name="medicine_add">Adicionar um medicamento</string>
+    <string name="medicine_new">Novo medicamento</string>
+    <string name="medicine_edit">Editar medicamento</string>
+    <string name="medicine_delete_title">Remover %1$s?</string>
+    <string name="medicine_delete_body">O medicamento e as tomas que registou são removidos definitivamente. Isto não pode ser anulado.</string>
+    <string name="medicine_name">Nome (por ex. paracetamol)</string>
+    <string name="medicine_dose">Dose (opcional, por ex. 2,5 ml)</string>
+    <string name="medicine_intervals">Intervalo entre tomas</string>
+    <string name="medicine_intervals_hint">Do seu médico ou do folheto informativo. O Sprout não conhece este medicamento nem o seu bebé: só conta as horas que escrever aqui.</string>
+    <string name="medicine_min_interval">Pelo menos</string>
+    <string name="medicine_comfort_interval">Normalmente (opcional)</string>
+    <string name="medicine_hours_suffix">horas</string>
+    <string name="medicine_max_per_day">Tomas máximas em 24 horas (opcional)</string>
+    <string name="medicine_doses_suffix">tomas</string>
+    <string name="medicine_remind">Avisar-me quando puder dar outra vez</string>
+    <string name="medicine_remind_at">Avisar-me depois de</string>
+    <string name="medicine_remind_at_min">O intervalo mínimo</string>
+    <string name="medicine_remind_at_comfort">O intervalo habitual</string>
+    <string name="medicine_give">Registar uma toma</string>
+    <string name="medicine_history">Tomas registadas</string>
+    <string name="medicine_never_given">Ainda não foi dado</string>
+    <string name="medicine_last_dose">Última toma %1$s</string>
+    <string name="medicine_day_count">%1$d de %2$d nas últimas 24 h</string>
+    <string name="medicine_day_count_plain">%1$d nas últimas 24 h</string>
+    <string name="medicine_state_too_soon">Cedo demais — faltam %1$s</string>
+    <string name="medicine_state_daily_max">Máximo diário atingido — faltam %1$s</string>
+    <string name="medicine_state_early">Pode dar-se — %1$s antes do intervalo habitual</string>
+    <string name="medicine_state_ready">Pode dar-se</string>
+    <string name="medicine_every">A cada %1$s</string>
+    <string name="medicine_every_range">A cada %1$s a %2$s</string>
+    <string name="medicine_dose_edit">Editar a toma</string>
+    <string name="medicine_dose_time">Hora da toma</string>
+    <string name="medicine_of">Toma de %1$s</string>
+
+    <!-- Notificações de medicamento em SOS -->
+    <string name="medicine_channel_name">Lembretes de medicamentos</string>
+    <string name="medicine_channel_desc">Avisos de que um medicamento em SOS já pode ser dado outra vez</string>
+    <string name="medicine_notif_text">Já pode ser dado outra vez.</string>
+    <string name="medicine_notif_text_baby">Já pode ser dado a %1$s outra vez.</string>
+
     <!-- Lembretes de refeições -->
     <string name="settings_feeding_reminders">Lembretes de refeições</string>
     <string name="settings_feeding_reminders_desc">Avisar-me quando passar demasiado tempo desde a última refeição.</string>

@@ -16,6 +16,16 @@ final class SyncPayloadTests: XCTestCase {
         try Vectors.load("replica.json")
     }
 
+    /// The schema version the vector was written at.
+    ///
+    /// Read from the vector rather than written as a literal: a schema bump
+    /// would otherwise make every decode below refuse the document as `tooNew`,
+    /// which is the format test failing for a reason that has nothing to do with
+    /// the format.
+    private func vectorSchemaVersion() throws -> Int {
+        try XCTUnwrap(try vector()["schemaVersion"] as? Int)
+    }
+
     private func document() throws -> Data {
         guard let json = try vector()["documentJson"] as? String else {
             throw XCTSkip("replica.json has no documentJson")
@@ -26,12 +36,15 @@ final class SyncPayloadTests: XCTestCase {
     // MARK: - Reading what Node wrote
 
     func testTheVectorDecodesRowForRow() throws {
-        let payload = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let schemaVersion = try vectorSchemaVersion()
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: schemaVersion
+        )
 
         XCTAssertEqual(payload.householdId, "household-vector")
         XCTAssertEqual(payload.deviceId, "device-vector")
         XCTAssertEqual(payload.deviceName, "Vector's phone")
-        XCTAssertEqual(payload.schemaVersion, 16)
+        XCTAssertEqual(payload.schemaVersion, schemaVersion)
         XCTAssertEqual(payload.createdAt, 1_757_400_000_000)
 
         let expectedRows = try vector()["rowCount"] as? Int
@@ -39,7 +52,9 @@ final class SyncPayloadTests: XCTestCase {
     }
 
     func testEveryRowTypeSurvivesTheTrip() throws {
-        let payload = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: try vectorSchemaVersion()
+        )
 
         let baby = try XCTUnwrap(payload.babies.first)
         XCTAssertEqual(baby.name, "Robin")
@@ -64,6 +79,27 @@ final class SyncPayloadTests: XCTestCase {
         XCTAssertEqual(treatment.row.name, "Vitamin D")
         XCTAssertEqual(treatment.row.dose, "400 IU")
 
+        // As-needed medicine (BDR-15). `medicineUid` is the one field in the
+        // document that points at another *row* rather than at a baby, and the
+        // one a hand-written port could quietly read as a local id.
+        let paracetamol = try XCTUnwrap(payload.medicines.first { $0.row.name == "Paracetamol" }).row
+        XCTAssertEqual(paracetamol.minIntervalMinutes, 360)
+        XCTAssertEqual(paracetamol.comfortIntervalMinutes, 480)
+        XCTAssertEqual(paracetamol.maxPerDay, 4)
+        XCTAssertTrue(paracetamol.remindWhenDue)
+        XCTAssertFalse(paracetamol.remindAtComfort)
+
+        // A medicine with only a minimum gap: the other two are absent keys, not
+        // zeroes — and a zero maximum would mean none allowed at all.
+        let ibuprofen = try XCTUnwrap(payload.medicines.first { $0.row.name == "Ibuprofen" }).row
+        XCTAssertNil(ibuprofen.comfortIntervalMinutes)
+        XCTAssertNil(ibuprofen.maxPerDay)
+
+        let dose = try XCTUnwrap(payload.medicineDoses.first)
+        XCTAssertEqual(dose.babyUid, baby.uid)
+        XCTAssertEqual(dose.row.medicineUid, paracetamol.uid)
+        XCTAssertEqual(dose.row.time, 1_757_402_800_000)
+
         let pumping = try XCTUnwrap(payload.pumpings.first)
         XCTAssertEqual(pumping.storage, .FRIDGE)
         XCTAssertEqual(pumping.amountMl, 120)
@@ -77,7 +113,9 @@ final class SyncPayloadTests: XCTestCase {
     /// a platform that helpfully turned them into arrays would write a document
     /// the other could not read.
     func testThePackedFieldsStayPacked() throws {
-        let payload = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: try vectorSchemaVersion()
+        )
 
         let feeding = try XCTUnwrap(payload.feedings.first).row
         XCTAssertEqual(
@@ -95,7 +133,9 @@ final class SyncPayloadTests: XCTestCase {
     /// A measure nobody took is an absent key, not a zero, and a row nobody
     /// deleted has no `deletedAt` at all.
     func testAbsentIsNullAndNullIsAbsent() throws {
-        let payload = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: try vectorSchemaVersion()
+        )
 
         let baby = try XCTUnwrap(payload.babies.first)
         XCTAssertNil(baby.feedingReminderEnabled)
@@ -145,7 +185,9 @@ final class SyncPayloadTests: XCTestCase {
             let reason = try XCTUnwrap(refusal["reason"] as? String, name)
 
             do {
-                _ = try SyncPayloadCodec.decode(Data(json.utf8), currentSchemaVersion: 16)
+                _ = try SyncPayloadCodec.decode(
+                    Data(json.utf8), currentSchemaVersion: try vectorSchemaVersion()
+                )
                 XCTFail("\(name): should not have decoded")
             } catch let error as SyncPayloadError {
                 switch (error, reason) {
@@ -177,9 +219,12 @@ final class SyncPayloadTests: XCTestCase {
     /// What this app writes, it can read — and the document it writes carries the
     /// same keys the vector does.
     func testWhatWeWriteIsWhatTheVectorLooksLike() throws {
-        let original = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let schemaVersion = try vectorSchemaVersion()
+        let original = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: schemaVersion
+        )
         let encoded = try SyncPayloadCodec.encode(original)
-        let again = try SyncPayloadCodec.decode(encoded, currentSchemaVersion: 16)
+        let again = try SyncPayloadCodec.decode(encoded, currentSchemaVersion: schemaVersion)
 
         XCTAssertEqual(again, original)
 
@@ -194,7 +239,9 @@ final class SyncPayloadTests: XCTestCase {
     }
 
     func testEncodingIsStable() throws {
-        let payload = try SyncPayloadCodec.decode(try document(), currentSchemaVersion: 16)
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: try vectorSchemaVersion()
+        )
 
         XCTAssertEqual(
             try SyncPayloadCodec.encode(payload),

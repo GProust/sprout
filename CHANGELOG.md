@@ -5,6 +5,23 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 💊 **Medicine you give when it's needed, and the wait before the next dose.**
+  A new *As needed* page on your baby's dashboard, for the medicines that aren't
+  on a schedule — paracetamol at three in the morning rather than vitamin D every
+  breakfast. Set one up with the wait you were told to keep between doses (six
+  hours at least, eight usually, say), tap **Give a dose** when you give one, and
+  the card answers the only question that matters at that hour: **red** while
+  it's too soon and how long is left, **amber** once it's allowed but sooner than
+  ideal, **green** once the full wait has passed. You can add a daily maximum too,
+  and Sprout will hold the light at red while the day's allowance is spent. The
+  doses share with your household's other phones like everything else, so the
+  parent who's awake can see what the parent who's asleep already gave — and you
+  can be reminded when the wait is over, if you ask for it.
+- 💊 **Every number is yours.** Sprout ships no list of medicines, no doses and no
+  intervals: you type in what your prescriber or the leaflet told you, and the
+  colours are the app counting the hours back to *your* figures. It never warns,
+  never advises, and never stops you logging a dose — it's a record, not a
+  second opinion.
 - 🛡️ **A file that isn't a Sprout file can no longer close the app.** Sprout
   offers itself for almost any file you tap, because an invitation arriving
   through a messaging app carries nothing else to recognise it by — so a

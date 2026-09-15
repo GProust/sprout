@@ -76,6 +76,8 @@ class SyncEngine(
             diapers = scoped(db.diaperDao().allForSync()) { it.babyId },
             growth = scoped(db.growthDao().allForSync()) { it.babyId },
             treatments = scoped(db.treatmentDao().allForSync()) { it.babyId },
+            medicines = scoped(db.medicineDao().allForSync()) { it.babyId },
+            medicineDoses = scoped(db.medicineDoseDao().allForSync()) { it.babyId },
             pumpings = if (includePumping) db.pumpingDao().allForSync() else emptyList(),
             tombstones = db.tombstoneDao().all(),
         )
@@ -153,6 +155,25 @@ class SyncEngine(
                 insert = { db.treatmentDao().insert(it.copy(id = 0L)) },
                 update = { incoming, local -> db.treatmentDao().update(incoming.copy(id = local.id)) },
             )
+            summary += mergeScoped(
+                payload.medicines, since, babyIdOf,
+                withBaby = { row, babyId -> row.copy(babyId = babyId) },
+                find = { db.medicineDao().findByUid(it) },
+                insert = { db.medicineDao().insert(it.copy(id = 0L)) },
+                update = { incoming, local -> db.medicineDao().update(incoming.copy(id = local.id)) },
+            )
+            // After the medicines, but not because a dose needs one to exist: it
+            // names its medicine by uid and stores that uid, so a dose whose
+            // medicine has not arrived yet is stored and simply shows nothing
+            // until the medicine does. The order is for the reader, not the
+            // database.
+            summary += mergeScoped(
+                payload.medicineDoses, since, babyIdOf,
+                withBaby = { row, babyId -> row.copy(babyId = babyId) },
+                find = { db.medicineDoseDao().findByUid(it) },
+                insert = { db.medicineDoseDao().insert(it.copy(id = 0L)) },
+                update = { incoming, local -> db.medicineDoseDao().update(incoming.copy(id = local.id)) },
+            )
             summary += mergeRows(
                 rows = payload.pumpings,
                 since = since,
@@ -178,6 +199,8 @@ class SyncEngine(
                 "diaper" -> db.diaperDao().findByUid(tombstone.uid)?.also { db.diaperDao().purgeByUid(tombstone.uid) }
                 "growth" -> db.growthDao().findByUid(tombstone.uid)?.also { db.growthDao().purgeByUid(tombstone.uid) }
                 "treatment" -> db.treatmentDao().findByUid(tombstone.uid)?.also { db.treatmentDao().purgeByUid(tombstone.uid) }
+                "medicine" -> db.medicineDao().findByUid(tombstone.uid)?.also { db.medicineDao().purgeByUid(tombstone.uid) }
+                "medicine_dose" -> db.medicineDoseDao().findByUid(tombstone.uid)?.also { db.medicineDoseDao().purgeByUid(tombstone.uid) }
                 "pumping" -> db.pumpingDao().findByUid(tombstone.uid)?.also { db.pumpingDao().purgeByUid(tombstone.uid) }
                 // A table we don't know: keep the tombstone, touch nothing.
                 else -> null

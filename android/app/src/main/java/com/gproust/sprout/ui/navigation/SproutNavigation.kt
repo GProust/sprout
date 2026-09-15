@@ -59,6 +59,7 @@ import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
+import com.gproust.sprout.ui.medicines.MedicinesScreen
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.startup.Startup
@@ -83,6 +84,7 @@ object Routes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val TREATMENTS = "treatments"
+    const val MEDICINES = "medicines"
     const val SYNC = "settings/sync"
     const val REPORT = "report/{babyId}"
 
@@ -127,7 +129,7 @@ private val bottomDestinations = listOf(
 private val knownRoutes = setOf(
     Routes.HOME, Routes.BABY, Routes.YOU, Routes.STATS,
     Routes.FEEDING, Routes.PUMPING, Routes.SLEEP, Routes.DIAPER,
-    Routes.GROWTH, Routes.HEALTH, Routes.TREATMENTS, Routes.CHECKIN,
+    Routes.GROWTH, Routes.HEALTH, Routes.TREATMENTS, Routes.MEDICINES, Routes.CHECKIN,
     Routes.PROFILE, Routes.SETTINGS, Routes.SYNC,
 )
 
@@ -382,6 +384,9 @@ private fun MainScaffold(
                     incomingFile = syncFile,
                     onIncomingFileHandled = onSyncFileConsumed,
                 )
+            }
+            composable(Routes.MEDICINES) {
+                MedicinesScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.TREATMENTS) {
                 TreatmentsScreen(onBack = { navController.popBackStack() })

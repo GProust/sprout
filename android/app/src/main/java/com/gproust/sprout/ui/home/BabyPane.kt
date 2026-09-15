@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material.icons.filled.Monitor
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingUp
@@ -279,9 +280,11 @@ private fun sideLabel(side: BreastSide) = when (side) {
 }
 
 /**
- * The six things there are to log, as tiles rather than a stack of identical
+ * The seven things there are to log, as tiles rather than a stack of identical
  * buttons. Wellbeing joins them only for a parent who tracks it; treatments is
- * here rather than in the bottom bar, where there was never a seat for it.
+ * here rather than in the bottom bar, where there was never a seat for it, and
+ * as-needed medicine sits beside it as its own tile — the two are asked about at
+ * different moments and a screen that mixed them would serve neither (BDR-15).
  */
 @Composable
 fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Modifier = Modifier) {
@@ -292,6 +295,7 @@ fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Mo
         add(Tile(R.string.nav_diaper, Icons.Filled.BabyChangingStation, Routes.DIAPER))
         add(Tile(R.string.nav_growth, Icons.Filled.Monitor, Routes.GROWTH))
         add(Tile(R.string.screen_treatments, Icons.Filled.Medication, Routes.TREATMENTS))
+        add(Tile(R.string.screen_medicines, Icons.Filled.Vaccines, Routes.MEDICINES))
         if (tracksWellbeing) {
             add(Tile(R.string.screen_wellbeing, Icons.Filled.Favorite, Routes.HEALTH))
         }

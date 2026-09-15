@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-09-08 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-15 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -12,8 +12,9 @@ what the app does — and does not do — with your information.
 ## What data Sprout stores
 
 Everything you log — feeding, sleep, diapers, growth measurements, the
-mother's postpartum check-ins, and your profile details — is saved in a
-private database (Room/SQLite) **on your device only**.
+medicines you set up and the doses you give, the mother's postpartum
+check-ins, and your profile details — is saved in a private database
+(Room/SQLite) **on your device only**.
 
 - There are **no user accounts** and no sign-in.
 - There is **no cloud sync** and **no server** operated by us.
@@ -77,6 +78,28 @@ choose the period it covers.
   Give the password to the doctor in person or by phone rather than in the same
   message as the file, and bear in mind what it does not cover: once they open
   it, the decrypted copy is theirs and lives under their own arrangements.
+
+## Medicines given when they are needed
+
+Sprout lets you set up a medicine you give as needed — paracetamol, say — with
+the wait you were told to keep between doses, and then record each dose so the
+app can tell you how long is left.
+
+- **Sprout ships no list of medicines and no doses of its own.** There is no
+  drug database in the app and nothing is looked up anywhere: the name, the
+  dose, the gap between doses and any daily maximum are all numbers *you* type
+  in, from your prescriber or the leaflet.
+- **Nothing here is medical advice.** The red, amber and green the screen shows
+  are the app counting the hours back to the figures you entered, and nothing
+  more. Sprout does not know what the medicine is, what your baby weighs, or
+  what else they have had.
+- **The doses stay on your phone**, alongside everything else you log. They are
+  shared with the other phones in your household if you have set that up, for
+  the same reason every other entry is — so the parent who is awake knows what
+  the parent who is asleep already gave — and they travel encrypted, directly
+  between your own phones, exactly as described below.
+- **If you turn on a reminder**, it is a notification your own phone schedules
+  and shows. Nothing is sent anywhere to produce it.
 
 ## Children's data
 
@@ -151,6 +174,17 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-15
+
+- Added the section on **medicines given when they are needed**. Sprout can now
+  record each dose of a medicine you set up yourself and count the wait before
+  the next one. The section says what is new to the database — the medicines and
+  their doses — and says plainly that the app ships no drug list, looks nothing
+  up, and is counting hours against figures you typed in rather than advising
+  you. Nothing about what Sprout collects or sends has changed: the doses stay on
+  your phone, travel only between your own household's phones, and the internet
+  permission is still absent.
 
 ### 2026-09-08 (2)
 

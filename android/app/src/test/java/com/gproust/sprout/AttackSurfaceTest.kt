@@ -134,7 +134,7 @@ class AttackSurfaceTest {
      * has to start it and because an invitation arrives as a file from whichever
      * app the other parent used. `SproutWidgetReceiver` is exported because the
      * platform's own `APPWIDGET_UPDATE` broadcast is how a widget is told to
-     * draw. The three reminder receivers are not, and a fourth one should not be
+     * draw. The four reminder receivers are not, and a fifth one should not be
      * either.
      */
     @Test
@@ -164,6 +164,7 @@ class AttackSurfaceTest {
                 "com.gproust.sprout.notifications.ReminderReceiver",
                 "com.gproust.sprout.notifications.FeedingReminderReceiver",
                 "com.gproust.sprout.notifications.GrowthSpurtReminderReceiver",
+                "com.gproust.sprout.notifications.MedicineReminderReceiver",
                 "com.gproust.sprout.widget.SproutWidgetReceiver",
             ),
             ourComponents().map { it.name }.toSet(),
