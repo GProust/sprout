@@ -156,8 +156,8 @@ final class ScreenshotTests: XCTestCase {
     private func captureMedicines(_ app: XCUIApplication, language: String) throws {
         let tile = app.buttons["log-tile-medicines"]
         XCTAssertTrue(
-            tile.waitForExistence(timeout: 15),
-            "07-medicines: no medicines tile on the dashboard"
+            scroll(app, to: tile),
+            "07-medicines: no medicines tile on the dashboard, even after scrolling"
         )
         tile.tap()
         try file(app, named: "07-medicines", language: language)
@@ -192,8 +192,8 @@ final class ScreenshotTests: XCTestCase {
     ) throws {
         let button = app.buttons["log-tile-\(tile)"]
         XCTAssertTrue(
-            button.waitForExistence(timeout: 15),
-            "\(name): no \(tile) tile on the dashboard"
+            scroll(app, to: button),
+            "\(name): no \(tile) tile on the dashboard, even after scrolling"
         )
         button.tap()
 
@@ -226,7 +226,7 @@ final class ScreenshotTests: XCTestCase {
         try file(app, named: name, language: language)
     }
 
-    /// Scrolls until `element` is in the accessibility tree, or gives up.
+    /// Scrolls until `element` is on screen, or gives up.
     ///
     /// Sharing is the fifth of six sections in Settings, so on a phone it starts
     /// below the fold — and the captured image of that screen shows its top. A
@@ -238,9 +238,33 @@ final class ScreenshotTests: XCTestCase {
     /// because the run's accessibility dump is inside an artifact this
     /// environment cannot fetch. Either way scrolling first is correct: it costs
     /// nothing when the row is already visible.
+    ///
+    /// The dashboard's log grid is the same story and now proves it. `LogGrid`
+    /// is a `LazyVGrid`, so its rows are built as they approach the viewport:
+    /// the run that added the medicine card (BDR-16) found *feeding*, *pumping*
+    /// and *sleep* and then failed on *diaper* — the first tile of the second
+    /// row, pushed out of the build window by one card's height. Nothing about
+    /// the grid was wrong; the capture had simply been reading the tiles that
+    /// happened to fit.
+    ///
+    /// **Hittable, not merely present.** A lazy container builds a row shortly
+    /// *before* it scrolls into view, so an element can be in the tree while
+    /// still off-screen — and tapping one that is throws rather than scrolling
+    /// to it. The final `exists` is the fallback: after the swipes are spent,
+    /// answering the question this asked before is better than failing a
+    /// seven-language run on a judgement about hit-testing.
     private func scroll(_ app: XCUIApplication, to element: XCUIElement, swipes: Int = 6) -> Bool {
+        // A short wait first, because swiping at a screen that has not rendered
+        // is not scrolling — it just spends the swipes. Short and not the
+        // fifteen seconds this replaced: the run's one slow moment is the cold
+        // launch, and `capture` already waits sixty seconds for the tab bar
+        // before anything reaches here. Every element this is asked about after
+        // that is either on screen or below the fold, and the second case is
+        // what the loop is for — waiting longer on it would cost the seven
+        // languages a minute and a half to learn nothing.
+        _ = element.waitForExistence(timeout: 5)
         for _ in 0..<swipes {
-            if element.exists { return true }
+            if element.exists && element.isHittable { return true }
             app.swipeUp()
         }
         return element.exists
