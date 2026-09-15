@@ -39,6 +39,8 @@ final class ScreenshotTests: XCTestCase {
             try captureLog(app, tile: log, named: String(format: "%02d-%@", index + 2, log), language: language)
         }
 
+        try captureMedicines(app, language: language)
+
         // Then the other tabs. Three in total with the seeded single baby: the
         // baby's own tab appears only from two children up, because with one the
         // dashboard already is that view.
@@ -138,6 +140,48 @@ final class ScreenshotTests: XCTestCase {
     private static let logs = [
         "feeding", "pumping", "sleep", "diaper", "growth", "treatments", "wellbeing",
     ]
+
+    /// The as-needed medicines, and the form a new one starts in (BDR-15).
+    ///
+    /// Its own function rather than another entry in `logs`, which numbers its
+    /// captures by position: adding to that list would renumber every file after
+    /// it. These two share a number with the treatments capture instead, the way
+    /// Android's sibling screens already do.
+    ///
+    /// Two captures because they answer different questions. The list is the one
+    /// a parent opens at 3 a.m. — three medicines, one in each state the traffic
+    /// light has. The editor is the one that is easiest to misread, so it is
+    /// worth showing that the prefilled six-to-eight hours sits under a line
+    /// saying the numbers come from a prescriber or the leaflet.
+    private func captureMedicines(_ app: XCUIApplication, language: String) throws {
+        let tile = app.buttons["log-tile-medicines"]
+        XCTAssertTrue(
+            tile.waitForExistence(timeout: 15),
+            "07-medicines: no medicines tile on the dashboard"
+        )
+        tile.tap()
+        try file(app, named: "07-medicines", language: language)
+
+        let add = app.buttons["medicine-add"]
+        XCTAssertTrue(
+            add.waitForExistence(timeout: 10),
+            "07-medicines-2-new: no add button on the medicines screen"
+        )
+        add.tap()
+        try file(app, named: "07-medicines-2-new", language: language)
+
+        // Out of the sheet and back to the dashboard, so the captures that
+        // follow start where they expect to. By identifier and not by position:
+        // the sheet puts a second navigation bar on screen, and which one
+        // `firstMatch` picks is not something to bet a seven-language run on.
+        let cancel = app.buttons["medicine-editor-cancel"]
+        XCTAssertTrue(
+            cancel.waitForExistence(timeout: 10),
+            "07-medicines-2-new: no cancel button in the medicine editor"
+        )
+        cancel.tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+    }
 
     /// Opens one log from the dashboard's grid, files it, and comes back.
     private func captureLog(

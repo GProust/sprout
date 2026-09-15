@@ -144,6 +144,9 @@ struct MedicinesScreen: View {
             AddEntryButton(accessibilityLabel: Str.t("medicine_add")) {
                 editing = newMedicine()
             }
+            // The screenshot run opens this sheet, and it walks the app in seven
+            // languages — so it needs a handle that is not the visible label.
+            .accessibilityIdentifier("medicine-add")
             .padding(Spacing.regular)
         }
         .sproutStyle()
@@ -415,6 +418,7 @@ private struct MedicineEditor: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Str.t("action_cancel")) { dismiss() }
+                        .accessibilityIdentifier("medicine-editor-cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Str.t("action_save"), action: save)
