@@ -376,17 +376,17 @@ private struct MedicineEditor: View {
                     Text(Str.t("medicine_intervals_hint"))
                         .font(.caption)
                         .foregroundStyle(SproutColor.onSurfaceVariant)
-                    NumberField(
+                    LabelledNumberField(
                         label: Str.t("medicine_min_interval"),
                         text: $minHours,
                         suffix: Str.t("medicine_hours_suffix")
                     )
-                    NumberField(
+                    LabelledNumberField(
                         label: Str.t("medicine_comfort_interval"),
                         text: $comfortHours,
                         suffix: Str.t("medicine_hours_suffix")
                     )
-                    NumberField(
+                    LabelledNumberField(
                         label: Str.t("medicine_max_per_day"),
                         text: $maxPerDay,
                         suffix: Str.t("medicine_doses_suffix")
@@ -443,6 +443,35 @@ private struct MedicineEditor: View {
         updated.active = true
         updated.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         onSave(updated)
+    }
+}
+
+/// A number field with its label beside it rather than inside it.
+///
+/// ``NumberField`` puts its label in the placeholder, which is right for every
+/// other field in the app because they all start empty. These three do not: the
+/// minimum and the usual wait open prefilled (BDR-15), so the placeholder is
+/// never drawn and the form showed "6 hours" above "8 hours" with nothing to say
+/// which was which.
+///
+/// Found by looking at the screenshot, which is what they are for. Android is
+/// unaffected — Material floats its label above a filled field rather than
+/// hiding it.
+private struct LabelledNumberField: View {
+    let label: String
+    @Binding var text: String
+    let suffix: String
+
+    var body: some View {
+        HStack(spacing: Spacing.snug) {
+            Text(label)
+                .foregroundStyle(SproutColor.onSurface)
+            Spacer(minLength: Spacing.tight)
+            // Wide enough for a two-digit answer and its unit, narrow enough to
+            // leave the label room to wrap rather than truncate.
+            NumberField(label: "", text: $text, suffix: suffix)
+                .frame(maxWidth: 150)
+        }
     }
 }
 
