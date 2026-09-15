@@ -67,6 +67,7 @@ class HouseholdSummaryTest {
         ongoing: List<SleepEntity> = emptyList(),
         medicines: List<MedicineEntity> = emptyList(),
         doses: List<MedicineDoseEntity> = emptyList(),
+        dismissed: Map<String, Long> = emptyMap(),
         // Named on purpose: the parameter list grew once already, and a
         // positional call would have gone on compiling with the medicines in
         // the wrong seat.
@@ -78,6 +79,7 @@ class HouseholdSummaryTest {
         ongoingSleeps = ongoing,
         medicines = medicines,
         medicineDoses = doses,
+        dismissedMedicines = dismissed,
         dayStart = dayStart,
         now = now,
     )
@@ -305,6 +307,51 @@ class HouseholdSummaryTest {
             listOf("Paracetamol", "Ibuprofen"),
             result[0].medicines.map { it.medicine.name },
         )
+    }
+
+    @Test
+    fun aDismissedMedicineIsPutAway() {
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(medicine(1, "m-para", "Paracetamol")),
+            doses = listOf(dose(1, "m-para", now - 2 * HOUR)),
+            dismissed = mapOf("m-para" to now - 2 * HOUR),
+        )
+        assertTrue(result[0].medicines.isEmpty())
+    }
+
+    @Test
+    fun theNextDoseBringsADismissedMedicineBack() {
+        // The dismissal names the dose it was made against, so it expires on its
+        // own rather than needing to be cleared: a newer dose is a different
+        // wait, and the card is about the wait that is running.
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(medicine(1, "m-para", "Paracetamol")),
+            doses = listOf(
+                dose(1, "m-para", now - 8 * HOUR),
+                dose(1, "m-para", now - 1 * HOUR),
+            ),
+            dismissed = mapOf("m-para" to now - 8 * HOUR),
+        )
+        assertEquals(1, result[0].medicines.size)
+    }
+
+    @Test
+    fun aDismissalNamesOneMedicineOnly() {
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(
+                medicine(1, "m-para", "Paracetamol"),
+                medicine(1, "m-ibu", "Ibuprofen"),
+            ),
+            doses = listOf(
+                dose(1, "m-para", now - 2 * HOUR),
+                dose(1, "m-ibu", now - 2 * HOUR),
+            ),
+            dismissed = mapOf("m-para" to now - 2 * HOUR),
+        )
+        assertEquals(listOf("Ibuprofen"), result[0].medicines.map { it.medicine.name })
     }
 
     @Test

@@ -23,10 +23,11 @@ All notable changes to Sprout are documented here. This project follows
   never advises, and never stops you logging a dose — it's a record, not a
   second opinion.
 - ⏱️ **A running wait now shows on the home page.** If a medicine can't be given
-  yet — or has just come round again — it sits above the feed buttons with the
-  same sentence and the same colour as the *As needed* page, and a **Give a dose**
-  button beside it. It's there only when something is actually in play: a
-  household in the middle of nothing has exactly the home page it had before.
+  yet — or has just come round again — it's one line under the feed buttons: the
+  name in its colour, how long is left if there's any, and **Give** and
+  **Dismiss** beside it. Dismiss puts it away until you next give that medicine.
+  It's there only when something is actually in play: a household in the middle of
+  nothing has exactly the home page it had before.
 - 🔔 **You can log a dose from the reminder itself.** The "you can give it again"
   notification now carries **Give a dose** and **Dismiss**. Tapping the first
   records the dose at the moment you tapped it and moves the next reminder along

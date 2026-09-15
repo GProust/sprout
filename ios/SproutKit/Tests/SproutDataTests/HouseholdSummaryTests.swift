@@ -23,7 +23,8 @@ final class HouseholdSummaryTests: XCTestCase {
         diapers: [Diaper] = [],
         ongoing: [Sleep] = [],
         medicines: [Medicine] = [],
-        doses: [MedicineDose] = []
+        doses: [MedicineDose] = [],
+        dismissed: [String: Int64] = [:]
     ) -> [BabySummary] {
         summariseHousehold(
             babies: babies,
@@ -33,6 +34,7 @@ final class HouseholdSummaryTests: XCTestCase {
             ongoingSleeps: ongoing,
             medicines: medicines,
             medicineDoses: doses,
+            dismissedMedicines: dismissed,
             dayStart: dayStart,
             now: now
         )
@@ -304,6 +306,48 @@ final class HouseholdSummaryTests: XCTestCase {
             summaries[0].medicines.map(\.medicine.name),
             ["Paracetamol", "Ibuprofen"]
         )
+    }
+
+    func testADismissedMedicineIsPutAway() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")],
+            doses: [dose(1, "m-para", now - 2 * hour)],
+            dismissed: ["m-para": now - 2 * hour]
+        )
+        XCTAssertTrue(summaries[0].medicines.isEmpty)
+    }
+
+    func testTheNextDoseBringsADismissedMedicineBack() {
+        // The dismissal names the dose it was made against, so it expires on its
+        // own rather than needing to be cleared: a newer dose is a different
+        // wait, and the card is about the wait that is running.
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")],
+            doses: [
+                dose(1, "m-para", now - 8 * hour),
+                dose(1, "m-para", now - hour),
+            ],
+            dismissed: ["m-para": now - 8 * hour]
+        )
+        XCTAssertEqual(summaries[0].medicines.count, 1)
+    }
+
+    func testADismissalNamesOneMedicineOnly() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [
+                medicine(1, "m-para", "Paracetamol"),
+                medicine(1, "m-ibu", "Ibuprofen"),
+            ],
+            doses: [
+                dose(1, "m-para", now - 2 * hour),
+                dose(1, "m-ibu", now - 2 * hour),
+            ],
+            dismissed: ["m-para": now - 2 * hour]
+        )
+        XCTAssertEqual(summaries[0].medicines.map(\.medicine.name), ["Ibuprofen"])
     }
 
     func testAnInactiveMedicineIsNotWatched() {

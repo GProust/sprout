@@ -108,7 +108,7 @@ struct RootView: View {
             }
         }
         .task {
-            let model = model ?? HomeViewModel(repository: sprout.repository)
+            let model = model ?? HomeViewModel(repository: sprout.repository, settings: sprout.settingsStore)
             self.model = model
             await model.observeEverything()
         }

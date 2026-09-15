@@ -190,11 +190,18 @@ data class MedicineWatch(
  * Ordered by **what can be given now first**, then by whichever wait ends
  * soonest, with the name breaking ties so the list does not reshuffle under a
  * parent who is reading it.
+ *
+ * [dismissed] is what *Dismiss* on the card put away, as medicine uid to the
+ * dose it was dismissed against. A dismissal therefore expires by itself: give
+ * another dose and the medicine's last dose is no longer the one that was put
+ * away, so it comes back. There is nothing to clear and nothing to leak — a
+ * medicine that is deleted takes its entry out of use with it.
  */
 fun medicinesNeedingAttention(
     medicines: List<MedicineEntity>,
     doses: List<MedicineDoseEntity>,
     now: Long,
+    dismissed: Map<String, Long> = emptyMap(),
 ): List<MedicineWatch> = medicines
     .asSequence()
     .filter { it.active && it.deletedAt == null }
@@ -203,6 +210,7 @@ fun medicinesNeedingAttention(
     // happened that the dashboard needs to carry.
     .filter { it.readiness.lastDoseAt != null }
     .filter { it.readiness.level != MedicineLevel.READY || it.readiness.dosesInLastDay > 0 }
+    .filter { dismissed[it.medicine.uid] != it.readiness.lastDoseAt }
     // `nextAllowedAt` is null for everything that can be given, so the elvis
     // sorts those to the front as one group rather than by an arbitrary key.
     .sortedWith(compareBy({ it.readiness.nextAllowedAt ?: 0L }, { it.medicine.name }))

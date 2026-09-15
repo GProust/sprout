@@ -355,7 +355,11 @@
     <string name="medicine_channel_desc">Erinnerungen, dass ein Bedarfsmedikament wieder gegeben werden kann</string>
     <string name="medicine_notif_text">Das kann jetzt wieder gegeben werden.</string>
     <string name="medicine_notif_text_baby">Das kann %1$s jetzt wieder gegeben werden.</string>
-    <string name="medicine_notif_dismiss">Schließen</string>
+    <string name="medicine_dismiss">Schließen</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Geben</string>
+    <string name="medicine_short_wait">noch %1$s</string>
+    <string name="medicine_short_early">%1$s zu früh</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">Medikamente bei Bedarf</string>
     <plurals name="home_medicine_more">

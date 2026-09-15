@@ -62,6 +62,7 @@ import com.gproust.sprout.ui.medicines.MedicinesScreen
 import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.baby.BabyScreen
 import com.gproust.sprout.ui.home.HomeScreen
+import com.gproust.sprout.ui.home.MedicineDismissals
 import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
@@ -277,6 +278,10 @@ class ScreenshotTest {
         // Feeding reminders are off by default; the Settings captures toggle them
         // on explicitly (see captureScreens) to show both states honestly.
         FeedingReminderSettings.setEnabled(app, false)
+        // Nothing put away from the dashboard: the three medicines above are
+        // seeded to show all three states of the card, and a dismissal left
+        // behind by an earlier run would photograph two of them (BDR-16).
+        MedicineDismissals.clear(app)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})

@@ -355,7 +355,11 @@
     <string name="medicine_channel_desc">Avisos de que um medicamento em SOS já pode ser dado outra vez</string>
     <string name="medicine_notif_text">Já pode ser dado outra vez.</string>
     <string name="medicine_notif_text_baby">Já pode ser dado a %1$s outra vez.</string>
-    <string name="medicine_notif_dismiss">Dispensar</string>
+    <string name="medicine_dismiss">Dispensar</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Dar</string>
+    <string name="medicine_short_wait">faltam %1$s</string>
+    <string name="medicine_short_early">%1$s antes</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">Medicamentos se necessário</string>
     <plurals name="home_medicine_more">

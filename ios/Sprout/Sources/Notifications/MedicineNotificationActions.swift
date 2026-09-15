@@ -71,7 +71,7 @@ final class MedicineNotificationActions: NSObject, UNUserNotificationCenterDeleg
                     ),
                     UNNotificationAction(
                         identifier: MedicineNotification.dismissAction,
-                        title: Str.t("medicine_notif_dismiss"),
+                        title: Str.t("medicine_dismiss"),
                         options: []
                     ),
                 ],

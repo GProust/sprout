@@ -51,6 +51,27 @@ func stateSentence(_ readiness: MedicineReadiness, now: Int64) -> String {
     }
 }
 
+/// The state in as few words as a line can carry: "4 h 12 m to wait", "1 h
+/// early", or nothing at all once the full wait has passed.
+///
+/// The dashboard's line has room for a name and a number and no more, and a bare
+/// duration would not say whether it is a wait or a head start — so the number
+/// keeps the one word that says which. Green has no number, because there is
+/// nothing left to count: the name's colour and the tick beside it are the whole
+/// message, and ``stateSentence(_:now:)`` is still what VoiceOver is given.
+func shortState(_ readiness: MedicineReadiness, now: Int64) -> String? {
+    switch readiness.level {
+    case .tooSoon:
+        let left = SproutFormat.duration(millis: (readiness.nextAllowedAt ?? now) - now).text
+        return Str.t("medicine_short_wait", left)
+    case .soonerThanIdeal:
+        let left = SproutFormat.duration(millis: (readiness.comfortableAt ?? now) - now).text
+        return Str.t("medicine_short_early", left)
+    case .ready:
+        return nil
+    }
+}
+
 /// "Last dose 03:20 · 2 of 4 in the last 24 h", or that it has never been given.
 func lastDoseLine(_ readiness: MedicineReadiness) -> String {
     guard let last = readiness.lastDoseAt else { return Str.t("medicine_never_given") }

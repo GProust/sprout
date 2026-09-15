@@ -71,6 +71,29 @@ internal fun stateSentence(context: Context, readiness: MedicineReadiness, now: 
         MedicineLevel.READY -> context.getString(R.string.medicine_state_ready)
     }
 
+/**
+ * The state in as few words as a line can carry: "4 h 12 m to wait", "1 h
+ * early", or nothing at all once the full wait has passed.
+ *
+ * The dashboard's line has room for a name and a number and no more, and a bare
+ * duration would not say whether it is a wait or a head start — so the number
+ * keeps the one word that says which. Green has no number, because there is
+ * nothing left to count: the name's colour and the tick beside it are the whole
+ * message, and [stateSentence] is still what a screen reader is given.
+ */
+internal fun shortState(context: Context, readiness: MedicineReadiness, now: Long): String? =
+    when (readiness.level) {
+        MedicineLevel.TOO_SOON -> context.getString(
+            R.string.medicine_short_wait,
+            formatDuration(context, (readiness.nextAllowedAt ?: now) - now),
+        )
+        MedicineLevel.SOONER_THAN_IDEAL -> context.getString(
+            R.string.medicine_short_early,
+            formatDuration(context, (readiness.comfortableAt ?: now) - now),
+        )
+        MedicineLevel.READY -> null
+    }
+
 /** "Last dose 03:20 · 2 of 4 in the last 24 h", or that it has never been given. */
 internal fun lastDoseLine(context: Context, readiness: MedicineReadiness): String {
     val last = readiness.lastDoseAt ?: return context.getString(R.string.medicine_never_given)

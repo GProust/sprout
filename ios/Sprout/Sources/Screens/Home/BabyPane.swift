@@ -15,7 +15,8 @@ struct BabyPane<Header: View>: View {
     let now: Int64
     let onFeed: (BreastSide) -> Void
     let onOpen: (LogDestination) -> Void
-    let onGiveMedicine: (Medicine) -> Void
+    let onGiveMedicine: (MedicineWatch) -> Void
+    let onDismissMedicine: (MedicineWatch) -> Void
     var onShareRecord: (() -> Void)?
     @ViewBuilder var header: () -> Header
 
@@ -24,19 +25,20 @@ struct BabyPane<Header: View>: View {
             header()
 
             SinceChips(summary: summary, now: now)
+            QuickFeed(next: summary.nextSide, onFeed: onFeed)
 
-            // Above the feed buttons, and above the log grid the medicine would
-            // otherwise be three taps down in: a wait that is running is the one
-            // thing here that is about *now* (BDR-16). It draws nothing at all
-            // when no wait is running, which is most of the time.
+            // Under the feed buttons, and above the log grid the medicine would
+            // otherwise be three taps down in. Feeding is what this screen is
+            // opened for; a wait that is running is what it is opened for a few
+            // days a year, and it draws nothing at all the rest of the time
+            // (BDR-16).
             MedicineWatchCard(
                 watches: summary.medicines,
                 now: now,
                 onGive: onGiveMedicine,
+                onDismiss: onDismissMedicine,
                 onOpen: { onOpen(.medicines) }
             )
-
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
 
             SectionLabel(Str.t("home_log"))
             LogGrid(tracksWellbeing: tracksWellbeing, onOpen: onOpen)
@@ -81,7 +83,8 @@ struct BabyCardView: View {
     let now: Int64
     let onOpen: () -> Void
     let onFeed: (BreastSide) -> Void
-    let onGiveMedicine: (Medicine) -> Void
+    let onGiveMedicine: (MedicineWatch) -> Void
+    let onDismissMedicine: (MedicineWatch) -> Void
     let onOpenMedicines: () -> Void
 
     var body: some View {
@@ -104,13 +107,14 @@ struct BabyCardView: View {
             .accessibilityLabel(Str.t("cd_open_baby", summary.baby.name))
 
             SinceChips(summary: summary, now: now)
+            QuickFeed(next: summary.nextSide, onFeed: onFeed)
             MedicineWatchCard(
                 watches: summary.medicines,
                 now: now,
                 onGive: onGiveMedicine,
+                onDismiss: onDismissMedicine,
                 onOpen: onOpenMedicines
             )
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
         }
         .padding(Spacing.regular)
         .frame(maxWidth: .infinity, alignment: .leading)

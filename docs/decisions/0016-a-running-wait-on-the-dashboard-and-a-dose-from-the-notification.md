@@ -43,13 +43,38 @@ notification itself.**
 
 ### The dashboard card
 
-A card above the feed buttons on each baby, listing the medicines that have
-something to say right now. It is the same sentence, the same icon and the same
-colour as the as-needed screen — drawn from the same helpers
+A card **below the feed buttons** on each baby, listing the medicines that have
+something to say right now, **one line each and no more**.
+
+A line is the medicine's name in its state's colour, the state's own icon, the
+number still to wait if there is one, and the two things there are to do about
+it: *Give* and *Dismiss*.
+
+The first version of this card said everything the as-needed screen says — name,
+dose, interval, the full state sentence, the last dose and its count, four lines
+per medicine — above the feed buttons. The first thing users said back was that
+the dashboard had got heavy, and they were right. This is a glance at something
+that is usually not happening, on the screen that is opened every hour: feeding
+is what the dashboard is *for*, and a medicine is what it is for a few days a
+year. So the card went to one line per medicine and moved below the feeds.
+
+**The abbreviation is visual only.** A screen reader is given the medicine's name
+and the full state sentence, unshortened, because the reason the line is short is
+that it is being *looked* at, and none of that reasoning applies to someone
+listening. The words themselves still come from the shared helpers
 (`ui/medicines/MedicineLabels.kt`, `Screens/Medicines/MedicineLabels.swift`), so
-the two cannot disagree about the same medicine at the same instant. Each line
-carries a *Give a dose* button, which is never disabled, for the reason BDR-15
-gives.
+the card and the screen cannot disagree about the same medicine at the same
+instant.
+
+**The number keeps the word that says what it is.** "4 h 12 m" alone does not say
+whether it is a wait or a head start, and the two mean opposite things, so the
+line reads "4 h 12 m to wait" or "1 h early". Green prints no number at all,
+because there is nothing left to count — there the colour and the tick beside the
+name are the whole message, which is why BDR-15's rule that the colour is never
+the only channel is kept by the *icon*, not by a sentence the line has no room
+for.
+
+*Give* is never disabled, for the reason BDR-15 gives.
 
 **A medicine earns a line when a wait is running, or when it was given within
 the last day and the wait has since passed.** That second case is the one the
@@ -62,6 +87,14 @@ not in the middle of anything has exactly the dashboard it had before, which is
 what stops a feature used a few days a year from taking up permanent space on
 the screen used every hour. Three medicines is the most it draws; beyond that it
 says how many it is not showing rather than growing to fit.
+
+**Dismiss puts a line away until the medicine is next given.** It is not a
+setting and not a snooze: a dismissal names *the dose it was made against*, so it
+expires by itself — give another dose and the medicine's last dose is no longer
+the one that was put away, and the line comes back. Nothing has to clear it,
+which means nothing can forget to. It is device-local and **never synced**: "I
+have seen this" is a fact about a person looking at a screen, and the parent
+holding the other phone has not seen anything.
 
 **A dose given from the card is recorded against the medicine's own baby**, not
 against whichever baby is selected. With twins the card that was touched and the
@@ -101,8 +134,11 @@ it records one the parent made.
 
 ## Consequences
 
-- One more thing on the dashboard, in the arrangement most likely to be in play
-  at 3 a.m. and absent the rest of the time.
+- One line per medicine on the dashboard, below the feeds, in the arrangement
+  most likely to be in play at 3 a.m. and absent the rest of the time.
+- **Everything the line drops is a tap away**, on the screen that was always
+  going to be the place for it. What the card is for is noticing; what the
+  as-needed screen is for is reading.
 - `MedicineWatch` and `medicinesNeedingAttention` are shared arithmetic, tested
   with the same cases on both platforms — a household with one phone of each has
   to see the same medicines on the same card.
@@ -118,6 +154,10 @@ it records one the parent made.
   delegate must be set before launching finishes, or an action tapped while the
   app was not running is delivered to nobody. A dose tapped from the lock screen
   is held until the database is open rather than dropped.
+- **A dismissal survives a restore to a new phone**, because it lives with the
+  ordinary settings rather than in `device.xml` (ADR-0011). That is harmless and
+  self-correcting: the worst case is a line missing until the next dose, which is
+  exactly what was asked for.
 - The card and the as-needed screen say the same things from one set of helpers.
   Adding a fourth state, or changing a sentence, is one edit — which is the point
   of extracting them, because the screen that would have drifted is the one

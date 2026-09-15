@@ -429,7 +429,11 @@
     <string name="medicine_channel_desc">Reminders that an as-needed medicine can be given again</string>
     <string name="medicine_notif_text">This can be given again now.</string>
     <string name="medicine_notif_text_baby">This can be given to %1$s again now.</string>
-    <string name="medicine_notif_dismiss">Dismiss</string>
+    <string name="medicine_dismiss">Dismiss</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Give</string>
+    <string name="medicine_short_wait">%1$s to wait</string>
+    <string name="medicine_short_early">%1$s early</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">As-needed medicine</string>
     <plurals name="home_medicine_more">

@@ -52,6 +52,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.data.MEDICINE_DAY_MS
+import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
@@ -107,8 +108,14 @@ private data class HouseholdRows(
     val feedings: List<FeedingEntity>,
     val sleeps: List<SleepEntity>,
     val diapers: List<DiaperEntity>,
+    val medicine: MedicineRows,
+)
+
+/** The as-needed medicines, their doses, and what has been put away (BDR-16). */
+private data class MedicineRows(
     val medicines: List<MedicineEntity>,
-    val medicineDoses: List<MedicineDoseEntity>,
+    val doses: List<MedicineDoseEntity>,
+    val dismissed: Map<String, Long>,
 )
 
 class HomeViewModel(
@@ -153,7 +160,8 @@ class HomeViewModel(
      * given but not logged is the failure the feature exists to prevent
      * (BDR-15, BDR-16).
      */
-    fun giveDose(medicine: MedicineEntity) = viewModelScope.launch {
+    fun giveDose(watch: MedicineWatch) = viewModelScope.launch {
+        val medicine = watch.medicine
         repository.giveMedicineDose(medicine, System.currentTimeMillis())
         // Re-read rather than reuse the dashboard's list: the flow that feeds
         // this screen and the write above are not ordered against each other,
@@ -166,21 +174,45 @@ class HomeViewModel(
     }
 
     /**
+     * Puts a medicine away until it is next given (BDR-16).
+     *
+     * The dose it was dismissed against is what is stored, so this expires on
+     * its own: the line comes back the moment there is a newer dose to count
+     * from. Nothing is written to the baby's record — a dismissal is about a
+     * parent having read a screen, and the other phone's parent has not.
+     */
+    fun dismiss(watch: MedicineWatch) {
+        val lastDoseAt = watch.readiness.lastDoseAt ?: return
+        MedicineDismissals.dismiss(context, watch.medicine.uid, lastDoseAt)
+    }
+
+    /**
+     * The three medicine reads, folded first.
+     *
+     * Five flows is what one [combine] takes, and the dashboard now wants six —
+     * so the medicines go together, which is the grouping that would have been
+     * chosen anyway: a dose belongs to a medicine, and a dismissal names one.
+     */
+    private val medicineRows = combine(
+        repository.householdMedicines,
+        repository.householdMedicineDoses(windowStart),
+        MedicineDismissals.dismissals(context),
+    ) { medicines, doses, dismissed -> MedicineRows(medicines, doses, dismissed) }
+
+    /**
      * The household's recent rows, as one value.
      *
-     * Five flows in one [combine] is its limit, and the arity is not the reason
-     * they are grouped: the summary is a function of all of them together, and
-     * emitting it from a partial mixture would draw a baby's feeds beside
-     * another minute's doses.
+     * Grouped rather than combined at the top for more than the arity: the
+     * summary is a function of all of them together, and emitting it from a
+     * partial mixture would draw a baby's feeds beside another minute's doses.
      */
     private val householdRows = combine(
         repository.householdFeedings(windowStart),
         repository.householdSleeps(windowStart),
         repository.householdDiapers(windowStart),
-        repository.householdMedicines,
-        repository.householdMedicineDoses(windowStart),
-    ) { feedings, sleeps, diapers, medicines, doses ->
-        HouseholdRows(feedings, sleeps, diapers, medicines, doses)
+        medicineRows,
+    ) { feedings, sleeps, diapers, medicine ->
+        HouseholdRows(feedings, sleeps, diapers, medicine)
     }
 
     /**
@@ -212,8 +244,9 @@ class HomeViewModel(
             sleeps = rows.sleeps,
             diapers = rows.diapers,
             ongoingSleeps = ongoing,
-            medicines = rows.medicines,
-            medicineDoses = rows.medicineDoses,
+            medicines = rows.medicine.medicines,
+            medicineDoses = rows.medicine.doses,
+            dismissedMedicines = rows.medicine.dismissed,
             dayStart = startOfDay(now),
             now = now,
         )
@@ -339,6 +372,7 @@ fun HomeScreen(
                     onFeed = { side -> withBaby(single.baby.id) { onQuickFeed(side) } },
                     onNavigate = onNavigate,
                     onGiveMedicine = vm::giveDose,
+                    onDismissMedicine = vm::dismiss,
                     onShareRecord = { onShareRecord(single.baby.id) },
                     header = {
                         Text(
@@ -366,6 +400,7 @@ fun HomeScreen(
                         onOpen = { withBaby(summary.baby.id) { onNavigate(Routes.BABY) } },
                         onFeed = { side -> withBaby(summary.baby.id) { onQuickFeed(side) } },
                         onGiveMedicine = vm::giveDose,
+                        onDismissMedicine = vm::dismiss,
                         // Selects the baby on the way, so the screen that opens
                         // is this card's child rather than whichever was last
                         // active — the dose the card offers already knows.

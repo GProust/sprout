@@ -71,6 +71,8 @@ fun summariseHousehold(
     ongoingSleeps: List<SleepEntity>,
     medicines: List<MedicineEntity> = emptyList(),
     medicineDoses: List<MedicineDoseEntity> = emptyList(),
+    /** What *Dismiss* put away: medicine uid to the dose it was dismissed against. */
+    dismissedMedicines: Map<String, Long> = emptyMap(),
     dayStart: Long,
     now: Long,
 ): List<BabySummary> {
@@ -107,6 +109,7 @@ fun summariseHousehold(
                 medicines = medicinesBy[baby.id].orEmpty(),
                 doses = dosesBy[baby.id].orEmpty(),
                 now = now,
+                dismissed = dismissedMedicines,
             ),
         )
     }

@@ -61,6 +61,8 @@ public func summariseHousehold(
     ongoingSleeps: [Sleep],
     medicines: [Medicine] = [],
     medicineDoses: [MedicineDose] = [],
+    /// What *Dismiss* put away: medicine uid to the dose it was dismissed against.
+    dismissedMedicines: [String: Int64] = [:],
     dayStart: Int64,
     now: Int64
 ) -> [BabySummary] {
@@ -96,7 +98,8 @@ public func summariseHousehold(
             medicines: medicinesNeedingAttention(
                 medicines: medicinesBy[id] ?? [],
                 doses: dosesBy[id] ?? [],
-                now: now
+                now: now,
+                dismissed: dismissedMedicines
             )
         )
     }

@@ -193,10 +193,17 @@ public struct MedicineWatch: Identifiable, Sendable, Equatable {
 /// Ordered by **what can be given now first**, then by whichever wait ends
 /// soonest, with the name breaking ties so the list does not reshuffle under a
 /// parent who is reading it.
+///
+/// `dismissed` is what *Dismiss* on the card put away, as medicine uid to the
+/// dose it was dismissed against. A dismissal therefore expires by itself: give
+/// another dose and the medicine's last dose is no longer the one that was put
+/// away, so it comes back. There is nothing to clear and nothing to leak — a
+/// medicine that is deleted takes its entry out of use with it.
 public func medicinesNeedingAttention(
     medicines: [Medicine],
     doses: [MedicineDose],
-    now: Int64
+    now: Int64,
+    dismissed: [String: Int64] = [:]
 ) -> [MedicineWatch] {
     medicines
         .filter { $0.active && $0.deletedAt == nil }
@@ -205,6 +212,7 @@ public func medicinesNeedingAttention(
         // has happened that the dashboard needs to carry.
         .filter { $0.readiness.lastDoseAt != nil }
         .filter { $0.readiness.level != .ready || $0.readiness.dosesInLastDay > 0 }
+        .filter { dismissed[$0.medicine.uid] != $0.readiness.lastDoseAt }
         .sorted { left, right in
             // `nextAllowedAt` is nil for everything that can be given, so the
             // default sorts those to the front as one group.

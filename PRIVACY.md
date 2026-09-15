@@ -104,7 +104,10 @@ app can tell you how long is left.
   leaves it, and nothing is sent to produce or to answer the notification.
 - **A wait that is running is shown on the home page**, so you do not have to go
   looking for it. It is read from the same entries on the same phone; no
-  additional information is collected to draw it.
+  additional information is collected to draw it. Putting one of those lines away
+  with **Dismiss** notes on this phone which medicine you dismissed and which
+  dose you dismissed it against — so it comes back when you next give it — and
+  that note stays on this phone and is not shared with your household's others.
 
 ## Children's data
 
@@ -183,10 +186,11 @@ one you can check.
 ### 2026-09-15 (2)
 
 - Amended the section on **medicines given when they are needed**: a wait that is
-  running is now shown on the home page, and the reminder carries a **Give a
-  dose** button that records the dose without opening the app. Both read and
-  write the same entries on the same phone. Nothing about what Sprout collects or
-  sends has changed.
+  running is now shown on the home page, that line can be dismissed until the
+  medicine is next given, and the reminder carries a **Give a dose** button that
+  records the dose without opening the app. All of it reads and writes the same
+  entries on the same phone, and a dismissal is a note this phone keeps to itself.
+  Nothing about what Sprout collects or sends has changed.
 
 ### 2026-09-15
 

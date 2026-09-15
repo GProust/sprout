@@ -217,6 +217,15 @@ A running wait also reaches the two places a parent already is
   middle of nothing has exactly the dashboard it had before. What it draws comes
   from `ui/medicines/MedicineLabels.kt` and `Screens/Medicines/MedicineLabels.swift`
   — the same helpers the as-needed screen uses, so the two cannot disagree.
+- **One line per medicine, below the feed buttons.** The first cut of the card
+  repeated the whole as-needed screen above them and users said the dashboard had
+  got heavy. A line is the name in its colour, the state's icon, the countdown if
+  there is one, *Give* and *Dismiss* — and the abbreviation is visual only: a
+  screen reader is still given the full sentence. Adding a field here is adding it
+  to the screen this card exists to keep people off.
+- **Dismiss names the dose it was made against**, so it expires on its own when
+  the next one is logged. Device-local (`MedicineDismissals`), never synced — the
+  parent holding the other phone has not seen anything.
 - **The dashboard's summary ticks.** A wait that runs out while the app is open
   turns green with nothing written, which means recomputing the fold once a
   minute rather than only reformatting it.

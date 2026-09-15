@@ -159,7 +159,7 @@ class MedicineReminderReceiver : BroadcastReceiver() {
             )
             .addAction(
                 0,
-                context.getString(R.string.medicine_notif_dismiss),
+                context.getString(R.string.medicine_dismiss),
                 MedicineReminders.buttonIntent(
                     context,
                     MedicineReminders.ACTION_DISMISS,

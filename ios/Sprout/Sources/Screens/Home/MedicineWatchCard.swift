@@ -10,56 +10,55 @@ private let watchLimit = 3
 /// The as-needed medicines with a wait running, or one that has just finished
 /// (BDR-16) — the mirror of `ui/home/MedicineWatchCard.kt`.
 ///
-/// It is on the dashboard because that is where a parent already is at 3 a.m.,
-/// and "has the paracetamol had six hours yet" is a question asked far more
-/// often than it is answered by opening a second screen. It says nothing the
-/// as-needed screen doesn't — same sentence, same symbol, same colour, from the
-/// same helpers — and it is absent entirely when no wait is running, so the
-/// dashboard of a household that is not in the middle of anything is unchanged.
+/// **One line each, and no more.** The first version of this said everything the
+/// As needed screen says — name, dose, interval, the full state sentence, the
+/// last dose and its count — and the first thing users said back was that the
+/// dashboard had got heavy. They were right: this is a glance at something that
+/// is usually not happening, sitting on the screen that is opened every hour. So
+/// a line is the name in its state's colour, the number still to wait if there
+/// is one, and the two things there are to do about it.
 ///
-/// *Give a dose* is offered here for the same reason it is never disabled
-/// there: the dose that goes unlogged is the one the parent had to leave the
-/// screen to record.
+/// It keeps its place under the feed buttons rather than above them, for the
+/// same reason: feeding is what the dashboard is opened for, and a medicine is
+/// what it is opened for a few days a year.
+///
+/// Everything the line drops is a tap away on the As needed screen — and none of
+/// it is dropped for VoiceOver, which is given the full sentence.
 struct MedicineWatchCard: View {
     let watches: [MedicineWatch]
     let now: Int64
-    let onGive: (Medicine) -> Void
+    let onGive: (MedicineWatch) -> Void
+    let onDismiss: (MedicineWatch) -> Void
     let onOpen: () -> Void
 
     var body: some View {
         if watches.isEmpty {
             EmptyView()
         } else {
-            VStack(alignment: .leading, spacing: Spacing.snug) {
-                Button(action: onOpen) {
-                    HStack {
-                        Text(Str.t("home_medicine_title"))
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(SproutColor.onSurface)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(SproutColor.onSurfaceVariant)
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Str.t("screen_medicines"))
-
+            VStack(spacing: 0) {
                 ForEach(watches.prefix(watchLimit)) { watch in
-                    WatchRow(watch: watch, now: now) { onGive(watch.medicine) }
+                    WatchRow(
+                        watch: watch,
+                        now: now,
+                        onOpen: onOpen,
+                        onGive: { onGive(watch) },
+                        onDismiss: { onDismiss(watch) }
+                    )
                 }
 
                 if watches.count > watchLimit {
-                    Text(Str.t("home_medicine_more", watches.count - watchLimit))
-                        .font(.caption)
-                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                    Button(action: onOpen) {
+                        Text(Str.t("home_medicine_more", watches.count - watchLimit))
+                            .font(.caption)
+                            .foregroundStyle(SproutColor.onSurfaceVariant)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, Spacing.snug)
+                            .padding(.bottom, Spacing.tight)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(Spacing.regular)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            // Outlined rather than filled: on a household dashboard this sits
-            // *inside* a baby's card, and two filled surfaces at the same tone
-            // would read as one.
+            .padding(.vertical, Spacing.hairline)
             .background(
                 RoundedRectangle(cornerRadius: Radius.card)
                     .stroke(SproutColor.outline.opacity(0.4), lineWidth: 1)
@@ -68,44 +67,72 @@ struct MedicineWatchCard: View {
     }
 }
 
-/// One medicine's line: the state three ways over — a dot, its own symbol and a
-/// sentence — and the dose beside it.
+/// One medicine, one line: `⏳ Paracetamol  4 h 12 m to wait   Give  ✕`.
 ///
-/// The three channels are not decoration. Red/amber/green is the palette a
-/// deuteranope reads worst, and this card exists to be read at a glance by
-/// someone frightened and half awake (BDR-15).
+/// The state is carried three ways over — the symbol's shape, the colour, and
+/// the words of the countdown — because red/amber/green is the palette a
+/// deuteranope reads worst and this is read at 3 a.m. by someone frightened
+/// (BDR-15). The symbol is what distinguishes *can be given* from *can be given,
+/// sooner than ideal* once there is no number left to print.
 private struct WatchRow: View {
     let watch: MedicineWatch
     let now: Int64
+    let onOpen: () -> Void
     let onGive: () -> Void
+    let onDismiss: () -> Void
+
+    private var colour: Color { watch.readiness.level.color }
 
     var body: some View {
         HStack(spacing: Spacing.tight) {
-            // Both decorative: the sentence beside them says the same thing,
-            // and a screen reader announcing all three would say it three times.
-            Circle()
-                .fill(watch.readiness.level.color)
-                .frame(width: 10, height: 10)
-                .accessibilityHidden(true)
-            Image(systemName: watch.readiness.level.symbol)
-                .foregroundStyle(watch.readiness.level.color)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(watch.medicine.name)
-                    .font(.callout)
-                    .foregroundStyle(SproutColor.onSurface)
-                Text(stateSentence(watch.readiness, now: now))
-                    .font(.caption)
-                    .foregroundStyle(watch.readiness.level.color)
+            Button(action: onOpen) {
+                HStack(spacing: Spacing.tight) {
+                    Image(systemName: watch.readiness.level.symbol)
+                        .font(.footnote)
+                        .foregroundStyle(colour)
+                    Text(watch.medicine.name)
+                        .font(.callout.weight(.medium))
+                        .foregroundStyle(colour)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    if let state = shortState(watch.readiness, now: now) {
+                        Text(state)
+                            .font(.caption)
+                            .foregroundStyle(SproutColor.onSurfaceVariant)
+                            .lineLimit(1)
+                            .layoutPriority(1)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .contentShape(Rectangle())
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            // Never disabled, whatever the light says — the same rule the
-            // as-needed screen keeps. Sprout records what happened; it does not
+            .buttonStyle(.plain)
+            // One utterance, and the long sentence rather than the short one:
+            // the line is abbreviated because it is being *looked* at, and none
+            // of that applies to VoiceOver.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(
+                "\(watch.medicine.name). \(stateSentence(watch.readiness, now: now))"
+            )
+
+            // Never disabled, whatever the light says — the same rule the As
+            // needed screen keeps. Sprout records what happened; it does not
             // decide it.
-            Button(Str.t("medicine_give"), action: onGive)
+            Button(Str.t("medicine_give_short"), action: onGive)
                 .font(.footnote.weight(.medium))
                 .buttonStyle(.plain)
                 .foregroundStyle(SproutColor.primary)
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.footnote)
+                    .foregroundStyle(SproutColor.outline)
+                    .padding(.leading, Spacing.tight)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Str.t("medicine_dismiss"))
         }
+        .padding(.horizontal, Spacing.snug)
+        .padding(.vertical, Spacing.tight)
     }
 }

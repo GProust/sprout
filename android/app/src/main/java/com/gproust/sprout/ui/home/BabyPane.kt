@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.data.local.BreastSide
-import com.gproust.sprout.data.local.MedicineEntity
+import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
@@ -68,7 +68,8 @@ fun BabyPane(
     now: Long,
     onFeed: (BreastSide) -> Unit,
     onNavigate: (String) -> Unit,
-    onGiveMedicine: (MedicineEntity) -> Unit,
+    onGiveMedicine: (MedicineWatch) -> Unit,
+    onDismissMedicine: (MedicineWatch) -> Unit,
     modifier: Modifier = Modifier,
     header: (@Composable () -> Unit)? = null,
     onShareRecord: (() -> Unit)? = null,
@@ -80,22 +81,23 @@ fun BabyPane(
 
         SinceChips(summary, now)
 
-        // Above the feed buttons, and above the log grid the medicine would
-        // otherwise be three taps down in: a wait that is running is the one
-        // thing here that is about *now* (BDR-16). It draws nothing at all when
-        // no wait is running, which is most of the time.
+        Spacer(Modifier.height(12.dp))
+        QuickFeed(summary.nextSide, onFeed)
+
+        // Under the feed buttons, and above the log grid the medicine would
+        // otherwise be three taps down in. Feeding is what this screen is opened
+        // for; a wait that is running is what it is opened for a few days a
+        // year, and it draws nothing at all the rest of the time (BDR-16).
         if (summary.medicines.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             MedicineWatchCard(
                 watches = summary.medicines,
                 now = now,
                 onGive = onGiveMedicine,
+                onDismiss = onDismissMedicine,
                 onOpen = { onNavigate(Routes.MEDICINES) },
             )
         }
-
-        Spacer(Modifier.height(12.dp))
-        QuickFeed(summary.nextSide, onFeed)
 
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_log))
@@ -153,7 +155,8 @@ fun BabyCard(
     now: Long,
     onOpen: () -> Unit,
     onFeed: (BreastSide) -> Unit,
-    onGiveMedicine: (MedicineEntity) -> Unit,
+    onGiveMedicine: (MedicineWatch) -> Unit,
+    onDismissMedicine: (MedicineWatch) -> Unit,
     onOpenMedicines: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -182,18 +185,19 @@ fun BabyCard(
             Spacer(Modifier.height(8.dp))
             SinceChips(summary, now)
 
+            Spacer(Modifier.height(12.dp))
+            QuickFeed(summary.nextSide, onFeed)
+
             if (summary.medicines.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
                 MedicineWatchCard(
                     watches = summary.medicines,
                     now = now,
                     onGive = onGiveMedicine,
+                    onDismiss = onDismissMedicine,
                     onOpen = onOpenMedicines,
                 )
             }
-
-            Spacer(Modifier.height(12.dp))
-            QuickFeed(summary.nextSide, onFeed)
         }
     }
 }

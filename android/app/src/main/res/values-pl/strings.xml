@@ -361,7 +361,11 @@
     <string name="medicine_channel_desc">Przypomnienia, że lek doraźny można podać ponownie</string>
     <string name="medicine_notif_text">Można to podać ponownie.</string>
     <string name="medicine_notif_text_baby">Można to podać %1$s ponownie.</string>
-    <string name="medicine_notif_dismiss">Odrzuć</string>
+    <string name="medicine_dismiss">Odrzuć</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Podaj</string>
+    <string name="medicine_short_wait">jeszcze %1$s</string>
+    <string name="medicine_short_early">%1$s wcześniej</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">Leki doraźne</string>
     <plurals name="home_medicine_more">

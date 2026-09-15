@@ -355,7 +355,11 @@
     <string name="medicine_channel_desc">Avisos de que un medicamento a demanda ya se puede volver a dar</string>
     <string name="medicine_notif_text">Ya se puede volver a dar.</string>
     <string name="medicine_notif_text_baby">Ya se le puede volver a dar a %1$s.</string>
-    <string name="medicine_notif_dismiss">Descartar</string>
+    <string name="medicine_dismiss">Descartar</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Dar</string>
+    <string name="medicine_short_wait">faltan %1$s</string>
+    <string name="medicine_short_early">%1$s antes</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">Medicamentos si hacen falta</string>
     <plurals name="home_medicine_more">

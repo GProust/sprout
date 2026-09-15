@@ -414,7 +414,11 @@
     <string name="medicine_channel_desc">Rappels indiquant qu\'un médicament au besoin peut être redonné</string>
     <string name="medicine_notif_text">Vous pouvez en redonner maintenant.</string>
     <string name="medicine_notif_text_baby">Vous pouvez en redonner à %1$s maintenant.</string>
-    <string name="medicine_notif_dismiss">Ignorer</string>
+    <string name="medicine_dismiss">Ignorer</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Donner</string>
+    <string name="medicine_short_wait">encore %1$s</string>
+    <string name="medicine_short_early">%1$s plus tôt</string>
     <!-- The dashboard card (BDR-16) -->
     <string name="home_medicine_title">Médicaments si besoin</string>
     <plurals name="home_medicine_more">
