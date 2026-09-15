@@ -209,7 +209,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(16, database.openHelper.writableDatabase.version)
+        assertEquals(17, database.openHelper.writableDatabase.version)
     }
 
     /**
