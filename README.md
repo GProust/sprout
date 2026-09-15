@@ -1,11 +1,15 @@
 # 🌱 Sprout
 
-A private, **offline-first Android app** for tracking a newborn's first weeks and months —
+A private, **offline-first app** for tracking a newborn's first weeks and months —
 feeds, pumping, sleep, diapers, growth and medications — while also looking after the parent's own
 postpartum recovery.
 
-All data stays on the device (Room/SQLite). **No accounts, no cloud, no tracking.** Sprout
-speaks 7 languages and can gently remind you about feeds and treatments.
+All data stays on the device. **No accounts, no cloud, no tracking.** Sprout speaks 7
+languages and can gently remind you about feeds and treatments.
+
+The **Android** app ships on Google Play. An **iOS** app is being built alongside it
+([ADR-0015](docs/adr/0015-native-ios-in-this-repository.md)) — natively, in this same
+repository, sharing the format two phones sync over rather than sharing code.
 
 ## Features
 
@@ -54,6 +58,8 @@ Reminders are local notifications scheduled on-device (no server), and survive a
 
 ## Tech stack
 
+**Android** (shipping):
+
 | Area | Choice |
 |------|--------|
 | Language | Kotlin |
@@ -66,10 +72,33 @@ Reminders are local notifications scheduled on-device (no server), and survive a
 | Min SDK | 26 (Android 8.0) · Target SDK 35 |
 | Build | Gradle (Kotlin DSL) + version catalog |
 
+**iOS** ([ADR-0015](docs/adr/0015-native-ios-in-this-repository.md), in progress):
+
+| Area | Choice |
+|------|--------|
+| Language | Swift |
+| UI | SwiftUI |
+| Crypto & compression | CryptoKit + Compression — system frameworks, no dependencies |
+| Deployment target | iOS 17 |
+| Build | Swift Package Manager; the Xcode project is generated from `project.yml` |
+
+Neither app depends on the other's code. What they share is
+[`spec/`](spec/) — the formats two phones sync over, and the vectors that keep
+the two implementations honest.
+
 ## Project layout
 
 ```
-app/src/main/java/com/gproust/sprout/
+android/   The Android app — Kotlin, Compose, Room. Ships on Play.
+ios/       The iOS app — Swift, SwiftUI. SproutKit/ is the wire formats;
+           Sprout/ is the app, still a shell.
+spec/      What the two apps must agree on, plus conformance vectors both
+           test suites check themselves against.
+docs/      Decision records (ADRs and BDRs), shared by both.
+```
+
+```
+android/app/src/main/java/com/gproust/sprout/
 ├── data/
 │   ├── local/        # Room entities, DAOs, database, type converters
 │   ├── sync/         # Household sharing: replicas, merge, pairing (+ nearby/ for Bluetooth)
@@ -87,8 +116,18 @@ app/src/main/java/com/gproust/sprout/
     └── settings/     # Language picker
 ```
 
-Localized strings live in `app/src/main/res/values/` (English, the default) and
+Localized strings live in `android/app/src/main/res/values/` (English, the default) and
 `values-{fr,de,es,it,pl,pt}/`.
+
+```
+ios/
+├── SproutKit/        # Swift package: the formats two phones exchange —
+│   │                 #   secret, sealed replica, invitation, session framing,
+│   │                 #   household beacon. No UI, no radio, no database.
+│   └── Tests/        #   checked against spec/vectors/ on every CI run
+└── Sprout/           # The app. project.yml is the Xcode project (XcodeGen);
+                      #   the .xcodeproj is generated, not committed.
+```
 
 ## Design decisions
 
@@ -101,6 +140,9 @@ The significant decisions behind Sprout are recorded with their rationale, split
   domain/policy rules.
 
 ## Building
+
+> All Gradle commands below run from **`android/`** — that is where the Android
+> app lives since [ADR-0015](docs/adr/0015-native-ios-in-this-repository.md).
 
 You'll need **JDK 17** and the **Android SDK** (easiest via [Android Studio](https://developer.android.com/studio)).
 
@@ -115,7 +157,7 @@ You'll need **JDK 17** and the **Android SDK** (easiest via [Android Studio](htt
 ./gradlew lintDebug
 ```
 
-The built APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
+The built APK lands in `android/app/build/outputs/apk/debug/app-debug.apk`.
 
 To run it, open the project in Android Studio and press **Run**, or install the APK on a device
 with `adb install`.
@@ -125,6 +167,13 @@ with `adb install`.
 Every push and pull request runs [GitHub Actions](.github/workflows/ci.yml): lint, unit tests, and
 a debug APK build. The APK is uploaded as a build artifact. A second workflow renders every screen
 on an emulator and attaches the screenshots to the pull request.
+
+The [iOS workflow](.github/workflows/ios.yml) builds and tests `SproutKit` and compiles the app for
+the simulator on a macOS runner, and checks that `spec/vectors/` is exactly what its generator
+produces. It needs **no Apple Developer account, no certificate and no Mac** — a simulator build is
+unsigned — so iOS is verified by CI the same way Android is
+([ADR-0006](docs/adr/0006-ci-as-build-verifier-and-screenshots.md)). Path filters keep an
+Android-only change off the Mac and an iOS-only change off the Android job.
 
 The [release workflow](.github/workflows/release.yml) is **manual** — run it from
 **Actions → Release → Run workflow** with a version (e.g. `1.3.0`) to bump the app version, build

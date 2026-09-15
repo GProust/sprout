@@ -1,0 +1,9 @@
+{
+  "note": "What one phone writes to the other: magic, version, big-endian int32 length, payload.",
+  "magic": "SPRTS",
+  "version": 1,
+  "lengthIsBigEndianInt32": true,
+  "maxPayloadBytes": 8388608,
+  "payloadUtf8": "a replica would be here",
+  "frameBase64": "U1BSVFMBAAAAF2EgcmVwbGljYSB3b3VsZCBiZSBoZXJl"
+}

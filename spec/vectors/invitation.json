@@ -1,0 +1,35 @@
+{
+  "note": "Field names and types an invitation file carries. Key order is not significant.",
+  "validForMs": 86400000,
+  "fields": {
+    "formatVersion": 1,
+    "householdId": "household-vector",
+    "secret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "createdAt": 1757400000000,
+    "fromName": "Alex"
+  },
+  "secretEncoding": "base64, unwrapped, padded",
+  "cases": [
+    {
+      "name": "fresh",
+      "now": 1757400001000,
+      "expect": "accepted"
+    },
+    {
+      "name": "just inside the window",
+      "now": 1757486400000,
+      "expect": "accepted"
+    },
+    {
+      "name": "just outside it",
+      "now": 1757486400001,
+      "expect": "expired"
+    },
+    {
+      "name": "written by a newer Sprout",
+      "formatVersion": 2,
+      "now": 1757400001000,
+      "expect": "tooNew"
+    }
+  ]
+}

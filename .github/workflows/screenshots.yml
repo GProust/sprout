@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       device:
-        description: 'Device to capture on. Tablet captures land in screenshots/tablet-{7,10}/ (for the Play listing''s tablet sections).'
+        description: 'Device to capture on. Tablet captures land in android/screenshots/tablet-{7,10}/ (for the Play listing''s tablet sections).'
         type: choice
         options: [phone, tablet-7, tablet-10]
         default: phone
@@ -42,11 +42,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         # UI-relevant: app code/resources and Gradle build files, except JVM
-        # unit tests (app/src/test/**), which can't change what is rendered.
+        # unit tests (android/app/src/test/**), which can't change what is rendered.
         run: |
           CHANGED=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename')
           printf 'Changed files:\n%s\n' "$CHANGED"
-          if printf '%s\n' "$CHANGED" | grep -v '^app/src/test/' | grep -qE '^(app/|gradle/|(build|settings)\.gradle\.kts$|gradle\.properties$)'; then
+          if printf '%s\n' "$CHANGED" | grep -v '^android/app/src/test/' | grep -qE '^android/(app/|gradle/|(build|settings)\.gradle\.kts$|gradle\.properties$)'; then
             echo "ui=true" >> "$GITHUB_OUTPUT"
           else
             echo "ui=false" >> "$GITHUB_OUTPUT"
@@ -72,7 +72,7 @@ jobs:
       # tablet-7 uses Nexus 9 (2048x1536): the "Nexus 7" AVD profile is the
       # 2012 model (800x1280), below Play's 1080px minimum.
       PROFILE: ${{ inputs.device == 'tablet-7' && 'Nexus 9' || inputs.device == 'tablet-10' && 'Nexus 10' || 'pixel_3' }}
-      OUTDIR: ${{ inputs.device == 'tablet-7' && 'screenshots/tablet-7' || inputs.device == 'tablet-10' && 'screenshots/tablet-10' || 'screenshots' }}
+      OUTDIR: ${{ inputs.device == 'tablet-7' && 'android/screenshots/tablet-7' || inputs.device == 'tablet-10' && 'android/screenshots/tablet-10' || 'android/screenshots' }}
       # Fresh capture lands here first and is promoted into OUTDIR only where it
       # differs visibly (see "Promote only visibly-changed screenshots").
       STAGEDIR: .screenshots-new
@@ -116,6 +116,7 @@ jobs:
 
       - name: Build app + test APKs
         run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+        working-directory: android
 
       - name: Enable KVM
         run: |
@@ -138,15 +139,24 @@ jobs:
           # (instead of Gradle's connectedAndroidTest, which uninstalls the app
           # afterwards and wipes the captured screenshots) so the app stays
           # installed and `run-as` can read its internal files.
+          #
+          # The first line is `||` and not `&&`, and it waits twice. `adb root`
+          # restarts adbd, which drops the very connection it answered on — so it
+          # exits non-zero, `&&` skipped the wait that was meant to cover exactly
+          # that, and `|| true` swallowed the whole thing. Everything after it
+          # then raced adbd coming back: usually it won, and on the run that lost
+          # eight commands hit "device offline" inside 150 ms and the first one
+          # without a `|| true` failed the job. Waiting for the device *and* for
+          # the boot flag is what makes the rest of the script deterministic.
           script: |
-            adb root && adb wait-for-device || true
+            adb root || true; adb wait-for-device; adb shell 'while [ "$(getprop sys.boot_completed)" != 1 ]; do sleep 1; done'
             adb shell settings put global auto_time 0 || true
             adb shell settings put global auto_time_zone 0 || true
             adb shell setprop persist.sys.timezone UTC || true
             adb shell "date -u $FAKE_CLOCK" || adb shell "su 0 date -u $FAKE_CLOCK" || true
             echo "Emulator clock now: $(adb shell date -u)"
-            adb install -r -t app/build/outputs/apk/debug/app-debug.apk
-            adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb install -r -t android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r -t android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner
             mkdir -p "$STAGEDIR"
             for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "$STAGEDIR/$n"; done
@@ -200,10 +210,10 @@ jobs:
       - name: Commit screenshots to the PR branch
         if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
         run: |
-          find screenshots -type f ! -name '*.png' -delete || true
+          find android/screenshots -type f ! -name '*.png' -delete || true
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A screenshots
+          git add -A android/screenshots
           if git diff --cached --quiet; then
             echo "No screenshot changes to commit."
           else
@@ -223,7 +233,7 @@ jobs:
             #
             # --autostash because the build leaves other files modified in the
             # working tree, which plain --rebase refuses to run with. We only
-            # publish `screenshots`, so whatever else the build touched is not
+            # publish `android/screenshots`, so whatever else the build touched is not
             # ours to commit; log it rather than silently discarding it.
             echo "Working tree state before rebase:"
             git status --porcelain

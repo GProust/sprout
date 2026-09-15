@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Deliberately almost empty, and that is the point (ADR-0014).
+
+	  No iCloud, no CloudKit, no push notifications, no App Groups yet, no
+	  keychain sharing, no associated domains. Everything Sprout stores stays in
+	  its own container, under the platform's own encryption, and nothing it
+	  holds leaves the phone except when the parent hands a file to someone.
+
+	  The App Group will appear here when the widget lands, because a widget
+	  cannot read the app's container without one — and that is the one entry
+	  that will ever be added without a decision record.
+	-->
+</dict>
+</plist>

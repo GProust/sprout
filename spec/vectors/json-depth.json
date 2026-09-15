@@ -1,0 +1,36 @@
+{
+  "note": "Bracket counting, checked before parsing. Brackets inside a double-quoted string do not count.",
+  "maxJsonDepth": 32,
+  "cases": [
+    {
+      "name": "flat object",
+      "text": "{\"a\":1}",
+      "exceeds": false
+    },
+    {
+      "name": "exactly at the limit",
+      "text": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "exceeds": false
+    },
+    {
+      "name": "one past it",
+      "text": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "exceeds": true
+    },
+    {
+      "name": "brackets inside a string",
+      "text": "{\"note\":\"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\"}",
+      "exceeds": false
+    },
+    {
+      "name": "escaped quote keeps the string open",
+      "text": "{\"note\":\"\\\"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\"}",
+      "exceeds": false
+    },
+    {
+      "name": "unbalanced closers do not go negative",
+      "text": "]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "exceeds": true
+    }
+  ]
+}

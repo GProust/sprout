@@ -1,0 +1,44 @@
+{
+  "note": "HMAC-SHA256(secret, ascii(decimal window)) truncated to 8 bytes; window = floor(at / 1800000).",
+  "windowMs": 1800000,
+  "valueBytes": 8,
+  "advertUuidLabel": "sprout-adv-v1:",
+  "cases": [
+    {
+      "at": 0,
+      "window": 0,
+      "beaconHex": "3a8b171143bc3fe5",
+      "advertUuid": "7671c03e-09ad-d06b-5cb0-83d3b49687f0"
+    },
+    {
+      "at": 1799999,
+      "window": 0,
+      "beaconHex": "3a8b171143bc3fe5",
+      "advertUuid": "7671c03e-09ad-d06b-5cb0-83d3b49687f0"
+    },
+    {
+      "at": 1800000,
+      "window": 1,
+      "beaconHex": "7761b1cc25227dfc",
+      "advertUuid": "0c94a63a-cc84-24d0-7e18-fb247b8c550d"
+    },
+    {
+      "at": 1800001,
+      "window": 1,
+      "beaconHex": "7761b1cc25227dfc",
+      "advertUuid": "0c94a63a-cc84-24d0-7e18-fb247b8c550d"
+    },
+    {
+      "at": 1757400000000,
+      "window": 976333,
+      "beaconHex": "d83f8428497c74bf",
+      "advertUuid": "f45a4b57-1d7e-eada-9672-6cade54daef9"
+    },
+    {
+      "at": 4102444800000,
+      "window": 2279136,
+      "beaconHex": "f7342170295b205e",
+      "advertUuid": "b74bc06b-498c-2760-2403-b2f7a33e815e"
+    }
+  ]
+}

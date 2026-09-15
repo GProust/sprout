@@ -1,0 +1,131 @@
+{
+  "note": "Decode documentJson and every field must come back as listed. Absent keys are nulls: a writer omits them, a reader treats absent and null alike.",
+  "formatVersion": 1,
+  "schemaVersion": 16,
+  "documentJson": "{\"formatVersion\":1,\"schemaVersion\":16,\"householdId\":\"household-vector\",\"deviceId\":\"device-vector\",\"deviceName\":\"Vector's phone\",\"createdAt\":1757400000000,\"babies\":[{\"uid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"updatedAt\":1757400000000,\"name\":\"Robin\",\"birthDate\":1755000000000,\"archived\":false}],\"feedings\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c9f0f895-fb98-4b6f-9b0e-1a2b3c4d5e6f\",\"updatedAt\":1757400060000,\"type\":\"BREAST\",\"side\":\"BOTH\",\"startTime\":1757400000000,\"endTime\":1757400780000,\"leftDurationMs\":540000,\"rightDurationMs\":240000,\"segments\":\"LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000\"}],\"sleeps\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"45c48cce-2e2d-4fbd-aa1f-dd0eaf14a7c9\",\"updatedAt\":1757403600000,\"startTime\":1757390000000,\"endTime\":1757403600000,\"position\":\"BACK\",\"place\":\"OTHER\",\"placeNote\":\"pram\"}],\"diapers\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"d3d94468-02a4-4cbe-b9dd-e0e5cbb2dbc0\",\"updatedAt\":1757401000000,\"time\":1757401000000,\"wet\":true,\"dirty\":true,\"stoolColor\":\"YELLOW\"},{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"1ff1de77-4005-4b9d-b3f1-2c3d4e5f6a7b\",\"updatedAt\":1757406000000,\"deletedAt\":1757406000000,\"time\":1757405500000,\"wet\":true,\"dirty\":false}],\"growth\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"6512bd43-d9ca-4e6f-9b3a-5c8b9f0a1d2e\",\"updatedAt\":1757402000000,\"time\":1757402000000,\"weightGrams\":4200}],\"treatments\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c20ad4d7-6fe9-4779-8c7e-3b1a2f4d5e60\",\"updatedAt\":1757402500000,\"name\":\"Vitamin D\",\"dose\":\"400 IU\",\"intervalDays\":1,\"timesOfDay\":\"540,1260\",\"startDate\":1755000000000,\"remindersEnabled\":true,\"active\":true}],\"pumpings\":[{\"uid\":\"aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d\",\"updatedAt\":1757404000000,\"time\":1757404000000,\"amountMl\":120,\"storage\":\"FRIDGE\"}],\"tombstones\":[{\"uid\":\"9bf31c7f-f062-4a17-bd23-6a1e7f8c9d0a\",\"entity\":\"feeding\",\"deletedAt\":1757405000000}]}",
+  "document": {
+    "formatVersion": 1,
+    "schemaVersion": 16,
+    "householdId": "household-vector",
+    "deviceId": "device-vector",
+    "deviceName": "Vector's phone",
+    "createdAt": 1757400000000,
+    "babies": [
+      {
+        "uid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "updatedAt": 1757400000000,
+        "name": "Robin",
+        "birthDate": 1755000000000,
+        "archived": false
+      }
+    ],
+    "feedings": [
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "c9f0f895-fb98-4b6f-9b0e-1a2b3c4d5e6f",
+        "updatedAt": 1757400060000,
+        "type": "BREAST",
+        "side": "BOTH",
+        "startTime": 1757400000000,
+        "endTime": 1757400780000,
+        "leftDurationMs": 540000,
+        "rightDurationMs": 240000,
+        "segments": "LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000"
+      }
+    ],
+    "sleeps": [
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "45c48cce-2e2d-4fbd-aa1f-dd0eaf14a7c9",
+        "updatedAt": 1757403600000,
+        "startTime": 1757390000000,
+        "endTime": 1757403600000,
+        "position": "BACK",
+        "place": "OTHER",
+        "placeNote": "pram"
+      }
+    ],
+    "diapers": [
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "d3d94468-02a4-4cbe-b9dd-e0e5cbb2dbc0",
+        "updatedAt": 1757401000000,
+        "time": 1757401000000,
+        "wet": true,
+        "dirty": true,
+        "stoolColor": "YELLOW"
+      },
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "1ff1de77-4005-4b9d-b3f1-2c3d4e5f6a7b",
+        "updatedAt": 1757406000000,
+        "deletedAt": 1757406000000,
+        "time": 1757405500000,
+        "wet": true,
+        "dirty": false
+      }
+    ],
+    "growth": [
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "6512bd43-d9ca-4e6f-9b3a-5c8b9f0a1d2e",
+        "updatedAt": 1757402000000,
+        "time": 1757402000000,
+        "weightGrams": 4200
+      }
+    ],
+    "treatments": [
+      {
+        "babyUid": "8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b",
+        "uid": "c20ad4d7-6fe9-4779-8c7e-3b1a2f4d5e60",
+        "updatedAt": 1757402500000,
+        "name": "Vitamin D",
+        "dose": "400 IU",
+        "intervalDays": 1,
+        "timesOfDay": "540,1260",
+        "startDate": 1755000000000,
+        "remindersEnabled": true,
+        "active": true
+      }
+    ],
+    "pumpings": [
+      {
+        "uid": "aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d",
+        "updatedAt": 1757404000000,
+        "time": 1757404000000,
+        "amountMl": 120,
+        "storage": "FRIDGE"
+      }
+    ],
+    "tombstones": [
+      {
+        "uid": "9bf31c7f-f062-4a17-bd23-6a1e7f8c9d0a",
+        "entity": "feeding",
+        "deletedAt": 1757405000000
+      }
+    ]
+  },
+  "rowCount": 9,
+  "refuses": [
+    {
+      "name": "a newer document format",
+      "json": "{\"formatVersion\":2,\"schemaVersion\":16,\"householdId\":\"household-vector\",\"deviceId\":\"device-vector\",\"deviceName\":\"Vector's phone\",\"createdAt\":1757400000000,\"babies\":[{\"uid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"updatedAt\":1757400000000,\"name\":\"Robin\",\"birthDate\":1755000000000,\"archived\":false}],\"feedings\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c9f0f895-fb98-4b6f-9b0e-1a2b3c4d5e6f\",\"updatedAt\":1757400060000,\"type\":\"BREAST\",\"side\":\"BOTH\",\"startTime\":1757400000000,\"endTime\":1757400780000,\"leftDurationMs\":540000,\"rightDurationMs\":240000,\"segments\":\"LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000\"}],\"sleeps\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"45c48cce-2e2d-4fbd-aa1f-dd0eaf14a7c9\",\"updatedAt\":1757403600000,\"startTime\":1757390000000,\"endTime\":1757403600000,\"position\":\"BACK\",\"place\":\"OTHER\",\"placeNote\":\"pram\"}],\"diapers\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"d3d94468-02a4-4cbe-b9dd-e0e5cbb2dbc0\",\"updatedAt\":1757401000000,\"time\":1757401000000,\"wet\":true,\"dirty\":true,\"stoolColor\":\"YELLOW\"},{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"1ff1de77-4005-4b9d-b3f1-2c3d4e5f6a7b\",\"updatedAt\":1757406000000,\"deletedAt\":1757406000000,\"time\":1757405500000,\"wet\":true,\"dirty\":false}],\"growth\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"6512bd43-d9ca-4e6f-9b3a-5c8b9f0a1d2e\",\"updatedAt\":1757402000000,\"time\":1757402000000,\"weightGrams\":4200}],\"treatments\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c20ad4d7-6fe9-4779-8c7e-3b1a2f4d5e60\",\"updatedAt\":1757402500000,\"name\":\"Vitamin D\",\"dose\":\"400 IU\",\"intervalDays\":1,\"timesOfDay\":\"540,1260\",\"startDate\":1755000000000,\"remindersEnabled\":true,\"active\":true}],\"pumpings\":[{\"uid\":\"aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d\",\"updatedAt\":1757404000000,\"time\":1757404000000,\"amountMl\":120,\"storage\":\"FRIDGE\"}],\"tombstones\":[{\"uid\":\"9bf31c7f-f062-4a17-bd23-6a1e7f8c9d0a\",\"entity\":\"feeding\",\"deletedAt\":1757405000000}]}",
+      "reason": "tooNew"
+    },
+    {
+      "name": "a newer database schema",
+      "json": "{\"formatVersion\":1,\"schemaVersion\":99,\"householdId\":\"household-vector\",\"deviceId\":\"device-vector\",\"deviceName\":\"Vector's phone\",\"createdAt\":1757400000000,\"babies\":[{\"uid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"updatedAt\":1757400000000,\"name\":\"Robin\",\"birthDate\":1755000000000,\"archived\":false}],\"feedings\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c9f0f895-fb98-4b6f-9b0e-1a2b3c4d5e6f\",\"updatedAt\":1757400060000,\"type\":\"BREAST\",\"side\":\"BOTH\",\"startTime\":1757400000000,\"endTime\":1757400780000,\"leftDurationMs\":540000,\"rightDurationMs\":240000,\"segments\":\"LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000\"}],\"sleeps\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"45c48cce-2e2d-4fbd-aa1f-dd0eaf14a7c9\",\"updatedAt\":1757403600000,\"startTime\":1757390000000,\"endTime\":1757403600000,\"position\":\"BACK\",\"place\":\"OTHER\",\"placeNote\":\"pram\"}],\"diapers\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"d3d94468-02a4-4cbe-b9dd-e0e5cbb2dbc0\",\"updatedAt\":1757401000000,\"time\":1757401000000,\"wet\":true,\"dirty\":true,\"stoolColor\":\"YELLOW\"},{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"1ff1de77-4005-4b9d-b3f1-2c3d4e5f6a7b\",\"updatedAt\":1757406000000,\"deletedAt\":1757406000000,\"time\":1757405500000,\"wet\":true,\"dirty\":false}],\"growth\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"6512bd43-d9ca-4e6f-9b3a-5c8b9f0a1d2e\",\"updatedAt\":1757402000000,\"time\":1757402000000,\"weightGrams\":4200}],\"treatments\":[{\"babyUid\":\"8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b\",\"uid\":\"c20ad4d7-6fe9-4779-8c7e-3b1a2f4d5e60\",\"updatedAt\":1757402500000,\"name\":\"Vitamin D\",\"dose\":\"400 IU\",\"intervalDays\":1,\"timesOfDay\":\"540,1260\",\"startDate\":1755000000000,\"remindersEnabled\":true,\"active\":true}],\"pumpings\":[{\"uid\":\"aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d\",\"updatedAt\":1757404000000,\"time\":1757404000000,\"amountMl\":120,\"storage\":\"FRIDGE\"}],\"tombstones\":[{\"uid\":\"9bf31c7f-f062-4a17-bd23-6a1e7f8c9d0a\",\"entity\":\"feeding\",\"deletedAt\":1757405000000}]}",
+      "reason": "tooNew"
+    },
+    {
+      "name": "no versions at all",
+      "json": "{\"householdId\":\"x\"}",
+      "reason": "unreadable"
+    },
+    {
+      "name": "not JSON",
+      "json": "not a replica at all",
+      "reason": "unreadable"
+    }
+  ]
+}

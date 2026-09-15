@@ -1,0 +1,13 @@
+{
+  "note": "Open this with the secret and the result must equal plaintextUtf8, byte for byte.",
+  "magic": "SPRT",
+  "version": 1,
+  "nonceBytes": 12,
+  "tagBits": 128,
+  "headerIsAssociatedData": true,
+  "nonceHex": "0b0a09080706050403020100",
+  "sealedBase64": "U1BSVAELCgkIBwYFBAMCAQA/dlESNmhtnf+9MS0pBgjXyje78j43cXjXqOtYcYL749t2H/TDqFa/fH2mtwxf0kx/Kv39lCCe6CuU1IYDRp5HuqspF3AObsHbTa+IJIibgJuxVPTxbaPJbdP57tFomHrg6mc0VPdYJI4T4oxvBoiFPM9+S0OdF1z/drqD",
+  "plaintextUtf8": "{\"formatVersion\":1,\"householdId\":\"household-vector\",\"deviceId\":\"device-vector\",\"deviceName\":\"Vector's phone\",\"babies\":[]}",
+  "tamperedBase64": "U1BSVAELCgkIBwYFBAMCAQA/dlASNmhtnf+9MS0pBgjXyje78j43cXjXqOtYcYL749t2H/TDqFa/fH2mtwxf0kx/Kv39lCCe6CuU1IYDRp5HuqspF3AObsHbTa+IJIibgJuxVPTxbaPJbdP57tFomHrg6mc0VPdYJI4T4oxvBoiFPM9+S0OdF1z/drqD",
+  "rewrittenVersionBase64": "U1BSVAILCgkIBwYFBAMCAQA/dlESNmhtnf+9MS0pBgjXyje78j43cXjXqOtYcYL749t2H/TDqFa/fH2mtwxf0kx/Kv39lCCe6CuU1IYDRp5HuqspF3AObsHbTa+IJIibgJuxVPTxbaPJbdP57tFomHrg6mc0VPdYJI4T4oxvBoiFPM9+S0OdF1z/drqD"
+}
