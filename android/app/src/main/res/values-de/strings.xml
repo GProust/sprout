@@ -355,6 +355,13 @@
     <string name="medicine_channel_desc">Erinnerungen, dass ein Bedarfsmedikament wieder gegeben werden kann</string>
     <string name="medicine_notif_text">Das kann jetzt wieder gegeben werden.</string>
     <string name="medicine_notif_text_baby">Das kann %1$s jetzt wieder gegeben werden.</string>
+    <string name="medicine_notif_dismiss">Schließen</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Medikamente bei Bedarf</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d weiteres nicht angezeigt</item>
+        <item quantity="other">%1$d weitere nicht angezeigt</item>
+    </plurals>
 
     <!-- Mahlzeit-Erinnerungen -->
     <string name="settings_feeding_reminders">Mahlzeit-Erinnerungen</string>

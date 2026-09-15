@@ -48,11 +48,10 @@ final class MedicinesViewModel {
 
     func delete(_ medicine: Medicine) { try? repository.deleteMedicine(medicine) }
 
-    /// Logs a dose of `medicine` as given now.
+    /// Logs a dose of `medicine` as given now, on the baby the medicine belongs
+    /// to rather than on whichever one happens to be selected.
     func give(_ medicine: Medicine) {
-        _ = try? repository.addMedicineDose(
-            MedicineDose(medicineUid: medicine.uid, time: Clock.millis)
-        )
+        _ = try? repository.giveMedicineDose(medicine, at: Clock.millis)
     }
 
     func updateDose(_ dose: MedicineDose) { try? repository.updateMedicineDose(dose) }
@@ -261,71 +260,6 @@ private struct MedicineCard: View {
         else { return medicine.name }
         return Str.t("treatment_title_dose", medicine.name, dose)
     }
-}
-
-private extension MedicineLevel {
-    /// The three state colours.
-    ///
-    /// Fixed values, and the warm middle is the one the statistics already use —
-    /// chosen by running a colour-vision check rather than by eye.
-    var color: Color {
-        switch self {
-        case .tooSoon: return Color(light: 0xBA1A1A, dark: 0xFFB4AB)
-        case .soonerThanIdeal: return Color(light: 0xB26A2B, dark: 0xCF8949)
-        case .ready: return Color(light: 0x1B5E3F, dark: 0x7FD0A6)
-        }
-    }
-
-    /// A different shape per state, so the three differ by more than their hue.
-    var symbol: String {
-        switch self {
-        case .tooSoon: return "hourglass"
-        case .soonerThanIdeal: return "clock"
-        case .ready: return "checkmark.circle.fill"
-        }
-    }
-}
-
-/// The sentence the card leads with — the state in words, never colour alone.
-private func stateSentence(_ readiness: MedicineReadiness, now: Int64) -> String {
-    switch readiness.level {
-    case .tooSoon:
-        let left = SproutFormat.duration(millis: (readiness.nextAllowedAt ?? now) - now).text
-        return readiness.reason == .dailyMaximum
-            ? Str.t("medicine_state_daily_max", left)
-            : Str.t("medicine_state_too_soon", left)
-    case .soonerThanIdeal:
-        let left = SproutFormat.duration(millis: (readiness.comfortableAt ?? now) - now).text
-        return Str.t("medicine_state_early", left)
-    case .ready:
-        return Str.t("medicine_state_ready")
-    }
-}
-
-/// "Last dose 03:20 · 2 of 4 in the last 24 h", or that it has never been given.
-private func lastDoseLine(_ readiness: MedicineReadiness) -> String {
-    guard let last = readiness.lastDoseAt else { return Str.t("medicine_never_given") }
-    let count = readiness.maxPerDay.map {
-        Str.t("medicine_day_count", readiness.dosesInLastDay, $0)
-    } ?? Str.t("medicine_day_count_plain", readiness.dosesInLastDay)
-    return Str.t(
-        "treatment_schedule_summary",
-        Str.t("medicine_last_dose", SproutDateStyle.dateTime(last)),
-        count
-    )
-}
-
-/// "Every 6 h to 8 h", or "Every 6 h" when only a minimum was set.
-private func intervalSummary(_ medicine: Medicine) -> String {
-    let min = SproutFormat.duration(millis: Int64(medicine.minIntervalMinutes) * 60_000).text
-    guard let comfort = medicine.comfortIntervalMinutes,
-          comfort > medicine.minIntervalMinutes
-    else { return Str.t("medicine_every", min) }
-    return Str.t(
-        "medicine_every_range",
-        min,
-        SproutFormat.duration(millis: Int64(comfort) * 60_000).text
-    )
 }
 
 // MARK: - The editors

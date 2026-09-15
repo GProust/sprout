@@ -355,6 +355,13 @@
     <string name="medicine_channel_desc">Avisos de que um medicamento em SOS já pode ser dado outra vez</string>
     <string name="medicine_notif_text">Já pode ser dado outra vez.</string>
     <string name="medicine_notif_text_baby">Já pode ser dado a %1$s outra vez.</string>
+    <string name="medicine_notif_dismiss">Dispensar</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Medicamentos se necessário</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">mais %1$d não mostrado</item>
+        <item quantity="other">mais %1$d não mostrados</item>
+    </plurals>
 
     <!-- Lembretes de refeições -->
     <string name="settings_feeding_reminders">Lembretes de refeições</string>

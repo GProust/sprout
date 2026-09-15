@@ -47,7 +47,37 @@ class MedicineReminderReceiver : BroadcastReceiver() {
 
                 val id = intent.getLongExtra(MedicineReminders.EXTRA_MEDICINE_ID, -1L)
                 if (id < 0) return@launch
-                val medicine = app.repository.getMedicine(id) ?: return@launch
+
+                // "Dismiss": take the notification away and change nothing. The
+                // wait really is over, so there is nothing to snooze and nothing
+                // to record — the parent has seen it, which is all the button
+                // claims (BDR-16).
+                if (intent.action == MedicineReminders.ACTION_DISMISS) {
+                    NotificationManagerCompat.from(context)
+                        .cancel(MedicineReminders.notificationId(id))
+                    return@launch
+                }
+
+                val medicine = app.repository.getMedicine(id)
+                    ?.takeIf { it.deletedAt == null }
+                    ?: return@launch
+
+                // "Give a dose": the same write the screen makes, without the
+                // screen. A dose given at 3 a.m. and logged in the morning is
+                // logged at the wrong time; one logged from the notification is
+                // logged when it happened.
+                if (intent.action == MedicineReminders.ACTION_GIVE) {
+                    app.repository.giveMedicineDose(medicine, System.currentTimeMillis())
+                    NotificationManagerCompat.from(context)
+                        .cancel(MedicineReminders.notificationId(id))
+                    MedicineReminders.schedule(
+                        context,
+                        medicine,
+                        app.repository.recentDosesOf(medicine.uid, MEDICINE_DAY_MS),
+                    )
+                    return@launch
+                }
+
                 if (!medicine.active || !medicine.remindWhenDue) return@launch
 
                 val doses = app.repository.recentDosesOf(medicine.uid, MEDICINE_DAY_MS)
@@ -116,6 +146,26 @@ class MedicineReminderReceiver : BroadcastReceiver() {
             .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            // No icons: Android has not drawn action icons since Nougat, and
+            // `NotificationCompat` takes 0 for exactly this case.
+            .addAction(
+                0,
+                context.getString(R.string.medicine_give),
+                MedicineReminders.buttonIntent(
+                    context,
+                    MedicineReminders.ACTION_GIVE,
+                    medicine.id,
+                ),
+            )
+            .addAction(
+                0,
+                context.getString(R.string.medicine_notif_dismiss),
+                MedicineReminders.buttonIntent(
+                    context,
+                    MedicineReminders.ACTION_DISMISS,
+                    medicine.id,
+                ),
+            )
             .build()
 
         NotificationManagerCompat.from(context)

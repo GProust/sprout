@@ -355,6 +355,13 @@
     <string name="medicine_channel_desc">Avisos de que un medicamento a demanda ya se puede volver a dar</string>
     <string name="medicine_notif_text">Ya se puede volver a dar.</string>
     <string name="medicine_notif_text_baby">Ya se le puede volver a dar a %1$s.</string>
+    <string name="medicine_notif_dismiss">Descartar</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Medicamentos si hacen falta</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d más sin mostrar</item>
+        <item quantity="other">%1$d más sin mostrar</item>
+    </plurals>
 
     <!-- Recordatorios de tomas -->
     <string name="settings_feeding_reminders">Recordatorios de tomas</string>

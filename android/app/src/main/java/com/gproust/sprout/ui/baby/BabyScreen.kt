@@ -93,6 +93,7 @@ fun BabyScreen(
                 now = now,
                 onFeed = onQuickFeed,
                 onNavigate = onNavigate,
+                onGiveMedicine = vm::giveDose,
                 onShareRecord = { onShareRecord(summary.baby.id) },
                 header = {
                     Text(

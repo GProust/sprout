@@ -5,6 +5,8 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.ui.home.nextBreast
@@ -63,7 +65,39 @@ class HouseholdSummaryTest {
         sleeps: List<SleepEntity> = emptyList(),
         nappies: List<DiaperEntity> = emptyList(),
         ongoing: List<SleepEntity> = emptyList(),
-    ) = summariseHousehold(babies, feeds, sleeps, nappies, ongoing, dayStart, now)
+        medicines: List<MedicineEntity> = emptyList(),
+        doses: List<MedicineDoseEntity> = emptyList(),
+        // Named on purpose: the parameter list grew once already, and a
+        // positional call would have gone on compiling with the medicines in
+        // the wrong seat.
+    ) = summariseHousehold(
+        babies = babies,
+        feedings = feeds,
+        sleeps = sleeps,
+        diapers = nappies,
+        ongoingSleeps = ongoing,
+        medicines = medicines,
+        medicineDoses = doses,
+        dayStart = dayStart,
+        now = now,
+    )
+
+    private fun medicine(
+        babyId: Long,
+        uid: String,
+        name: String,
+        minHours: Int = 6,
+        comfortHours: Int? = 8,
+    ) = MedicineEntity(
+        babyId = babyId,
+        uid = uid,
+        name = name,
+        minIntervalMinutes = minHours * 60,
+        comfortIntervalMinutes = comfortHours?.let { it * 60 },
+    )
+
+    private fun dose(babyId: Long, medicineUid: String, at: Long) =
+        MedicineDoseEntity(babyId = babyId, medicineUid = medicineUid, time = at)
 
     @Test
     fun rowsGoToTheBabyTheyBelongTo() {
@@ -208,6 +242,79 @@ class HouseholdSummaryTest {
         // order — so there is no alternation to continue.
         val side = nextBreast(listOf(feed(1, now - HOUR, side = BreastSide.BOTH)), now)
         assertNull(side)
+    }
+
+    // The dashboard's medicine card (BDR-16). The arithmetic itself is
+    // MedicineReadinessTest's; what is checked here is which medicines reach
+    // the dashboard at all, and under whose name.
+
+    @Test
+    fun aMedicineNeverGivenStaysOffTheDashboard() {
+        // Green because it has never been given is not news, and a household
+        // with a shelf of medicines set up would otherwise have a dashboard
+        // that is mostly shelf.
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(medicine(1, "m-para", "Paracetamol")),
+        )
+        assertTrue(result[0].medicines.isEmpty())
+    }
+
+    @Test
+    fun aRunningWaitReachesTheDashboard() {
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(medicine(1, "m-para", "Paracetamol")),
+            doses = listOf(dose(1, "m-para", now - 2 * HOUR)),
+        )
+        assertEquals(1, result[0].medicines.size)
+        assertEquals("Paracetamol", result[0].medicines[0].medicine.name)
+    }
+
+    @Test
+    fun aDoseNeverCountsAgainstAnotherBabysMedicine() {
+        // Two babies, the same medicine name, one dose. The sibling's card must
+        // read as untouched — uids make the mix-up unlikely, the grouping makes
+        // it impossible.
+        val result = summarise(
+            babies = listOf(baby(1, "Léa"), baby(2, "Noah")),
+            medicines = listOf(
+                medicine(1, "m-lea", "Paracetamol"),
+                medicine(2, "m-noah", "Paracetamol"),
+            ),
+            doses = listOf(dose(1, "m-lea", now - 2 * HOUR)),
+        )
+        assertEquals(1, result[0].medicines.size)
+        assertTrue("Noah has had none", result[1].medicines.isEmpty())
+    }
+
+    @Test
+    fun theSoonestToBeGivenComesFirst() {
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(
+                medicine(1, "m-a", "Ibuprofen", minHours = 8, comfortHours = null),
+                medicine(1, "m-b", "Paracetamol", minHours = 4, comfortHours = null),
+            ),
+            doses = listOf(
+                dose(1, "m-a", now - HOUR),
+                dose(1, "m-b", now - HOUR),
+            ),
+        )
+        assertEquals(
+            listOf("Paracetamol", "Ibuprofen"),
+            result[0].medicines.map { it.medicine.name },
+        )
+    }
+
+    @Test
+    fun anInactiveMedicineIsNotWatched() {
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(medicine(1, "m-para", "Paracetamol").copy(active = false)),
+            doses = listOf(dose(1, "m-para", now - 2 * HOUR)),
+        )
+        assertTrue(result[0].medicines.isEmpty())
     }
 
     @Test

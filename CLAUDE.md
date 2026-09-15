@@ -209,6 +209,28 @@ The arithmetic is `data/MedicineReadiness.kt` and
 both sides, because a household with one phone of each has to get the same answer
 to "may I give another dose".
 
+A running wait also reaches the two places a parent already is
+([BDR-16](docs/decisions/0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md)):
+
+- **The dashboard card is absent, not empty.** `medicinesNeedingAttention` picks
+  the medicines with a wait running or one just finished; a household in the
+  middle of nothing has exactly the dashboard it had before. What it draws comes
+  from `ui/medicines/MedicineLabels.kt` and `Screens/Medicines/MedicineLabels.swift`
+  — the same helpers the as-needed screen uses, so the two cannot disagree.
+- **The dashboard's summary ticks.** A wait that runs out while the app is open
+  turns green with nothing written, which means recomputing the fold once a
+  minute rather than only reformatting it.
+- **A dose given from the card goes to the medicine's own baby**, through
+  `giveMedicineDose`. `addMedicineDose` fills the baby in from the *active*
+  selection, which with twins is not the card that was touched.
+- **The notification's two buttons are the same write.** On Android they go back
+  to the existing, non-exported `MedicineReminderReceiver` — no new component, so
+  no line in `AttackSurfaceTest`. On iOS they are a `UNNotificationCategory` and
+  a delegate, which is why the app has a `UIApplicationDelegate` at all: the
+  notification delegate must be set before launching finishes or an action tapped
+  from the lock screen is delivered to nobody. Answering a notification is not
+  deciding one, so ADR-0019 is untouched.
+
 ## The record you hand to a doctor
 
 Shipped, on top of those same per-day figures: a **PDF report** and an **`.xlsx`

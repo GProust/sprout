@@ -157,6 +157,64 @@ public func medicineReadiness(
     )
 }
 
+/// One medicine the dashboard should mention, and where it stands.
+///
+/// The readiness is carried rather than recomputed by the screen, so the card
+/// and the medicines screen cannot disagree about the same medicine at the same
+/// instant.
+public struct MedicineWatch: Identifiable, Sendable, Equatable {
+    public let medicine: Medicine
+    public let readiness: MedicineReadiness
+
+    /// The medicine's `uid`, which is stable across a reorder — an index would
+    /// make SwiftUI reuse the wrong row when a wait elapses and the list sorts
+    /// itself differently.
+    public var id: String { medicine.uid }
+
+    public init(medicine: Medicine, readiness: MedicineReadiness) {
+        self.medicine = medicine
+        self.readiness = readiness
+    }
+}
+
+/// The medicines worth a line on the dashboard (BDR-16).
+///
+/// A medicine earns its place when **a wait is running** — it cannot be given
+/// yet, or it can but sooner than ideal — or when it was **given within the last
+/// day and the wait has since passed**. That last case is the one a parent is
+/// actually waiting for, and the dashboard is where they should not have to go
+/// looking for it.
+///
+/// A medicine that has never been given, or whose last dose is older than the
+/// window, is left off: it is set up rather than in play, and the screen that
+/// lists every medicine is one tap away. That is what keeps this card absent
+/// from the dashboard of a household that is not in the middle of anything.
+///
+/// Ordered by **what can be given now first**, then by whichever wait ends
+/// soonest, with the name breaking ties so the list does not reshuffle under a
+/// parent who is reading it.
+public func medicinesNeedingAttention(
+    medicines: [Medicine],
+    doses: [MedicineDose],
+    now: Int64
+) -> [MedicineWatch] {
+    medicines
+        .filter { $0.active && $0.deletedAt == nil }
+        .map { MedicineWatch(medicine: $0, readiness: medicineReadiness(medicine: $0, doses: doses, now: now)) }
+        // Never given is not "in play": there is no wait to report and nothing
+        // has happened that the dashboard needs to carry.
+        .filter { $0.readiness.lastDoseAt != nil }
+        .filter { $0.readiness.level != .ready || $0.readiness.dosesInLastDay > 0 }
+        .sorted { left, right in
+            // `nextAllowedAt` is nil for everything that can be given, so the
+            // default sorts those to the front as one group.
+            let a = left.readiness.nextAllowedAt ?? 0
+            let b = right.readiness.nextAllowedAt ?? 0
+            if a != b { return a < b }
+            return left.medicine.name < right.medicine.name
+        }
+}
+
 /// When to tell the parent that `medicine` can be given again, or `nil` when it
 /// wants no reminder, is already there, or has never been given.
 ///

@@ -34,11 +34,11 @@ final class HomeViewModel {
         self.repository = repository
     }
 
-    /// Six observations feeding one summary.
+    /// Eight observations feeding one summary.
     ///
     /// Each keeps the last value it saw, so a change to any one of them
     /// recomputes against the rest rather than blanking the screen — the
-    /// equivalent of Compose's `combine` over six flows.
+    /// equivalent of Compose's `combine` over the same flows.
     ///
     /// The repository and the window are lifted out of `self` first: the child
     /// tasks are not main-actor isolated, and reading a stored property off a
@@ -88,6 +88,18 @@ final class HomeViewModel {
                     self?.recompute()
                 }
             }
+            group.addTask {
+                await observe(repository.householdMedicines) { [weak self] value in
+                    self?.latestMedicines = value
+                    self?.recompute()
+                }
+            }
+            group.addTask {
+                await observe(repository.householdMedicineDoses(since: windowStart)) { [weak self] value in
+                    self?.latestMedicineDoses = value
+                    self?.recompute()
+                }
+            }
         }
     }
 
@@ -96,6 +108,8 @@ final class HomeViewModel {
     private var latestSleeps: [Sleep] = []
     private var latestDiapers: [Diaper] = []
     private var latestOngoing: [Sleep] = []
+    private var latestMedicines: [Medicine] = []
+    private var latestMedicineDoses: [MedicineDose] = []
 
     private func recompute() {
         hasProfile = !latestBabies.isEmpty
@@ -105,6 +119,8 @@ final class HomeViewModel {
             sleeps: latestSleeps,
             diapers: latestDiapers,
             ongoingSleeps: latestOngoing,
+            medicines: latestMedicines,
+            medicineDoses: latestMedicineDoses,
             dayStart: SproutFormat.startOfDay(now),
             now: now
         )
@@ -152,6 +168,21 @@ final class HomeViewModel {
     func tick() {
         now = Clock.millis
         recompute()
+    }
+
+    /// Logs a dose of `medicine` as given now, straight from the dashboard, and
+    /// moves its reminder on.
+    ///
+    /// The same write the as-needed screen makes, offered a screen earlier: the
+    /// dashboard is where a parent already is when the wait runs out, and a dose
+    /// given but not logged is the failure the feature exists to prevent
+    /// (BDR-15, BDR-16).
+    /// The reminder is not re-armed here, and deliberately: on iOS the whole
+    /// schedule is rebuilt when the app goes to the background and again when it
+    /// comes back (ADR-0019, `SproutApp`), which brackets every write there is.
+    /// A second, per-write hook would be a second answer to the same question.
+    func giveDose(of medicine: Medicine) {
+        try? repository.giveMedicineDose(medicine, at: Clock.millis)
     }
 
     /// Close a sleep that was logged as still running.
@@ -212,6 +243,7 @@ struct HomeScreen: View {
                             now: model.now,
                             onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
+                            onGiveMedicine: { model.giveDose(of: $0) },
                             onShareRecord: { if let id = single.baby.id { onOpen(.report(id)) } },
                             header: {
                                 VStack(alignment: .leading, spacing: 2) {
@@ -233,7 +265,16 @@ struct HomeScreen: View {
                                 summary: summary,
                                 now: model.now,
                                 onOpen: { model.select(summary.baby) },
-                                onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) }
+                                onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
+                                onGiveMedicine: { model.giveDose(of: $0) },
+                                // Selects the baby on the way, so the screen
+                                // that opens is this card's child rather than
+                                // whichever was last active — the dose the card
+                                // offers already knows.
+                                onOpenMedicines: {
+                                    model.select(summary.baby)
+                                    onOpen(.medicines)
+                                }
                             )
                         }
                     }

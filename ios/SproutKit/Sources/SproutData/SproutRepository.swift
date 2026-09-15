@@ -323,6 +323,30 @@ public final class SproutRepository: @unchecked Sendable {
         }
     }
 
+    /// Every tracked baby's as-needed medicines (BDR-15).
+    public var householdMedicines: AsyncValueObservation<[Medicine]> {
+        observe { db in
+            try Medicine
+                .filter(Column("active") == true && Column("deletedAt") == nil)
+                .order(Column("name"))
+                .fetchAll(db)
+        }
+    }
+
+    /// Every tracked baby's doses since `since`.
+    ///
+    /// The window has to be wider than the daily maximum's, not equal to it: a
+    /// medicine whose minimum wait is longer than a day would otherwise read as
+    /// never given, and so as ready, on the one screen that says whether it is.
+    public func householdMedicineDoses(since: Int64) -> AsyncValueObservation<[MedicineDose]> {
+        observe { db in
+            try MedicineDose
+                .filter(Column("time") >= since && Column("deletedAt") == nil)
+                .order(Column("time").desc)
+                .fetchAll(db)
+        }
+    }
+
     /// Sleeps still running, across every tracked baby — the dashboard shows
     /// them whichever baby is selected.
     public var ongoingSleeps: AsyncValueObservation<[Sleep]> {
@@ -467,6 +491,29 @@ public final class SproutRepository: @unchecked Sendable {
             copy.updatedAt = timestamp
             try copy.insert(db)
             return copy.id
+        }
+    }
+
+    /// Records a dose of `medicine`, on the baby the medicine belongs to rather
+    /// than on whichever one is selected.
+    ///
+    /// The dashboard offers a dose for every baby in the household at once
+    /// (BDR-16), and with twins the selected baby and the card that was touched
+    /// are not the same thing — resolving the baby from the selection is how a
+    /// sibling's paracetamol ends up in the wrong history.
+    @discardableResult
+    public func giveMedicineDose(_ medicine: Medicine, at time: Int64) throws -> Int64? {
+        let timestamp = now()
+        return try database.write { db in
+            var dose = MedicineDose(
+                babyId: medicine.babyId,
+                medicineUid: medicine.uid,
+                time: time
+            )
+            dose.uid = newUid()
+            dose.updatedAt = timestamp
+            try dose.insert(db)
+            return dose.id
         }
     }
 

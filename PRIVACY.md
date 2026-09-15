@@ -99,7 +99,12 @@ app can tell you how long is left.
   the parent who is asleep already gave — and they travel encrypted, directly
   between your own phones, exactly as described below.
 - **If you turn on a reminder**, it is a notification your own phone schedules
-  and shows. Nothing is sent anywhere to produce it.
+  and shows. Nothing is sent anywhere to produce it. Its **Give a dose** button
+  writes the dose straight into the same database on the same phone — nothing
+  leaves it, and nothing is sent to produce or to answer the notification.
+- **A wait that is running is shown on the home page**, so you do not have to go
+  looking for it. It is read from the same entries on the same phone; no
+  additional information is collected to draw it.
 
 ## Children's data
 
@@ -174,6 +179,14 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-15 (2)
+
+- Amended the section on **medicines given when they are needed**: a wait that is
+  running is now shown on the home page, and the reminder carries a **Give a
+  dose** button that records the dose without opening the app. Both read and
+  write the same entries on the same phone. Nothing about what Sprout collects or
+  sends has changed.
 
 ### 2026-09-15
 

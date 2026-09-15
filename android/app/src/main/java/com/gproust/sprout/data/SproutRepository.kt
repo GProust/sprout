@@ -95,6 +95,19 @@ class SproutRepository(
     fun householdDiapers(since: Long): Flow<List<DiaperEntity>> =
         db.diaperDao().observeAllSince(since)
 
+    /** Every tracked baby's as-needed medicines (BDR-15). */
+    val householdMedicines: Flow<List<MedicineEntity>> = db.medicineDao().observeAllActive()
+
+    /**
+     * Every tracked baby's doses since [since].
+     *
+     * The window has to be wider than the daily maximum's, not equal to it: a
+     * medicine whose minimum wait is longer than a day would otherwise read as
+     * never given, and so as ready, on the one screen that says whether it is.
+     */
+    fun householdMedicineDoses(since: Long): Flow<List<MedicineDoseEntity>> =
+        db.medicineDoseDao().observeAllSince(since)
+
     // Sync stamping (ADR-0007). Screens build entities without a uid or an
     // updatedAt; every write goes through one of these on its way to the DAO,
     // so no call site has to remember. `ifEmpty` keeps the unique index safe
@@ -376,6 +389,24 @@ class SproutRepository(
         val id = activeBabyId.first() ?: return null
         return db.medicineDoseDao().insert(entity.copy(babyId = id).stamped())
     }
+
+    /**
+     * Records a dose of [medicine] at [time], on the baby the medicine belongs
+     * to rather than on whichever one is selected.
+     *
+     * The dashboard offers a dose for every baby in the household at once
+     * (BDR-16), and with twins the selected baby and the card that was touched
+     * are not the same thing — resolving the baby from the selection is how a
+     * sibling's paracetamol ends up in the wrong history.
+     */
+    suspend fun giveMedicineDose(medicine: MedicineEntity, time: Long): Long =
+        db.medicineDoseDao().insert(
+            MedicineDoseEntity(
+                babyId = medicine.babyId,
+                medicineUid = medicine.uid,
+                time = time,
+            ).stamped(),
+        )
 
     suspend fun updateMedicineDose(entity: MedicineDoseEntity) =
         db.medicineDoseDao().update(entity.stamped())

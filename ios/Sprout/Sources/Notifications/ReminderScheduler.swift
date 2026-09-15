@@ -308,6 +308,10 @@ enum ReminderScheduler {
                 ? Str.t("medicine_notif_text_baby", babyName)
                 : Str.t("medicine_notif_text")
             content.sound = .default
+            // The two buttons (BDR-16). The category is registered at launch;
+            // the id is what the *Give a dose* button writes against.
+            content.categoryIdentifier = MedicineNotification.category
+            content.userInfo = [MedicineNotification.medicineIdKey: id]
 
             requests.append(
                 request(id: "\(prefix)medicine.\(id)", content: content, at: trigger, now: now)

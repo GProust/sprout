@@ -414,6 +414,13 @@
     <string name="medicine_channel_desc">Rappels indiquant qu\'un médicament au besoin peut être redonné</string>
     <string name="medicine_notif_text">Vous pouvez en redonner maintenant.</string>
     <string name="medicine_notif_text_baby">Vous pouvez en redonner à %1$s maintenant.</string>
+    <string name="medicine_notif_dismiss">Ignorer</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Médicaments si besoin</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d autre non affiché</item>
+        <item quantity="other">%1$d autres non affichés</item>
+    </plurals>
 
     <!-- Rappels de repas -->
     <string name="settings_feeding_reminders">Rappels de repas</string>

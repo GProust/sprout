@@ -429,6 +429,13 @@
     <string name="medicine_channel_desc">Reminders that an as-needed medicine can be given again</string>
     <string name="medicine_notif_text">This can be given again now.</string>
     <string name="medicine_notif_text_baby">This can be given to %1$s again now.</string>
+    <string name="medicine_notif_dismiss">Dismiss</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">As-needed medicine</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d more not shown</item>
+        <item quantity="other">%1$d more not shown</item>
+    </plurals>
 
     <!-- Feeding reminders -->
     <string name="settings_feeding_reminders">Feeding reminders</string>

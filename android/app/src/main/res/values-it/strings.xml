@@ -355,6 +355,13 @@
     <string name="medicine_channel_desc">Avvisi che un farmaco al bisogno si può dare di nuovo</string>
     <string name="medicine_notif_text">Si può dare di nuovo adesso.</string>
     <string name="medicine_notif_text_baby">Si può dare di nuovo a %1$s adesso.</string>
+    <string name="medicine_notif_dismiss">Ignora</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Medicine al bisogno</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d altra non mostrata</item>
+        <item quantity="other">%1$d altre non mostrate</item>
+    </plurals>
 
     <!-- Promemoria pasti -->
     <string name="settings_feeding_reminders">Promemoria pasti</string>

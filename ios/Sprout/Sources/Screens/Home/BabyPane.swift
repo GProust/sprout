@@ -15,6 +15,7 @@ struct BabyPane<Header: View>: View {
     let now: Int64
     let onFeed: (BreastSide) -> Void
     let onOpen: (LogDestination) -> Void
+    let onGiveMedicine: (Medicine) -> Void
     var onShareRecord: (() -> Void)?
     @ViewBuilder var header: () -> Header
 
@@ -23,6 +24,18 @@ struct BabyPane<Header: View>: View {
             header()
 
             SinceChips(summary: summary, now: now)
+
+            // Above the feed buttons, and above the log grid the medicine would
+            // otherwise be three taps down in: a wait that is running is the one
+            // thing here that is about *now* (BDR-16). It draws nothing at all
+            // when no wait is running, which is most of the time.
+            MedicineWatchCard(
+                watches: summary.medicines,
+                now: now,
+                onGive: onGiveMedicine,
+                onOpen: { onOpen(.medicines) }
+            )
+
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
 
             SectionLabel(Str.t("home_log"))
@@ -68,6 +81,8 @@ struct BabyCardView: View {
     let now: Int64
     let onOpen: () -> Void
     let onFeed: (BreastSide) -> Void
+    let onGiveMedicine: (Medicine) -> Void
+    let onOpenMedicines: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.snug) {
@@ -89,6 +104,12 @@ struct BabyCardView: View {
             .accessibilityLabel(Str.t("cd_open_baby", summary.baby.name))
 
             SinceChips(summary: summary, now: now)
+            MedicineWatchCard(
+                watches: summary.medicines,
+                now: now,
+                onGive: onGiveMedicine,
+                onOpen: onOpenMedicines
+            )
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
         }
         .padding(Spacing.regular)

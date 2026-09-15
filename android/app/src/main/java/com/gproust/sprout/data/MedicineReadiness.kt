@@ -162,6 +162,53 @@ fun medicineReadiness(
 }
 
 /**
+ * One medicine the dashboard should mention, and where it stands.
+ *
+ * The readiness is carried rather than recomputed by the screen, so the card
+ * and the medicines screen cannot disagree about the same medicine at the same
+ * instant.
+ */
+data class MedicineWatch(
+    val medicine: MedicineEntity,
+    val readiness: MedicineReadiness,
+)
+
+/**
+ * The medicines worth a line on the dashboard (BDR-16).
+ *
+ * A medicine earns its place when **a wait is running** — it cannot be given
+ * yet, or it can but sooner than ideal — or when it was **given within the last
+ * day and the wait has since passed**. That last case is the one a parent is
+ * actually waiting for, and the dashboard is where they should not have to go
+ * looking for it.
+ *
+ * A medicine that has never been given, or whose last dose is older than the
+ * window, is left off: it is set up rather than in play, and the screen that
+ * lists every medicine is one tap away. That is what keeps this card absent
+ * from the dashboard of a household that is not in the middle of anything.
+ *
+ * Ordered by **what can be given now first**, then by whichever wait ends
+ * soonest, with the name breaking ties so the list does not reshuffle under a
+ * parent who is reading it.
+ */
+fun medicinesNeedingAttention(
+    medicines: List<MedicineEntity>,
+    doses: List<MedicineDoseEntity>,
+    now: Long,
+): List<MedicineWatch> = medicines
+    .asSequence()
+    .filter { it.active && it.deletedAt == null }
+    .map { MedicineWatch(it, medicineReadiness(it, doses, now)) }
+    // Never given is not "in play": there is no wait to report and nothing has
+    // happened that the dashboard needs to carry.
+    .filter { it.readiness.lastDoseAt != null }
+    .filter { it.readiness.level != MedicineLevel.READY || it.readiness.dosesInLastDay > 0 }
+    // `nextAllowedAt` is null for everything that can be given, so the elvis
+    // sorts those to the front as one group rather than by an arbitrary key.
+    .sortedWith(compareBy({ it.readiness.nextAllowedAt ?: 0L }, { it.medicine.name }))
+    .toList()
+
+/**
  * When to remind the parent that [medicine] can be given again, or null when it
  * wants no reminder, is already there, or has never been given.
  *

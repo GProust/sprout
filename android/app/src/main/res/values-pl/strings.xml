@@ -361,6 +361,15 @@
     <string name="medicine_channel_desc">Przypomnienia, że lek doraźny można podać ponownie</string>
     <string name="medicine_notif_text">Można to podać ponownie.</string>
     <string name="medicine_notif_text_baby">Można to podać %1$s ponownie.</string>
+    <string name="medicine_notif_dismiss">Odrzuć</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Leki doraźne</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">jeszcze %1$d niepokazany</item>
+        <item quantity="few">jeszcze %1$d niepokazane</item>
+        <item quantity="many">jeszcze %1$d niepokazanych</item>
+        <item quantity="other">jeszcze %1$d niepokazanego</item>
+    </plurals>
 
     <!-- Przypomnienia o karmieniu -->
     <string name="settings_feeding_reminders">Przypomnienia o karmieniu</string>

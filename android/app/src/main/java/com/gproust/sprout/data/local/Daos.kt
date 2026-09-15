@@ -367,6 +367,15 @@ interface MedicineDao {
     )
     fun observeForBaby(babyId: Long): Flow<List<MedicineEntity>>
 
+    /**
+     * Every tracked baby's active medicines at once — what the dashboard reads,
+     * because it summarises the whole household rather than the active baby
+     * (BDR-9). Rows belonging to a baby the dashboard is not showing are
+     * dropped when the summaries are folded, as the other household reads do.
+     */
+    @Query("SELECT * FROM medicine WHERE active = 1 AND deletedAt IS NULL ORDER BY name ASC")
+    fun observeAllActive(): Flow<List<MedicineEntity>>
+
     @Query("SELECT * FROM medicine WHERE id = :id AND deletedAt IS NULL LIMIT 1")
     suspend fun getById(id: Long): MedicineEntity?
 
@@ -430,6 +439,10 @@ interface MedicineDoseDao {
             "AND deletedAt IS NULL ORDER BY time DESC",
     )
     suspend fun recentFor(medicineUid: String, since: Long): List<MedicineDoseEntity>
+
+    /** Every baby's doses since [since] — the dashboard's read. */
+    @Query("SELECT * FROM medicine_dose WHERE time >= :since AND deletedAt IS NULL ORDER BY time DESC")
+    fun observeAllSince(since: Long): Flow<List<MedicineDoseEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: MedicineDoseEntity): Long
