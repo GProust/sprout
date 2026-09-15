@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material.icons.filled.Monitor
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingUp
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
@@ -66,6 +68,8 @@ fun BabyPane(
     now: Long,
     onFeed: (BreastSide) -> Unit,
     onNavigate: (String) -> Unit,
+    onGiveMedicine: (MedicineWatch) -> Unit,
+    onDismissMedicine: (MedicineWatch) -> Unit,
     modifier: Modifier = Modifier,
     header: (@Composable () -> Unit)? = null,
     onShareRecord: (() -> Unit)? = null,
@@ -79,6 +83,21 @@ fun BabyPane(
 
         Spacer(Modifier.height(12.dp))
         QuickFeed(summary.nextSide, onFeed)
+
+        // Under the feed buttons, and above the log grid the medicine would
+        // otherwise be three taps down in. Feeding is what this screen is opened
+        // for; a wait that is running is what it is opened for a few days a
+        // year, and it draws nothing at all the rest of the time (BDR-16).
+        if (summary.medicines.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            MedicineWatchCard(
+                watches = summary.medicines,
+                now = now,
+                onGive = onGiveMedicine,
+                onDismiss = onDismissMedicine,
+                onOpen = { onNavigate(Routes.MEDICINES) },
+            )
+        }
 
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_log))
@@ -136,6 +155,9 @@ fun BabyCard(
     now: Long,
     onOpen: () -> Unit,
     onFeed: (BreastSide) -> Unit,
+    onGiveMedicine: (MedicineWatch) -> Unit,
+    onDismissMedicine: (MedicineWatch) -> Unit,
+    onOpenMedicines: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -165,6 +187,17 @@ fun BabyCard(
 
             Spacer(Modifier.height(12.dp))
             QuickFeed(summary.nextSide, onFeed)
+
+            if (summary.medicines.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                MedicineWatchCard(
+                    watches = summary.medicines,
+                    now = now,
+                    onGive = onGiveMedicine,
+                    onDismiss = onDismissMedicine,
+                    onOpen = onOpenMedicines,
+                )
+            }
         }
     }
 }
@@ -279,9 +312,11 @@ private fun sideLabel(side: BreastSide) = when (side) {
 }
 
 /**
- * The six things there are to log, as tiles rather than a stack of identical
+ * The seven things there are to log, as tiles rather than a stack of identical
  * buttons. Wellbeing joins them only for a parent who tracks it; treatments is
- * here rather than in the bottom bar, where there was never a seat for it.
+ * here rather than in the bottom bar, where there was never a seat for it, and
+ * as-needed medicine sits beside it as its own tile — the two are asked about at
+ * different moments and a screen that mixed them would serve neither (BDR-15).
  */
 @Composable
 fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Modifier = Modifier) {
@@ -292,6 +327,7 @@ fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Mo
         add(Tile(R.string.nav_diaper, Icons.Filled.BabyChangingStation, Routes.DIAPER))
         add(Tile(R.string.nav_growth, Icons.Filled.Monitor, Routes.GROWTH))
         add(Tile(R.string.screen_treatments, Icons.Filled.Medication, Routes.TREATMENTS))
+        add(Tile(R.string.screen_medicines, Icons.Filled.Vaccines, Routes.MEDICINES))
         if (tracksWellbeing) {
             add(Tile(R.string.screen_wellbeing, Icons.Filled.Favorite, Routes.HEALTH))
         }

@@ -1,5 +1,6 @@
 import SproutData
 import SwiftUI
+import UIKit
 
 /// The iOS app (ADR-0015).
 ///
@@ -8,6 +9,10 @@ import SwiftUI
 /// placeholder that named the missing ones is gone, which is what it was for.
 @main
 struct SproutApp: App {
+
+    /// The one thing that has to happen before launch finishes: the
+    /// notification delegate. See ``SproutAppDelegate``.
+    @UIApplicationDelegateAdaptor(SproutAppDelegate.self) private var appDelegate
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var environment: AppEnvironment?
@@ -39,6 +44,12 @@ struct SproutApp: App {
                     }
                     #endif
                     environment = try AppEnvironment.onDisk()
+                    // A *Give a dose* tapped from the lock screen can launch the
+                    // app from cold; the response is waiting by the time the
+                    // database is open.
+                    if let environment {
+                        MedicineNotificationActions.shared.attach(environment)
+                    }
                 } catch {
                     // ADR-0002: there is no server copy of any of this, so a
                     // database that will not open is not something to paper
@@ -72,6 +83,22 @@ struct SproutApp: App {
                 }
             }
         }
+    }
+}
+
+/// The only reason this app has a `UIApplicationDelegate` at all.
+///
+/// `UNUserNotificationCenter`'s delegate has to be set before launching
+/// finishes, or a notification action tapped while the app was not running is
+/// delivered to nobody — and that action is a dose the parent has already
+/// given. SwiftUI's `.task` runs too late for that; this does not.
+final class SproutAppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        MainActor.assumeIsolated { MedicineNotificationActions.shared.register() }
+        return true
     }
 }
 

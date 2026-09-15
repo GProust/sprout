@@ -67,6 +67,70 @@ enum ScreenshotSeed {
         try seedFeeds(repository)
         try seedSleeps(repository)
         try seedDiapers(repository)
+        try seedMedicines(repository)
+    }
+
+    /// As-needed medicine (BDR-15), seeded into one of each state the traffic
+    /// light has: too soon, allowed-but-sooner-than-ideal, and ready. One card
+    /// would show the screen; three show what it is *for*.
+    ///
+    /// The uids are written out rather than generated, because each dose has to
+    /// name the medicine it was of, and the repository keeps a uid that is
+    /// already set. The same three, with the same gaps, as Android's
+    /// `ScreenshotTest` — the two sets are one product.
+    private static func seedMedicines(_ repository: SproutRepository) throws {
+        let ibuprofen = "screenshot-medicine-ibuprofen"
+        _ = try repository.addMedicine(
+            Medicine(
+                name: "Ibuprofen",
+                dose: "1.25 ml",
+                minIntervalMinutes: 6 * 60,
+                comfortIntervalMinutes: 8 * 60,
+                maxPerDay: 3,
+                remindWhenDue: true,
+                uid: ibuprofen
+            )
+        )
+        // Two hours ago: four of the six still to wait.
+        try repository.addMedicineDose(
+            MedicineDose(medicineUid: ibuprofen, time: now - 2 * hour)
+        )
+
+        let paracetamol = "screenshot-medicine-paracetamol"
+        _ = try repository.addMedicine(
+            Medicine(
+                name: "Paracetamol",
+                dose: "2.5 ml",
+                minIntervalMinutes: 6 * 60,
+                comfortIntervalMinutes: 8 * 60,
+                maxPerDay: 4,
+                remindWhenDue: true,
+                uid: paracetamol
+            )
+        )
+        // Seven hours ago: past the minimum, an hour short of the usual gap —
+        // and a second dose inside the day, so the count reads "2 of 4".
+        try repository.addMedicineDose(
+            MedicineDose(medicineUid: paracetamol, time: now - 7 * hour)
+        )
+        try repository.addMedicineDose(
+            MedicineDose(medicineUid: paracetamol, time: now - 16 * hour)
+        )
+
+        let teething = "screenshot-medicine-teething"
+        _ = try repository.addMedicine(
+            Medicine(
+                name: "Teething gel",
+                // No usual interval and no daily maximum: a medicine with only a
+                // minimum gap, which is a real setup and reads differently on
+                // the card — "Every 4 h", and no "of 4" on the count.
+                minIntervalMinutes: 4 * 60,
+                uid: teething
+            )
+        )
+        try repository.addMedicineDose(
+            MedicineDose(medicineUid: teething, time: now - 10 * hour)
+        )
     }
 
     private static func seedFeeds(_ repository: SproutRepository) throws {

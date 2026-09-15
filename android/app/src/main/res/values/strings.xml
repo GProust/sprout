@@ -385,6 +385,62 @@
     <string name="treatment_notif_text">It\'s time for this dose.</string>
     <string name="treatment_notif_text_baby">It\'s time for %1$s\'s dose.</string>
 
+    <!-- As-needed medicine (BDR-15). Sprout supplies no medical knowledge here:
+         every interval is the parent's own, typed from a prescriber or a leaflet,
+         and these sentences only count the hours back to them. -->
+    <string name="screen_medicines">As needed</string>
+    <string name="medicine_empty">Nothing set up yet. Add a medicine with the + button — a name and the wait you were told to keep between doses.</string>
+    <string name="medicine_add">Add a medicine</string>
+    <string name="medicine_new">New medicine</string>
+    <string name="medicine_edit">Edit medicine</string>
+    <string name="medicine_delete_title">Remove %1$s?</string>
+    <string name="medicine_delete_body">The medicine and the doses you logged for it are removed for good. This can\'t be undone.</string>
+    <string name="medicine_name">Name (e.g. Paracetamol)</string>
+    <string name="medicine_dose">Dose (optional, e.g. 2.5 ml)</string>
+    <string name="medicine_intervals">Wait between doses</string>
+    <string name="medicine_intervals_hint">From your prescriber or the leaflet. Sprout doesn\'t know this medicine or your baby — it only counts the hours you enter here.</string>
+    <string name="medicine_min_interval">At least</string>
+    <string name="medicine_comfort_interval">Usually (optional)</string>
+    <string name="medicine_hours_suffix">hours</string>
+    <string name="medicine_max_per_day">Most doses in 24 hours (optional)</string>
+    <string name="medicine_doses_suffix">doses</string>
+    <string name="medicine_remind">Remind me when it can be given again</string>
+    <string name="medicine_remind_at">Remind me after</string>
+    <string name="medicine_remind_at_min">The minimum wait</string>
+    <string name="medicine_remind_at_comfort">The usual wait</string>
+    <string name="medicine_give">Give a dose</string>
+    <string name="medicine_history">Doses given</string>
+    <string name="medicine_never_given">Not given yet</string>
+    <string name="medicine_last_dose">Last dose %1$s</string>
+    <string name="medicine_day_count">%1$d of %2$d in the last 24 h</string>
+    <string name="medicine_day_count_plain">%1$d in the last 24 h</string>
+    <string name="medicine_state_too_soon">Too soon — %1$s to wait</string>
+    <string name="medicine_state_daily_max">Daily maximum reached — %1$s to wait</string>
+    <string name="medicine_state_early">Can be given — %1$s before the usual wait</string>
+    <string name="medicine_state_ready">Can be given</string>
+    <string name="medicine_every">Every %1$s</string>
+    <string name="medicine_every_range">Every %1$s to %2$s</string>
+    <string name="medicine_dose_edit">Edit dose</string>
+    <string name="medicine_dose_time">When it was given</string>
+    <string name="medicine_of">Dose of %1$s</string>
+
+    <!-- As-needed medicine notifications -->
+    <string name="medicine_channel_name">Medicine reminders</string>
+    <string name="medicine_channel_desc">Reminders that an as-needed medicine can be given again</string>
+    <string name="medicine_notif_text">This can be given again now.</string>
+    <string name="medicine_notif_text_baby">This can be given to %1$s again now.</string>
+    <string name="medicine_dismiss">Dismiss</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Give</string>
+    <string name="medicine_short_wait">%1$s to wait</string>
+    <string name="medicine_short_early">%1$s early</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">As-needed medicine</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">%1$d more not shown</item>
+        <item quantity="other">%1$d more not shown</item>
+    </plurals>
+
     <!-- Feeding reminders -->
     <string name="settings_feeding_reminders">Feeding reminders</string>
     <string name="settings_feeding_reminders_desc">Nudge me when it\'s been too long since a feed.</string>

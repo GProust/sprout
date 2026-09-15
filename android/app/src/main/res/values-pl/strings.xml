@@ -320,6 +320,61 @@
     <string name="treatment_notif_text">Czas na tę dawkę.</string>
     <string name="treatment_notif_text_baby">Czas na dawkę dla %1$s.</string>
 
+    <string name="screen_medicines">Doraźnie</string>
+    <string name="medicine_empty">Nic jeszcze nie ustawiono. Dodaj lek przyciskiem + — nazwę i odstęp, jaki masz zachować między dawkami.</string>
+    <string name="medicine_add">Dodaj lek</string>
+    <string name="medicine_new">Nowy lek</string>
+    <string name="medicine_edit">Edytuj lek</string>
+    <string name="medicine_delete_title">Usunąć %1$s?</string>
+    <string name="medicine_delete_body">Lek i zapisane dla niego dawki zostaną usunięte na stałe. Tego nie da się cofnąć.</string>
+    <string name="medicine_name">Nazwa (np. paracetamol)</string>
+    <string name="medicine_dose">Dawka (opcjonalnie, np. 2,5 ml)</string>
+    <string name="medicine_intervals">Odstęp między dawkami</string>
+    <string name="medicine_intervals_hint">Od lekarza albo z ulotki. Sprout nie zna ani tego leku, ani Twojego dziecka — liczy tylko godziny, które tu wpiszesz.</string>
+    <string name="medicine_min_interval">Co najmniej</string>
+    <string name="medicine_comfort_interval">Zwykle (opcjonalnie)</string>
+    <string name="medicine_hours_suffix">godz.</string>
+    <string name="medicine_max_per_day">Najwięcej dawek na 24 godziny (opcjonalnie)</string>
+    <string name="medicine_doses_suffix">dawek</string>
+    <string name="medicine_remind">Przypomnij mi, gdy będzie można podać ponownie</string>
+    <string name="medicine_remind_at">Przypomnij mi po</string>
+    <string name="medicine_remind_at_min">Minimalnym odstępie</string>
+    <string name="medicine_remind_at_comfort">Zwykłym odstępie</string>
+    <string name="medicine_give">Zapisz dawkę</string>
+    <string name="medicine_history">Zapisane dawki</string>
+    <string name="medicine_never_given">Jeszcze nie podano</string>
+    <string name="medicine_last_dose">Ostatnia dawka %1$s</string>
+    <string name="medicine_day_count">%1$d z %2$d w ostatnich 24 godz.</string>
+    <string name="medicine_day_count_plain">%1$d w ostatnich 24 godz.</string>
+    <string name="medicine_state_too_soon">Za wcześnie — jeszcze %1$s</string>
+    <string name="medicine_state_daily_max">Osiągnięto maksimum dobowe — jeszcze %1$s</string>
+    <string name="medicine_state_early">Można podać — %1$s przed zwykłym odstępem</string>
+    <string name="medicine_state_ready">Można podać</string>
+    <string name="medicine_every">Co %1$s</string>
+    <string name="medicine_every_range">Co %1$s do %2$s</string>
+    <string name="medicine_dose_edit">Edytuj dawkę</string>
+    <string name="medicine_dose_time">Godzina podania</string>
+    <string name="medicine_of">Dawka leku %1$s</string>
+
+    <!-- Powiadomienia o lekach doraźnych -->
+    <string name="medicine_channel_name">Przypomnienia o lekach</string>
+    <string name="medicine_channel_desc">Przypomnienia, że lek doraźny można podać ponownie</string>
+    <string name="medicine_notif_text">Można to podać ponownie.</string>
+    <string name="medicine_notif_text_baby">Można to podać %1$s ponownie.</string>
+    <string name="medicine_dismiss">Odrzuć</string>
+    <!-- The dashboard card's one-liner (BDR-16) -->
+    <string name="medicine_give_short">Podaj</string>
+    <string name="medicine_short_wait">jeszcze %1$s</string>
+    <string name="medicine_short_early">%1$s wcześniej</string>
+    <!-- The dashboard card (BDR-16) -->
+    <string name="home_medicine_title">Leki doraźne</string>
+    <plurals name="home_medicine_more">
+        <item quantity="one">jeszcze %1$d niepokazany</item>
+        <item quantity="few">jeszcze %1$d niepokazane</item>
+        <item quantity="many">jeszcze %1$d niepokazanych</item>
+        <item quantity="other">jeszcze %1$d niepokazanego</item>
+    </plurals>
+
     <!-- Przypomnienia o karmieniu -->
     <string name="settings_feeding_reminders">Przypomnienia o karmieniu</string>
     <string name="settings_feeding_reminders_desc">Przypomnij, gdy od ostatniego karmienia minęło zbyt dużo czasu.</string>

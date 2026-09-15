@@ -174,6 +174,72 @@ that a change can quietly break:
   sleep quietly dropped from it, and the position is reported without comment —
   no warning, no colour-coding, no ordering that grades it.
 
+## Medicine given when it is needed
+
+Separate from the calendar-shaped `treatment` table, and deliberately so: the
+rules are in [BDR-15](docs/decisions/0015-medicine-given-when-needed-and-the-wait-between-doses.md).
+Two synced tables (`medicine`, `medicine_dose`), Room migration 16 → 17 with an
+iOS migration to match, and four things a change can quietly undo:
+
+- **Sprout ships no drug knowledge at all** — no list of medicines, no default
+  dose, no interval for any named substance. The parent types the figures their
+  prescriber or the leaflet gave them, and the traffic light restates *those*.
+  The paracetamol in the new-medicine form is a prefilled, editable starting
+  point under a line saying where the right numbers come from; it is not a
+  recommendation, and a list of medicines with their usual intervals is the one
+  addition this feature must not grow.
+- **Nothing here is an assessment, and nothing argues.** Amber is "allowed,
+  sooner than ideal" — arithmetic against the parent's own second number. There
+  is no warning, no confirmation before a dose given while red, and the *Give a
+  dose* button is never disabled. A dose given anyway and not logged is the exact
+  failure the feature exists to prevent.
+- **The colour is never the only channel.** Each state carries its own icon and
+  its own sentence, and the sentence leads. Red/amber/green is the palette a
+  deuteranope reads worst, and this screen is used at 3 a.m. by someone
+  frightened. The colours are fixed values rather than the dynamic scheme's, and
+  the warm middle is the one `StatsScreen` already validated.
+- **A dose points at its medicine by `uid`, stored as a uid.** `id` is a
+  per-device counter; resolving one at merge time would let a dose attach to the
+  wrong medicine when an exchange arrives out of order. It is also not a SQL
+  foreign key, because a dose can arrive from a merge before the medicine it
+  names. Deleting a medicine soft-deletes its doses in the same transaction.
+
+The arithmetic is `data/MedicineReadiness.kt` and
+`SproutData/MedicineReadiness.swift` — pure functions, the same cases tested on
+both sides, because a household with one phone of each has to get the same answer
+to "may I give another dose".
+
+A running wait also reaches the two places a parent already is
+([BDR-16](docs/decisions/0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md)):
+
+- **The dashboard card is absent, not empty.** `medicinesNeedingAttention` picks
+  the medicines with a wait running or one just finished; a household in the
+  middle of nothing has exactly the dashboard it had before. What it draws comes
+  from `ui/medicines/MedicineLabels.kt` and `Screens/Medicines/MedicineLabels.swift`
+  — the same helpers the as-needed screen uses, so the two cannot disagree.
+- **One line per medicine, below the feed buttons.** The first cut of the card
+  repeated the whole as-needed screen above them and users said the dashboard had
+  got heavy. A line is the name in its colour, the state's icon, the countdown if
+  there is one, *Give* and *Dismiss* — and the abbreviation is visual only: a
+  screen reader is still given the full sentence. Adding a field here is adding it
+  to the screen this card exists to keep people off.
+- **Dismiss names the dose it was made against**, so it expires on its own when
+  the next one is logged. Device-local (`MedicineDismissals`), never synced — the
+  parent holding the other phone has not seen anything.
+- **The dashboard's summary ticks.** A wait that runs out while the app is open
+  turns green with nothing written, which means recomputing the fold once a
+  minute rather than only reformatting it.
+- **A dose given from the card goes to the medicine's own baby**, through
+  `giveMedicineDose`. `addMedicineDose` fills the baby in from the *active*
+  selection, which with twins is not the card that was touched.
+- **The notification's two buttons are the same write.** On Android they go back
+  to the existing, non-exported `MedicineReminderReceiver` — no new component, so
+  no line in `AttackSurfaceTest`. On iOS they are a `UNNotificationCategory` and
+  a delegate, which is why the app has a `UIApplicationDelegate` at all: the
+  notification delegate must be set before launching finishes or an action tapped
+  from the lock screen is delivered to nobody. Answering a notification is not
+  deciding one, so ADR-0019 is untouched.
+
 ## The record you hand to a doctor
 
 Shipped, on top of those same per-day figures: a **PDF report** and an **`.xlsx`

@@ -36,6 +36,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.ParentProfileEntity
@@ -56,9 +58,11 @@ import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.NursingScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
+import com.gproust.sprout.ui.medicines.MedicinesScreen
 import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.baby.BabyScreen
 import com.gproust.sprout.ui.home.HomeScreen
+import com.gproust.sprout.ui.home.MedicineDismissals
 import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
@@ -208,6 +212,59 @@ class ScreenshotTest {
                 endDate = now - 3 * day,
             ),
         )
+        // As-needed medicine (BDR-15), seeded into one of each state the traffic
+        // light has: too soon, allowed-but-sooner-than-ideal, and ready. One
+        // card would show the screen; three show what it is *for*.
+        //
+        // The uids are written out rather than generated, because each dose has
+        // to name the medicine it was of, and the repository keeps a uid that is
+        // already set. Alphabetical order is the DAO's, which puts the three
+        // states in the order the colours run.
+        val ibuprofen = "screenshot-medicine-ibuprofen"
+        repo.addMedicine(
+            MedicineEntity(
+                name = "Ibuprofen",
+                dose = "1.25 ml",
+                minIntervalMinutes = 6 * 60,
+                comfortIntervalMinutes = 8 * 60,
+                maxPerDay = 3,
+                remindWhenDue = true,
+                uid = ibuprofen,
+            ),
+        )
+        // Two hours ago: four of the six still to wait.
+        repo.addMedicineDose(MedicineDoseEntity(medicineUid = ibuprofen, time = now - 2 * hour))
+
+        val paracetamol = "screenshot-medicine-paracetamol"
+        repo.addMedicine(
+            MedicineEntity(
+                name = "Paracetamol",
+                dose = "2.5 ml",
+                minIntervalMinutes = 6 * 60,
+                comfortIntervalMinutes = 8 * 60,
+                maxPerDay = 4,
+                remindWhenDue = true,
+                uid = paracetamol,
+            ),
+        )
+        // Seven hours ago: past the minimum, an hour short of the usual gap —
+        // and a second dose inside the day, so the count reads "2 of 4".
+        repo.addMedicineDose(MedicineDoseEntity(medicineUid = paracetamol, time = now - 7 * hour))
+        repo.addMedicineDose(MedicineDoseEntity(medicineUid = paracetamol, time = now - 16 * hour))
+
+        val teething = "screenshot-medicine-teething"
+        repo.addMedicine(
+            MedicineEntity(
+                name = "Teething gel",
+                // No usual interval and no daily maximum: a medicine with only a
+                // minimum gap, which is a real setup and reads differently on
+                // the card — "Every 4 h", and no "of 4" on the count.
+                minIntervalMinutes = 4 * 60,
+                uid = teething,
+            ),
+        )
+        repo.addMedicineDose(MedicineDoseEntity(medicineUid = teething, time = now - 10 * hour))
+
         repo.addWellbeing(
             WellbeingEntity(
                 time = now - day,
@@ -221,6 +278,10 @@ class ScreenshotTest {
         // Feeding reminders are off by default; the Settings captures toggle them
         // on explicitly (see captureScreens) to show both states honestly.
         FeedingReminderSettings.setEnabled(app, false)
+        // Nothing put away from the dashboard: the three medicines above are
+        // seeded to show all three states of the card, and a dismissal left
+        // behind by an earlier run would photograph two of them (BDR-16).
+        MedicineDismissals.clear(app)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
@@ -534,6 +595,19 @@ class ScreenshotTest {
         runBlocking { app.repository.setTrackWellbeing(true) }
         show { TreatmentsScreen {} }
         save("12-treatments")
+
+        // As-needed medicine beside it, sharing the number the way the feeding
+        // and pumping captures already do — the two are different questions
+        // asked at different moments (BDR-15).
+        show { MedicinesScreen {} }
+        save("12-medicines")
+        // And the form a new one starts in: paracetamol at six-to-eight hours is
+        // a prefilled, editable starting point sitting under the line that says
+        // where the right numbers come from. It is not a recommendation, and the
+        // capture is the place that is easiest to misread — so it shows the
+        // sentence as well as the fields.
+        tapDesc("Add a medicine")
+        save("12-medicines-2-new")
 
         // Partner sync: before pairing, after, and with the stash held back.
         // The ViewModel is built by hand rather than through viewModel(),

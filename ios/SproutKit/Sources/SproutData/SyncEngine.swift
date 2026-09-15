@@ -122,6 +122,8 @@ public final class SyncEngine: @unchecked Sendable {
             payload.diapers = try scoped()
             payload.growth = try scoped()
             payload.treatments = try scoped()
+            payload.medicines = try scoped()
+            payload.medicineDoses = try scoped()
             // `try` in front of the whole conditional: Swift refuses it to the
             // right of a non-assignment operator.
             payload.pumpings = try includePumping ? Pumping.fetchAll(db) : []
@@ -170,6 +172,12 @@ public final class SyncEngine: @unchecked Sendable {
             summary += try mergeScoped(db, payload.diapers, since: since, babyIdOf: babyIdOf)
             summary += try mergeScoped(db, payload.growth, since: since, babyIdOf: babyIdOf)
             summary += try mergeScoped(db, payload.treatments, since: since, babyIdOf: babyIdOf)
+            summary += try mergeScoped(db, payload.medicines, since: since, babyIdOf: babyIdOf)
+            // After the medicines, but not because a dose needs one to exist: a
+            // dose names its medicine by uid and stores that uid, so one whose
+            // medicine has not arrived yet is stored and simply shows nothing
+            // until it does. The order is for the reader, not the database.
+            summary += try mergeScoped(db, payload.medicineDoses, since: since, babyIdOf: babyIdOf)
             summary += try mergeRows(db, payload.pumpings, since: since)
             return summary
         }
@@ -209,7 +217,8 @@ public final class SyncEngine: @unchecked Sendable {
     /// list and not the string off the wire — a replica is parsed with nothing
     /// authenticated at all (ADR-0014).
     private static let purgeableTables: Set<String> = [
-        "baby", "feeding", "sleep", "diaper", "growth", "treatment", "pumping",
+        "baby", "feeding", "sleep", "diaper", "growth", "treatment",
+        "medicine", "medicine_dose", "pumping",
     ]
 
     private func mergeScoped<T: SyncableRecord & FetchableRecord & BabyScoped & Equatable>(

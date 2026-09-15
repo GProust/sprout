@@ -5,6 +5,8 @@ import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.PumpingEntity
 import com.gproust.sprout.data.local.SleepEntity
@@ -93,6 +95,19 @@ class SproutRepository(
     fun householdDiapers(since: Long): Flow<List<DiaperEntity>> =
         db.diaperDao().observeAllSince(since)
 
+    /** Every tracked baby's as-needed medicines (BDR-15). */
+    val householdMedicines: Flow<List<MedicineEntity>> = db.medicineDao().observeAllActive()
+
+    /**
+     * Every tracked baby's doses since [since].
+     *
+     * The window has to be wider than the daily maximum's, not equal to it: a
+     * medicine whose minimum wait is longer than a day would otherwise read as
+     * never given, and so as ready, on the one screen that says whether it is.
+     */
+    fun householdMedicineDoses(since: Long): Flow<List<MedicineDoseEntity>> =
+        db.medicineDoseDao().observeAllSince(since)
+
     // Sync stamping (ADR-0007). Screens build entities without a uid or an
     // updatedAt; every write goes through one of these on its way to the DAO,
     // so no call site has to remember. `ifEmpty` keeps the unique index safe
@@ -103,6 +118,8 @@ class SproutRepository(
     private fun DiaperEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun GrowthEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun TreatmentEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun MedicineEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun MedicineDoseEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun PumpingEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
 
     /** Adds a baby and returns its new id, selecting it if none is active yet. */
@@ -160,6 +177,8 @@ class SproutRepository(
                 addAll(db.diaperDao().uidsForBaby(babyId).toTombstones("diaper", deletedAt))
                 addAll(db.growthDao().uidsForBaby(babyId).toTombstones("growth", deletedAt))
                 addAll(db.treatmentDao().uidsForBaby(babyId).toTombstones("treatment", deletedAt))
+                addAll(db.medicineDao().uidsForBaby(babyId).toTombstones("medicine", deletedAt))
+                addAll(db.medicineDoseDao().uidsForBaby(babyId).toTombstones("medicine_dose", deletedAt))
                 addAll(listOfNotNull(db.babyDao().uidById(babyId)).toTombstones("baby", deletedAt))
             }
             db.tombstoneDao().insertAll(tombstones)
@@ -169,6 +188,8 @@ class SproutRepository(
             db.diaperDao().purgeForBaby(babyId)
             db.growthDao().purgeForBaby(babyId)
             db.treatmentDao().purgeForBaby(babyId)
+            db.medicineDao().purgeForBaby(babyId)
+            db.medicineDoseDao().purgeForBaby(babyId)
             db.babyDao().purgeById(babyId)
         }
         reassignActiveIfNeeded(babyId)
@@ -190,6 +211,8 @@ class SproutRepository(
             db.diaperDao().compact(cutoff)
             db.growthDao().compact(cutoff)
             db.treatmentDao().compact(cutoff)
+            db.medicineDao().compact(cutoff)
+            db.medicineDoseDao().compact(cutoff)
             db.pumpingDao().compact(cutoff)
             db.tombstoneDao().compact(cutoff)
         }
@@ -320,6 +343,87 @@ class SproutRepository(
     /** All active treatments (across babies) that want reminders — for (re)scheduling alarms. */
     suspend fun treatmentsWithReminders(): List<TreatmentEntity> = db.treatmentDao().activeWithReminders()
 
+    // As-needed medicine (BDR-15) — the paracetamol case, per active baby.
+    //
+    // Two streams rather than one joined read: the medicines change when the
+    // parent edits one, the doses change every time one is given, and the
+    // screen needs both to draw a traffic light. Joining them in SQL would put
+    // the arithmetic somewhere it cannot be unit-tested.
+
+    val medicines: Flow<List<MedicineEntity>> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(emptyList()) else db.medicineDao().observeForBaby(id)
+    }
+
+    /** Every dose of the active baby's medicines, newest first. */
+    val medicineDoses: Flow<List<MedicineDoseEntity>> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(emptyList()) else db.medicineDoseDao().observeForBaby(id)
+    }
+
+    suspend fun addMedicine(entity: MedicineEntity): Long? {
+        val id = activeBabyId.first() ?: return null
+        return db.medicineDao().insert(entity.copy(babyId = id).stamped())
+    }
+
+    suspend fun updateMedicine(entity: MedicineEntity) = db.medicineDao().update(entity.stamped())
+
+    /**
+     * Removes a medicine and, with it, the doses that were of it.
+     *
+     * Both soft-deleted in one transaction. Leaving the doses behind would leave
+     * rows naming a medicine nothing points at any more — and a medicine added
+     * later could not be given the same uid, but a merge carrying the old one
+     * back would resurrect a history the parent thought they had removed.
+     */
+    suspend fun deleteMedicine(entity: MedicineEntity) {
+        val deletedAt = now()
+        db.withTransaction {
+            db.medicineDoseDao().softDeleteForMedicine(entity.uid, deletedAt)
+            db.medicineDao().softDelete(entity.id, deletedAt)
+        }
+    }
+
+    suspend fun getMedicine(id: Long): MedicineEntity? = db.medicineDao().getById(id)
+
+    /** Records a dose as given. Returns the new row id, or null with no active baby. */
+    suspend fun addMedicineDose(entity: MedicineDoseEntity): Long? {
+        val id = activeBabyId.first() ?: return null
+        return db.medicineDoseDao().insert(entity.copy(babyId = id).stamped())
+    }
+
+    /**
+     * Records a dose of [medicine] at [time], on the baby the medicine belongs
+     * to rather than on whichever one is selected.
+     *
+     * The dashboard offers a dose for every baby in the household at once
+     * (BDR-16), and with twins the selected baby and the card that was touched
+     * are not the same thing — resolving the baby from the selection is how a
+     * sibling's paracetamol ends up in the wrong history.
+     */
+    suspend fun giveMedicineDose(medicine: MedicineEntity, time: Long): Long =
+        db.medicineDoseDao().insert(
+            MedicineDoseEntity(
+                babyId = medicine.babyId,
+                medicineUid = medicine.uid,
+                time = time,
+            ).stamped(),
+        )
+
+    suspend fun updateMedicineDose(entity: MedicineDoseEntity) =
+        db.medicineDoseDao().update(entity.stamped())
+
+    suspend fun deleteMedicineDose(entity: MedicineDoseEntity) =
+        db.medicineDoseDao().softDelete(entity.id, now())
+
+    /**
+     * The doses of one medicine within the last [windowMs] — everything the
+     * traffic light and the daily count need, and nothing more.
+     */
+    suspend fun recentDosesOf(medicineUid: String, windowMs: Long): List<MedicineDoseEntity> =
+        db.medicineDoseDao().recentFor(medicineUid, now() - windowMs)
+
+    /** All active medicines (across babies) that want a reminder — for (re)arming alarms. */
+    suspend fun medicinesWithReminders(): List<MedicineEntity> = db.medicineDao().activeWithReminders()
+
     // Reading one named baby's whole log, for a report (BDR-0012)
     //
     // The screens above always follow the *active* baby, which is right for
@@ -341,6 +445,9 @@ class SproutRepository(
 
     suspend fun treatmentsForBabyOnce(babyId: Long): List<TreatmentEntity> =
         db.treatmentDao().observeForBaby(babyId).first()
+
+    suspend fun medicinesForBabyOnce(babyId: Long): List<MedicineEntity> =
+        db.medicineDao().observeForBaby(babyId).first()
 
     // Pumping (expressed milk — the parent's stash, not a baby's log)
     val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()

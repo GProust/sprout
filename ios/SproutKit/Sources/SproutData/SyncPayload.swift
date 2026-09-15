@@ -38,6 +38,8 @@ public struct SyncPayload: Equatable, Sendable {
     public var diapers: [BabyScopedRow<Diaper>] = []
     public var growth: [BabyScopedRow<Growth>] = []
     public var treatments: [BabyScopedRow<Treatment>] = []
+    public var medicines: [BabyScopedRow<Medicine>] = []
+    public var medicineDoses: [BabyScopedRow<MedicineDose>] = []
     public var pumpings: [Pumping] = []
     public var tombstones: [Tombstone] = []
 
@@ -63,7 +65,8 @@ public struct SyncPayload: Equatable, Sendable {
     public var rowCount: Int {
         let logs: Int = feedings.count + sleeps.count + diapers.count
         let more: Int = growth.count + treatments.count + pumpings.count
-        return babies.count + logs + more + tombstones.count
+        let asNeeded: Int = medicines.count + medicineDoses.count
+        return babies.count + logs + more + asNeeded + tombstones.count
     }
 }
 
@@ -113,6 +116,8 @@ public enum SyncPayloadCodec {
             "diapers": payload.diapers.map { scoped($0, diaper) },
             "growth": payload.growth.map { scoped($0, growth) },
             "treatments": payload.treatments.map { scoped($0, treatment) },
+            "medicines": payload.medicines.map { scoped($0, medicine) },
+            "medicineDoses": payload.medicineDoses.map { scoped($0, medicineDose) },
             "pumpings": payload.pumpings.map(pumping),
             "tombstones": payload.tombstones.map(tombstone),
         ]
@@ -187,6 +192,8 @@ public enum SyncPayloadCodec {
             payload.diapers = try root.rows("diapers") { try scopedFrom($0, diaperFrom) }
             payload.growth = try root.rows("growth") { try scopedFrom($0, growthFrom) }
             payload.treatments = try root.rows("treatments") { try scopedFrom($0, treatmentFrom) }
+            payload.medicines = try root.rows("medicines") { try scopedFrom($0, medicineFrom) }
+            payload.medicineDoses = try root.rows("medicineDoses") { try scopedFrom($0, medicineDoseFrom) }
             payload.pumpings = try root.rows("pumpings", pumpingFrom)
             payload.tombstones = try root.rows("tombstones", tombstoneFrom)
         } catch let error as SyncPayloadError {
@@ -408,6 +415,63 @@ private extension SyncPayloadCodec {
         )
         row.timesOfDay = json.string("timesOfDay") ?? ""
         return row
+    }
+
+    // MARK: Medicine
+
+    static func medicine(_ row: Medicine) -> [String: Any] {
+        var json = sync(row)
+        json["name"] = row.name
+        json.put("dose", row.dose)
+        json["minIntervalMinutes"] = row.minIntervalMinutes
+        json.put("comfortIntervalMinutes", row.comfortIntervalMinutes)
+        json.put("maxPerDay", row.maxPerDay)
+        json["remindWhenDue"] = row.remindWhenDue
+        json["remindAtComfort"] = row.remindAtComfort
+        json["active"] = row.active
+        json.put("notes", row.notes)
+        return json
+    }
+
+    static func medicineFrom(_ json: [String: Any]) throws -> Medicine {
+        Medicine(
+            name: try json.required("name"),
+            dose: json.string("dose"),
+            minIntervalMinutes: json.int("minIntervalMinutes") ?? 0,
+            comfortIntervalMinutes: json.int("comfortIntervalMinutes"),
+            maxPerDay: json.int("maxPerDay"),
+            // Defaulted rather than required: both switches arrived with this
+            // table, but defaulting them is what keeps a field addable later
+            // without a version bump.
+            remindWhenDue: json.bool("remindWhenDue") ?? false,
+            remindAtComfort: json.bool("remindAtComfort") ?? false,
+            active: json.bool("active") ?? true,
+            notes: json.string("notes"),
+            uid: try json.required("uid"),
+            updatedAt: try json.requiredInt64("updatedAt"),
+            deletedAt: json.int64("deletedAt")
+        )
+    }
+
+    static func medicineDose(_ row: MedicineDose) -> [String: Any] {
+        var json = sync(row)
+        // The medicine's uid, not its local id: `id` counts from 1 on every
+        // phone and would name a different medicine on the other one.
+        json["medicineUid"] = row.medicineUid
+        json["time"] = row.time
+        json.put("notes", row.notes)
+        return json
+    }
+
+    static func medicineDoseFrom(_ json: [String: Any]) throws -> MedicineDose {
+        MedicineDose(
+            medicineUid: try json.required("medicineUid"),
+            time: try json.requiredInt64("time"),
+            notes: json.string("notes"),
+            uid: try json.required("uid"),
+            updatedAt: try json.requiredInt64("updatedAt"),
+            deletedAt: json.int64("deletedAt")
+        )
     }
 
     // MARK: Pumping

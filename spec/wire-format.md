@@ -182,11 +182,12 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
 ```json
 {
   "formatVersion": 1,
-  "schemaVersion": 16,
+  "schemaVersion": 17,
   "householdId": "…", "deviceId": "…", "deviceName": "…",
   "createdAt": 1757400000000,
   "babies": [], "feedings": [], "sleeps": [], "diapers": [],
-  "growth": [], "treatments": [], "pumpings": [], "tombstones": []
+  "growth": [], "treatments": [], "medicines": [], "medicineDoses": [],
+  "pumpings": [], "tombstones": []
 }
 ```
 
@@ -215,6 +216,18 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
 - **Two fields are packed strings, not arrays**, because that is how Room stores
   them: a treatment's `timesOfDay` is minutes joined by `,`, and a feeding's
   `segments` is `SIDE,start,end` triples joined by `;`. Empty is `""`.
+- **A row points at another row by that row's `uid`.** A baby-scoped row carries
+  `babyUid`, as above; a `medicineDoses` entry also carries `medicineUid`, the
+  `uid` of the `medicines` row it was a dose of. Unlike `babyUid` this one is
+  *stored* as a uid on both platforms rather than resolved to a local id at
+  merge time, so a dose that arrives before its medicine is kept as it is and
+  simply has nothing to show until the medicine turns up — rather than being
+  dropped, or attached to whichever medicine happened to exist
+  ([BDR-15](../docs/decisions/0015-medicine-given-when-needed-and-the-wait-between-doses.md)).
+- **A tombstone's `entity` is the table name**, so the two new ones are
+  `medicine` and `medicine_dose` — underscored, because that is what the table
+  is called. Both readers hold a closed list of names and ignore any other, so a
+  table from a newer Sprout leaves the tombstone in place and touches nothing.
 
 **Vector:** `replica.json` — a document with one of every row type, and the
 absent-versus-null cases spelled out.

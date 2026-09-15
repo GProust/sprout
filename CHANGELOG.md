@@ -5,6 +5,35 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 💊 **Medicine you give when it's needed, and the wait before the next dose.**
+  A new *As needed* page on your baby's dashboard, for the medicines that aren't
+  on a schedule — paracetamol at three in the morning rather than vitamin D every
+  breakfast. Set one up with the wait you were told to keep between doses (six
+  hours at least, eight usually, say), tap **Give a dose** when you give one, and
+  the card answers the only question that matters at that hour: **red** while
+  it's too soon and how long is left, **amber** once it's allowed but sooner than
+  ideal, **green** once the full wait has passed. You can add a daily maximum too,
+  and Sprout will hold the light at red while the day's allowance is spent. The
+  doses share with your household's other phones like everything else, so the
+  parent who's awake can see what the parent who's asleep already gave — and you
+  can be reminded when the wait is over, if you ask for it.
+- 💊 **Every number is yours.** Sprout ships no list of medicines, no doses and no
+  intervals: you type in what your prescriber or the leaflet told you, and the
+  colours are the app counting the hours back to *your* figures. It never warns,
+  never advises, and never stops you logging a dose — it's a record, not a
+  second opinion.
+- ⏱️ **A running wait now shows on the home page.** If a medicine can't be given
+  yet — or has just come round again — it's one line under the feed buttons: the
+  name in its colour, how long is left if there's any, and **Give** and
+  **Dismiss** beside it. Dismiss puts it away until you next give that medicine.
+  It's there only when something is actually in play: a household in the middle of
+  nothing has exactly the home page it had before.
+- 🔔 **You can log a dose from the reminder itself.** The "you can give it again"
+  notification now carries **Give a dose** and **Dismiss**. Tapping the first
+  records the dose at the moment you tapped it and moves the next reminder along
+  — no unlocking, no opening the app, no hunting for the screen at three in the
+  morning. A dose given and not written down is the thing this whole feature is
+  trying to prevent.
 - 🛡️ **A file that isn't a Sprout file can no longer close the app.** Sprout
   offers itself for almost any file you tap, because an invitation arriving
   through a messaging app carries nothing else to recognise it by — so a

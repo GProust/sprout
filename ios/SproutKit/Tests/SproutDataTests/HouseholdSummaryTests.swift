@@ -21,7 +21,10 @@ final class HouseholdSummaryTests: XCTestCase {
         feedings: [Feeding] = [],
         sleeps: [Sleep] = [],
         diapers: [Diaper] = [],
-        ongoing: [Sleep] = []
+        ongoing: [Sleep] = [],
+        medicines: [Medicine] = [],
+        doses: [MedicineDose] = [],
+        dismissed: [String: Int64] = [:]
     ) -> [BabySummary] {
         summariseHousehold(
             babies: babies,
@@ -29,9 +32,32 @@ final class HouseholdSummaryTests: XCTestCase {
             sleeps: sleeps,
             diapers: diapers,
             ongoingSleeps: ongoing,
+            medicines: medicines,
+            medicineDoses: doses,
+            dismissedMedicines: dismissed,
             dayStart: dayStart,
             now: now
         )
+    }
+
+    private func medicine(
+        _ babyId: Int64,
+        _ uid: String,
+        _ name: String,
+        minHours: Int = 6,
+        comfortHours: Int? = 8
+    ) -> Medicine {
+        Medicine(
+            babyId: babyId,
+            name: name,
+            minIntervalMinutes: minHours * 60,
+            comfortIntervalMinutes: comfortHours.map { $0 * 60 },
+            uid: uid
+        )
+    }
+
+    private func dose(_ babyId: Int64, _ medicineUid: String, _ at: Int64) -> MedicineDose {
+        MedicineDose(babyId: babyId, medicineUid: medicineUid, time: at)
     }
 
     // MARK: - Per baby
@@ -220,5 +246,118 @@ final class HouseholdSummaryTests: XCTestCase {
         )
 
         XCTAssertNil(summaries[0].nextSide)
+    }
+
+    // MARK: - The dashboard's medicine card (BDR-16)
+    //
+    // The arithmetic itself is MedicineReadinessTests'; these are about which
+    // medicines reach the dashboard at all, and under whose name. The same
+    // cases run on Android in `HouseholdSummaryTest`.
+
+    func testAMedicineNeverGivenStaysOffTheDashboard() {
+        // Green because it has never been given is not news, and a household
+        // with a shelf of medicines set up would otherwise have a dashboard
+        // that is mostly shelf.
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")]
+        )
+        XCTAssertTrue(summaries[0].medicines.isEmpty)
+    }
+
+    func testARunningWaitReachesTheDashboard() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")],
+            doses: [dose(1, "m-para", now - 2 * hour)]
+        )
+        XCTAssertEqual(summaries[0].medicines.count, 1)
+        XCTAssertEqual(summaries[0].medicines[0].medicine.name, "Paracetamol")
+    }
+
+    func testADoseNeverCountsAgainstAnotherBabysMedicine() {
+        // Two babies, the same medicine name, one dose. The sibling's card must
+        // read as untouched.
+        let summaries = summarise(
+            babies: [baby(1, "Robin"), baby(2, "Sam")],
+            medicines: [
+                medicine(1, "m-robin", "Paracetamol"),
+                medicine(2, "m-sam", "Paracetamol"),
+            ],
+            doses: [dose(1, "m-robin", now - 2 * hour)]
+        )
+        XCTAssertEqual(summaries[0].medicines.count, 1)
+        XCTAssertTrue(summaries[1].medicines.isEmpty)
+    }
+
+    func testTheSoonestToBeGivenComesFirst() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [
+                medicine(1, "m-a", "Ibuprofen", minHours: 8, comfortHours: nil),
+                medicine(1, "m-b", "Paracetamol", minHours: 4, comfortHours: nil),
+            ],
+            doses: [
+                dose(1, "m-a", now - hour),
+                dose(1, "m-b", now - hour),
+            ]
+        )
+        XCTAssertEqual(
+            summaries[0].medicines.map(\.medicine.name),
+            ["Paracetamol", "Ibuprofen"]
+        )
+    }
+
+    func testADismissedMedicineIsPutAway() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")],
+            doses: [dose(1, "m-para", now - 2 * hour)],
+            dismissed: ["m-para": now - 2 * hour]
+        )
+        XCTAssertTrue(summaries[0].medicines.isEmpty)
+    }
+
+    func testTheNextDoseBringsADismissedMedicineBack() {
+        // The dismissal names the dose it was made against, so it expires on its
+        // own rather than needing to be cleared: a newer dose is a different
+        // wait, and the card is about the wait that is running.
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [medicine(1, "m-para", "Paracetamol")],
+            doses: [
+                dose(1, "m-para", now - 8 * hour),
+                dose(1, "m-para", now - hour),
+            ],
+            dismissed: ["m-para": now - 8 * hour]
+        )
+        XCTAssertEqual(summaries[0].medicines.count, 1)
+    }
+
+    func testADismissalNamesOneMedicineOnly() {
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [
+                medicine(1, "m-para", "Paracetamol"),
+                medicine(1, "m-ibu", "Ibuprofen"),
+            ],
+            doses: [
+                dose(1, "m-para", now - 2 * hour),
+                dose(1, "m-ibu", now - 2 * hour),
+            ],
+            dismissed: ["m-para": now - 2 * hour]
+        )
+        XCTAssertEqual(summaries[0].medicines.map(\.medicine.name), ["Ibuprofen"])
+    }
+
+    func testAnInactiveMedicineIsNotWatched() {
+        var stopped = medicine(1, "m-para", "Paracetamol")
+        stopped.active = false
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [stopped],
+            doses: [dose(1, "m-para", now - 2 * hour)]
+        )
+        XCTAssertTrue(summaries[0].medicines.isEmpty)
     }
 }

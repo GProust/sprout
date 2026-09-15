@@ -246,6 +246,31 @@ public final class SproutRepository: @unchecked Sendable {
         }
     }
 
+    /// The active baby's as-needed medicines (BDR-15).
+    public var medicines: AsyncValueObservation<[Medicine]> {
+        observeForActiveBaby { db, babyId in
+            try Medicine
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .filter(Column("active") == true)
+                .order(Column("name"))
+                .fetchAll(db)
+        }
+    }
+
+    /// Every dose of the active baby's medicines, newest first.
+    ///
+    /// All of them in one stream rather than one per medicine: the screen draws
+    /// every medicine's state at once, and the traffic light is computed from
+    /// this list rather than queried per row.
+    public var medicineDoses: AsyncValueObservation<[MedicineDose]> {
+        observeForActiveBaby { db, babyId in
+            try MedicineDose
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .order(Column("time").desc)
+                .fetchAll(db)
+        }
+    }
+
     /// Pumping belongs to the parent, not to a baby (BDR-0007), so it is not
     /// scoped by the active one.
     public var pumpings: AsyncValueObservation<[Pumping]> {
@@ -292,6 +317,30 @@ public final class SproutRepository: @unchecked Sendable {
     public func householdDiapers(since: Int64) -> AsyncValueObservation<[Diaper]> {
         observe { db in
             try Diaper
+                .filter(Column("time") >= since && Column("deletedAt") == nil)
+                .order(Column("time").desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Every tracked baby's as-needed medicines (BDR-15).
+    public var householdMedicines: AsyncValueObservation<[Medicine]> {
+        observe { db in
+            try Medicine
+                .filter(Column("active") == true && Column("deletedAt") == nil)
+                .order(Column("name"))
+                .fetchAll(db)
+        }
+    }
+
+    /// Every tracked baby's doses since `since`.
+    ///
+    /// The window has to be wider than the daily maximum's, not equal to it: a
+    /// medicine whose minimum wait is longer than a day would otherwise read as
+    /// never given, and so as ready, on the one screen that says whether it is.
+    public func householdMedicineDoses(since: Int64) -> AsyncValueObservation<[MedicineDose]> {
+        observe { db in
+            try MedicineDose
                 .filter(Column("time") >= since && Column("deletedAt") == nil)
                 .order(Column("time").desc)
                 .fetchAll(db)
@@ -380,6 +429,129 @@ public final class SproutRepository: @unchecked Sendable {
     }
 
     public func deleteTreatment(_ treatment: Treatment) throws { try softDelete(treatment) }
+
+    @discardableResult
+    public func addMedicine(_ medicine: Medicine) throws -> Int64? {
+        guard let babyId = try activeBabyIdNow() else { return nil }
+        let timestamp = now()
+        return try database.write { db in
+            var copy = medicine
+            copy.babyId = babyId
+            copy.uid = copy.uid.isEmpty ? newUid() : copy.uid
+            copy.updatedAt = timestamp
+            try copy.insert(db)
+            return copy.id
+        }
+    }
+
+    public func updateMedicine(_ medicine: Medicine) throws {
+        let timestamp = now()
+        try database.write { db in
+            var copy = medicine
+            copy.updatedAt = timestamp
+            try copy.update(db)
+        }
+    }
+
+    /// Removes a medicine and, with it, the doses that were of it.
+    ///
+    /// Both in one transaction. Leaving the doses would leave rows naming a
+    /// medicine nothing points at any more — and a merge carrying the old uid
+    /// back would resurrect a history the parent thought they had removed.
+    public func deleteMedicine(_ medicine: Medicine) throws {
+        let timestamp = now()
+        try database.write { db in
+            try db.execute(
+                sql: """
+                UPDATE medicine_dose SET deletedAt = ?, updatedAt = ?
+                WHERE medicineUid = ? AND deletedAt IS NULL
+                """,
+                arguments: [timestamp, timestamp, medicine.uid]
+            )
+            try db.execute(
+                sql: "UPDATE medicine SET deletedAt = ?, updatedAt = ? WHERE id = ?",
+                arguments: [timestamp, timestamp, medicine.id]
+            )
+        }
+    }
+
+    public func medicine(id: Int64) throws -> Medicine? {
+        try database.read { db in try Medicine.fetchOne(db, key: id) }
+    }
+
+    /// Records a dose as given.
+    @discardableResult
+    public func addMedicineDose(_ dose: MedicineDose) throws -> Int64? {
+        guard let babyId = try activeBabyIdNow() else { return nil }
+        let timestamp = now()
+        return try database.write { db in
+            var copy = dose
+            copy.babyId = babyId
+            copy.uid = copy.uid.isEmpty ? newUid() : copy.uid
+            copy.updatedAt = timestamp
+            try copy.insert(db)
+            return copy.id
+        }
+    }
+
+    /// Records a dose of `medicine`, on the baby the medicine belongs to rather
+    /// than on whichever one is selected.
+    ///
+    /// The dashboard offers a dose for every baby in the household at once
+    /// (BDR-16), and with twins the selected baby and the card that was touched
+    /// are not the same thing — resolving the baby from the selection is how a
+    /// sibling's paracetamol ends up in the wrong history.
+    @discardableResult
+    public func giveMedicineDose(_ medicine: Medicine, at time: Int64) throws -> Int64? {
+        let timestamp = now()
+        return try database.write { db in
+            var dose = MedicineDose(
+                babyId: medicine.babyId,
+                medicineUid: medicine.uid,
+                time: time
+            )
+            dose.uid = newUid()
+            dose.updatedAt = timestamp
+            try dose.insert(db)
+            return dose.id
+        }
+    }
+
+    public func updateMedicineDose(_ dose: MedicineDose) throws {
+        let timestamp = now()
+        try database.write { db in
+            var copy = dose
+            copy.updatedAt = timestamp
+            try copy.update(db)
+        }
+    }
+
+    public func deleteMedicineDose(_ dose: MedicineDose) throws { try softDelete(dose) }
+
+    /// The doses of one medicine within the last `windowMs` — everything the
+    /// traffic light and the daily count need, and nothing more.
+    public func recentDoses(of medicineUid: String, withinMs windowMs: Int64) throws -> [MedicineDose] {
+        let since = now() - windowMs
+        return try database.read { db in
+            try MedicineDose
+                .filter(Column("medicineUid") == medicineUid)
+                .filter(Column("time") >= since && Column("deletedAt") == nil)
+                .order(Column("time").desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// The active baby's medicines, read once — what the reminder scheduler
+    /// plans from.
+    public func medicinesForBabyOnce(_ babyId: Int64) throws -> [Medicine] {
+        try database.read { db in
+            try Medicine
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .filter(Column("active") == true)
+                .order(Column("name"))
+                .fetchAll(db)
+        }
+    }
 
     public func treatment(id: Int64) throws -> Treatment? {
         try database.read { db in try Treatment.fetchOne(db, key: id) }
@@ -476,7 +648,7 @@ public final class SproutRepository: @unchecked Sendable {
             }
 
             var tombstones: [Tombstone] = []
-            for table in ["feeding", "sleep", "diaper", "growth", "treatment"] {
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose"] {
                 tombstones += try uids(table).map {
                     Tombstone(uid: $0, entity: table, deletedAt: timestamp)
                 }
@@ -488,7 +660,7 @@ public final class SproutRepository: @unchecked Sendable {
             }
             for tombstone in tombstones { try tombstone.insert(db) }
 
-            for table in ["feeding", "sleep", "diaper", "growth", "treatment"] {
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose"] {
                 try db.execute(sql: "DELETE FROM \(table) WHERE babyId = ?", arguments: [id])
             }
             try db.execute(sql: "DELETE FROM baby WHERE id = ?", arguments: [id])
@@ -555,7 +727,10 @@ public final class SproutRepository: @unchecked Sendable {
         let cutoff = now() - Self.tombstoneRetentionMs
         try database.write { db in
             try db.execute(sql: "DELETE FROM tombstone WHERE deletedAt < ?", arguments: [cutoff])
-            for table in ["baby", "feeding", "sleep", "diaper", "growth", "treatment", "pumping"] {
+            for table in [
+                "baby", "feeding", "sleep", "diaper", "growth", "treatment",
+                "medicine", "medicine_dose", "pumping",
+            ] {
                 try db.execute(
                     sql: "DELETE FROM \(table) WHERE deletedAt IS NOT NULL AND deletedAt < ?",
                     arguments: [cutoff]

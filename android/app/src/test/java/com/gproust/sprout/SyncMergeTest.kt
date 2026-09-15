@@ -6,6 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.ParentProfileEntity
 import com.gproust.sprout.data.local.PumpingEntity
@@ -60,6 +62,18 @@ class SyncMergeTest {
         suspend fun feedingUids() = feedings().map { it.uid }.toSet()
 
         suspend fun seedParent() = repository.saveParentProfile(ParentProfileEntity(name = name))
+
+        /** Adds an as-needed medicine and hands back the stamped row. */
+        suspend fun addMedicine(name: String): MedicineEntity {
+            val id = repository.addMedicine(
+                MedicineEntity(name = name, minIntervalMinutes = 6 * 60),
+            )
+            return db.medicineDao().allForSync().first { it.id == id }
+        }
+
+        suspend fun liveMedicines() = db.medicineDao().allForSync().filter { it.deletedAt == null }
+
+        suspend fun liveDoses() = db.medicineDoseDao().allForSync().filter { it.deletedAt == null }
     }
 
     private val phones = mutableListOf<Phone>()
@@ -283,5 +297,70 @@ class SyncMergeTest {
         assertEquals("the baby, and only what was logged after pairing", 2, summary.added)
         assertEquals(1, summary.skipped)
         assertEquals(listOf(80), sam.db.feedingDao().allForSync().map { it.amountMl })
+    }
+
+    /**
+     * A dose still points at its medicine after the trip (BDR-15).
+     *
+     * The one row in Sprout that names another row rather than a baby. Local ids
+     * count from 1 on both phones, so a dose that travelled as `medicineId`
+     * would land on whichever medicine happened to be first on the other
+     * handset — and with one medicine each side, it would look right.
+     *
+     * So the medicines are deliberately created in a different order on the two
+     * phones: if the link were positional, this is the test that would catch it.
+     */
+    @Test
+    fun `a dose still names its own medicine after a merge`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        val ibuprofen = alex.addMedicine("Ibuprofen")
+        val paracetamol = alex.addMedicine("Paracetamol")
+        alex.repository.addMedicineDose(
+            MedicineDoseEntity(medicineUid = paracetamol.uid, time = 1_700_000_100_000),
+        )
+
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+
+        val samsMedicines = sam.db.medicineDao().allForSync().associateBy { it.uid }
+        val samsDose = sam.db.medicineDoseDao().allForSync().single()
+
+        assertEquals("both medicines arrived", 2, samsMedicines.size)
+        assertEquals("Paracetamol", samsMedicines.getValue(samsDose.medicineUid).name)
+        // Not the other one, which is what a positional link would have given.
+        assertTrue(samsDose.medicineUid != ibuprofen.uid)
+    }
+
+    /**
+     * Removing a medicine takes its doses with it, and the other phone agrees.
+     *
+     * A dose left behind is a row naming a medicine nothing points at — and the
+     * merge would hand it back at the next exchange, which is the resurrection
+     * ADR-0007's tombstones exist to prevent.
+     */
+    @Test
+    fun `removing a medicine removes its doses on both phones`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        val paracetamol = alex.addMedicine("Paracetamol")
+        alex.repository.addMedicineDose(
+            MedicineDoseEntity(medicineUid = paracetamol.uid, time = 1_700_000_100_000),
+        )
+
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+        assertEquals(1, sam.liveDoses().size)
+
+        alex.clock += 10_000
+        alex.repository.deleteMedicine(alex.db.medicineDao().allForSync().single())
+        sam.engine.merge(alex.replica())
+
+        assertTrue("the medicine is gone here too", sam.liveMedicines().isEmpty())
+        assertTrue("and so is the dose that was of it", sam.liveDoses().isEmpty())
     }
 }

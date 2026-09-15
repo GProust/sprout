@@ -413,6 +413,121 @@ public struct Treatment: Codable, FetchableRecord, Identifiable, Equatable, Sync
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }
 
+/// A medicine given **when it is needed** rather than on a calendar — the
+/// paracetamol case (BDR-15). The course-shaped counterpart is ``Treatment``.
+///
+/// Every number here is the parent's own, typed from a prescriber or a leaflet.
+/// Sprout ships no drug list, no default dose and no interval for any named
+/// substance; it counts the hours between the doses in ``MedicineDose`` and
+/// hands the figures back.
+public struct Medicine: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord, BabyScoped {
+    public static let databaseTableName = "medicine"
+
+    public var id: Int64?
+    public var babyId: Int64 = 0
+    public var name: String
+    /// Optional dose description, e.g. "2.5 ml" or "half a sachet".
+    public var dose: String?
+    /// The shortest gap the parent was told to keep, in minutes.
+    public var minIntervalMinutes: Int
+    /// The gap the prescriber actually wants kept; `nil` when only a minimum was
+    /// given, and then there is no in-between band at all.
+    public var comfortIntervalMinutes: Int?
+    /// Most doses allowed in twenty-four hours; `nil` when the parent set none.
+    public var maxPerDay: Int?
+    /// Opt-in, off until asked for, like every other notification here.
+    public var remindWhenDue: Bool = false
+    /// Which wait the reminder fires at: the comfortable interval when true, the
+    /// minimum when false. Ignored when ``comfortIntervalMinutes`` is `nil`.
+    public var remindAtComfort: Bool = false
+    /// False once the parent stops using it; kept out of the active list.
+    public var active: Bool = true
+    public var notes: String?
+    public var uid: String = newUid()
+    public var updatedAt: Int64 = 0
+    public var deletedAt: Int64?
+
+    public init(
+        id: Int64? = nil,
+        babyId: Int64 = 0,
+        name: String,
+        dose: String? = nil,
+        minIntervalMinutes: Int,
+        comfortIntervalMinutes: Int? = nil,
+        maxPerDay: Int? = nil,
+        remindWhenDue: Bool = false,
+        remindAtComfort: Bool = false,
+        active: Bool = true,
+        notes: String? = nil,
+        uid: String = newUid(),
+        updatedAt: Int64 = 0,
+        deletedAt: Int64? = nil
+    ) {
+        self.id = id
+        self.babyId = babyId
+        self.name = name
+        self.dose = dose
+        self.minIntervalMinutes = minIntervalMinutes
+        self.comfortIntervalMinutes = comfortIntervalMinutes
+        self.maxPerDay = maxPerDay
+        self.remindWhenDue = remindWhenDue
+        self.remindAtComfort = remindAtComfort
+        self.active = active
+        self.notes = notes
+        self.uid = uid
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+    }
+
+    public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
+}
+
+/// One dose of a ``Medicine``, actually given.
+///
+/// These are the record: the traffic light is derived from them every time it is
+/// asked for, so a correction or a deletion moves it (BDR-15).
+///
+/// It names its medicine by **uid**, not by the local `id`, and stores that uid
+/// rather than resolving one at merge time — `id` counts from 1 on every phone,
+/// and a dose that arrives before its medicine has to wait for it rather than
+/// attach to whichever row happens to exist.
+public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord, BabyScoped {
+    public static let databaseTableName = "medicine_dose"
+
+    public var id: Int64?
+    public var babyId: Int64 = 0
+    /// The ``Medicine/uid`` this dose was of.
+    public var medicineUid: String
+    /// When it was given — the wait is counted from here.
+    public var time: Int64
+    public var notes: String?
+    public var uid: String = newUid()
+    public var updatedAt: Int64 = 0
+    public var deletedAt: Int64?
+
+    public init(
+        id: Int64? = nil,
+        babyId: Int64 = 0,
+        medicineUid: String,
+        time: Int64,
+        notes: String? = nil,
+        uid: String = newUid(),
+        updatedAt: Int64 = 0,
+        deletedAt: Int64? = nil
+    ) {
+        self.id = id
+        self.babyId = babyId
+        self.medicineUid = medicineUid
+        self.time = time
+        self.notes = notes
+        self.uid = uid
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+    }
+
+    public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
+}
+
 /// A pumping session. Belongs to the parent, not to a baby (BDR-0007), which is
 /// why there is no `babyId`.
 public struct Pumping: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord {
