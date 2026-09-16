@@ -88,6 +88,17 @@ what stops a feature used a few days a year from taking up permanent space on
 the screen used every hour. Three medicines is the most it draws; beyond that it
 says how many it is not showing rather than growing to fit.
 
+**The order is how freely it may be given**: the full wait passed, then allowed
+but sooner than ideal, then not yet. Green above amber is the part worth writing
+down, because both of those may be given and the first arrangement of this card
+simply grouped them together. They are not the same thing to a parent: one is the
+dose they were told to give, the other is the dose they are *allowed* to give
+early. So the medicine that needs no second thought is the one at the top.
+
+It is an ordering, not a recommendation. The amber line says exactly what it said
+before, and its *Give* works exactly as well — BDR-15's rule is that nothing here
+argues, and putting a row second is not an argument.
+
 **Dismiss puts a line away until the medicine is next given.** It is not a
 setting and not a snooze: a dismissal names *the dose it was made against*, so it
 expires by itself — give another dose and the medicine's last dose is no longer

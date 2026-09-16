@@ -290,6 +290,31 @@ final class HouseholdSummaryTests: XCTestCase {
         XCTAssertTrue(summaries[1].medicines.isEmpty)
     }
 
+    func testWhatNeedsNoSecondThoughtComesFirst() {
+        // Green, then amber, then red. Both of the first two may be given, but
+        // one is the dose the parent was told to give and the other is the dose
+        // they are allowed to give early.
+        let summaries = summarise(
+            babies: [baby(1, "Robin")],
+            medicines: [
+                // Alphabetically the reverse of the order expected, so a list
+                // that only sorted by name would pass this by accident.
+                medicine(1, "m-red", "Aspirin"),
+                medicine(1, "m-amber", "Ibuprofen"),
+                medicine(1, "m-green", "Paracetamol"),
+            ],
+            doses: [
+                dose(1, "m-red", now - 2 * hour),
+                dose(1, "m-amber", now - 7 * hour),
+                dose(1, "m-green", now - 9 * hour),
+            ]
+        )
+        XCTAssertEqual(
+            summaries[0].medicines.map(\.medicine.name),
+            ["Paracetamol", "Ibuprofen", "Aspirin"]
+        )
+    }
+
     func testTheSoonestToBeGivenComesFirst() {
         let summaries = summarise(
             babies: [baby(1, "Robin")],

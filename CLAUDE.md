@@ -223,6 +223,10 @@ A running wait also reaches the two places a parent already is
   there is one, *Give* and *Dismiss* — and the abbreviation is visual only: a
   screen reader is still given the full sentence. Adding a field here is adding it
   to the screen this card exists to keep people off.
+- **Green, then amber, then red.** The card is ordered by how freely a medicine
+  may be given, not by which wait ends soonest: green and amber may both be given,
+  but one is the dose the parent was told to give. It is an ordering and not an
+  argument — the amber line reads the same and its button works the same.
 - **Dismiss names the dose it was made against**, so it expires on its own when
   the next one is logged. Device-local (`MedicineDismissals`), never synced — the
   parent holding the other phone has not seen anything.

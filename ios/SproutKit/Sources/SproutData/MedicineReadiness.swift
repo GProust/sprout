@@ -190,9 +190,16 @@ public struct MedicineWatch: Identifiable, Sendable, Equatable {
 /// lists every medicine is one tap away. That is what keeps this card absent
 /// from the dashboard of a household that is not in the middle of anything.
 ///
-/// Ordered by **what can be given now first**, then by whichever wait ends
-/// soonest, with the name breaking ties so the list does not reshuffle under a
-/// parent who is reading it.
+/// Ordered by **how freely it may be given**: the full wait passed, then allowed
+/// but sooner than ideal, then not yet — with the soonest wait first inside each
+/// group and the name breaking the last tie, so the list does not reshuffle under
+/// a parent who is reading it.
+///
+/// Green above amber, and not merely "givable first". Both may be given, but one
+/// of them is the dose the parent was told to give and the other is the dose they
+/// are allowed to give early — so the medicine that needs no second thought is
+/// the one at the top. It is an ordering, not a recommendation: the amber line
+/// says what it says, and its button works exactly as well (BDR-15).
 ///
 /// `dismissed` is what *Dismiss* on the card put away, as medicine uid to the
 /// dose it was dismissed against. A dismissal therefore expires by itself: give
@@ -214,13 +221,33 @@ public func medicinesNeedingAttention(
         .filter { $0.readiness.level != .ready || $0.readiness.dosesInLastDay > 0 }
         .filter { dismissed[$0.medicine.uid] != $0.readiness.lastDoseAt }
         .sorted { left, right in
-            // `nextAllowedAt` is nil for everything that can be given, so the
-            // default sorts those to the front as one group.
-            let a = left.readiness.nextAllowedAt ?? 0
-            let b = right.readiness.nextAllowedAt ?? 0
+            if left.readiness.level.givingOrder != right.readiness.level.givingOrder {
+                return left.readiness.level.givingOrder < right.readiness.level.givingOrder
+            }
+            // Then the moment this group's own wait ends — `nextAllowedAt` for a
+            // medicine still too soon, `comfortableAt` for one that is early,
+            // and neither for one that is simply ready. Both are nil in that
+            // last case, so the fallback leaves the name to order them.
+            let a = left.readiness.nextAllowedAt ?? left.readiness.comfortableAt ?? 0
+            let b = right.readiness.nextAllowedAt ?? right.readiness.comfortableAt ?? 0
             if a != b { return a < b }
             return left.medicine.name < right.medicine.name
         }
+}
+
+private extension MedicineLevel {
+    /// Where a state sits when the dashboard asks "what may I give?".
+    ///
+    /// Written out rather than taken from the case order, which runs the other
+    /// way: the enum is declared in the order a *wait* passes through, and this
+    /// is the order a *parent* wants to read.
+    var givingOrder: Int {
+        switch self {
+        case .ready: return 0
+        case .soonerThanIdeal: return 1
+        case .tooSoon: return 2
+        }
+    }
 }
 
 /// When to tell the parent that `medicine` can be given again, or `nil` when it

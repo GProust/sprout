@@ -187,9 +187,16 @@ data class MedicineWatch(
  * lists every medicine is one tap away. That is what keeps this card absent
  * from the dashboard of a household that is not in the middle of anything.
  *
- * Ordered by **what can be given now first**, then by whichever wait ends
- * soonest, with the name breaking ties so the list does not reshuffle under a
- * parent who is reading it.
+ * Ordered by **how freely it may be given**: the full wait passed, then allowed
+ * but sooner than ideal, then not yet — with the soonest wait first inside each
+ * group and the name breaking the last tie, so the list does not reshuffle under
+ * a parent who is reading it.
+ *
+ * Green above amber, and not merely "givable first". Both may be given, but one
+ * of them is the dose the parent was told to give and the other is the dose they
+ * are allowed to give early — so the medicine that needs no second thought is the
+ * one at the top. It is an ordering, not a recommendation: the amber line says
+ * what it says, and its button works exactly as well (BDR-15).
  *
  * [dismissed] is what *Dismiss* on the card put away, as medicine uid to the
  * dose it was dismissed against. A dismissal therefore expires by itself: give
@@ -211,10 +218,32 @@ fun medicinesNeedingAttention(
     .filter { it.readiness.lastDoseAt != null }
     .filter { it.readiness.level != MedicineLevel.READY || it.readiness.dosesInLastDay > 0 }
     .filter { dismissed[it.medicine.uid] != it.readiness.lastDoseAt }
-    // `nextAllowedAt` is null for everything that can be given, so the elvis
-    // sorts those to the front as one group rather than by an arbitrary key.
-    .sortedWith(compareBy({ it.readiness.nextAllowedAt ?: 0L }, { it.medicine.name }))
+    // Rank first, then the moment the group's own wait ends — `nextAllowedAt`
+    // for a medicine still too soon, `comfortableAt` for one that is early, and
+    // neither for one that is simply ready. Both are null in that last case, so
+    // the elvis leaves the name to order them.
+    .sortedWith(
+        compareBy(
+            { it.readiness.level.givingOrder },
+            { it.readiness.nextAllowedAt ?: it.readiness.comfortableAt ?: 0L },
+            { it.medicine.name },
+        ),
+    )
     .toList()
+
+/**
+ * Where a state sits when the dashboard asks "what may I give?".
+ *
+ * Written out rather than taken from [MedicineLevel]'s `ordinal`, which runs the
+ * other way: that enum is declared in the order a *wait* passes through, and this
+ * is the order a *parent* wants to read.
+ */
+private val MedicineLevel.givingOrder: Int
+    get() = when (this) {
+        MedicineLevel.READY -> 0
+        MedicineLevel.SOONER_THAN_IDEAL -> 1
+        MedicineLevel.TOO_SOON -> 2
+    }
 
 /**
  * When to remind the parent that [medicine] can be given again, or null when it

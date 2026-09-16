@@ -291,6 +291,32 @@ class HouseholdSummaryTest {
     }
 
     @Test
+    fun whatNeedsNoSecondThoughtComesFirst() {
+        // Green, then amber, then red. Both of the first two may be given, but
+        // one is the dose the parent was told to give and the other is the dose
+        // they are allowed to give early.
+        val result = summarise(
+            babies = listOf(baby(1, "Léa")),
+            medicines = listOf(
+                // Alphabetically the reverse of the order expected, so a list
+                // that only sorted by name would pass this by accident.
+                medicine(1, "m-red", "Aspirin", minHours = 6, comfortHours = 8),
+                medicine(1, "m-amber", "Ibuprofen", minHours = 6, comfortHours = 8),
+                medicine(1, "m-green", "Paracetamol", minHours = 6, comfortHours = 8),
+            ),
+            doses = listOf(
+                dose(1, "m-red", now - 2 * HOUR),
+                dose(1, "m-amber", now - 7 * HOUR),
+                dose(1, "m-green", now - 9 * HOUR),
+            ),
+        )
+        assertEquals(
+            listOf("Paracetamol", "Ibuprofen", "Aspirin"),
+            result[0].medicines.map { it.medicine.name },
+        )
+    }
+
+    @Test
     fun theSoonestToBeGivenComesFirst() {
         val result = summarise(
             babies = listOf(baby(1, "Léa")),
