@@ -1,0 +1,24 @@
+{
+  "note": "Where the PSM is published, and how it is encoded. The service UUID is the advertUuid of beacon.json.",
+  "characteristicUuid": "5f9b3a70-6d1e-4b6a-9c4e-2f7d8a1b0c34",
+  "psmBytes": 2,
+  "psmEncoding": "unsigned 16-bit big-endian",
+  "cases": [
+    {
+      "psm": 1,
+      "hex": "0001"
+    },
+    {
+      "psm": 128,
+      "hex": "0080"
+    },
+    {
+      "psm": 32768,
+      "hex": "8000"
+    },
+    {
+      "psm": 65535,
+      "hex": "ffff"
+    }
+  ]
+}

@@ -165,6 +165,30 @@ write('session-frame.json', {
   frameBase64: frame.toString('base64'),
 })
 
+// -------------------------------------------------------- reaching the channel
+
+// ADR-0016: an L2CAP channel is reached by a PSM the listener's stack picks, so
+// the listener publishes it on a GATT characteristic. The UUID is fixed and
+// shared; two apps that derived the same advertisement but read different
+// characteristics would connect and then find nothing.
+const psmBytes = (psm) => Buffer.from([(psm >> 8) & 0xff, psm & 0xff]).toString('hex')
+
+write('l2cap.json', {
+  note: 'Where the PSM is published, and how it is encoded. The service UUID is the advertUuid of beacon.json.',
+  characteristicUuid: '5f9b3a70-6d1e-4b6a-9c4e-2f7d8a1b0c34',
+  psmBytes: 2,
+  psmEncoding: 'unsigned 16-bit big-endian',
+  // The ends of the range and one ordinary value; a two-byte field read the
+  // wrong way round is the mistake this exists to catch, so 0x0080 and 0x8000
+  // are both here.
+  cases: [
+    { psm: 1, hex: psmBytes(1) },
+    { psm: 128, hex: psmBytes(128) },
+    { psm: 32_768, hex: psmBytes(32_768) },
+    { psm: 65_535, hex: psmBytes(65_535) },
+  ],
+})
+
 // ----------------------------------------------------------- the invitation
 
 const invitation = {

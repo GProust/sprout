@@ -52,10 +52,12 @@ enum HistoryChoice {
 ///
 /// **One of Android's two ways in, for now.** By hand — a file is written when
 /// the parents ask to send one, and read when they hand one over — works here
-/// exactly as it does there. The automatic exchange does not: Android's is
-/// RFCOMM, which iOS cannot speak at all, and the transport both platforms *can*
-/// speak is decided but written on neither side yet (ADR-0016). The screen says
-/// so rather than offering a switch that would do nothing.
+/// exactly as it does there. The automatic exchange does not yet: the transport
+/// both platforms can speak is decided (ADR-0016) and Android now advertises,
+/// scans and listens in it, but the radio on this side is still to be written.
+/// ``HouseholdBeacon/advertUuid(secret:at:)`` and ``L2capPsm`` are the halves of
+/// it that are already pinned against the shared vectors. The screen says so
+/// rather than offering a switch that would do nothing.
 ///
 /// Nothing here touches the network. There is no code in this app that could.
 @Observable

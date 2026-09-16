@@ -38,7 +38,7 @@ each record has a **Status**, **Context**, **Decision**, and **Consequences**.
 | [0013](0013-writing-the-pdf-and-the-workbook-by-hand.md) | Writing the PDF and the workbook by hand | Accepted |
 | [0014](0014-the-way-in-is-an-allow-list.md) | The way in is an allow-list, and untrusted bytes are fuzzed | Accepted |
 | [0015](0015-native-ios-in-this-repository.md) | Native iOS, in this repository | Accepted |
-| [0016](0016-a-transport-both-platforms-can-speak.md) | A transport both platforms can speak | Accepted (Android implementation Proposed) |
+| [0016](0016-a-transport-both-platforms-can-speak.md) | A transport both platforms can speak | Accepted (Android implemented; iOS radio still to be written) |
 | [0017](0017-grdb-for-the-ios-database.md) | GRDB for the iOS database, and Room's schema as the source | Accepted |
 | [0018](0018-where-ios-keeps-what-must-not-travel.md) | Where iOS keeps what must not travel | Accepted |
 | [0019](0019-a-reminder-decided-when-it-is-scheduled.md) | A reminder decided when it is scheduled | Accepted |

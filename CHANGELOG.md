@@ -5,6 +5,19 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 📱 **Automatic sharing can now reach an iPhone.** Sprout's second app is being
+  built, and two phones only find each other if they are looking for the same
+  thing. The way a phone announces its household over Bluetooth has changed to
+  one an iPhone can also send and see, and the hand-over itself moved to a
+  channel both can open. Nothing about the feature changes for you: the same
+  few seconds of looking when you open the app, the same *Sync now*, the same
+  encrypted record, and still no internet permission.
+- 🔒 **Less goes on the air than before.** The value your phones broadcast to
+  recognise each other already changed by itself every half hour; the fixed
+  marker that used to go out beside it — readable by anyone nearby as "a Sprout
+  is here" — is being retired. This version still sends it so that a phone on
+  the previous version can find yours, and the next one won't send it at all.
+
 - 💊 **Medicine you give when it's needed, and the wait before the next dose.**
   A new *As needed* page on your baby's dashboard, for the medicines that aren't
   on a schedule — paracetamol at three in the morning rather than vitamin D every

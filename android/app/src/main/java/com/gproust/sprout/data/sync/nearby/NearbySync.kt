@@ -81,7 +81,13 @@ class NearbySync(
 
         val replies = try {
             transport.exchange(
+                // Both forms of the advertisement, because the phone on the
+                // other side of the window might be looking for either
+                // (ADR-0016): an Android that has not updated scans for the
+                // service data, an iPhone can only see the derived UUID.
                 beacon = HouseholdBeacon.value(pairing.secret, now()),
+                advertUuid = HouseholdBeacon.advertUuid(pairing.secret, now()),
+                scanUuids = HouseholdBeacon.advertUuidsToScanFor(pairing.secret, now()),
                 // The secret stays here; the transport only ever gets an answer.
                 isOurs = { HouseholdBeacon.matches(it, pairing.secret, now()) },
                 mine = mine,

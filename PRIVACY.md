@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-09-15 — see [Change history](#change-history) at the end._
+_Last updated: 2026-09-16 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -128,6 +128,14 @@ after them — usually two parents, sometimes a grandparent as well. It works
 - What travels is **encrypted** with a key that exists only on the phones you
   have paired. Nobody else can read it, including us and including whichever
   app carried the file.
+- **Nothing identifying goes on the air.** To find each other, two phones of one
+  household broadcast a value worked out from the key they share. It changes by
+  itself every half hour, it means nothing to anyone who does not hold that key,
+  and it carries no name, no phone identifier and nothing about your baby. From
+  this version the value is *all* that is broadcast: the fixed marker that used
+  to go out beside it — the one that said "a Sprout is here" to anyone
+  listening — is on its way out, and is sent now only so that phones still on
+  the previous version are not left unable to find yours.
 - **Your own check-ins are never shared.** Mood, bleeding, recovery and breast
   comfort stay on your phone, and there is no setting that changes that.
 - The expressed-milk log **can** be shared with your household, and there is a
@@ -182,6 +190,16 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-09-16
+
+- Amended the section on **sharing between the phones of a household** to say
+  what is broadcast while two phones look for each other, and that it is now
+  only the half-hourly value derived from your household's key. The fixed
+  marker that used to accompany it is being retired — this version still sends
+  it so that phones on the previous version can find yours, and the one after
+  will not. Nothing about what Sprout collects, stores or sends has changed;
+  less goes out than before, and the internet permission is still absent.
 
 ### 2026-09-15 (2)
 

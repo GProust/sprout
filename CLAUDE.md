@@ -118,14 +118,18 @@ Five things that a change can quietly undo:
 - **`SproutRepository` is the only place that stamps `uid`/`updatedAt`.** Keep
   it that way; a DAO called directly writes an unstamped row, which then loses
   every merge.
-- **The transport is changing** ([ADR-0016](docs/adr/0016-a-transport-both-platforms-can-speak.md),
-  Android side not written yet). iOS cannot do RFCOMM at all and cannot advertise
-  service data, so the exchange moves to L2CAP CoC and the rotating beacon moves
-  into a derived service UUID. `SyncSession`, `SyncCrypto`, the payload and the
-  merge are all untouched by that — it is `BluetoothNearbyTransport` and the
-  advertisement only. Don't start it without reading the ADR's rollout note:
-  Android has to advertise both forms for one release or every existing paired
-  household stops syncing until both phones update.
+- **The transport has two forms, and only for one release**
+  ([ADR-0016](docs/adr/0016-a-transport-both-platforms-can-speak.md)). iOS cannot
+  do RFCOMM at all and cannot advertise service data, so the exchange moved to
+  L2CAP CoC and the rotating beacon moved into a derived service UUID. Android
+  now advertises, scans and listens in *both* forms — that is the rollout note,
+  not redundancy: drop the old pair before the release carrying both has shipped
+  and every existing paired household stops syncing until both phones update.
+  What the two forms are is `HouseholdBeacon`; where the L2CAP channel is
+  announced is `L2capPsm` and `PsmDirectory`, pinned by `spec/vectors/l2cap.json`
+  because a characteristic read from the wrong UUID fails with no error in it.
+  `SyncSession`, `SyncCrypto`, the payload and the merge are untouched by all of
+  it. **The iOS radio is still to be written** — it was waiting on this release.
 - **No `INTERNET` permission, ever.** It grants any socket at all, and its
   absence is the one privacy claim a user can check for themselves rather than
   take on trust. The same goes for `ACCESS_FINE_LOCATION`: `BLUETOOTH_SCAN` is
