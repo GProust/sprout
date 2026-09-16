@@ -31,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.UUID
 
 /**
  * One discovery window, end to end — minus the radio (ADR-0010).
@@ -62,6 +63,8 @@ class NearbySyncTest {
     ) : NearbyTransport {
         var windows = 0
         var advertised: ByteArray? = null
+        var advertisedUuid: UUID? = null
+        var scannedFor: List<UUID> = emptyList()
         var sent: ByteArray? = null
 
         /** The rule the caller handed down for recognising a household beacon. */
@@ -71,12 +74,16 @@ class NearbySyncTest {
 
         override suspend fun exchange(
             beacon: ByteArray,
+            advertUuid: UUID,
+            scanUuids: List<UUID>,
             isOurs: (ByteArray) -> Boolean,
             mine: ByteArray,
             windowMs: Long,
         ): List<ByteArray> {
             windows++
             advertised = beacon
+            advertisedUuid = advertUuid
+            scannedFor = scanUuids
             sent = mine
             this.isOurs = isOurs
             if (refuse) throw NearbyTransport.RadioRefused("advertising refused (1)")
@@ -177,6 +184,38 @@ class NearbySyncTest {
         assertTrue(
             "another household's beacon is not ours",
             !isOurs(HouseholdBeacon.value(SyncSecret(ByteArray(SyncSecret.SIZE_BYTES) { 7 }), clock)),
+        )
+    }
+
+    /**
+     * ADR-0016's rollout: the window has to be visible to a phone that has not
+     * updated *and* to an iPhone, which can only see the derived UUID. Dropping
+     * either form is the change that stops a household syncing with nothing
+     * written anywhere.
+     */
+    @Test
+    fun `both forms of the advertisement go out, and both windows are scanned for`() = runBlocking {
+        val transport = FakeTransport()
+
+        sync(transport).run(userAsked = true)
+
+        assertEquals(
+            "an iPhone scans for this and nothing else",
+            HouseholdBeacon.advertUuid(secret, clock),
+            transport.advertisedUuid,
+        )
+        assertEquals(
+            "this window and the last, since a scan filter cannot say 'or the one before'",
+            listOf(
+                HouseholdBeacon.advertUuid(secret, clock),
+                HouseholdBeacon.advertUuid(secret, clock - HouseholdBeacon.WINDOW_MS),
+            ),
+            transport.scannedFor,
+        )
+        assertEquals(
+            "and the old form too, for the Sprouts already installed",
+            HouseholdBeacon.VALUE_BYTES,
+            transport.advertised!!.size,
         )
     }
 

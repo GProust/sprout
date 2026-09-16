@@ -2,10 +2,13 @@ package com.gproust.sprout
 
 import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.HouseholdBeacon
+import com.gproust.sprout.data.sync.nearby.L2capPsm
 import com.gproust.sprout.data.sync.nearby.NearbyPolicy
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -84,6 +87,99 @@ class NearbyDiscoveryTest {
         val advertisement = 3 + 2 + 16 + HouseholdBeacon.VALUE_BYTES
 
         assertTrue("advertisement is $advertisement bytes", advertisement <= 31)
+    }
+
+    // --- the derived service UUID (ADR-0016) -------------------------------
+
+    @Test
+    fun `a household recognises its own advertised uuid`() {
+        assertEquals(
+            HouseholdBeacon.advertUuid(secret, now),
+            HouseholdBeacon.advertUuidsToScanFor(secret, now).first(),
+        )
+    }
+
+    @Test
+    fun `another household's advertised uuid means nothing to us`() {
+        assertFalse(
+            HouseholdBeacon.advertUuidsToScanFor(secret, now)
+                .contains(HouseholdBeacon.advertUuid(other, now)),
+        )
+    }
+
+    @Test
+    fun `the advertised uuid changes on its own, so it cannot be followed`() {
+        val first = HouseholdBeacon.advertUuid(secret, now)
+        val later = HouseholdBeacon.advertUuid(secret, now + HouseholdBeacon.WINDOW_MS)
+
+        assertNotEquals(
+            "after the old form is dropped this is the only thing on the air",
+            first,
+            later,
+        )
+        // Same window, same value — otherwise two phones could never agree.
+        assertEquals(first, HouseholdBeacon.advertUuid(secret, now + HouseholdBeacon.WINDOW_MS / 2))
+    }
+
+    @Test
+    fun `a phone whose clock lags a little is still scanned for`() {
+        val scanning = HouseholdBeacon.advertUuidsToScanFor(secret, now)
+
+        assertEquals(2, scanning.size)
+        assertTrue(
+            "a scan filter cannot say 'or the one before', so both are listed",
+            scanning.contains(HouseholdBeacon.advertUuid(secret, now - HouseholdBeacon.WINDOW_MS)),
+        )
+        assertFalse(
+            "but not forever — an old capture must stop working",
+            scanning.contains(HouseholdBeacon.advertUuid(secret, now - 2 * HouseholdBeacon.WINDOW_MS)),
+        )
+    }
+
+    @Test
+    fun `the two forms of one window are different values`() {
+        // Both are an HMAC of the same secret over the same window; only the
+        // label keeps them apart. Without it the service data would be the first
+        // eight bytes of the UUID, which is a fixed relationship an observer
+        // could use to tie the two advertisements to one phone.
+        val beacon = HouseholdBeacon.value(secret, now)
+        val uuid = HouseholdBeacon.advertUuid(secret, now)
+        val firstEightOfUuid = ByteArray(8) { i -> ((uuid.mostSignificantBits ushr (56 - 8 * i)) and 0xFFL).toByte() }
+
+        assertFalse(beacon.contentEquals(firstEightOfUuid))
+    }
+
+    @Test
+    fun `neither form of the advertisement can share a packet with the other`() {
+        // Why the transport starts two advertisements rather than one: 3 bytes
+        // of flags, 2 + 16 for a service UUID, and 2 + 16 + 8 for service data.
+        val both = 3 + (2 + 16) + (2 + 16 + HouseholdBeacon.VALUE_BYTES)
+
+        assertTrue("both forms would be $both bytes", both > 31)
+    }
+
+    // --- reaching the channel once we have found it ------------------------
+
+    @Test
+    fun `a psm survives the round trip`() {
+        for (psm in listOf(1, 128, 0x1234, 32_768, 65_535)) {
+            assertEquals(psm, L2capPsm.decode(L2capPsm.encode(psm)))
+        }
+    }
+
+    @Test
+    fun `a psm is big-endian, because the other phone reads it that way`() {
+        assertArrayEquals(byteArrayOf(0x00, 0x80.toByte()), L2capPsm.encode(128))
+        assertArrayEquals(byteArrayOf(0x80.toByte(), 0x00), L2capPsm.encode(32_768))
+    }
+
+    @Test
+    fun `something that is not a psm is refused rather than dialled`() {
+        assertNull(L2capPsm.decode(null))
+        assertNull("zero is not a channel", L2capPsm.decode(byteArrayOf(0, 0)))
+        assertNull(L2capPsm.decode(ByteArray(0)))
+        assertNull(L2capPsm.decode(byteArrayOf(1)))
+        assertNull(L2capPsm.decode(byteArrayOf(0, 0, 1)))
     }
 
     // --- when we are allowed to look ---------------------------------------

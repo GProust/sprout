@@ -12,6 +12,7 @@ import com.gproust.sprout.data.sync.SyncPayloadCodec
 import com.gproust.sprout.data.sync.SyncPayloadException
 import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.HouseholdBeacon
+import com.gproust.sprout.data.sync.nearby.L2capPsm
 import com.gproust.sprout.data.sync.nearby.SyncSession
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
@@ -116,29 +117,47 @@ class SpecConformanceTest {
     }
 
     /**
-     * The UUID form is what ADR-0016 moves the advertisement to, and Android
-     * does not implement it yet. Pinning the derivation here means the day it
-     * does, it either matches iOS or fails this test — rather than shipping a
-     * transport that silently cannot see an iPhone.
+     * The UUID form is what ADR-0016 moves the advertisement to, and the only
+     * one an iPhone can send or see. A derivation that drifted by a byte would
+     * not fail anywhere else: the two apps would simply never find each other,
+     * and report an empty room.
      */
     @Test
     fun `the advertised uuid derivation matches the spec`() {
         val v = vector("beacon.json")
-        val label = v.getString("advertUuidLabel")
-        val mac = javax.crypto.Mac.getInstance("HmacSHA256").apply {
-            init(javax.crypto.spec.SecretKeySpec(secret().bytes, "HmacSHA256"))
-        }
+        assertEquals(HouseholdBeacon.ADVERT_LABEL, v.getString("advertUuidLabel"))
 
         val cases = v.getJSONArray("cases")
         for (i in 0 until cases.length()) {
             val case = cases.getJSONObject(i)
-            val window = case.getLong("window")
-            val bytes = mac.doFinal("$label$window".toByteArray(Charsets.US_ASCII)).copyOf(16)
-            val hex = bytes.toHex()
-            val uuid = "${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-" +
-                "${hex.substring(16, 20)}-${hex.substring(20, 32)}"
+            val at = case.getLong("at")
+            assertEquals(
+                "advertised uuid for at=$at",
+                case.getString("advertUuid"),
+                HouseholdBeacon.advertUuid(secret(), at).toString(),
+            )
+            assertEquals("window for at=$at", case.getLong("window"), HouseholdBeacon.window(at))
+        }
+    }
 
-            assertEquals("advertised uuid for window=$window", case.getString("advertUuid"), uuid)
+    /**
+     * Where the L2CAP channel is announced (ADR-0016). Two apps that derived the
+     * same advertisement but read a different characteristic would connect and
+     * then find nothing — a failure with no error in it anywhere.
+     */
+    @Test
+    fun `the psm characteristic and its encoding match the spec`() {
+        val v = vector("l2cap.json")
+        assertEquals(v.getString("characteristicUuid"), L2capPsm.CHARACTERISTIC_UUID.toString())
+        assertEquals(v.getInt("psmBytes"), L2capPsm.BYTES)
+
+        val cases = v.getJSONArray("cases")
+        for (i in 0 until cases.length()) {
+            val case = cases.getJSONObject(i)
+            val psm = case.getInt("psm")
+            assertEquals("psm $psm encoded", case.getString("hex"), L2capPsm.encode(psm).toHex())
+            // And read back the way iOS would read ours.
+            assertEquals("psm $psm decoded", psm, L2capPsm.decode(case.getString("hex").fromHex()))
         }
     }
 

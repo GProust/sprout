@@ -4,8 +4,10 @@ Date: 2026-09-10
 
 ## Status
 
-Accepted (decision) — Android implementation **Proposed**, to land in its own
-pull request.
+Accepted. The Android implementation has landed; it advertises, scans and
+listens in **both** forms for this one release, per the rollout note in
+*Consequences*. The iOS radio is still to be written, and was waiting on exactly
+that release.
 
 Amends [ADR-0010](0010-automatic-exchange-over-bluetooth-when-the-app-is-open.md)
 on two points: what carries the exchange, and how a phone advertises. Everything

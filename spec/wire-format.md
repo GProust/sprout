@@ -173,6 +173,35 @@ guess is close.
 
 **Vector:** `beacon.json`
 
+### Finding the channel
+
+Recognising the advertisement says *which* phone to talk to; it does not say
+where. RFCOMM needed no answer to that — a service record carries a fixed UUID
+and the stack looks the channel up — but an L2CAP connection-oriented channel is
+reached by a **PSM**, a number the listener's Bluetooth stack picks when it opens
+the socket. So the listener publishes it, over GATT
+([ADR-0016](../docs/adr/0016-a-transport-both-platforms-can-speak.md)).
+
+- The listener exposes a **primary GATT service whose UUID is the `advertUuid`
+  it is advertising**, so the service a caller was told about is the service it
+  finds.
+- That service carries **one readable characteristic**,
+  `5f9b3a70-6d1e-4b6a-9c4e-2f7d8a1b0c34`, whose value is the PSM as an
+  **unsigned 16-bit big-endian** integer — two bytes, most significant first.
+  Zero is not a PSM.
+- The read needs **no pairing, bonding or link encryption**. What it discloses
+  is a channel number on a phone the reader has already proved it can recognise,
+  and everything that then crosses that channel is sealed (§3).
+- A caller may look the characteristic up **by its own UUID across every service
+  offered**, rather than inside the advertised one: a phone found on the
+  previous window's UUID is by then advertising the current one.
+
+Nothing fixed reaches the air because of any of this. A GATT service is only
+visible to a phone that has already connected, and connecting means having
+matched the rotating `advertUuid` first.
+
+**Vector:** `l2cap.json`
+
 ---
 
 ## 7. The replica document
