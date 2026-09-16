@@ -23,7 +23,65 @@ public enum SproutDatabase {
     /// The list exists so that ``schemaVersion`` cannot drift from it: adding a
     /// migration here moves the number a replica carries, with nothing else to
     /// remember to edit.
-    static let migrationsAfterAndroidSchema: [(name: String, migrate: @Sendable (Database) throws -> Void)] = []
+    static let migrationsAfterAndroidSchema: [(name: String, migrate: @Sendable (Database) throws -> Void)] = [
+        (name: "v17-as-needed-medicine", migrate: migrateToV17),
+    ]
+
+    /// v16 -> v17: the two tables behind as-needed medicine (BDR-15).
+    ///
+    /// The statements are Android's `MIGRATION_16_17`, verbatim, for the same
+    /// reason the v16 schema above is Room's export verbatim: the two are
+    /// comparable by reading them side by side, and a column that differs by a
+    /// default or a nullability is a merge that half-works.
+    ///
+    /// `medicine_dose.medicineUid` is a uid rather than a foreign key to
+    /// `medicine.id`, and deliberately not a SQL foreign key either: a dose can
+    /// arrive from a merge before the medicine it names, and the constraint
+    /// would reject the row rather than let the next exchange complete it —
+    /// which matters more here than on Android, because `foreignKeysEnabled` is
+    /// on in this app's configuration.
+    private static func migrateToV17(_ db: Database) throws {
+        for statement in schemaV17 {
+            try db.execute(sql: statement)
+        }
+    }
+
+    static let schemaV17: [String] = [
+        """
+        CREATE TABLE IF NOT EXISTS `medicine` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `babyId` INTEGER NOT NULL,
+            `name` TEXT NOT NULL,
+            `dose` TEXT,
+            `minIntervalMinutes` INTEGER NOT NULL,
+            `comfortIntervalMinutes` INTEGER,
+            `maxPerDay` INTEGER,
+            `remindWhenDue` INTEGER NOT NULL,
+            `remindAtComfort` INTEGER NOT NULL,
+            `active` INTEGER NOT NULL,
+            `notes` TEXT,
+            `uid` TEXT NOT NULL DEFAULT '',
+            `updatedAt` INTEGER NOT NULL DEFAULT 0,
+            `deletedAt` INTEGER)
+        """,
+        "CREATE INDEX IF NOT EXISTS `index_medicine_babyId` ON `medicine` (`babyId`)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS `index_medicine_uid` ON `medicine` (`uid`)",
+
+        """
+        CREATE TABLE IF NOT EXISTS `medicine_dose` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `babyId` INTEGER NOT NULL,
+            `medicineUid` TEXT NOT NULL,
+            `time` INTEGER NOT NULL,
+            `notes` TEXT,
+            `uid` TEXT NOT NULL DEFAULT '',
+            `updatedAt` INTEGER NOT NULL DEFAULT 0,
+            `deletedAt` INTEGER)
+        """,
+        "CREATE INDEX IF NOT EXISTS `index_medicine_dose_babyId` ON `medicine_dose` (`babyId`)",
+        "CREATE INDEX IF NOT EXISTS `index_medicine_dose_medicineUid` ON `medicine_dose` (`medicineUid`)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS `index_medicine_dose_uid` ON `medicine_dose` (`uid`)",
+    ]
 
     /// The schema version this build speaks, in **Android's** numbering.
     ///

@@ -1,11 +1,15 @@
 package com.gproust.sprout.ui.home
 
+import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.data.medicinesNeedingAttention
 import com.gproust.sprout.widget.LAST_BREAST_WINDOW_MS
 import com.gproust.sprout.widget.firstNursedSide
 
@@ -43,6 +47,13 @@ data class BabySummary(
     val nextSide: BreastSide? = null,
     /** A sleep that has begun and not ended, or null if this baby is awake. */
     val ongoingSleep: SleepEntity? = null,
+    /**
+     * The as-needed medicines with something to say right now — a wait running,
+     * or one just finished (BDR-16). Empty for a household that is not in the
+     * middle of anything, which is what keeps the card off the dashboard rather
+     * than showing an empty one.
+     */
+    val medicines: List<MedicineWatch> = emptyList(),
 )
 
 /**
@@ -58,6 +69,10 @@ fun summariseHousehold(
     sleeps: List<SleepEntity>,
     diapers: List<DiaperEntity>,
     ongoingSleeps: List<SleepEntity>,
+    medicines: List<MedicineEntity> = emptyList(),
+    medicineDoses: List<MedicineDoseEntity> = emptyList(),
+    /** What *Dismiss* put away: medicine uid to the dose it was dismissed against. */
+    dismissedMedicines: Map<String, Long> = emptyMap(),
     dayStart: Long,
     now: Long,
 ): List<BabySummary> {
@@ -65,6 +80,12 @@ fun summariseHousehold(
     val sleepsBy = sleeps.groupBy { it.babyId }
     val diapersBy = diapers.groupBy { it.babyId }
     val ongoingBy = ongoingSleeps.groupBy { it.babyId }
+    val medicinesBy = medicines.groupBy { it.babyId }
+    // Doses are filtered per medicine by `medicinesNeedingAttention`, but they
+    // are grouped by baby first so one baby's dose can never be counted against
+    // another's medicine — the uids make that impossible in practice, and this
+    // makes it impossible by construction.
+    val dosesBy = medicineDoses.groupBy { it.babyId }
 
     return babies.map { baby ->
         val babyFeeds = feedsBy[baby.id].orEmpty()
@@ -84,6 +105,12 @@ fun summariseHousehold(
             diapersToday = babyDiapers.count { it.time >= dayStart },
             nextSide = nextBreast(babyFeeds, now),
             ongoingSleep = ongoingSleep,
+            medicines = medicinesNeedingAttention(
+                medicines = medicinesBy[baby.id].orEmpty(),
+                doses = dosesBy[baby.id].orEmpty(),
+                now = now,
+                dismissed = dismissedMedicines,
+            ),
         )
     }
 }

@@ -38,5 +38,7 @@ ADR log and are cross-linked from here.
 | [0012](0012-a-record-for-the-doctor.md) | A record for the doctor: the figures, and no interpretation | Product / Domain | Accepted |
 | [0013](0013-protecting-the-file-that-leaves.md) | Protecting the file that leaves, and refusing the encryption that doesn't | Product / Domain | Accepted |
 | [0014](0014-what-a-sleep-records-beyond-its-hours.md) | What a sleep records beyond its hours, and why it isn't graded | Product / Domain | Accepted |
+| [0015](0015-medicine-given-when-needed-and-the-wait-between-doses.md) | Medicine given when it is needed, and the wait between doses | Product / Domain | Accepted |
+| [0016](0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md) | A running wait on the dashboard, and a dose from the notification | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

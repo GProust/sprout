@@ -258,6 +258,91 @@ data class TreatmentEntity(
 ) : Syncable
 
 /**
+ * A medicine given **when it is needed** rather than on a calendar — the
+ * paracetamol case (BDR-15). The course-shaped counterpart is [TreatmentEntity].
+ *
+ * Everything here is the parent's own number, typed from a prescriber or a
+ * leaflet. Sprout ships no drug list, no default dose and no interval for any
+ * named substance: it counts the hours between the doses in
+ * [MedicineDoseEntity] and restates these figures back, and it supplies no
+ * medical knowledge of its own.
+ */
+@Entity(
+    tableName = "medicine",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
+data class MedicineEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** Which baby this medicine is for; stamped by the repository on insert. */
+    val babyId: Long = 0L,
+    val name: String,
+    /** Optional dose description, e.g. "2.5 ml" or "half a sachet". */
+    val dose: String? = null,
+    /**
+     * The shortest gap the parent was told to keep, in minutes. Before it has
+     * elapsed the medicine reads red.
+     */
+    val minIntervalMinutes: Int,
+    /**
+     * The gap the prescriber actually wants kept, in minutes; null when only a
+     * minimum was given. Between the two the medicine reads amber — allowed,
+     * sooner than ideal — and a null here means there is no amber band at all.
+     */
+    val comfortIntervalMinutes: Int? = null,
+    /**
+     * Most doses allowed in twenty-four hours; null when the parent set none.
+     * A limit an interval cannot express: the wait can elapse while the day's
+     * allowance is spent.
+     */
+    val maxPerDay: Int? = null,
+    /** Opt-in, off until asked for, like every other notification here. */
+    val remindWhenDue: Boolean = false,
+    /**
+     * Which wait the reminder fires at: the comfortable interval when true, the
+     * minimum when false. Ignored when [comfortIntervalMinutes] is null, since
+     * there is then only one boundary to fire at.
+     */
+    val remindAtComfort: Boolean = false,
+    /** False once the parent stops using it; kept out of the active list. */
+    val active: Boolean = true,
+    val notes: String? = null,
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
+
+/**
+ * One dose of a [MedicineEntity], actually given. These are the record; the
+ * traffic light is derived from them every time it is asked for, so that a
+ * correction or a deletion moves it (BDR-15).
+ *
+ * It points at its medicine by **uid**, not by the local `id`: `id` is a
+ * per-device counter and would name a different row on the other phone. Storing
+ * the uid rather than resolving one at merge time also means a dose cannot be
+ * attached to the wrong medicine by an exchange that arrived out of order.
+ */
+@Entity(
+    tableName = "medicine_dose",
+    indices = [
+        Index("babyId"),
+        Index("medicineUid"),
+        Index(value = ["uid"], unique = true),
+    ],
+)
+data class MedicineDoseEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val babyId: Long = 0L,
+    /** The [MedicineEntity.uid] this dose was of. */
+    val medicineUid: String,
+    /** When it was given (epoch millis) — the wait is counted from here. */
+    val time: Long,
+    val notes: String? = null,
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
+
+/**
  * One pumping session: when it happened, how much milk came out and where that
  * milk went (fridge, freezer, room temperature — or straight to the baby).
  *

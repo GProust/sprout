@@ -108,7 +108,7 @@ struct RootView: View {
             }
         }
         .task {
-            let model = model ?? HomeViewModel(repository: sprout.repository)
+            let model = model ?? HomeViewModel(repository: sprout.repository, settings: sprout.settingsStore)
             self.model = model
             await model.observeEverything()
         }
@@ -192,6 +192,7 @@ struct RootView: View {
         case .growth: GrowthScreen()
         case .pumping: PumpingScreen()
         case .treatments: TreatmentsScreen()
+        case .medicines: MedicinesScreen()
         case .wellbeing: HealthScreen()
         case .checkIn: DailyCheckInScreen()
         case .report(let babyId): ReportScreen(babyId: babyId)

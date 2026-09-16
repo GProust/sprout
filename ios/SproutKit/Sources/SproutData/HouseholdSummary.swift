@@ -16,8 +16,37 @@ public struct BabySummary: Equatable, Identifiable, Sendable {
     /// Which breast to offer next, when that can be answered.
     public let nextSide: BreastSide?
     public let ongoingSleep: Sleep?
+    /// The as-needed medicines with something to say right now — a wait
+    /// running, or one just finished (BDR-16). Empty for a household that is
+    /// not in the middle of anything, which is what keeps the card off the
+    /// dashboard rather than showing an empty one.
+    public let medicines: [MedicineWatch]
 
     public var id: Int64 { baby.id ?? 0 }
+
+    public init(
+        baby: Baby,
+        lastFeed: Int64? = nil,
+        lastSleep: Int64? = nil,
+        lastDiaper: Int64? = nil,
+        feedsToday: Int = 0,
+        sleepTodayMs: Int64 = 0,
+        diapersToday: Int = 0,
+        nextSide: BreastSide? = nil,
+        ongoingSleep: Sleep? = nil,
+        medicines: [MedicineWatch] = []
+    ) {
+        self.baby = baby
+        self.lastFeed = lastFeed
+        self.lastSleep = lastSleep
+        self.lastDiaper = lastDiaper
+        self.feedsToday = feedsToday
+        self.sleepTodayMs = sleepTodayMs
+        self.diapersToday = diapersToday
+        self.nextSide = nextSide
+        self.ongoingSleep = ongoingSleep
+        self.medicines = medicines
+    }
 }
 
 /// How far back the app still cares which breast the last breastfeed began on.
@@ -30,6 +59,10 @@ public func summariseHousehold(
     sleeps: [Sleep],
     diapers: [Diaper],
     ongoingSleeps: [Sleep],
+    medicines: [Medicine] = [],
+    medicineDoses: [MedicineDose] = [],
+    /// What *Dismiss* put away: medicine uid to the dose it was dismissed against.
+    dismissedMedicines: [String: Int64] = [:],
     dayStart: Int64,
     now: Int64
 ) -> [BabySummary] {
@@ -37,6 +70,12 @@ public func summariseHousehold(
     let sleepsBy = Dictionary(grouping: sleeps, by: \.babyId)
     let diapersBy = Dictionary(grouping: diapers, by: \.babyId)
     let ongoingBy = Dictionary(grouping: ongoingSleeps, by: \.babyId)
+    let medicinesBy = Dictionary(grouping: medicines, by: \.babyId)
+    // Doses are filtered per medicine by `medicinesNeedingAttention`, but they
+    // are grouped by baby first so one baby's dose can never be counted against
+    // another's medicine — the uids make that impossible in practice, and this
+    // makes it impossible by construction.
+    let dosesBy = Dictionary(grouping: medicineDoses, by: \.babyId)
 
     return babies.map { baby in
         let id = baby.id ?? 0
@@ -55,7 +94,13 @@ public func summariseHousehold(
             sleepTodayMs: sleepMillis(in: babySleeps, since: dayStart, now: now),
             diapersToday: babyDiapers.filter { $0.time >= dayStart }.count,
             nextSide: nextBreast(feeds: babyFeeds, now: now),
-            ongoingSleep: (ongoingBy[id] ?? []).max { $0.startTime < $1.startTime }
+            ongoingSleep: (ongoingBy[id] ?? []).max { $0.startTime < $1.startTime },
+            medicines: medicinesNeedingAttention(
+                medicines: medicinesBy[id] ?? [],
+                doses: dosesBy[id] ?? [],
+                now: now,
+                dismissed: dismissedMedicines
+            )
         )
     }
 }

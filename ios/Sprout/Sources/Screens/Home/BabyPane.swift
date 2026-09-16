@@ -15,6 +15,8 @@ struct BabyPane<Header: View>: View {
     let now: Int64
     let onFeed: (BreastSide) -> Void
     let onOpen: (LogDestination) -> Void
+    let onGiveMedicine: (MedicineWatch) -> Void
+    let onDismissMedicine: (MedicineWatch) -> Void
     var onShareRecord: (() -> Void)?
     @ViewBuilder var header: () -> Header
 
@@ -24,6 +26,19 @@ struct BabyPane<Header: View>: View {
 
             SinceChips(summary: summary, now: now)
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
+
+            // Under the feed buttons, and above the log grid the medicine would
+            // otherwise be three taps down in. Feeding is what this screen is
+            // opened for; a wait that is running is what it is opened for a few
+            // days a year, and it draws nothing at all the rest of the time
+            // (BDR-16).
+            MedicineWatchCard(
+                watches: summary.medicines,
+                now: now,
+                onGive: onGiveMedicine,
+                onDismiss: onDismissMedicine,
+                onOpen: { onOpen(.medicines) }
+            )
 
             SectionLabel(Str.t("home_log"))
             LogGrid(tracksWellbeing: tracksWellbeing, onOpen: onOpen)
@@ -68,6 +83,9 @@ struct BabyCardView: View {
     let now: Int64
     let onOpen: () -> Void
     let onFeed: (BreastSide) -> Void
+    let onGiveMedicine: (MedicineWatch) -> Void
+    let onDismissMedicine: (MedicineWatch) -> Void
+    let onOpenMedicines: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.snug) {
@@ -90,6 +108,13 @@ struct BabyCardView: View {
 
             SinceChips(summary: summary, now: now)
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
+            MedicineWatchCard(
+                watches: summary.medicines,
+                now: now,
+                onGive: onGiveMedicine,
+                onDismiss: onDismissMedicine,
+                onOpen: onOpenMedicines
+            )
         }
         .padding(Spacing.regular)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -172,7 +197,7 @@ struct QuickFeed: View {
 /// export is reached from one baby's page, and a menu left on another name must
 /// not be able to send the wrong child's record.
 enum LogDestination: Hashable {
-    case feeding, pumping, sleep, diaper, growth, treatments, wellbeing
+    case feeding, pumping, sleep, diaper, growth, treatments, medicines, wellbeing
     case stats, checkIn
     case report(Int64)
     /// Not logs — the two the dashboard's toolbar opens, and the sync screen
@@ -193,6 +218,7 @@ enum LogDestination: Hashable {
         case .diaper: return "diaper"
         case .growth: return "growth"
         case .treatments: return "treatments"
+        case .medicines: return "medicines"
         case .wellbeing: return "wellbeing"
         case .stats: return "stats"
         case .checkIn: return "checkIn"
@@ -204,7 +230,7 @@ enum LogDestination: Hashable {
     }
 }
 
-/// The five baby logs plus the parent's two, as equals.
+/// The six baby logs plus the parent's two, as equals.
 ///
 /// All of them sit here rather than in the tab bar (BDR-0010): a Material
 /// navigation bar holds five, Home takes one of those seats, and the arithmetic
@@ -233,6 +259,7 @@ struct LogGrid: View {
             Tile(label: Str.t("nav_diaper"), symbol: "figure.child", destination: .diaper),
             Tile(label: Str.t("nav_growth"), symbol: "ruler", destination: .growth),
             Tile(label: Str.t("screen_treatments"), symbol: "pills.fill", destination: .treatments),
+            Tile(label: Str.t("screen_medicines"), symbol: "cross.vial.fill", destination: .medicines),
         ]
         // Dropped for a parent who has turned their own tracking off; the
         // history stays, untouched.

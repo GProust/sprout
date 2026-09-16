@@ -21,6 +21,8 @@ struct BabyScreen: View {
                         now: model.now,
                         onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                         onOpen: onOpen,
+                        onGiveMedicine: { model.giveDose(of: $0) },
+                        onDismissMedicine: { model.dismiss($0) },
                         onShareRecord: { if let id = summary.baby.id { onOpen(.report(id)) } },
                         header: {
                             Text(SproutFormat.age(birthDate: summary.baby.birthDate, now: model.now).text)

@@ -233,6 +233,26 @@ class SpecConformanceTest {
         assertEquals(1_757_400_000_000L, segments.first().startTime)
         assertEquals(listOf(540, 1260), payload.treatments.first().row.timesOfDay)
 
+        // As-needed medicine (BDR-15). The dose names its medicine by that
+        // medicine's uid — the one field in the document that points at another
+        // row rather than at a baby, and the one a hand-written port could
+        // quietly read as a local id.
+        val paracetamol = payload.medicines.first { it.row.name == "Paracetamol" }.row
+        assertEquals(360, paracetamol.minIntervalMinutes)
+        assertEquals(480, paracetamol.comfortIntervalMinutes)
+        assertEquals(4, paracetamol.maxPerDay)
+        assertTrue(paracetamol.remindWhenDue)
+
+        // A medicine with only a minimum gap: the other two are absent keys, not
+        // zeroes, and a zero here would be a daily maximum of none allowed.
+        val ibuprofen = payload.medicines.first { it.row.name == "Ibuprofen" }.row
+        assertNull(ibuprofen.comfortIntervalMinutes)
+        assertNull(ibuprofen.maxPerDay)
+
+        val dose = payload.medicineDoses.single().row
+        assertEquals(paracetamol.uid, dose.medicineUid)
+        assertEquals(1_757_402_800_000L, dose.time)
+
         // A measure nobody took is an absent key, not a zero.
         assertNull(payload.growth.first().row.heightMm)
         assertNull(payload.babies.first().feedingReminderEnabled)
@@ -255,7 +275,10 @@ class SpecConformanceTest {
             val thrown = try {
                 SyncPayloadCodec.decode(
                     case.getString("json").toByteArray(Charsets.UTF_8),
-                    currentSchemaVersion = 16,
+                    // From the vector, not a literal: a schema bump would
+                    // otherwise turn every one of these into a `tooNew` that
+                    // passes for the wrong reason.
+                    currentSchemaVersion = vector("replica.json").getInt("schemaVersion"),
                 )
                 null
             } catch (e: SyncPayloadException) {

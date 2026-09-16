@@ -99,6 +99,12 @@ class DatabaseMigrationTest {
         // Added by v12 -> v13; querying it at all proves that migration ran as
         // part of the chain rather than the upgrade stopping short.
         assertEquals("pumping rows", 0, database.countOf("pumping"))
+
+        // Same again for the two tables v16 -> v17 adds (BDR-15). An upgrade
+        // that stopped before them would leave the as-needed medicine screen
+        // querying tables that are not there.
+        assertEquals("medicine rows", 0, database.countOf("medicine"))
+        assertEquals("medicine_dose rows", 0, database.countOf("medicine_dose"))
     }
 
     @Test
@@ -203,7 +209,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(16, database.openHelper.writableDatabase.version)
+        assertEquals(17, database.openHelper.writableDatabase.version)
     }
 
     /**

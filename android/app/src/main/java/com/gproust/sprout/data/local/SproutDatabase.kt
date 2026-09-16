@@ -17,12 +17,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DiaperEntity::class,
         GrowthEntity::class,
         TreatmentEntity::class,
+        MedicineEntity::class,
+        MedicineDoseEntity::class,
         PumpingEntity::class,
         WellbeingEntity::class,
         ParentProfileEntity::class,
         TombstoneEntity::class,
     ],
-    version = 16,
+    version = 17,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -36,6 +38,8 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun diaperDao(): DiaperDao
     abstract fun growthDao(): GrowthDao
     abstract fun treatmentDao(): TreatmentDao
+    abstract fun medicineDao(): MedicineDao
+    abstract fun medicineDoseDao(): MedicineDoseDao
     abstract fun pumpingDao(): PumpingDao
     abstract fun wellbeingDao(): WellbeingDao
     abstract fun parentProfileDao(): ParentProfileDao
@@ -253,9 +257,68 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * v16 -> v17: the two tables behind as-needed medicine (BDR-15) — the
+         * paracetamol case, which the calendar-shaped `treatment` table has no
+         * room for.
+         *
+         * Both are created with the sync columns already on them rather than
+         * added by a later `ALTER`: they are new, so there is no row to backfill
+         * and no reason to arrive at the shape [MIGRATION_13_14] had to reach in
+         * two steps. `uid` carries the same unique index every other synced
+         * table has.
+         *
+         * `medicine_dose.medicineUid` is a uid and not a foreign key to
+         * `medicine.id` on purpose. A local id means a different row on the
+         * other phone, and resolving one at merge time would let a dose attach
+         * to the wrong medicine when an exchange arrives out of order. It is
+         * also deliberately not declared as a SQL foreign key: a dose can arrive
+         * from a merge before the medicine it names does, and the constraint
+         * would reject the row rather than let the next exchange complete it.
+         */
+        private val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `medicine` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`babyId` INTEGER NOT NULL, `name` TEXT NOT NULL, `dose` TEXT, " +
+                        "`minIntervalMinutes` INTEGER NOT NULL, " +
+                        "`comfortIntervalMinutes` INTEGER, `maxPerDay` INTEGER, " +
+                        "`remindWhenDue` INTEGER NOT NULL, `remindAtComfort` INTEGER NOT NULL, " +
+                        "`active` INTEGER NOT NULL, `notes` TEXT, " +
+                        "`uid` TEXT NOT NULL DEFAULT '', " +
+                        "`updatedAt` INTEGER NOT NULL DEFAULT 0, `deletedAt` INTEGER)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_medicine_babyId` ON `medicine` (`babyId`)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_medicine_uid` ON `medicine` (`uid`)")
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `medicine_dose` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`babyId` INTEGER NOT NULL, `medicineUid` TEXT NOT NULL, " +
+                        "`time` INTEGER NOT NULL, `notes` TEXT, " +
+                        "`uid` TEXT NOT NULL DEFAULT '', " +
+                        "`updatedAt` INTEGER NOT NULL DEFAULT 0, `deletedAt` INTEGER)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_medicine_dose_babyId` ON `medicine_dose` (`babyId`)")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_medicine_dose_medicineUid` " +
+                        "ON `medicine_dose` (`medicineUid`)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_medicine_dose_uid` " +
+                        "ON `medicine_dose` (`uid`)",
+                )
+            }
+        }
+
+        /**
          * The tables partner sync merges, and so the ones that gain the sync
          * columns in [MIGRATION_13_14]. `wellbeing` and `parent_profile` are
          * absent on purpose — they never leave the device (ADR-0007).
+         *
+         * `medicine` and `medicine_dose` are absent for a different reason: they
+         * arrived at v17 with those columns already on them, so there was
+         * nothing for that migration to add.
          */
         private val SYNCED_TABLES = listOf(
             "baby", "feeding", "sleep", "diaper", "growth", "treatment", "pumping",
@@ -366,6 +429,7 @@ abstract class SproutDatabase : RoomDatabase() {
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
             MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
+            MIGRATION_16_17,
         )
 
         fun getInstance(context: Context): SproutDatabase =

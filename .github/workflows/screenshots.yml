@@ -140,6 +140,13 @@ jobs:
           # afterwards and wipes the captured screenshots) so the app stays
           # installed and `run-as` can read its internal files.
           #
+          # `am instrument` exits 0 whether the test passed or threw, so its
+          # output is grepped instead. Without that check a screen that crashes
+          # on open — a ViewModel the factory does not know, say — leaves the job
+          # green, every capture after the throw missing, and the committed set
+          # quietly stale. That is not hypothetical: it is how the medicines
+          # capture was added, found broken, and nearly left that way.
+          #
           # The first line is `||` and not `&&`, and it waits twice. `adb root`
           # restarts adbd, which drops the very connection it answered on — so it
           # exits non-zero, `&&` skipped the wait that was meant to cover exactly
@@ -157,7 +164,8 @@ jobs:
             echo "Emulator clock now: $(adb shell date -u)"
             adb install -r -t android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r -t android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-            adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner
+            adb shell am instrument -w -e class com.gproust.sprout.ScreenshotTest com.gproust.sprout.test/androidx.test.runner.AndroidJUnitRunner 2>&1 | tee /tmp/instrument.log
+            grep -q 'FAILURES!!!' /tmp/instrument.log && { echo "::error::The screenshot run threw. Every capture after the throw is missing, and promoting a partial set would quietly leave them stale."; sed -n '/FAILURES!!!/,$p' /tmp/instrument.log; exit 1; } || true
             mkdir -p "$STAGEDIR"
             for f in $(adb exec-out run-as com.gproust.sprout ls files/screenshots 2>/dev/null); do n=$(echo "$f" | tr -d '\r'); adb exec-out run-as com.gproust.sprout cat "files/screenshots/$n" > "$STAGEDIR/$n"; done
             ls -1 "$STAGEDIR" || true

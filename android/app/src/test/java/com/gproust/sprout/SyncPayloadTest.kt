@@ -5,6 +5,8 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
 import com.gproust.sprout.data.local.PumpingEntity
@@ -157,6 +159,49 @@ class SyncPayloadTest {
                 ),
             ),
         ),
+        medicines = listOf(
+            // Everything an as-needed medicine can carry (BDR-15).
+            BabyScoped(
+                babyUid,
+                MedicineEntity(
+                    name = "Paracétamol",
+                    dose = "2,5 ml",
+                    minIntervalMinutes = 360,
+                    comfortIntervalMinutes = 480,
+                    maxPerDay = 4,
+                    remindWhenDue = true,
+                    remindAtComfort = true,
+                    notes = "sirop",
+                    uid = "med-1",
+                    updatedAt = 41,
+                ),
+            ),
+            // And one with only a minimum gap: no in-between band, no daily
+            // maximum — a real configuration, not an incomplete one, and the
+            // case where a zero would read as "none allowed".
+            BabyScoped(
+                babyUid,
+                MedicineEntity(
+                    name = "Ibuprofène",
+                    minIntervalMinutes = 360,
+                    uid = "med-2",
+                    updatedAt = 42,
+                ),
+            ),
+        ),
+        medicineDoses = listOf(
+            BabyScoped(
+                babyUid,
+                MedicineDoseEntity(
+                    // The medicine's uid, never its local id.
+                    medicineUid = "med-1",
+                    time = 1_700_002_500_000,
+                    notes = "après 38,4",
+                    uid = "dose-1",
+                    updatedAt = 43,
+                ),
+            ),
+        ),
         pumpings = listOf(
             PumpingEntity(
                 time = 1_700_003_000_000,
@@ -184,6 +229,8 @@ class SyncPayloadTest {
         assertEquals(original.sleeps, decoded.sleeps)
         assertEquals(original.diapers, decoded.diapers)
         assertEquals(original.treatments, decoded.treatments)
+        assertEquals(original.medicines, decoded.medicines)
+        assertEquals(original.medicineDoses, decoded.medicineDoses)
         assertEquals(original.pumpings, decoded.pumpings)
         assertEquals(original.tombstones, decoded.tombstones)
     }
@@ -204,6 +251,10 @@ class SyncPayloadTest {
         assertNull("nothing was said about how they were lying", nap.position)
         assertNull("nor about where", nap.place)
         assertNull(nap.placeNote)
+        val ibuprofen = decoded.medicines.single { it.row.uid == "med-2" }.row
+        assertNull("only a minimum gap was given", ibuprofen.comfortIntervalMinutes)
+        assertNull("and no daily maximum — which is not a maximum of zero", ibuprofen.maxPerDay)
+        assertNull(ibuprofen.dose)
     }
 
     @Test

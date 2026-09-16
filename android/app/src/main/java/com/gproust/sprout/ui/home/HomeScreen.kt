@@ -51,9 +51,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
+import com.gproust.sprout.data.MEDICINE_DAY_MS
+import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.local.DiaperEntity
+import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
+import com.gproust.sprout.notifications.MedicineReminders
 import com.gproust.sprout.ui.common.ageInDays
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.currentGrowthSpurt
@@ -69,12 +76,16 @@ import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /** How often the dashboard's "how long ago" chips are refreshed. */
 private const val CHIP_REFRESH_MS = 60_000L
+
+/** How often the summary itself is recomputed. See [HomeViewModel.minuteTick]. */
+private const val SUMMARY_TICK_MS = 60_000L
 
 data class HomeUiState(
     val parentName: String? = null,
@@ -91,6 +102,21 @@ data class HomeUiState(
 
 /** The growth spurt note to show for a baby, when one is relevant. */
 data class GrowthSpurtUi(val ageLabel: String, val startsSoon: Boolean)
+
+/** One emission of every household-wide read the dashboard folds together. */
+private data class HouseholdRows(
+    val feedings: List<FeedingEntity>,
+    val sleeps: List<SleepEntity>,
+    val diapers: List<DiaperEntity>,
+    val medicine: MedicineRows,
+)
+
+/** The as-needed medicines, their doses, and what has been put away (BDR-16). */
+private data class MedicineRows(
+    val medicines: List<MedicineEntity>,
+    val doses: List<MedicineDoseEntity>,
+    val dismissed: Map<String, Long>,
+)
 
 class HomeViewModel(
     private val repository: SproutRepository,
@@ -125,27 +151,102 @@ class HomeViewModel(
         repository.updateSleep(sleep.copy(endTime = System.currentTimeMillis()))
     }
 
+    /**
+     * Logs a dose of [medicine] as given now, straight from the dashboard, and
+     * moves its reminder on.
+     *
+     * The same write the as-needed screen makes, offered a screen earlier: the
+     * dashboard is where a parent already is when the wait runs out, and a dose
+     * given but not logged is the failure the feature exists to prevent
+     * (BDR-15, BDR-16).
+     */
+    fun giveDose(watch: MedicineWatch) = viewModelScope.launch {
+        val medicine = watch.medicine
+        repository.giveMedicineDose(medicine, System.currentTimeMillis())
+        // Re-read rather than reuse the dashboard's list: the flow that feeds
+        // this screen and the write above are not ordered against each other,
+        // so arming from it could set the alarm from the previous dose.
+        MedicineReminders.schedule(
+            context,
+            medicine,
+            repository.recentDosesOf(medicine.uid, MEDICINE_DAY_MS),
+        )
+    }
+
+    /**
+     * Puts a medicine away until it is next given (BDR-16).
+     *
+     * The dose it was dismissed against is what is stored, so this expires on
+     * its own: the line comes back the moment there is a newer dose to count
+     * from. Nothing is written to the baby's record — a dismissal is about a
+     * parent having read a screen, and the other phone's parent has not.
+     */
+    fun dismiss(watch: MedicineWatch) {
+        val lastDoseAt = watch.readiness.lastDoseAt ?: return
+        MedicineDismissals.dismiss(context, watch.medicine.uid, lastDoseAt)
+    }
+
+    /**
+     * The three medicine reads, folded first.
+     *
+     * Five flows is what one [combine] takes, and the dashboard now wants six —
+     * so the medicines go together, which is the grouping that would have been
+     * chosen anyway: a dose belongs to a medicine, and a dismissal names one.
+     */
+    private val medicineRows = combine(
+        repository.householdMedicines,
+        repository.householdMedicineDoses(windowStart),
+        MedicineDismissals.dismissals(context),
+    ) { medicines, doses, dismissed -> MedicineRows(medicines, doses, dismissed) }
+
+    /**
+     * The household's recent rows, as one value.
+     *
+     * Grouped rather than combined at the top for more than the arity: the
+     * summary is a function of all of them together, and emitting it from a
+     * partial mixture would draw a baby's feeds beside another minute's doses.
+     */
     private val householdRows = combine(
         repository.householdFeedings(windowStart),
         repository.householdSleeps(windowStart),
         repository.householdDiapers(windowStart),
-    ) { feedings, sleeps, diapers -> Triple(feedings, sleeps, diapers) }
+        medicineRows,
+    ) { feedings, sleeps, diapers, medicine ->
+        HouseholdRows(feedings, sleeps, diapers, medicine)
+    }
+
+    /**
+     * A minute hand for the summary itself.
+     *
+     * Most of this screen is a time *stamp* that the composable formats against
+     * its own clock, so nothing here had to tick. A medicine's state is not:
+     * it is arithmetic against now, and a wait that runs out while the app is
+     * open has to turn green with nothing written and nobody touching anything
+     * (BDR-16). The fold is over a week of rows at most, once a minute.
+     */
+    private val minuteTick = flow {
+        while (true) {
+            emit(System.currentTimeMillis())
+            delay(SUMMARY_TICK_MS)
+        }
+    }
 
     val uiState = combine(
         repository.parentProfile,
         repository.babies,
         householdRows,
         repository.ongoingSleeps,
-    ) { parent, babies, rows, ongoing ->
-        val now = System.currentTimeMillis()
-        val (feedings, sleeps, diapers) = rows
-
+        minuteTick,
+    ) { parent, babies, rows, ongoing, now ->
         val summaries = summariseHousehold(
             babies = babies,
-            feedings = feedings,
-            sleeps = sleeps,
-            diapers = diapers,
+            feedings = rows.feedings,
+            sleeps = rows.sleeps,
+            diapers = rows.diapers,
             ongoingSleeps = ongoing,
+            medicines = rows.medicine.medicines,
+            medicineDoses = rows.medicine.doses,
+            dismissedMedicines = rows.medicine.dismissed,
             dayStart = startOfDay(now),
             now = now,
         )
@@ -270,6 +371,8 @@ fun HomeScreen(
                     now = now,
                     onFeed = { side -> withBaby(single.baby.id) { onQuickFeed(side) } },
                     onNavigate = onNavigate,
+                    onGiveMedicine = vm::giveDose,
+                    onDismissMedicine = vm::dismiss,
                     onShareRecord = { onShareRecord(single.baby.id) },
                     header = {
                         Text(
@@ -296,6 +399,14 @@ fun HomeScreen(
                         now = now,
                         onOpen = { withBaby(summary.baby.id) { onNavigate(Routes.BABY) } },
                         onFeed = { side -> withBaby(summary.baby.id) { onQuickFeed(side) } },
+                        onGiveMedicine = vm::giveDose,
+                        onDismissMedicine = vm::dismiss,
+                        // Selects the baby on the way, so the screen that opens
+                        // is this card's child rather than whichever was last
+                        // active — the dose the card offers already knows.
+                        onOpenMedicines = {
+                            withBaby(summary.baby.id) { onNavigate(Routes.MEDICINES) }
+                        },
                     )
                     state.spurts[summary.baby.id]?.let {
                         Spacer(Modifier.height(8.dp))
