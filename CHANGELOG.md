@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.11.0] — 2026-09-16
 
 - 📱 **Automatic sharing can now reach an iPhone.** Sprout's second app is being
   built, and two phones only find each other if they are looking for the same
