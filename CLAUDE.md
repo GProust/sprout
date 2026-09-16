@@ -40,6 +40,16 @@ than anywhere else — see [`spec/README.md`](spec/README.md).
   record before reopening a settled question; if a decision genuinely changes,
   add a new record instead of editing the old one (they are immutable once
   merged).
+- **One decision, both apps.** One numbered sequence, not one per platform — the
+  records describe the product, and the same capability is meant to exist on both
+  sides. Never write a second record because the other app now needs the same
+  thing; a platform-scoped record is only for a mechanism the platform *forces*
+  (ADR-0017, ADR-0018, ADR-0019 are the only ones), it names the shared record it
+  applies, and it changes nothing that record decided. No BDR is ever
+  platform-scoped. The rule is
+  [ADR-0015](docs/adr/0015-native-ios-in-this-repository.md)'s and the
+  [index](docs/adr/README.md#one-decision-both-apps) carries a `Scope` column so
+  it stays visible.
 - There is **no local Android toolchain** — CI is the build verifier
   ([ADR-0006](docs/adr/0006-ci-as-build-verifier-and-screenshots.md)). Schema and
   migration correctness is only ever proven there, so treat migrations with

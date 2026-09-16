@@ -19,6 +19,17 @@ ADR log and are cross-linked from here.
 - One decision per file, `NNNN-short-title.md`, referred to as **BDR-NNNN**.
 - BDRs are immutable; supersede with a new record rather than rewriting.
 - Statuses: `Proposed`, `Accepted`, `Deprecated`, `Superseded by BDR-XXXX`.
+- **Never per platform.** A BDR says what Sprout does and what it refuses to do,
+  which is the same answer on an Android phone and on an iPhone — every record
+  below applies to both apps, and none has a platform in its scope. Where a
+  platform genuinely forces a different *mechanism* the record for it is an ADR
+  ([ADR-0017](../adr/0017-grdb-for-the-ios-database.md),
+  [ADR-0018](../adr/0018-where-ios-keeps-what-must-not-travel.md),
+  [ADR-0019](../adr/0019-a-reminder-decided-when-it-is-scheduled.md) are the
+  only three), and it changes nothing a BDR decided. The rule and its reasoning
+  are in the [ADR log's conventions](../adr/README.md#one-decision-both-apps).
+- A capability one app has first is **not** a second decision. It is the same
+  one, not yet built twice.
 
 ## Index
 
