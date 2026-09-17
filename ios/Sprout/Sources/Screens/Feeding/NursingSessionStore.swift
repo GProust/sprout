@@ -2,19 +2,6 @@ import Foundation
 import Observation
 import SproutData
 
-/// One uninterrupted breastfeeding session in progress.
-public struct NursingSession: Equatable, Sendable {
-    public var sessionStart: Int64
-    public var currentSide: BreastSide
-    public var segmentStart: Int64
-    public var segments: [NursingSegment] = []
-
-    /// Every stretch including the one still running at `now`.
-    func allSegments(endingAt now: Int64) -> [NursingSegment] {
-        segments + [NursingSegment(side: currentSide, startTime: segmentStart, endTime: now)]
-    }
-}
-
 /// The one live breastfeeding session, from `ui/feeding/NursingSessionStore.kt`.
 ///
 /// Held in `UserDefaults` so it survives the app being killed and can be read by
@@ -67,13 +54,21 @@ final class NursingSessionStore {
     /// Bank the current breast as a completed stretch and switch to the other.
     func switchBreast(at now: Int64) {
         guard let current = session else { return }
-        var next = current
-        next.segments.append(
-            NursingSegment(side: current.currentSide, startTime: current.segmentStart, endTime: now)
-        )
-        next.currentSide = current.currentSide == .LEFT ? .RIGHT : .LEFT
-        next.segmentStart = now
-        write(next)
+        write(current.switched(at: now))
+    }
+
+    /// Bank the breast being nursed and start a break — the burp between the
+    /// sides, the nappy halfway through. The session stays open and keeps its
+    /// start time; only the clock at the breast stops (BDR-17).
+    func pause(at now: Int64) {
+        guard let current = session else { return }
+        write(current.paused(at: now))
+    }
+
+    /// Come back from a break, on whichever breast the feed carries on with.
+    func resume(on side: BreastSide, at now: Int64) {
+        guard let current = session else { return }
+        write(current.resumed(on: side, at: now))
     }
 
     /// Takes the session and clears it, in one step.
@@ -103,6 +98,10 @@ final class NursingSessionStore {
                 // The same encoding Room's converter uses, so the widget and a
                 // future App Group read the bytes the app wrote.
                 "segments": NursingSegmentCoding.encode(value.segments),
+                // Zero is "not on a break", the way an absent key reads: a
+                // session stored before breaks existed was nursing, and comes
+                // back as one that is.
+                "pausedAt": value.pausedAt ?? 0,
             ],
             forKey: key
         )
@@ -118,11 +117,13 @@ final class NursingSessionStore {
         else { return nil }
 
         let segmentStart = (stored["segmentStart"] as? NSNumber)?.int64Value ?? start
+        let pausedAt = (stored["pausedAt"] as? NSNumber)?.int64Value ?? 0
         return NursingSession(
             sessionStart: start,
             currentSide: side,
             segmentStart: segmentStart,
-            segments: NursingSegmentCoding.decode(stored["segments"] as? String)
+            segments: NursingSegmentCoding.decode(stored["segments"] as? String),
+            pausedAt: pausedAt > 0 ? pausedAt : nil
         )
     }
 }

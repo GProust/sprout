@@ -520,6 +520,17 @@ class ScreenshotTest {
         Thread.sleep(1500)
         rule.mainClock.advanceTimeBy(1000)
         save("05-feeding-4-two-left-one-right")
+        // A break in the middle of the feed (BDR-17): winding for a burp, with
+        // the clock at the breast stopped and the break running one of its own.
+        rule.onNodeWithText("Pause").performClick()
+        rule.mainClock.advanceTimeByFrame()
+        Thread.sleep(1500)
+        rule.mainClock.advanceTimeBy(1000)
+        save("05-feeding-7-paused")
+        // Back on the left, so the widget capture further down still finds a
+        // session that is actually nursing.
+        rule.onNodeWithText("Resume left").performClick()
+        rule.mainClock.advanceTimeByFrame()
         rule.mainClock.autoAdvance = true
 
         // Pumping: the milk stash on top of the session history. The log form

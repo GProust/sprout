@@ -463,11 +463,18 @@ private fun LiveRow(
             title = stringResource(
                 R.string.home_live_nursing,
                 stringResource(
-                    if (nursing.currentSide == BreastSide.RIGHT) R.string.side_right
-                    else R.string.side_left,
+                    when {
+                        // A feed on a break says so here too, or the dashboard
+                        // shows a side that nobody is actually feeding on.
+                        nursing.isPaused -> R.string.feeding_paused
+                        nursing.currentSide == BreastSide.RIGHT -> R.string.side_right
+                        else -> R.string.side_left
+                    },
                 ),
             ),
-            value = formatClock(tick - nursing.sessionStart),
+            // Time at the breast, not time since the feed began: the clock
+            // stops while the break runs, exactly as it does on the timer.
+            value = formatClock(nursing.nursedMs(tick)),
             actionLabel = stringResource(R.string.home_live_open),
             // The same path the quick feed button takes, which puts the feed
             // history under the timer; the session is already running, so
