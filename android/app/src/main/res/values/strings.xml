@@ -153,6 +153,15 @@
     <string name="feeding_switch_to_right">Switch to right</string>
     <string name="feeding_last_switch">Last switch at %1$s</string>
     <string name="feeding_stop_save">Stop &amp; save</string>
+    <!-- Breaks in the middle of a feed — a burp between the sides, a nappy -->
+    <string name="feeding_pause">Pause</string>
+    <string name="feeding_paused">Paused</string>
+    <!-- How long the break has been running, e.g. "Paused · 03:12" -->
+    <string name="feeding_paused_for">Paused · %1$s</string>
+    <string name="feeding_resume_left">Resume left</string>
+    <string name="feeding_resume_right">Resume right</string>
+    <!-- Time a finished feed spent on breaks, e.g. "Paused 5m" -->
+    <string name="feeding_paused_total">Paused %1$s</string>
     <!-- Side + duration, e.g. "Left 8m" -->
     <string name="feeding_side_time">%1$s %2$s</string>
     <!-- Total nursing time, e.g. "Total 13m" -->

@@ -130,6 +130,12 @@
     <string name="feeding_switch_to_right">Przełącz na prawą</string>
     <string name="feeding_last_switch">Ostatnia zmiana o %1$s</string>
     <string name="feeding_stop_save">Zatrzymaj &amp; zapisz</string>
+    <string name="feeding_pause">Pauza</string>
+    <string name="feeding_paused">Przerwa</string>
+    <string name="feeding_paused_for">Przerwa · %1$s</string>
+    <string name="feeding_resume_left">Wznów lewą</string>
+    <string name="feeding_resume_right">Wznów prawą</string>
+    <string name="feeding_paused_total">Przerwa %1$s</string>
     <string name="feeding_side_time">%1$s %2$s</string>
     <string name="feeding_total">Razem %1$s</string>
     <string name="feeding_segments">Ta sesja</string>

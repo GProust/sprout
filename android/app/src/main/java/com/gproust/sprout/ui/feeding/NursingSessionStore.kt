@@ -1,6 +1,7 @@
 package com.gproust.sprout.ui.feeding
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.Converters
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ object NursingSessionStore {
     private const val KEY_SIDE = "currentSide"
     private const val KEY_SEGMENT_START = "segmentStart"
     private const val KEY_SEGMENTS = "segments"
+    private const val KEY_PAUSED_AT = "pausedAt"
 
     private val state = MutableStateFlow<NursingSession?>(null)
     private var seeded = false
@@ -79,6 +81,18 @@ object NursingSessionStore {
         return state.value?.also { write(context, null) }
     }
 
+    /**
+     * Drops the in-memory copy so the next read comes back from storage — what
+     * the app coming up after being killed mid-feed does. Nothing in the app
+     * has any use for it; a test of what actually survives does.
+     */
+    @VisibleForTesting
+    @Synchronized
+    fun forgetInMemory() {
+        seeded = false
+        state.value = null
+    }
+
     /** Reads the stored session once, the first time anyone asks for it. */
     private fun seed(context: Context) {
         if (seeded) return
@@ -95,6 +109,7 @@ object NursingSessionStore {
                 .putString(KEY_SIDE, session.currentSide.name)
                 .putLong(KEY_SEGMENT_START, session.segmentStart)
                 .putString(KEY_SEGMENTS, Converters().nursingSegmentsToString(session.segments))
+                .putLong(KEY_PAUSED_AT, session.pausedAt ?: 0L)
                 .apply()
         }
         seeded = true
@@ -112,6 +127,9 @@ object NursingSessionStore {
             currentSide = side,
             segmentStart = p.getLong(KEY_SEGMENT_START, start),
             segments = Converters().stringToNursingSegments(p.getString(KEY_SEGMENTS, null)),
+            // Absent (0) is "not on a break": a session stored before breaks
+            // existed reads back as one that is nursing, which it was.
+            pausedAt = p.getLong(KEY_PAUSED_AT, 0L).takeIf { it > 0L },
         )
     }
 }

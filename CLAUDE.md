@@ -188,6 +188,26 @@ that a change can quietly break:
   sleep quietly dropped from it, and the position is reported without comment —
   no warning, no colour-coding, no ordering that grades it.
 
+## A breastfeed that stops for a burp
+
+The live timer has three states, not two: nursing, on a break, finished
+([BDR-17](docs/decisions/0017-a-breastfeed-can-stop-and-carry-on.md)). Three
+things a change can quietly undo:
+
+- **A break is not time at the breast, and every clock reads it that way.**
+  `NursingSession.nursedMs` / `NursingSession.nursedMs(at:)` is how the timer,
+  the bar, the dashboard card and the widget all ask — never `now -
+  segmentStart`, which on a break is the length of the burp. The saved feed ends
+  when its last stretch ended, not when *Save* was tapped.
+- **A break is stored as nothing at all.** It is the gap between two stretches,
+  which is why this feature has no column, no wire-format change and no
+  migration, and why a feed logged before it existed reads back as one with no
+  breaks. `breastfeedPausedMillis` is the gap, on both platforms; keep it
+  derived, and keep the manual form carrying the gaps it was given through an
+  edit rather than collapsing them.
+- **Nothing about a break is judged.** No maximum, no nudge, no automatic stop,
+  and pausing twice must not restart the break's clock.
+
 ## Medicine given when it is needed
 
 Separate from the calendar-shaped `treatment` table, and deliberately so: the
