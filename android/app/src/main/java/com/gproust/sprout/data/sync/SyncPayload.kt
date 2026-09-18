@@ -322,6 +322,9 @@ object SyncPayloadCodec {
         put("minIntervalMinutes", entity.minIntervalMinutes)
         putOrNull("comfortIntervalMinutes", entity.comfortIntervalMinutes)
         putOrNull("maxPerDay", entity.maxPerDay)
+        putOrNull("doseAmount", entity.doseAmount)
+        putOrNull("doseUnit", entity.doseUnit)
+        putOrNull("maxAmountPerDay", entity.maxAmountPerDay)
         put("remindWhenDue", entity.remindWhenDue)
         put("remindAtComfort", entity.remindAtComfort)
         put("active", entity.active)
@@ -334,6 +337,11 @@ object SyncPayloadCodec {
         minIntervalMinutes = o.getInt("minIntervalMinutes"),
         comfortIntervalMinutes = o.intOrNull("comfortIntervalMinutes"),
         maxPerDay = o.intOrNull("maxPerDay"),
+        // Absent on a replica written before amounts existed, which is a
+        // medicine that was never measured in anything (BDR-18).
+        doseAmount = o.doubleOrNull("doseAmount"),
+        doseUnit = o.stringOrNull("doseUnit"),
+        maxAmountPerDay = o.doubleOrNull("maxAmountPerDay"),
         // Defaulted rather than required: both switches arrived with this table,
         // but defaulting them costs nothing and is what keeps a field addable
         // later without a version bump.
@@ -352,12 +360,14 @@ object SyncPayloadCodec {
         // phone and would name a different medicine on the other one.
         put("medicineUid", entity.medicineUid)
         put("time", entity.time)
+        putOrNull("amount", entity.amount)
         putOrNull("notes", entity.notes)
     }
 
     private fun medicineDoseFromJson(o: JSONObject) = MedicineDoseEntity(
         medicineUid = o.getString("medicineUid"),
         time = o.getLong("time"),
+        amount = o.doubleOrNull("amount"),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),
@@ -415,6 +425,9 @@ object SyncPayloadCodec {
     private fun JSONObject.intOrNull(key: String): Int? = if (isNull(key)) null else getInt(key)
 
     private fun JSONObject.longOrNull(key: String): Long? = if (isNull(key)) null else getLong(key)
+
+    private fun JSONObject.doubleOrNull(key: String): Double? =
+        if (isNull(key)) null else getDouble(key)
 
     private fun JSONObject.booleanOrNull(key: String): Boolean? =
         if (isNull(key)) null else getBoolean(key)

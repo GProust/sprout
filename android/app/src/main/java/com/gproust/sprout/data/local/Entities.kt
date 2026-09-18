@@ -281,6 +281,11 @@ data class MedicineEntity(
     /**
      * The shortest gap the parent was told to keep, in minutes. Before it has
      * elapsed the medicine reads red.
+     *
+     * **Zero means there is no gap rule at all** — a teething gel is "six times
+     * a day", with nothing said about how far apart. Such a medicine is held
+     * only by [maxPerDay] and [maxAmountPerDay], and reads green until one of
+     * those is spent (BDR-18).
      */
     val minIntervalMinutes: Int,
     /**
@@ -295,6 +300,32 @@ data class MedicineEntity(
      * allowance is spent.
      */
     val maxPerDay: Int? = null,
+    /**
+     * How much one application uses, as a number — 1.5 for "1.5 cm of gel".
+     * Null when the parent never gave one, which is every medicine measured in
+     * whole doses rather than in a quantity.
+     *
+     * [dose] stays the sentence the card shows ("2.5 ml", "half a sachet");
+     * this is the same figure in a form that can be added up, and it is only
+     * ever what the parent typed.
+     */
+    val doseAmount: Double? = null,
+    /**
+     * The parent's own unit for [doseAmount] and [maxAmountPerDay] — "cm",
+     * "ml", "mg", "puffs". Free text and never a list Sprout ships: a list of
+     * units is one step from a list of medicines, which is the addition this
+     * feature must not grow (BDR-15).
+     */
+    val doseUnit: String? = null,
+    /**
+     * The most of [doseUnit] allowed in twenty-four hours — "no more than
+     * 1.5 cm of gel a day". Null when the parent set none.
+     *
+     * A second kind of daily ceiling beside [maxPerDay], because a leaflet
+     * often gives both and they do not imply each other: six small applications
+     * and three generous ones can reach the same quantity.
+     */
+    val maxAmountPerDay: Double? = null,
     /** Opt-in, off until asked for, like every other notification here. */
     val remindWhenDue: Boolean = false,
     /**
@@ -336,6 +367,18 @@ data class MedicineDoseEntity(
     val medicineUid: String,
     /** When it was given (epoch millis) — the wait is counted from here. */
     val time: Long,
+    /**
+     * How much was actually used, in the medicine's own
+     * [MedicineEntity.doseUnit]. Filled in from
+     * [MedicineEntity.doseAmount] when the dose is logged and editable
+     * afterwards, because "I only used half of it" is a correction a parent
+     * makes and the day's total has to follow it.
+     *
+     * Null for every dose of a medicine that carries no amount, and for every
+     * dose logged before amounts existed — which is a dose that said nothing
+     * about quantity, not a dose of nothing.
+     */
+    val amount: Double? = null,
     val notes: String? = null,
     @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
     @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,

@@ -27,6 +27,8 @@ public struct ReportOptions: Equatable, Sendable {
     public var reference: WhoSex?
     public var includeDailyTable = true
     public var includeTreatments = true
+    /// The as-needed medicines, and the doses given inside the range (BDR-18).
+    public var includeMedicines = true
     /// Off by default: free text is where a parent writes what they meant for
     /// themselves.
     public var includeNotes = false
@@ -38,6 +40,7 @@ public struct ReportOptions: Equatable, Sendable {
         reference: WhoSex? = nil,
         includeDailyTable: Bool = true,
         includeTreatments: Bool = true,
+        includeMedicines: Bool = true,
         includeNotes: Bool = false
     ) {
         self.period = period
@@ -46,6 +49,7 @@ public struct ReportOptions: Equatable, Sendable {
         self.reference = reference
         self.includeDailyTable = includeDailyTable
         self.includeTreatments = includeTreatments
+        self.includeMedicines = includeMedicines
         self.includeNotes = includeNotes
     }
 }
@@ -88,6 +92,30 @@ public struct TreatmentCourse: Equatable, Sendable {
     public let doseDays: [Int]
 }
 
+/// One as-needed medicine and the doses of it that fall inside the range.
+///
+/// The medicine's own figures travel with them because they are what the doses
+/// mean: "four in a day" reads differently against a maximum of four than
+/// against a maximum of six, and a reader who has only the doses cannot tell.
+/// They are the parent's figures, restated — the document still interprets
+/// nothing (BDR-0012).
+public struct MedicineRecord: Equatable, Sendable {
+    public let medicine: Medicine
+    /// Oldest first, as everything else in the report is.
+    public let doses: [MedicineDose]
+
+    public init(medicine: Medicine, doses: [MedicineDose]) {
+        self.medicine = medicine
+        self.doses = doses
+    }
+
+    /// How much was used across the range, in the medicine's own unit.
+    public var amountTotal: Double { doses.reduce(0) { $0 + ($1.amount ?? 0) } }
+
+    /// Whether any dose recorded a quantity at all — an absent one is not a zero.
+    public var hasAmounts: Bool { doses.contains { $0.amount != nil } }
+}
+
 /// The whole of a report, ready to be drawn or written out.
 public struct ReportContent: Sendable {
     public let babyName: String
@@ -116,6 +144,10 @@ public struct ReportContent: Sendable {
     /// months.
     public let growth: [GrowthReading]
     public let treatments: [TreatmentCourse]
+    /// As-needed medicines that were actually given inside the range, with their
+    /// doses. A medicine set up but never given in the period is left out: the
+    /// document reports what happened, and a shelf is not an event.
+    public let medicines: [MedicineRecord]
     /// The raw entries inside the range, oldest first, for the workbook.
     public let feedings: [Feeding]
     public let sleeps: [Sleep]
@@ -150,6 +182,8 @@ public func buildReport(
     diapers: [Diaper],
     growth: [Growth],
     treatments: [Treatment],
+    medicines: [Medicine],
+    medicineDoses: [MedicineDose],
     options: ReportOptions,
     now: Int64
 ) -> ReportContent {
@@ -226,6 +260,9 @@ public func buildReport(
         stoolColours: colours,
         growth: growthReadings(birthDate: baby.birthDate, growth: growth, reference: options.reference),
         treatments: options.includeTreatments ? treatmentCourses(treatments, range: range) : [],
+        medicines: options.includeMedicines
+            ? medicineRecords(medicines, doses: medicineDoses, from: startMillis, to: endMillis)
+            : [],
         feedings: feedsInRange,
         sleeps: sleepsInRange,
         diapers: diapersInRange
@@ -275,6 +312,36 @@ extension GrowthMeasure {
         case .head: return entry.headMm.map { Double($0) / 10 }
         }
     }
+}
+
+/// The as-needed medicines given inside the range, and their doses.
+///
+/// A dose finds its medicine by uid, the way it does everywhere else — a dose
+/// whose medicine has since been deleted has nothing to be reported under, and
+/// is left out rather than listed against a name the document would have to
+/// invent. Deleted rows on either side are ignored, as every read does.
+///
+/// Ordered by name, because a document is read rather than scrolled and there
+/// is no "most recent" to lead with once a range is fixed.
+public func medicineRecords(
+    _ medicines: [Medicine],
+    doses: [MedicineDose],
+    from startMillis: Int64,
+    to endMillis: Int64
+) -> [MedicineRecord] {
+    var inRange: [String: [MedicineDose]] = [:]
+    for dose in doses.sorted(by: { $0.time < $1.time })
+    where dose.deletedAt == nil && dose.time >= startMillis && dose.time < endMillis {
+        inRange[dose.medicineUid, default: []].append(dose)
+    }
+
+    return medicines
+        .filter { $0.deletedAt == nil }
+        .compactMap { medicine in
+            guard let given = inRange[medicine.uid], !given.isEmpty else { return nil }
+            return MedicineRecord(medicine: medicine, doses: given)
+        }
+        .sorted { $0.medicine.name.lowercased() < $1.medicine.name.lowercased() }
 }
 
 /// The courses that were running at any point in `range`, with their bars clamped

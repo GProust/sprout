@@ -71,11 +71,14 @@ import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.EntryCard
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.NotesField
+import com.gproust.sprout.ui.common.DecimalField
 import com.gproust.sprout.ui.common.NumberField
 import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDateTime
+import com.gproust.sprout.ui.common.formatDecimal
+import com.gproust.sprout.ui.common.parseDecimal
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -223,6 +226,9 @@ fun MedicinesScreen(onBack: () -> Unit) {
         DoseEditor(
             dose = dose,
             medicineName = medicine?.name.orEmpty(),
+            // Null when the medicine is measured in whole doses, or has been
+            // deleted out from under its history.
+            unit = medicine?.doseUnit,
             onCancel = { editingDose = null },
             onSave = { vm.updateDose(medicine, it); editingDose = null },
         )
@@ -266,8 +272,12 @@ fun MedicinesScreen(onBack: () -> Unit) {
                 }
                 items(recent, key = { "dose-${it.id}" }) { dose ->
                     val medicine = state.medicines.firstOrNull { it.uid == dose.medicineUid }
+                    val given = amountLabel(context, dose.amount, medicine?.doseUnit)
                     EntryCard(
-                        title = medicine?.name ?: stringResource(R.string.medicine_never_given),
+                        title = listOfNotNull(
+                            medicine?.name ?: stringResource(R.string.medicine_never_given),
+                            given,
+                        ).joinToString(stringResource(R.string.feeding_detail_separator)),
                         subtitle = formatDateTime(context, dose.time),
                         meta = dose.notes.orEmpty(),
                         icon = Icons.Filled.Medication,
@@ -392,6 +402,13 @@ private fun MedicineEditor(
     var name by remember { mutableStateOf(initial.name) }
     var dose by remember { mutableStateOf(initial.dose.orEmpty()) }
     var minHours by remember { mutableStateOf(hoursText(initial.minIntervalMinutes)) }
+    var doseAmount by remember {
+        mutableStateOf(initial.doseAmount?.let { formatDecimal(it) }.orEmpty())
+    }
+    var unit by remember { mutableStateOf(initial.doseUnit.orEmpty()) }
+    var maxAmount by remember {
+        mutableStateOf(initial.maxAmountPerDay?.let { formatDecimal(it) }.orEmpty())
+    }
     var comfortHours by remember {
         mutableStateOf(initial.comfortIntervalMinutes?.let { hoursText(it) }.orEmpty())
     }
@@ -456,11 +473,47 @@ private fun MedicineEditor(
                     modifier = Modifier.weight(1f),
                 )
             }
+            // Said here rather than only in the hint above, because a blank
+            // wait is a deliberate answer — "the leaflet gave no gap" — and a
+            // parent who does not know that invents six hours instead.
+            Text(
+                stringResource(R.string.medicine_no_gap_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             NumberField(
                 label = stringResource(R.string.medicine_max_per_day),
                 value = maxPerDay,
                 onChange = { maxPerDay = it },
                 suffix = stringResource(R.string.medicine_doses_suffix),
+            )
+
+            FieldLabel(stringResource(R.string.medicine_amounts))
+            Text(
+                stringResource(R.string.medicine_amounts_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                DecimalField(
+                    label = stringResource(R.string.medicine_dose_amount),
+                    value = doseAmount,
+                    onChange = { doseAmount = it },
+                    modifier = Modifier.weight(1f),
+                )
+                OutlinedTextField(
+                    value = unit,
+                    onValueChange = { unit = it },
+                    label = { Text(stringResource(R.string.medicine_unit)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            DecimalField(
+                label = stringResource(R.string.medicine_max_amount_per_day),
+                value = maxAmount,
+                onChange = { maxAmount = it },
+                suffix = unit.trim().ifBlank { null },
             )
 
             Row(
@@ -495,7 +548,11 @@ private fun MedicineEditor(
                 }
                 Button(
                     onClick = {
-                        val min = minHours.toIntOrNull()?.takeIf { it > 0 } ?: 1
+                        // Blank is zero, not an hour: a medicine whose leaflet
+                        // gave no gap is held by its daily ceilings alone
+                        // (BDR-18). Only a typed number becomes a wait.
+                        val min = minHours.toIntOrNull()?.takeIf { it > 0 } ?: 0
+                        val typedUnit = unit.trim().ifBlank { null }
                         onSave(
                             initial.copy(
                                 name = name.trim(),
@@ -504,6 +561,9 @@ private fun MedicineEditor(
                                 comfortIntervalMinutes = comfortHours.toIntOrNull()
                                     ?.takeIf { it > 0 }?.times(60),
                                 maxPerDay = maxPerDay.toIntOrNull()?.takeIf { it > 0 },
+                                doseAmount = parseDecimal(doseAmount)?.takeIf { it > 0 },
+                                doseUnit = typedUnit,
+                                maxAmountPerDay = parseDecimal(maxAmount)?.takeIf { it > 0 },
                                 remindWhenDue = remind,
                                 remindAtComfort = remindAtComfort,
                                 notes = notes.trim().ifBlank { null },
@@ -531,10 +591,12 @@ private fun MedicineEditor(
 private fun DoseEditor(
     dose: MedicineDoseEntity,
     medicineName: String,
+    unit: String?,
     onCancel: () -> Unit,
     onSave: (MedicineDoseEntity) -> Unit,
 ) {
     var time by remember { mutableLongStateOf(dose.time) }
+    var amount by remember { mutableStateOf(dose.amount?.let { formatDecimal(it) }.orEmpty()) }
     var notes by remember { mutableStateOf(dose.notes.orEmpty()) }
     Scaffold(
         topBar = {
@@ -566,6 +628,17 @@ private fun DoseEditor(
                 millis = time,
                 onChange = { time = it },
             )
+            // Only for a medicine that is measured in something: a paracetamol
+            // dose is one dose, and a field asking how much of it would be a
+            // question with no answer.
+            if (unit != null) {
+                DecimalField(
+                    label = stringResource(R.string.medicine_dose_amount_given),
+                    value = amount,
+                    onChange = { amount = it },
+                    suffix = unit.ifBlank { null },
+                )
+            }
             NotesField(notes, { notes = it })
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
@@ -573,7 +646,17 @@ private fun DoseEditor(
                 }
                 Button(
                     onClick = {
-                        onSave(dose.copy(time = time, notes = notes.trim().ifBlank { null }))
+                        onSave(
+                            dose.copy(
+                                time = time,
+                                // Cleared rather than kept at zero when the
+                                // field is emptied: a dose that says nothing
+                                // about quantity adds nothing to the day, which
+                                // is not the same as a dose of none.
+                                amount = if (unit == null) dose.amount else parseDecimal(amount),
+                                notes = notes.trim().ifBlank { null },
+                            ),
+                        )
                     },
                     modifier = Modifier.weight(1f),
                 ) {
@@ -590,5 +673,10 @@ private fun DoseEditor(
  * The fields are in hours because that is the unit every leaflet uses, and a
  * medicine whose stored interval is not a whole number of hours — which nothing
  * in the app can currently produce — rounds down rather than showing a blank.
+ *
+ * Zero comes back **blank**, and that is the whole of how a medicine with no
+ * gap rule is expressed: an empty field saves as no wait, and a saved no-wait
+ * reopens empty (BDR-18).
  */
-private fun hoursText(minutes: Int): String = (minutes / 60).coerceAtLeast(1).toString()
+private fun hoursText(minutes: Int): String =
+    if (minutes <= 0) "" else (minutes / 60).coerceAtLeast(1).toString()

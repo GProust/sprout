@@ -40,8 +40,36 @@ class MedicineReadinessTest {
         uid = "medicine-uid",
     )
 
-    private fun dose(at: Long, of: String = "medicine-uid", deletedAt: Long? = null) =
-        MedicineDoseEntity(medicineUid = of, time = at, uid = "dose-$at", deletedAt = deletedAt)
+    private fun dose(
+        at: Long,
+        of: String = "medicine-uid",
+        deletedAt: Long? = null,
+        amount: Double? = null,
+    ) = MedicineDoseEntity(
+        medicineUid = of,
+        time = at,
+        amount = amount,
+        uid = "dose-$at",
+        deletedAt = deletedAt,
+    )
+
+    /**
+     * The other shape a leaflet comes in: no gap at all, six a day, and a
+     * centimetre and a half of gel across them (BDR-18).
+     */
+    private fun teethingGel(
+        maxPerDay: Int? = 6,
+        maxAmountPerDay: Double? = 1.5,
+    ) = MedicineEntity(
+        name = "Teething gel",
+        minIntervalMinutes = 0,
+        comfortIntervalMinutes = null,
+        maxPerDay = maxPerDay,
+        doseAmount = 0.25,
+        doseUnit = "cm",
+        maxAmountPerDay = maxAmountPerDay,
+        uid = "medicine-uid",
+    )
 
     @Test
     fun `a medicine never given is ready, not red`() {
@@ -316,6 +344,166 @@ class MedicineReadinessTest {
                 listOf(dose(now - 2 * hour)),
                 now,
             ),
+        )
+    }
+
+    // --- no gap at all, and a day measured in quantity (BDR-18) ------------
+
+    @Test
+    fun `a medicine with no gap is ready the moment after it is given`() {
+        val readiness = medicineReadiness(teethingGel(), listOf(dose(now - 60_000)), now)
+
+        assertEquals(MedicineLevel.READY, readiness.level)
+        assertNull("nothing is being waited for", readiness.nextAllowedAt)
+    }
+
+    @Test
+    fun `with no gap the day's count is the only thing that holds it`() {
+        val doses = (1..6).map { dose(now - it * hour) }
+
+        val readiness = medicineReadiness(teethingGel(maxAmountPerDay = null), doses, now)
+
+        assertEquals(MedicineLevel.TOO_SOON, readiness.level)
+        assertEquals(TooSoonReason.DAILY_MAXIMUM, readiness.reason)
+        // The sixth-most-recent dose is the oldest, and it has to age out.
+        assertEquals(now - 6 * hour + 24 * hour, readiness.nextAllowedAt)
+    }
+
+    @Test
+    fun `the day's quantity can run out before the count does`() {
+        // Three generous applications, half a centimetre each: three of six
+        // doses, but the whole centimetre and a half.
+        val doses = listOf(
+            dose(now - 5 * hour, amount = 0.5),
+            dose(now - 3 * hour, amount = 0.5),
+            dose(now - 1 * hour, amount = 0.5),
+        )
+
+        val readiness = medicineReadiness(teethingGel(), doses, now)
+
+        assertEquals(MedicineLevel.TOO_SOON, readiness.level)
+        assertEquals(TooSoonReason.DAILY_AMOUNT, readiness.reason)
+        assertEquals(3, readiness.dosesInLastDay)
+        assertEquals(1.5, readiness.amountInLastDay, 1e-9)
+        assertEquals(1.5, readiness.maxAmountPerDay!!, 1e-9)
+        assertEquals("cm", readiness.unit)
+        // Free again when the oldest half-centimetre leaves the window.
+        assertEquals(now - 5 * hour + 24 * hour, readiness.nextAllowedAt)
+    }
+
+    @Test
+    fun `under the day's quantity it stays green`() {
+        val doses = listOf(dose(now - 2 * hour, amount = 0.25), dose(now - hour, amount = 0.25))
+
+        val readiness = medicineReadiness(teethingGel(), doses, now)
+
+        assertEquals(MedicineLevel.READY, readiness.level)
+        assertEquals(0.5, readiness.amountInLastDay, 1e-9)
+    }
+
+    /**
+     * A dose nobody measured is not a dose of nothing. It counts against the
+     * tally, because it happened, and adds nothing to the quantity, because
+     * there is nothing to add.
+     */
+    @Test
+    fun `doses that recorded no amount never spend the day's quantity`() {
+        val doses = (1..5).map { dose(now - it * hour) }
+
+        val readiness = medicineReadiness(teethingGel(), doses, now)
+
+        assertEquals(MedicineLevel.READY, readiness.level)
+        assertEquals(5, readiness.dosesInLastDay)
+        assertEquals(0.0, readiness.amountInLastDay, 1e-9)
+    }
+
+    @Test
+    fun `an amount older than the window does not count against the day`() {
+        val doses = listOf(
+            dose(now - 25 * hour, amount = 1.5),
+            dose(now - hour, amount = 0.25),
+        )
+
+        val readiness = medicineReadiness(teethingGel(), doses, now)
+
+        assertEquals(MedicineLevel.READY, readiness.level)
+        assertEquals(0.25, readiness.amountInLastDay, 1e-9)
+    }
+
+    @Test
+    fun `a daily quantity of zero is no quantity at all`() {
+        val doses = listOf(dose(now - hour, amount = 5.0))
+
+        val readiness = medicineReadiness(teethingGel(maxAmountPerDay = 0.0), doses, now)
+
+        assertEquals(MedicineLevel.READY, readiness.level)
+    }
+
+    /**
+     * Decimals a parent typed are added up in binary, where three lots of 0.3
+     * do not make 0.9. The tolerance is what keeps the arithmetic agreeing with
+     * the parent's own sum rather than with the last bit of a Double.
+     */
+    @Test
+    fun `a day that exactly reaches its quantity counts as reached`() {
+        val doses = listOf(
+            dose(now - 3 * hour, amount = 0.3),
+            dose(now - 2 * hour, amount = 0.3),
+            dose(now - hour, amount = 0.3),
+        )
+
+        val readiness = medicineReadiness(
+            teethingGel(maxPerDay = null, maxAmountPerDay = 0.9),
+            doses,
+            now,
+        )
+
+        assertEquals(MedicineLevel.TOO_SOON, readiness.level)
+        assertEquals(TooSoonReason.DAILY_AMOUNT, readiness.reason)
+    }
+
+    /** The interval keeps its precedence over either ceiling while it runs. */
+    @Test
+    fun `the interval is still named ahead of a spent quantity`() {
+        val medicine = MedicineEntity(
+            name = "Ibuprofen",
+            minIntervalMinutes = 6 * 60,
+            doseAmount = 2.5,
+            doseUnit = "ml",
+            maxAmountPerDay = 5.0,
+            uid = "medicine-uid",
+        )
+        val doses = listOf(
+            dose(now - 8 * hour, amount = 2.5),
+            dose(now - 2 * hour, amount = 2.5),
+        )
+
+        val readiness = medicineReadiness(medicine, doses, now)
+
+        assertEquals(TooSoonReason.INTERVAL, readiness.reason)
+        // And still the later of the two moments, which is the quantity's.
+        assertEquals(now - 8 * hour + 24 * hour, readiness.nextAllowedAt)
+    }
+
+    @Test
+    fun `a reminder waits for the day's quantity as well as the interval`() {
+        val medicine = MedicineEntity(
+            name = "Teething gel",
+            minIntervalMinutes = 0,
+            doseAmount = 0.5,
+            doseUnit = "cm",
+            maxAmountPerDay = 1.0,
+            remindWhenDue = true,
+            uid = "medicine-uid",
+        )
+        val doses = listOf(
+            dose(now - 4 * hour, amount = 0.5),
+            dose(now - hour, amount = 0.5),
+        )
+
+        assertEquals(
+            now - 4 * hour + 24 * hour,
+            nextMedicineReminder(medicine, doses, now),
         )
     }
 }

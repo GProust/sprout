@@ -5,6 +5,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.SleepPlace
 import com.gproust.sprout.data.local.SleepPosition
@@ -71,6 +73,21 @@ class ReportWorkbookTest {
             treatments = listOf(
                 TreatmentEntity(babyId = 1, name = "Vitamin D", startDate = at(born, 9), endDate = null),
             ),
+            medicines = listOf(
+                MedicineEntity(
+                    babyId = 1,
+                    name = "Teething gel",
+                    minIntervalMinutes = 0,
+                    maxPerDay = 6,
+                    doseAmount = 0.25,
+                    doseUnit = "cm",
+                    maxAmountPerDay = 1.5,
+                    uid = "gel",
+                ),
+            ),
+            medicineDoses = listOf(
+                MedicineDoseEntity(babyId = 1, medicineUid = "gel", time = at(today, 10), amount = 0.25),
+            ),
             options = options,
             now = now,
             zone = zone,
@@ -81,7 +98,10 @@ class ReportWorkbookTest {
     @Test
     fun thereIsOneSheetPerKindOfEntry() {
         assertEquals(
-            listOf("Summary", "Day by day", "Feeding", "Sleep", "Nappies", "Growth", "Treatments"),
+            listOf(
+                "Summary", "Day by day", "Feeding", "Sleep", "Nappies", "Growth",
+                "Treatments", "Medicines",
+            ),
             sheets().map { it.name },
         )
     }
@@ -137,6 +157,48 @@ class ReportWorkbookTest {
         assertEquals(Xlsx.Cell.Whole(6 * 60), after)
     }
 
+    /**
+     * The sheet a pivot table is written against: raw dose rows, the parent's
+     * own ceilings beside them, and an amount that is blank rather than zero
+     * where none was recorded (BDR-18).
+     */
+    @Test
+    fun theMedicineSheetCarriesTheDoseAndTheLimitsItWasGivenAgainst() {
+        val sheet = sheets().first { it.name == "Medicines" }
+        val row = sheet.rows.single()
+
+        assertEquals(Xlsx.Cell.Text("Teething gel"), row[sheet.headers.indexOf("medicine")])
+        assertEquals(Xlsx.Cell.Decimal(0.25), row[sheet.headers.indexOf("amount")])
+        assertEquals(Xlsx.Cell.Text("cm"), row[sheet.headers.indexOf("unit")])
+        assertEquals(Xlsx.Cell.Whole(6L), row[sheet.headers.indexOf("max_per_day")])
+        assertEquals(Xlsx.Cell.Decimal(1.5), row[sheet.headers.indexOf("max_amount_per_day")])
+        // Zero and not absent: the medicine's leaflet gave no gap at all.
+        assertEquals(Xlsx.Cell.Whole(0L), row[sheet.headers.indexOf("min_interval_minutes")])
+    }
+
+    /** No doses in the period, no sheet — the book reports what happened. */
+    @Test
+    fun theMedicineSheetGoesWhenNoDoseFallsInTheRange() {
+        val names = ReportWorkbook.build(
+            buildReport(
+                baby = baby,
+                feedings = emptyList(),
+                sleeps = emptyList(),
+                diapers = emptyList(),
+                growth = emptyList(),
+                treatments = emptyList(),
+                medicines = emptyList(),
+                medicineDoses = emptyList(),
+                options = ReportOptions(period = ReportPeriod.WEEK),
+                now = now,
+                zone = zone,
+            ),
+            zone,
+        ).map { it.name }
+
+        assertTrue("Medicines" !in names)
+    }
+
     @Test
     fun theWholeBookIsWritable() {
         val bytes = ReportWorkbook.bytes(
@@ -147,6 +209,8 @@ class ReportWorkbookTest {
                 diapers = emptyList(),
                 growth = emptyList(),
                 treatments = emptyList(),
+                medicines = emptyList(),
+                medicineDoses = emptyList(),
                 options = ReportOptions(period = ReportPeriod.SINCE_BIRTH),
                 now = now,
                 zone = zone,

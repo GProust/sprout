@@ -25,6 +25,31 @@ public enum SproutDatabase {
     /// remember to edit.
     static let migrationsAfterAndroidSchema: [(name: String, migrate: @Sendable (Database) throws -> Void)] = [
         (name: "v17-as-needed-medicine", migrate: migrateToV17),
+        (name: "v18-medicine-amounts", migrate: migrateToV18),
+    ]
+
+    /// v17 -> v18: amounts on an as-needed medicine, and on the dose that used
+    /// them (BDR-18).
+    ///
+    /// Android's `MIGRATION_17_18`, verbatim. Four added columns and nothing
+    /// rewritten: a medicine set up before this reads back with every amount
+    /// nil, which is the truth — it was never measured in anything, and
+    /// inventing a zero would put it into arithmetic it was never part of.
+    ///
+    /// `minIntervalMinutes` does not move. It gains a meaning instead: zero is
+    /// "no gap rule", which older rows cannot hold because neither editor ever
+    /// let one be typed.
+    private static func migrateToV18(_ db: Database) throws {
+        for statement in schemaV18 {
+            try db.execute(sql: statement)
+        }
+    }
+
+    static let schemaV18: [String] = [
+        "ALTER TABLE `medicine` ADD COLUMN `doseAmount` REAL",
+        "ALTER TABLE `medicine` ADD COLUMN `doseUnit` TEXT",
+        "ALTER TABLE `medicine` ADD COLUMN `maxAmountPerDay` REAL",
+        "ALTER TABLE `medicine_dose` ADD COLUMN `amount` REAL",
     ]
 
     /// v16 -> v17: the two tables behind as-needed medicine (BDR-15).

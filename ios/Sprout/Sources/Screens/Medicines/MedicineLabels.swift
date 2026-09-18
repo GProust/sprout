@@ -40,9 +40,14 @@ func stateSentence(_ readiness: MedicineReadiness, now: Int64) -> String {
     switch readiness.level {
     case .tooSoon:
         let left = SproutFormat.duration(millis: (readiness.nextAllowedAt ?? now) - now).text
-        return readiness.reason == .dailyMaximum
-            ? Str.t("medicine_state_daily_max", left)
-            : Str.t("medicine_state_too_soon", left)
+        switch readiness.reason {
+        case .dailyMaximum: return Str.t("medicine_state_daily_max", left)
+        // Named apart from the dose count, because "you have used the day's
+        // 1.5 cm" and "that would be the seventh today" are two different
+        // things to have run out of.
+        case .dailyAmount: return Str.t("medicine_state_daily_amount", left)
+        default: return Str.t("medicine_state_too_soon", left)
+        }
     case .soonerThanIdeal:
         let left = SproutFormat.duration(millis: (readiness.comfortableAt ?? now) - now).text
         return Str.t("medicine_state_early", left)
@@ -72,21 +77,48 @@ func shortState(_ readiness: MedicineReadiness, now: Int64) -> String? {
     }
 }
 
-/// "Last dose 03:20 · 2 of 4 in the last 24 h", or that it has never been given.
+/// "Last dose 03:20 · 2 of 4 in the last 24 h · 0.5 of 1.5 cm", or that it has
+/// never been given.
+///
+/// The quantity is only there when the parent gave a daily one to count
+/// against: a medicine measured in whole doses says nothing about millilitres,
+/// and a running total nobody set a limit for is a number with no question
+/// behind it.
 func lastDoseLine(_ readiness: MedicineReadiness) -> String {
     guard let last = readiness.lastDoseAt else { return Str.t("medicine_never_given") }
     let count = readiness.maxPerDay.map {
         Str.t("medicine_day_count", readiness.dosesInLastDay, $0)
     } ?? Str.t("medicine_day_count_plain", readiness.dosesInLastDay)
-    return Str.t(
+    let line = Str.t(
         "treatment_schedule_summary",
         Str.t("medicine_last_dose", SproutDateStyle.dateTime(last)),
         count
     )
+    guard let max = readiness.maxAmountPerDay else { return line }
+    return Str.t(
+        "treatment_schedule_summary",
+        line,
+        Str.t(
+            "medicine_day_amount",
+            SproutFormat.decimal(readiness.amountInLastDay),
+            SproutFormat.decimal(max),
+            readiness.unit ?? ""
+        )
+    )
 }
 
-/// "Every 6 h to 8 h", or "Every 6 h" when only a minimum was set.
+/// "0.25 cm" — an amount in the medicine's own unit, or nil when it has none.
+func amountLabel(_ amount: Double?, unit: String?) -> String? {
+    guard let amount else { return nil }
+    let value = SproutFormat.decimal(amount)
+    guard let unit, !unit.trimmingCharacters(in: .whitespaces).isEmpty else { return value }
+    return Str.t("medicine_amount_value", value, unit)
+}
+
+/// "Every 6 h to 8 h", "Every 6 h" when only a minimum was set, or "No set gap"
+/// for a medicine whose leaflet gave none at all (BDR-18).
 func intervalSummary(_ medicine: Medicine) -> String {
+    guard medicine.minIntervalMinutes > 0 else { return Str.t("medicine_no_gap") }
     let min = SproutFormat.duration(millis: Int64(medicine.minIntervalMinutes) * 60_000).text
     guard let comfort = medicine.comfortIntervalMinutes,
           comfort > medicine.minIntervalMinutes

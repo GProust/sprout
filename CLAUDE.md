@@ -243,6 +243,39 @@ The arithmetic is `data/MedicineReadiness.kt` and
 both sides, because a household with one phone of each has to get the same answer
 to "may I give another dose".
 
+A medicine can also be measured rather than only counted
+([BDR-18](docs/decisions/0018-a-medicine-measured-by-amount.md)), which added
+`doseAmount` / `doseUnit` / `maxAmountPerDay` to `medicine`, `amount` to
+`medicine_dose`, and Room migration 17 → 18 with an iOS migration to match. Four
+things a change can quietly undo:
+
+- **`minIntervalMinutes = 0` means there is no gap rule**, not a gap of no
+  length — a leaflet that gives six times a day and 1.5 cm and no wait at all.
+  It is a value a parent can save, the editor's field opens and saves *blank*
+  for it, and the screen says "No set gap" rather than "Every 0 h". The wire
+  needed no key for it; a reader treating zero as "give it now" was already
+  right.
+- **The quantity ceiling is the dose count's twin**: the same rolling 24 hours,
+  the same "when does the oldest age out" arithmetic, and a tolerance, because a
+  parent's three lots of 0.3 are not 0.9 in binary and the app should agree with
+  their sum. `TooSoonReason.DAILY_AMOUNT` is worded apart from `DAILY_MAXIMUM` —
+  "the day's 1.5 cm is used" and "that would be the seventh today" are two
+  different things to have run out of — and the interval still wins the naming
+  while it is the thing running.
+- **A dose that recorded no amount adds nothing and is not a dose of nothing.**
+  It counts against the day's tally because it happened; inventing a size for it
+  would be the app supplying a figure the parent never gave. `amount` is stamped
+  from the medicine when the dose is logged and editable afterwards, because "I
+  only used half" is a correction the day's total has to follow.
+- **The unit is free text and nothing converts it.** "cm", "ml", "puffs". A list
+  of units would be the thin end of the list of medicines BDR-15 refuses.
+
+The doctor's record carries them too: `ReportContent.medicines` is assembled
+once in `ReportData.kt` / `ReportData.swift` and rendered by both the PDF and the
+workbook's `Medicines` sheet, whose column names are English like every other
+sheet's. A medicine set up but never given inside the range is left out — the
+document reports what happened.
+
 A running wait also reaches the two places a parent already is
 ([BDR-16](docs/decisions/0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md)):
 

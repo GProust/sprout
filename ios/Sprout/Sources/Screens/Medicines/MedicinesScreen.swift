@@ -124,9 +124,12 @@ struct MedicinesScreen: View {
                     if !recent.isEmpty {
                         SectionLabel(Str.t("medicine_history"))
                         ForEach(recent) { dose in
+                            let medicine = model.medicine(forDose: dose)
                             EntryCard(
-                                title: model.medicine(forDose: dose)?.name
-                                    ?? Str.t("medicine_never_given"),
+                                title: doseTitle(
+                                    name: medicine?.name ?? Str.t("medicine_never_given"),
+                                    amount: amountLabel(dose.amount, unit: medicine?.doseUnit)
+                                ),
                                 subtitle: SproutDateStyle.dateTime(dose.time),
                                 meta: dose.notes ?? "",
                                 systemImage: "pills.fill",
@@ -155,7 +158,10 @@ struct MedicinesScreen: View {
         .sheet(item: $editingDose) { dose in
             DoseEditor(
                 dose: dose,
-                medicineName: model.medicine(forDose: dose)?.name ?? ""
+                medicineName: model.medicine(forDose: dose)?.name ?? "",
+                // Nil when the medicine is measured in whole doses, or has been
+                // deleted out from under its history.
+                unit: model.medicine(forDose: dose)?.doseUnit
             ) { model.updateDose($0); editingDose = nil }
         }
         .confirmDelete(
@@ -274,6 +280,9 @@ private struct MedicineEditor: View {
     @State private var minHours: String
     @State private var comfortHours: String
     @State private var maxPerDay: String
+    @State private var doseAmount: String
+    @State private var unit: String
+    @State private var maxAmount: String
     @State private var remind: Bool
     @State private var remindAtComfort: Bool
     @State private var notes: String
@@ -288,6 +297,11 @@ private struct MedicineEditor: View {
             initialValue: initial.comfortIntervalMinutes.map(hoursText) ?? ""
         )
         _maxPerDay = State(initialValue: initial.maxPerDay.map(String.init) ?? "")
+        _doseAmount = State(initialValue: initial.doseAmount.map(SproutFormat.decimal) ?? "")
+        _unit = State(initialValue: initial.doseUnit ?? "")
+        _maxAmount = State(
+            initialValue: initial.maxAmountPerDay.map(SproutFormat.decimal) ?? ""
+        )
         _remind = State(initialValue: initial.remindWhenDue)
         _remindAtComfort = State(initialValue: initial.remindAtComfort)
         _notes = State(initialValue: initial.notes ?? "")
@@ -320,10 +334,31 @@ private struct MedicineEditor: View {
                         text: $comfortHours,
                         suffix: Str.t("medicine_hours_suffix")
                     )
+                    // Said here rather than only in the hint above, because a
+                    // blank wait is a deliberate answer — "the leaflet gave no
+                    // gap" — and a parent who does not know that invents six
+                    // hours instead.
+                    Text(Str.t("medicine_no_gap_hint"))
+                        .font(.caption)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
                     LabelledNumberField(
                         label: Str.t("medicine_max_per_day"),
                         text: $maxPerDay,
                         suffix: Str.t("medicine_doses_suffix")
+                    )
+                }
+
+                Section {
+                    FieldLabel(Str.t("medicine_amounts"))
+                    Text(Str.t("medicine_amounts_hint"))
+                        .font(.caption)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                    DecimalField(label: Str.t("medicine_dose_amount"), text: $doseAmount)
+                    TextField(Str.t("medicine_unit"), text: $unit)
+                    DecimalField(
+                        label: Str.t("medicine_max_amount_per_day"),
+                        text: $maxAmount,
+                        suffix: unit.trimmingCharacters(in: .whitespaces).nilIfEmpty
                     )
                 }
 
@@ -366,12 +401,19 @@ private struct MedicineEditor: View {
         var updated = initial
         updated.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         updated.dose = dose.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-        // Never zero: a minimum wait of no time at all is not a wait.
-        updated.minIntervalMinutes = max(1, Int(minHours) ?? 1) * 60
+        // Blank is zero, not an hour: a medicine whose leaflet gave no gap is
+        // held by its daily ceilings alone (BDR-18). Only a typed number
+        // becomes a wait.
+        updated.minIntervalMinutes = max(0, Int(minHours) ?? 0) * 60
         updated.comfortIntervalMinutes = Int(comfortHours).flatMap { hours -> Int? in
             hours > 0 ? hours * 60 : nil
         }
         updated.maxPerDay = Int(maxPerDay).flatMap { limit -> Int? in limit > 0 ? limit : nil }
+        updated.doseAmount = SproutFormat.parseDecimal(doseAmount)
+            .flatMap { value -> Double? in value > 0 ? value : nil }
+        updated.doseUnit = unit.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        updated.maxAmountPerDay = SproutFormat.parseDecimal(maxAmount)
+            .flatMap { value -> Double? in value > 0 ? value : nil }
         updated.remindWhenDue = remind
         updated.remindAtComfort = remindAtComfort
         updated.active = true
@@ -417,17 +459,27 @@ private struct LabelledNumberField: View {
 private struct DoseEditor: View {
     let dose: MedicineDose
     let medicineName: String
+    /// The medicine's own unit, or nil when it is measured in whole doses.
+    let unit: String?
     let onSave: (MedicineDose) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var time: Int64
+    @State private var amount: String
     @State private var notes: String
 
-    init(dose: MedicineDose, medicineName: String, onSave: @escaping (MedicineDose) -> Void) {
+    init(
+        dose: MedicineDose,
+        medicineName: String,
+        unit: String?,
+        onSave: @escaping (MedicineDose) -> Void
+    ) {
         self.dose = dose
         self.medicineName = medicineName
+        self.unit = unit
         self.onSave = onSave
         _time = State(initialValue: dose.time)
+        _amount = State(initialValue: dose.amount.map(SproutFormat.decimal) ?? "")
         _notes = State(initialValue: dose.notes ?? "")
     }
 
@@ -438,6 +490,16 @@ private struct DoseEditor: View {
                     Text(Str.t("medicine_of", medicineName))
                         .font(.body.weight(.medium))
                     DateTimeField(label: Str.t("medicine_dose_time"), millis: $time)
+                    // Only for a medicine that is measured in something: a
+                    // paracetamol dose is one dose, and a field asking how much
+                    // of it would be a question with no answer.
+                    if let unit {
+                        DecimalField(
+                            label: Str.t("medicine_dose_amount_given"),
+                            text: $amount,
+                            suffix: unit.nilIfEmpty
+                        )
+                    }
                     NotesField(text: $notes)
                 }
             }
@@ -451,6 +513,11 @@ private struct DoseEditor: View {
                     Button(Str.t("action_save")) {
                         var updated = dose
                         updated.time = time
+                        // Cleared rather than kept at zero when the field is
+                        // emptied: a dose that says nothing about quantity adds
+                        // nothing to the day, which is not the same as a dose
+                        // of none.
+                        if unit != nil { updated.amount = SproutFormat.parseDecimal(amount) }
                         updated.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
                         onSave(updated)
                     }
@@ -465,4 +532,17 @@ private struct DoseEditor: View {
 /// The fields are in hours because that is the unit every leaflet uses, and a
 /// medicine whose stored interval is not a whole number of hours — which nothing
 /// in the app can currently produce — rounds down rather than showing a blank.
-private func hoursText(_ minutes: Int) -> String { String(max(1, minutes / 60)) }
+///
+/// Zero comes back **blank**, and that is the whole of how a medicine with no
+/// gap rule is expressed: an empty field saves as no wait, and a saved no-wait
+/// reopens empty (BDR-18).
+private func hoursText(_ minutes: Int) -> String {
+    minutes <= 0 ? "" : String(max(1, minutes / 60))
+}
+
+/// "Teething gel · 0.25 cm" for the history, or just the name when the medicine
+/// is measured in whole doses.
+private func doseTitle(name: String, amount: String?) -> String {
+    guard let amount else { return name }
+    return Str.t("treatment_schedule_summary", name, amount)
+}

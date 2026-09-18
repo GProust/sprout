@@ -283,6 +283,7 @@ extension ReportPdf {
 
         blocks.append(contentsOf: growthSection())
         blocks.append(contentsOf: treatmentSection())
+        blocks.append(contentsOf: medicineSection())
         blocks.append(contentsOf: dailySection())
         blocks.append(paragraph(Str.t("report_about"), size: 7.4, colour: muted, topGap: 14))
         return blocks
@@ -597,6 +598,83 @@ extension ReportPdf {
                 }
             }
         }]
+    }
+
+    /// What was given when it was needed, and against which of the parent's own
+    /// figures (BDR-18).
+    ///
+    /// Two tables: the medicines with the limits their parent typed, and then
+    /// every dose with its time and, where there is one, its amount. No
+    /// threshold is applied and nothing is flagged — a day that reached the
+    /// maximum is printed as the number it reached, and what that means belongs
+    /// to the clinician reading it (BDR-0012).
+    func medicineSection() -> [Block] {
+        let records = report.medicines
+        guard !records.isEmpty else { return [] }
+
+        let summaryColumns: [(String, CGFloat, Align)] = [
+            (Str.t("report_col_name"), 0, .left),
+            (Str.t("report_col_dose"), 130, .left),
+            (Str.t("report_col_limits"), 230, .left),
+            (Str.t("report_col_given"), 400, .right),
+            (Str.t("report_col_total"), 460, .right),
+        ]
+        let summaryRows: [[String]] = records.map { record in
+            [
+                record.medicine.name,
+                record.medicine.dose?.nilIfEmpty ?? "—",
+                limits(of: record),
+                String(record.doses.count),
+                record.hasAmounts
+                    ? (amountLabel(record.amountTotal, unit: record.medicine.doseUnit) ?? "—")
+                    : "—",
+            ]
+        }
+
+        var doseColumns: [(String, CGFloat, Align)] = [
+            (Str.t("report_col_date"), 0, .left),
+            (Str.t("report_col_time"), 90, .left),
+            (Str.t("report_col_name"), 160, .left),
+            (Str.t("report_col_amount"), 300, .left),
+        ]
+        if report.options.includeNotes {
+            doseColumns.append((Str.t("report_col_notes"), 380, .left))
+        }
+
+        let given = records
+            .flatMap { record in record.doses.map { (medicine: record.medicine, dose: $0) } }
+            .sorted { $0.dose.time < $1.dose.time }
+        let doseRows: [[String]] = given.map { entry in
+            var row = [
+                SproutDateStyle.date(entry.dose.time),
+                SproutDateStyle.time(entry.dose.time),
+                entry.medicine.name,
+                amountLabel(entry.dose.amount, unit: entry.medicine.doseUnit) ?? "—",
+            ]
+            if report.options.includeNotes { row.append(entry.dose.notes ?? "—") }
+            return row
+        }
+
+        return table(
+            title: Str.t("screen_medicines"),
+            columns: summaryColumns,
+            rows: summaryRows,
+            newPage: true
+        )
+            + table(title: Str.t("medicine_history"), columns: doseColumns, rows: doseRows)
+            + [paragraph(Str.t("report_medicine_note"), size: 7.4, colour: muted, topGap: 6)]
+    }
+
+    /// The parent's own ceilings for a medicine, side by side and unjudged.
+    func limits(of record: MedicineRecord) -> String {
+        let medicine = record.medicine
+        var parts = [intervalSummary(medicine)]
+        if let max = medicine.maxPerDay { parts.append(Str.t("report_limit_doses", max)) }
+        if let max = medicine.maxAmountPerDay,
+           let label = amountLabel(max, unit: medicine.doseUnit) {
+            parts.append(Str.t("report_limit_amount", label))
+        }
+        return parts.joined(separator: Str.t("feeding_detail_separator"))
     }
 
     /// One row per calendar day, **including the days nothing was logged on**.

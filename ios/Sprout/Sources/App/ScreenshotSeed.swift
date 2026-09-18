@@ -121,16 +121,26 @@ enum ScreenshotSeed {
         _ = try repository.addMedicine(
             Medicine(
                 name: "Teething gel",
-                // No usual interval and no daily maximum: a medicine with only a
-                // minimum gap, which is a real setup and reads differently on
-                // the card — "Every 4 h", and no "of 4" on the count.
-                minIntervalMinutes: 4 * 60,
+                dose: "0.25 cm",
+                // The other shape a leaflet comes in (BDR-18): no gap at all,
+                // held by how many and how much in a day. It reads "No set gap"
+                // where the others read "Every 6 h to 8 h", and carries the
+                // running quantity beside the count.
+                minIntervalMinutes: 0,
+                maxPerDay: 6,
+                doseAmount: 0.25,
+                doseUnit: "cm",
+                maxAmountPerDay: 1.5,
                 uid: teething
             )
         )
-        try repository.addMedicineDose(
-            MedicineDose(medicineUid: teething, time: now - 10 * hour)
-        )
+        // Three applications inside the day: "3 of 6 in the last 24 h" and
+        // three quarters of a centimetre of the allowed centimetre and a half.
+        for ago in [10 * hour, 6 * hour, 2 * hour] {
+            try repository.addMedicineDose(
+                MedicineDose(medicineUid: teething, time: now - ago, amount: 0.25)
+            )
+        }
     }
 
     private static func seedFeeds(_ repository: SproutRepository) throws {

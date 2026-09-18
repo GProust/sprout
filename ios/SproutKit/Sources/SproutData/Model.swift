@@ -429,12 +429,27 @@ public struct Medicine: Codable, FetchableRecord, Identifiable, Equatable, Synca
     /// Optional dose description, e.g. "2.5 ml" or "half a sachet".
     public var dose: String?
     /// The shortest gap the parent was told to keep, in minutes.
+    ///
+    /// **Zero means there is no gap rule at all** — a teething gel is "six times
+    /// a day", with nothing said about how far apart. Such a medicine is held
+    /// only by ``maxPerDay`` and ``maxAmountPerDay`` (BDR-18).
     public var minIntervalMinutes: Int
     /// The gap the prescriber actually wants kept; `nil` when only a minimum was
     /// given, and then there is no in-between band at all.
     public var comfortIntervalMinutes: Int?
     /// Most doses allowed in twenty-four hours; `nil` when the parent set none.
     public var maxPerDay: Int?
+    /// How much one application uses, as a number — 1.5 for "1.5 cm of gel".
+    /// ``dose`` stays the sentence the card shows; this is the same figure in a
+    /// form that can be added up, and only ever what the parent typed.
+    public var doseAmount: Double?
+    /// The parent's own unit for the two amounts — "cm", "ml", "puffs". Free
+    /// text and never a list Sprout ships (BDR-15).
+    public var doseUnit: String?
+    /// The most of ``doseUnit`` allowed in twenty-four hours. A second ceiling
+    /// beside ``maxPerDay``, because a leaflet often gives both and three
+    /// generous applications can reach the quantity before the count (BDR-18).
+    public var maxAmountPerDay: Double?
     /// Opt-in, off until asked for, like every other notification here.
     public var remindWhenDue: Bool = false
     /// Which wait the reminder fires at: the comfortable interval when true, the
@@ -455,6 +470,9 @@ public struct Medicine: Codable, FetchableRecord, Identifiable, Equatable, Synca
         minIntervalMinutes: Int,
         comfortIntervalMinutes: Int? = nil,
         maxPerDay: Int? = nil,
+        doseAmount: Double? = nil,
+        doseUnit: String? = nil,
+        maxAmountPerDay: Double? = nil,
         remindWhenDue: Bool = false,
         remindAtComfort: Bool = false,
         active: Bool = true,
@@ -470,6 +488,9 @@ public struct Medicine: Codable, FetchableRecord, Identifiable, Equatable, Synca
         self.minIntervalMinutes = minIntervalMinutes
         self.comfortIntervalMinutes = comfortIntervalMinutes
         self.maxPerDay = maxPerDay
+        self.doseAmount = doseAmount
+        self.doseUnit = doseUnit
+        self.maxAmountPerDay = maxAmountPerDay
         self.remindWhenDue = remindWhenDue
         self.remindAtComfort = remindAtComfort
         self.active = active
@@ -500,6 +521,13 @@ public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, S
     public var medicineUid: String
     /// When it was given — the wait is counted from here.
     public var time: Int64
+    /// How much was actually used, in the medicine's own ``Medicine/doseUnit``.
+    /// Filled in from the medicine when the dose is logged and editable
+    /// afterwards, because "I only used half" is a correction a parent makes and
+    /// the day's total has to follow it. `nil` for a medicine that carries no
+    /// amount, and for every dose logged before amounts existed — a dose that
+    /// said nothing about quantity, not a dose of nothing (BDR-18).
+    public var amount: Double?
     public var notes: String?
     public var uid: String = newUid()
     public var updatedAt: Int64 = 0
@@ -510,6 +538,7 @@ public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, S
         babyId: Int64 = 0,
         medicineUid: String,
         time: Int64,
+        amount: Double? = nil,
         notes: String? = nil,
         uid: String = newUid(),
         updatedAt: Int64 = 0,
@@ -519,6 +548,7 @@ public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, S
         self.babyId = babyId
         self.medicineUid = medicineUid
         self.time = time
+        self.amount = amount
         self.notes = notes
         self.uid = uid
         self.updatedAt = updatedAt

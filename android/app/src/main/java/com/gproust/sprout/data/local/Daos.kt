@@ -376,6 +376,15 @@ interface MedicineDao {
     @Query("SELECT * FROM medicine WHERE active = 1 AND deletedAt IS NULL ORDER BY name ASC")
     fun observeAllActive(): Flow<List<MedicineEntity>>
 
+    /**
+     * Every as-needed medicine of a baby, the retired ones included — what the
+     * doctor's record reads (BDR-18). A medicine stopped last week was still
+     * given last week, and a document that quietly dropped it would be wrong
+     * about the very period it covers.
+     */
+    @Query("SELECT * FROM medicine WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY name ASC")
+    suspend fun allForBabyOnce(babyId: Long): List<MedicineEntity>
+
     @Query("SELECT * FROM medicine WHERE id = :id AND deletedAt IS NULL LIMIT 1")
     suspend fun getById(id: Long): MedicineEntity?
 
@@ -460,6 +469,12 @@ interface MedicineDoseDao {
      */
     @Query("UPDATE medicine_dose SET deletedAt = :now, updatedAt = :now WHERE medicineUid = :medicineUid AND deletedAt IS NULL")
     suspend fun softDeleteForMedicine(medicineUid: String, now: Long)
+
+    /** Every dose of a baby's medicines, oldest first — the doctor's record's read. */
+    @Query(
+        "SELECT * FROM medicine_dose WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY time ASC",
+    )
+    suspend fun allForBabyOnce(babyId: Long): List<MedicineDoseEntity>
 
     @Query("SELECT uid FROM medicine_dose WHERE babyId = :babyId")
     suspend fun uidsForBaby(babyId: Long): List<String>

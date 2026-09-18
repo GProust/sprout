@@ -355,6 +355,17 @@
     <string name="medicine_dose_edit">Editar la toma</string>
     <string name="medicine_dose_time">Hora de la toma</string>
     <string name="medicine_of">Toma de %1$s</string>
+    <string name="medicine_no_gap">Sin intervalo fijo</string>
+    <string name="medicine_no_gap_hint">Deja el intervalo en blanco si no te dieron ninguno: algunos medicamentos solo limitan cuántas veces, o cuánto, al día.</string>
+    <string name="medicine_amounts">Cantidad</string>
+    <string name="medicine_amounts_hint">Solo si el prospecto indica una cantidad: 1,5 cm de gel, 2,5 ml. Sprout suma lo que registras y lo compara con el máximo diario que escribas aquí.</string>
+    <string name="medicine_dose_amount">Una aplicación</string>
+    <string name="medicine_unit">Unidad (p. ej. cm)</string>
+    <string name="medicine_max_amount_per_day">Máximo en 24 horas (opcional)</string>
+    <string name="medicine_dose_amount_given">Cuánto se usó</string>
+    <string name="medicine_day_amount">%1$s de %2$s %3$s</string>
+    <string name="medicine_amount_value">%1$s %2$s</string>
+    <string name="medicine_state_daily_amount">Cantidad diaria agotada — faltan %1$s</string>
 
     <!-- Notificaciones de medicamento a demanda -->
     <string name="medicine_channel_name">Recordatorios de medicamentos</string>
@@ -653,6 +664,16 @@
     <string name="report_col_name">Nombre</string>
     <string name="report_col_dose">Dosis</string>
     <string name="report_col_schedule">Pauta</string>
+    <string name="report_col_time">Hora</string>
+    <string name="report_col_limits">Límites fijados</string>
+    <string name="report_col_given">Administrado</string>
+    <string name="report_col_total">Total</string>
+    <string name="report_limit_doses">Máx. %1$d/día</string>
+    <string name="report_limit_amount">Máx. %1$s/día</string>
+    <string name="report_col_amount">Cantidad</string>
+    <string name="report_col_notes">Notas</string>
+    <string name="report_include_medicines_hint">Medicamentos a demanda y cada dosis del periodo</string>
+    <string name="report_medicine_note">Dosis tal como se registraron, junto a los límites que introdujo la familia a partir de la receta o del prospecto. Sprout no aplica límites propios ni extrae ninguna conclusión de estas cifras.</string>
     <string name="report_col_day">Día</string>
     <string name="report_col_week">Semana</string>
     <string name="report_col_at_breast">Al pecho</string>

@@ -287,6 +287,50 @@ struct NumberField: View {
     }
 }
 
+/// ``NumberField`` for a figure that can carry a fraction — 1.5 cm of gel,
+/// 2.5 ml.
+///
+/// Both separators are accepted, because the number pad offers whichever the
+/// phone's locale uses and a parent who types 1,5 means one and a half. The
+/// field refuses everything else as it is typed rather than rejecting the value
+/// afterwards: there is nothing to explain if the stray character never lands.
+struct DecimalField: View {
+    let label: String
+    @Binding var text: String
+    var suffix: String?
+
+    var body: some View {
+        HStack {
+            TextField(label, text: $text)
+                .keyboardType(.decimalPad)
+                .onChange(of: text) { _, new in
+                    let cleaned = filtered(new)
+                    if cleaned != new { text = cleaned }
+                }
+            if let suffix {
+                Text(suffix).foregroundStyle(SproutColor.onSurfaceVariant)
+            }
+        }
+        .padding(Spacing.snug)
+        .background(SproutColor.surface, in: RoundedRectangle(cornerRadius: Radius.control))
+    }
+
+    /// Digits and at most one separator, in the order they were typed.
+    private func filtered(_ input: String) -> String {
+        var separatorSeen = false
+        var out = ""
+        for character in input {
+            if character.isNumber {
+                out.append(character)
+            } else if (character == "." || character == ",") && !separatorSeen {
+                separatorSeen = true
+                out.append(character)
+            }
+        }
+        return out
+    }
+}
+
 struct NotesField: View {
     @Binding var text: String
 

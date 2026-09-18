@@ -253,6 +253,18 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   simply has nothing to show until the medicine turns up — rather than being
   dropped, or attached to whichever medicine happened to exist
   ([BDR-15](../docs/decisions/0015-medicine-given-when-needed-and-the-wait-between-doses.md)).
+- **An amount is a JSON number in the parent's own unit.** A `medicines` entry
+  may carry `doseAmount` (what one application uses), `doseUnit` (`"cm"`,
+  `"ml"` — free text the parent typed, never a list either app ships) and
+  `maxAmountPerDay`; a `medicineDoses` entry may carry the `amount` it actually
+  used. All four are absent on a replica written before they existed, which
+  reads back as a medicine that was never measured in anything — not as one
+  measured in zero.
+- **`minIntervalMinutes` of `0` means there is no gap rule**, not a gap of no
+  length. Such a medicine is held only by its daily ceilings
+  ([BDR-18](../docs/decisions/0018-a-medicine-measured-by-amount.md)); a reader
+  that treats zero as "give it now" is already right, which is why this needed
+  no new key.
 - **A tombstone's `entity` is the table name**, so the two new ones are
   `medicine` and `medicine_dose` — underscored, because that is what the table
   is called. Both readers hold a closed list of names and ignore any other, so a

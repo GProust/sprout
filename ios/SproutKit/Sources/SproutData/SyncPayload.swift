@@ -426,6 +426,9 @@ private extension SyncPayloadCodec {
         json["minIntervalMinutes"] = row.minIntervalMinutes
         json.put("comfortIntervalMinutes", row.comfortIntervalMinutes)
         json.put("maxPerDay", row.maxPerDay)
+        json.put("doseAmount", row.doseAmount)
+        json.put("doseUnit", row.doseUnit)
+        json.put("maxAmountPerDay", row.maxAmountPerDay)
         json["remindWhenDue"] = row.remindWhenDue
         json["remindAtComfort"] = row.remindAtComfort
         json["active"] = row.active
@@ -440,6 +443,11 @@ private extension SyncPayloadCodec {
             minIntervalMinutes: json.int("minIntervalMinutes") ?? 0,
             comfortIntervalMinutes: json.int("comfortIntervalMinutes"),
             maxPerDay: json.int("maxPerDay"),
+            // Absent on a replica written before amounts existed, which is a
+            // medicine that was never measured in anything (BDR-18).
+            doseAmount: json.double("doseAmount"),
+            doseUnit: json.string("doseUnit"),
+            maxAmountPerDay: json.double("maxAmountPerDay"),
             // Defaulted rather than required: both switches arrived with this
             // table, but defaulting them is what keeps a field addable later
             // without a version bump.
@@ -459,6 +467,7 @@ private extension SyncPayloadCodec {
         // phone and would name a different medicine on the other one.
         json["medicineUid"] = row.medicineUid
         json["time"] = row.time
+        json.put("amount", row.amount)
         json.put("notes", row.notes)
         return json
     }
@@ -467,6 +476,7 @@ private extension SyncPayloadCodec {
         MedicineDose(
             medicineUid: try json.required("medicineUid"),
             time: try json.requiredInt64("time"),
+            amount: json.double("amount"),
             notes: json.string("notes"),
             uid: try json.required("uid"),
             updatedAt: try json.requiredInt64("updatedAt"),
@@ -539,6 +549,8 @@ private extension Dictionary where Key == String, Value == Any {
     func int(_ key: String) -> Int? { (value(key) as? NSNumber)?.intValue }
 
     func int64(_ key: String) -> Int64? { (value(key) as? NSNumber)?.int64Value }
+
+    func double(_ key: String) -> Double? { (value(key) as? NSNumber)?.doubleValue }
 
     func required(_ key: String) throws -> String {
         guard let text = string(key) else {

@@ -414,6 +414,17 @@
     <string name="medicine_dose_edit">Modifier la prise</string>
     <string name="medicine_dose_time">Heure de la prise</string>
     <string name="medicine_of">Prise de %1$s</string>
+    <string name="medicine_no_gap">Pas d\'intervalle imposé</string>
+    <string name="medicine_no_gap_hint">Laisse l\'intervalle vide si on ne t\'en a pas donné : certains médicaments ne limitent que le nombre de fois, ou la quantité, par jour.</string>
+    <string name="medicine_amounts">Quantité</string>
+    <string name="medicine_amounts_hint">Seulement si la notice donne une quantité : 1,5 cm de gel, 2,5 ml. Sprout additionne ce que tu enregistres et le compare au maximum quotidien saisi ici.</string>
+    <string name="medicine_dose_amount">Une application</string>
+    <string name="medicine_unit">Unité (ex. cm)</string>
+    <string name="medicine_max_amount_per_day">Maximum sur 24 heures (facultatif)</string>
+    <string name="medicine_dose_amount_given">Quantité utilisée</string>
+    <string name="medicine_day_amount">%1$s sur %2$s %3$s</string>
+    <string name="medicine_amount_value">%1$s %2$s</string>
+    <string name="medicine_state_daily_amount">Quantité du jour atteinte — encore %1$s</string>
 
     <!-- Notifications médicament au besoin -->
     <string name="medicine_channel_name">Rappels de médicaments</string>
@@ -712,6 +723,16 @@
     <string name="report_col_name">Nom</string>
     <string name="report_col_dose">Dose</string>
     <string name="report_col_schedule">Rythme</string>
+    <string name="report_col_time">Heure</string>
+    <string name="report_col_limits">Limites indiquées</string>
+    <string name="report_col_given">Administré</string>
+    <string name="report_col_total">Total</string>
+    <string name="report_limit_doses">Max %1$d/jour</string>
+    <string name="report_limit_amount">Max %1$s/jour</string>
+    <string name="report_col_amount">Quantité</string>
+    <string name="report_col_notes">Notes</string>
+    <string name="report_include_medicines_hint">Médicaments donnés au besoin, et chaque prise de la période</string>
+    <string name="report_medicine_note">Prises telles qu\'elles ont été enregistrées, en regard des limites saisies par le parent depuis une ordonnance ou une notice. Sprout n\'applique aucune limite propre et ne tire aucune conclusion de ces chiffres.</string>
     <string name="report_col_day">Jour</string>
     <string name="report_col_week">Semaine</string>
     <string name="report_col_at_breast">Au sein</string>

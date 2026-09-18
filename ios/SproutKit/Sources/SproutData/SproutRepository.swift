@@ -508,7 +508,11 @@ public final class SproutRepository: @unchecked Sendable {
             var dose = MedicineDose(
                 babyId: medicine.babyId,
                 medicineUid: medicine.uid,
-                time: time
+                time: time,
+                // The medicine's own per-application amount, copied onto the
+                // dose so that editing the medicine later cannot rewrite what
+                // was given last night (BDR-18).
+                amount: medicine.doseAmount
             )
             dose.uid = newUid()
             dose.updatedAt = timestamp
@@ -705,6 +709,20 @@ public final class SproutRepository: @unchecked Sendable {
 
     public func treatmentsForBabyOnce(_ babyId: Int64) throws -> [Treatment] {
         try allForBaby(babyId, ordered: "startDate")
+    }
+
+    /// Every as-needed medicine of a baby, the retired ones included — unlike
+    /// ``medicinesForBabyOnce(_:)``, which is the live list a screen draws.
+    ///
+    /// A medicine stopped last week was still given last week, and a document
+    /// that quietly dropped it would be wrong about the very period it covers
+    /// (BDR-18).
+    public func allMedicinesForBabyOnce(_ babyId: Int64) throws -> [Medicine] {
+        try allForBaby(babyId, ordered: "name")
+    }
+
+    public func medicineDosesForBabyOnce(_ babyId: Int64) throws -> [MedicineDose] {
+        try allForBaby(babyId, ordered: "time")
     }
 
     private func allForBaby<T: FetchableRecord & TableRecord>(

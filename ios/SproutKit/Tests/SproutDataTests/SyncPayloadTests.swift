@@ -95,10 +95,26 @@ final class SyncPayloadTests: XCTestCase {
         XCTAssertNil(ibuprofen.comfortIntervalMinutes)
         XCTAssertNil(ibuprofen.maxPerDay)
 
+        // A medicine measured in something, with no gap rule at all: zero is a
+        // value here and not an absent key, and the two amounts ride alongside
+        // the dose count (BDR-18).
+        let gel = try XCTUnwrap(payload.medicines.first { $0.row.name == "Teething gel" }).row
+        XCTAssertEqual(gel.minIntervalMinutes, 0)
+        XCTAssertEqual(gel.maxPerDay, 6)
+        XCTAssertEqual(gel.doseAmount ?? 0, 0.25, accuracy: 1e-9)
+        XCTAssertEqual(gel.doseUnit, "cm")
+        XCTAssertEqual(gel.maxAmountPerDay ?? 0, 1.5, accuracy: 1e-9)
+
+        // And absent on the two that are measured in whole doses.
+        XCTAssertNil(paracetamol.doseAmount)
+        XCTAssertNil(paracetamol.maxAmountPerDay)
+        XCTAssertNil(ibuprofen.doseUnit)
+
         let dose = try XCTUnwrap(payload.medicineDoses.first)
         XCTAssertEqual(dose.babyUid, baby.uid)
         XCTAssertEqual(dose.row.medicineUid, paracetamol.uid)
         XCTAssertEqual(dose.row.time, 1_757_402_800_000)
+        XCTAssertEqual(dose.row.amount ?? 0, 2.5, accuracy: 1e-9)
 
         let pumping = try XCTUnwrap(payload.pumpings.first)
         XCTAssertEqual(pumping.storage, .FRIDGE)

@@ -334,6 +334,26 @@ const replica = {
       // a minimum gap has no amber band and no daily cap, which is a real
       // configuration and not an incomplete one.
     },
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'c9f0f895-fb98-4bd9-b3e4-f5a6b7c8d9e0',
+      updatedAt: 1_757_402_750_000,
+      name: 'Teething gel',
+      dose: '0.25 cm',
+      // Zero, and not absent: a medicine the parent was given no gap rule for.
+      // It is held by the two daily ceilings below and by nothing else, which
+      // is a leaflet that reads "up to six times a day" (BDR-18).
+      minIntervalMinutes: 0,
+      maxPerDay: 6,
+      // The same figure as `dose`, in a form that can be added up, and the
+      // day's total allowed in the parent's own unit.
+      doseAmount: 0.25,
+      doseUnit: 'cm',
+      maxAmountPerDay: 1.5,
+      remindWhenDue: false,
+      remindAtComfort: false,
+      active: true,
+    },
   ],
   medicineDoses: [
     {
@@ -343,6 +363,9 @@ const replica = {
       // The medicine's uid, never its local id.
       medicineUid: 'e4da3b7f-bbce-4f8c-a2b1-9d0e1f2a3b4c',
       time: 1_757_402_800_000,
+      // What this dose actually used, in its medicine's unit. Absent on a dose
+      // of a medicine that carries no amount.
+      amount: 2.5,
       notes: 'after the 38.4 reading',
     },
   ],

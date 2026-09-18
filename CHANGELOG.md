@@ -20,6 +20,22 @@ All notable changes to Sprout are documented here. This project follows
 - 🤫 **And it never nags.** No maximum, no "are you still feeding?", nothing that
   stops a session on its own. If you doze off with a break running, the feed you
   save is still the time you actually fed.
+- 💧 **A medicine can be measured, not just counted.** Some leaflets don't give a
+  gap between doses at all — they give a number of times a day and a total
+  amount, like a teething gel at up to six applications and no more than 1.5 cm
+  in twenty-four hours. An as-needed medicine can now carry how much one dose
+  uses, in your own unit, and how much is allowed in a day; the wait turns red
+  when either the count **or** the amount is used up, and says which.
+- 🕒 **"No set gap" is now something you can save.** Leave the minimum wait empty
+  and Sprout stops asking you to invent one — the medicine is held by its daily
+  limits alone, and the screen says so instead of counting down a wait nobody
+  gave you. Each dose keeps the amount it used, and you can correct it later if
+  you only used half.
+- 🩺 **The doctor's record now includes them.** The PDF gains a section listing
+  the as-needed medicines given over the period, with the limits you entered
+  beside them and every dose with its time and amount; the workbook gains a
+  *Medicines* sheet with the same rows. As with everything else in that
+  document, it reports the figures and draws no conclusion from them.
 
 ## [1.11.0] — 2026-09-16
 

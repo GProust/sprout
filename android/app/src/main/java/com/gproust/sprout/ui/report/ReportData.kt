@@ -7,6 +7,8 @@ import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.StoolColor
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.TreatmentEntity
 import com.gproust.sprout.ui.stats.DayStats
 import com.gproust.sprout.ui.stats.GrowthMeasure
@@ -51,6 +53,8 @@ data class ReportOptions(
     val reference: WhoSex? = null,
     val includeDailyTable: Boolean = true,
     val includeTreatments: Boolean = true,
+    /** The as-needed medicines, and the doses given inside the range (BDR-18). */
+    val includeMedicines: Boolean = true,
     /** Off by default: free text is where a parent writes what they meant for themselves. */
     val includeNotes: Boolean = false,
 )
@@ -95,6 +99,27 @@ data class TreatmentCourse(
     val doseDays: List<Int>,
 )
 
+/**
+ * One as-needed medicine and the doses of it that fall inside the range.
+ *
+ * The medicine's own figures travel with them because they are what the doses
+ * mean: "four in a day" reads differently against a maximum of four than
+ * against a maximum of six, and a reader who has only the doses cannot tell.
+ * They are the parent's figures, restated — the document still interprets
+ * nothing (BDR-12).
+ */
+data class MedicineRecord(
+    val medicine: MedicineEntity,
+    /** Oldest first, as everything else in the report is. */
+    val doses: List<MedicineDoseEntity>,
+) {
+    /** How much was used across the range, in the medicine's own unit. */
+    val amountTotal: Double get() = doses.sumOf { it.amount ?: 0.0 }
+
+    /** Whether any dose recorded a quantity at all — an absent one is not a zero. */
+    val hasAmounts: Boolean get() = doses.any { it.amount != null }
+}
+
 /** The whole of a report, ready to be drawn or written out. */
 data class ReportContent(
     val babyName: String,
@@ -123,6 +148,12 @@ data class ReportContent(
     /** Measurements over the whole history — a curve is only worth reading over months. */
     val growth: List<GrowthReading>,
     val treatments: List<TreatmentCourse>,
+    /**
+     * As-needed medicines that were actually given inside the range, with their
+     * doses. A medicine set up but never given in the period is left out: the
+     * document reports what happened, and a shelf is not an event.
+     */
+    val medicines: List<MedicineRecord>,
     /** The raw entries inside the range, oldest first, for the workbook. */
     val feedings: List<FeedingEntity>,
     val sleeps: List<SleepEntity>,
@@ -160,6 +191,8 @@ fun buildReport(
     diapers: List<DiaperEntity>,
     growth: List<GrowthEntity>,
     treatments: List<TreatmentEntity>,
+    medicines: List<MedicineEntity>,
+    medicineDoses: List<MedicineDoseEntity>,
     options: ReportOptions,
     now: Long,
     zone: ZoneId = ZoneId.systemDefault(),
@@ -217,10 +250,45 @@ fun buildReport(
         } else {
             emptyList()
         },
+        medicines = if (options.includeMedicines) {
+            medicineRecords(medicines, medicineDoses, startMillis, endMillis)
+        } else {
+            emptyList()
+        },
         feedings = feedsInRange,
         sleeps = sleepsInRange,
         diapers = diapersInRange,
     )
+}
+
+/**
+ * The as-needed medicines given inside the range, and their doses.
+ *
+ * A dose finds its medicine by uid, the way it does everywhere else — a dose
+ * whose medicine has since been deleted has nothing to be reported under, and
+ * is left out rather than listed against a name the document would have to
+ * invent. Deleted rows on either side are ignored, as every read does.
+ *
+ * Ordered by name, because a document is read rather than scrolled and there is
+ * no "most recent" to lead with once a range is fixed.
+ */
+fun medicineRecords(
+    medicines: List<MedicineEntity>,
+    doses: List<MedicineDoseEntity>,
+    startMillis: Long,
+    endMillis: Long,
+): List<MedicineRecord> {
+    val inRange = doses
+        .filter { it.deletedAt == null && it.time in startMillis until endMillis }
+        .sortedBy { it.time }
+        .groupBy { it.medicineUid }
+
+    return medicines
+        .filter { it.deletedAt == null }
+        .mapNotNull { medicine ->
+            inRange[medicine.uid]?.takeIf { it.isNotEmpty() }?.let { MedicineRecord(medicine, it) }
+        }
+        .sortedBy { it.medicine.name.lowercase() }
 }
 
 /**

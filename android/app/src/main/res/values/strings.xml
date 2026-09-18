@@ -432,6 +432,20 @@
     <string name="medicine_dose_edit">Edit dose</string>
     <string name="medicine_dose_time">When it was given</string>
     <string name="medicine_of">Dose of %1$s</string>
+    <!-- A medicine measured by amount, and one with no gap at all (BDR-18) -->
+    <string name="medicine_no_gap">No set gap</string>
+    <string name="medicine_no_gap_hint">Leave the wait blank if you weren\'t given one — some medicines only cap how many, or how much, in a day.</string>
+    <string name="medicine_amounts">Amount</string>
+    <string name="medicine_amounts_hint">Only if your leaflet gives a quantity — 1.5 cm of gel, 2.5 ml. Sprout adds up what you log and counts it against the daily maximum you type here.</string>
+    <string name="medicine_dose_amount">One application</string>
+    <string name="medicine_unit">Unit (e.g. cm)</string>
+    <string name="medicine_max_amount_per_day">Most in 24 hours (optional)</string>
+    <string name="medicine_dose_amount_given">How much was used</string>
+    <!-- Used of the day\'s total, e.g. "0.5 of 1.5 cm" -->
+    <string name="medicine_day_amount">%1$s of %2$s %3$s</string>
+    <!-- An amount and its unit, e.g. "0.25 cm" -->
+    <string name="medicine_amount_value">%1$s %2$s</string>
+    <string name="medicine_state_daily_amount">Day\'s amount used up — %1$s to wait</string>
 
     <!-- As-needed medicine notifications -->
     <string name="medicine_channel_name">Medicine reminders</string>
@@ -731,6 +745,16 @@
     <string name="report_col_name">Name</string>
     <string name="report_col_dose">Dose</string>
     <string name="report_col_schedule">Schedule</string>
+    <string name="report_col_time">Time</string>
+    <string name="report_col_limits">Limits set</string>
+    <string name="report_col_given">Given</string>
+    <string name="report_col_total">Total</string>
+    <string name="report_limit_doses">Max %1$d/day</string>
+    <string name="report_limit_amount">Max %1$s/day</string>
+    <string name="report_col_amount">Amount</string>
+    <string name="report_col_notes">Notes</string>
+    <string name="report_include_medicines_hint">Medicines given when needed, and every dose in the period</string>
+    <string name="report_medicine_note">Doses as they were logged, against the limits the parent entered from a prescriber or a leaflet. Sprout applies no limits of its own and draws no conclusion from these figures.</string>
     <string name="report_col_day">Day</string>
     <string name="report_col_week">Week</string>
     <string name="report_col_at_breast">At breast</string>
