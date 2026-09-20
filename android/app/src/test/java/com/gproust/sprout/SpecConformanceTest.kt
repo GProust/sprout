@@ -268,9 +268,25 @@ class SpecConformanceTest {
         assertNull(ibuprofen.comfortIntervalMinutes)
         assertNull(ibuprofen.maxPerDay)
 
+        // A medicine measured in something, with no gap rule at all: zero is a
+        // value here and not an absent key, and the two amounts ride alongside
+        // the dose count (BDR-18).
+        val gel = payload.medicines.first { it.row.name == "Teething gel" }.row
+        assertEquals(0, gel.minIntervalMinutes)
+        assertEquals(6, gel.maxPerDay)
+        assertEquals(0.25, gel.doseAmount!!, 1e-9)
+        assertEquals("cm", gel.doseUnit)
+        assertEquals(1.5, gel.maxAmountPerDay!!, 1e-9)
+
+        // And absent on the two that are measured in whole doses.
+        assertNull(paracetamol.doseAmount)
+        assertNull(paracetamol.maxAmountPerDay)
+        assertNull(ibuprofen.doseUnit)
+
         val dose = payload.medicineDoses.single().row
         assertEquals(paracetamol.uid, dose.medicineUid)
         assertEquals(1_757_402_800_000L, dose.time)
+        assertEquals(2.5, dose.amount!!, 1e-9)
 
         // A measure nobody took is an absent key, not a zero.
         assertNull(payload.growth.first().row.heightMm)

@@ -5,6 +5,8 @@ import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.SleepPlace
 import com.gproust.sprout.data.local.SleepPosition
@@ -55,8 +57,22 @@ class ReportDataTest {
         diapers: List<DiaperEntity> = emptyList(),
         growth: List<GrowthEntity> = emptyList(),
         treatments: List<TreatmentEntity> = emptyList(),
+        medicines: List<MedicineEntity> = emptyList(),
+        medicineDoses: List<MedicineDoseEntity> = emptyList(),
         options: ReportOptions = ReportOptions(period = ReportPeriod.WEEK),
-    ) = buildReport(baby, feedings, sleeps, diapers, growth, treatments, options, now, zone)
+    ) = buildReport(
+        baby = baby,
+        feedings = feedings,
+        sleeps = sleeps,
+        diapers = diapers,
+        growth = growth,
+        treatments = treatments,
+        medicines = medicines,
+        medicineDoses = medicineDoses,
+        options = options,
+        now = now,
+        zone = zone,
+    )
 
     private fun bottle(date: LocalDate, hour: Int, ml: Int?) = FeedingEntity(
         babyId = 1,
@@ -332,5 +348,82 @@ class ReportDataTest {
         assertFalse(content.hasEntries)
         assertEquals(0, content.feedTotal)
         assertEquals(7, content.days.size)
+    }
+
+    // --- as-needed medicine in the doctor's record (BDR-18) ---------------
+
+    private fun gel(uid: String = "gel") = MedicineEntity(
+        babyId = 1,
+        name = "Teething gel",
+        minIntervalMinutes = 0,
+        maxPerDay = 6,
+        doseAmount = 0.25,
+        doseUnit = "cm",
+        maxAmountPerDay = 1.5,
+        uid = uid,
+    )
+
+    private fun gelDose(at: Long, amount: Double? = 0.25, uid: String = "gel") =
+        MedicineDoseEntity(babyId = 1, medicineUid = uid, time = at, amount = amount)
+
+    @Test
+    fun `a medicine reaches the record with the doses inside the range`() {
+        val report = report(
+            medicines = listOf(gel()),
+            medicineDoses = listOf(gelDose(at(today, 9)), gelDose(at(today, 14))),
+        )
+
+        val record = report.medicines.single()
+        assertEquals("Teething gel", record.medicine.name)
+        assertEquals(2, record.doses.size)
+        assertEquals(0.5, record.amountTotal, 1e-9)
+        assertTrue(record.hasAmounts)
+    }
+
+    /** A shelf is not an event: a medicine set up but not given says nothing. */
+    @Test
+    fun `a medicine never given inside the range is left out`() {
+        val report = report(medicines = listOf(gel()), medicineDoses = emptyList())
+
+        assertTrue(report.medicines.isEmpty())
+    }
+
+    @Test
+    fun `a dose from before the range does not travel with it`() {
+        val report = report(
+            medicines = listOf(gel()),
+            medicineDoses = listOf(gelDose(at(born, 9)), gelDose(at(today, 9))),
+        )
+
+        assertEquals(1, report.medicines.single().doses.size)
+    }
+
+    /**
+     * A dose that recorded no quantity is still a dose. It is listed, and adds
+     * nothing to the total — which is why the total is only worth printing when
+     * something was measured at all.
+     */
+    @Test
+    fun `a dose with no amount is reported without inventing one`() {
+        val report = report(
+            medicines = listOf(gel()),
+            medicineDoses = listOf(gelDose(at(today, 9), amount = null)),
+        )
+
+        val record = report.medicines.single()
+        assertEquals(1, record.doses.size)
+        assertEquals(0.0, record.amountTotal, 1e-9)
+        assertFalse(record.hasAmounts)
+    }
+
+    @Test
+    fun `turning the medicines off leaves them out of the document`() {
+        val report = report(
+            medicines = listOf(gel()),
+            medicineDoses = listOf(gelDose(at(today, 9))),
+            options = ReportOptions(period = ReportPeriod.WEEK, includeMedicines = false),
+        )
+
+        assertTrue(report.medicines.isEmpty())
     }
 }

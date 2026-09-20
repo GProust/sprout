@@ -32,8 +32,33 @@ final class MedicineReadinessTests: XCTestCase {
         )
     }
 
-    private func dose(_ at: Int64, of: String = "medicine-uid", deletedAt: Int64? = nil) -> MedicineDose {
-        MedicineDose(medicineUid: of, time: at, uid: "dose-\(at)", deletedAt: deletedAt)
+    private func dose(
+        _ at: Int64,
+        of: String = "medicine-uid",
+        deletedAt: Int64? = nil,
+        amount: Double? = nil
+    ) -> MedicineDose {
+        MedicineDose(
+            medicineUid: of, time: at, amount: amount, uid: "dose-\(at)", deletedAt: deletedAt
+        )
+    }
+
+    /// The other shape a leaflet comes in: no gap at all, six a day, and a
+    /// centimetre and a half of gel across them (BDR-18).
+    private func teethingGel(
+        maxPerDay: Int? = 6,
+        maxAmountPerDay: Double? = 1.5
+    ) -> Medicine {
+        Medicine(
+            name: "Teething gel",
+            minIntervalMinutes: 0,
+            comfortIntervalMinutes: nil,
+            maxPerDay: maxPerDay,
+            doseAmount: 0.25,
+            doseUnit: "cm",
+            maxAmountPerDay: maxAmountPerDay,
+            uid: "medicine-uid"
+        )
     }
 
     func testAMedicineNeverGivenIsReadyNotRed() {
@@ -294,6 +319,153 @@ final class MedicineReadinessTests: XCTestCase {
                 doses: [dose(now - 2 * hour)],
                 now: now
             )
+        )
+    }
+
+    // MARK: - No gap at all, and a day measured in quantity (BDR-18)
+
+    func testAMedicineWithNoGapIsReadyTheMomentAfterItIsGiven() {
+        let readiness = medicineReadiness(
+            medicine: teethingGel(), doses: [dose(now - 60_000)], now: now
+        )
+
+        XCTAssertEqual(readiness.level, .ready)
+        XCTAssertNil(readiness.nextAllowedAt, "nothing is being waited for")
+    }
+
+    func testWithNoGapTheDaysCountIsTheOnlyThingThatHoldsIt() {
+        let doses = (1...6).map { dose(now - Int64($0) * hour) }
+
+        let readiness = medicineReadiness(
+            medicine: teethingGel(maxAmountPerDay: nil), doses: doses, now: now
+        )
+
+        XCTAssertEqual(readiness.level, .tooSoon)
+        XCTAssertEqual(readiness.reason, .dailyMaximum)
+        // The sixth-most-recent dose is the oldest, and it has to age out.
+        XCTAssertEqual(readiness.nextAllowedAt, now - 6 * hour + medicineDayMs)
+    }
+
+    func testTheDaysQuantityCanRunOutBeforeTheCountDoes() {
+        // Three generous applications, half a centimetre each: three of six
+        // doses, but the whole centimetre and a half.
+        let doses = [
+            dose(now - 5 * hour, amount: 0.5),
+            dose(now - 3 * hour, amount: 0.5),
+            dose(now - 1 * hour, amount: 0.5),
+        ]
+
+        let readiness = medicineReadiness(medicine: teethingGel(), doses: doses, now: now)
+
+        XCTAssertEqual(readiness.level, .tooSoon)
+        XCTAssertEqual(readiness.reason, .dailyAmount)
+        XCTAssertEqual(readiness.dosesInLastDay, 3)
+        XCTAssertEqual(readiness.amountInLastDay, 1.5, accuracy: 1e-9)
+        XCTAssertEqual(readiness.maxAmountPerDay ?? 0, 1.5, accuracy: 1e-9)
+        XCTAssertEqual(readiness.unit, "cm")
+        // Free again when the oldest half-centimetre leaves the window.
+        XCTAssertEqual(readiness.nextAllowedAt, now - 5 * hour + medicineDayMs)
+    }
+
+    func testUnderTheDaysQuantityItStaysGreen() {
+        let doses = [dose(now - 2 * hour, amount: 0.25), dose(now - hour, amount: 0.25)]
+
+        let readiness = medicineReadiness(medicine: teethingGel(), doses: doses, now: now)
+
+        XCTAssertEqual(readiness.level, .ready)
+        XCTAssertEqual(readiness.amountInLastDay, 0.5, accuracy: 1e-9)
+    }
+
+    /// A dose nobody measured is not a dose of nothing. It counts against the
+    /// tally, because it happened, and adds nothing to the quantity, because
+    /// there is nothing to add.
+    func testDosesThatRecordedNoAmountNeverSpendTheDaysQuantity() {
+        let doses = (1...5).map { dose(now - Int64($0) * hour) }
+
+        let readiness = medicineReadiness(medicine: teethingGel(), doses: doses, now: now)
+
+        XCTAssertEqual(readiness.level, .ready)
+        XCTAssertEqual(readiness.dosesInLastDay, 5)
+        XCTAssertEqual(readiness.amountInLastDay, 0, accuracy: 1e-9)
+    }
+
+    func testAnAmountOlderThanTheWindowDoesNotCountAgainstTheDay() {
+        let doses = [dose(now - 25 * hour, amount: 1.5), dose(now - hour, amount: 0.25)]
+
+        let readiness = medicineReadiness(medicine: teethingGel(), doses: doses, now: now)
+
+        XCTAssertEqual(readiness.level, .ready)
+        XCTAssertEqual(readiness.amountInLastDay, 0.25, accuracy: 1e-9)
+    }
+
+    func testADailyQuantityOfZeroIsNoQuantityAtAll() {
+        let readiness = medicineReadiness(
+            medicine: teethingGel(maxAmountPerDay: 0),
+            doses: [dose(now - hour, amount: 5)],
+            now: now
+        )
+
+        XCTAssertEqual(readiness.level, .ready)
+    }
+
+    /// Decimals a parent typed are added up in binary, where three lots of 0.3
+    /// do not make 0.9. The tolerance is what keeps the arithmetic agreeing
+    /// with the parent's own sum rather than with the last bit of a Double.
+    func testADayThatExactlyReachesItsQuantityCountsAsReached() {
+        let doses = [
+            dose(now - 3 * hour, amount: 0.3),
+            dose(now - 2 * hour, amount: 0.3),
+            dose(now - hour, amount: 0.3),
+        ]
+
+        let readiness = medicineReadiness(
+            medicine: teethingGel(maxPerDay: nil, maxAmountPerDay: 0.9), doses: doses, now: now
+        )
+
+        XCTAssertEqual(readiness.level, .tooSoon)
+        XCTAssertEqual(readiness.reason, .dailyAmount)
+    }
+
+    /// The interval keeps its precedence over either ceiling while it runs.
+    func testTheIntervalIsStillNamedAheadOfASpentQuantity() {
+        let medicine = Medicine(
+            name: "Ibuprofen",
+            minIntervalMinutes: 6 * 60,
+            doseAmount: 2.5,
+            doseUnit: "ml",
+            maxAmountPerDay: 5,
+            uid: "medicine-uid"
+        )
+        let doses = [
+            dose(now - 8 * hour, amount: 2.5),
+            dose(now - 2 * hour, amount: 2.5),
+        ]
+
+        let readiness = medicineReadiness(medicine: medicine, doses: doses, now: now)
+
+        XCTAssertEqual(readiness.reason, .interval)
+        // And still the later of the two moments, which is the quantity's.
+        XCTAssertEqual(readiness.nextAllowedAt, now - 8 * hour + medicineDayMs)
+    }
+
+    func testAReminderWaitsForTheDaysQuantityAsWellAsTheInterval() {
+        let medicine = Medicine(
+            name: "Teething gel",
+            minIntervalMinutes: 0,
+            doseAmount: 0.5,
+            doseUnit: "cm",
+            maxAmountPerDay: 1,
+            remindWhenDue: true,
+            uid: "medicine-uid"
+        )
+        let doses = [
+            dose(now - 4 * hour, amount: 0.5),
+            dose(now - hour, amount: 0.5),
+        ]
+
+        XCTAssertEqual(
+            nextMedicineReminder(medicine: medicine, doses: doses, now: now),
+            now - 4 * hour + medicineDayMs
         )
     }
 }

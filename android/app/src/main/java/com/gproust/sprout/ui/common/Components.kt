@@ -303,6 +303,48 @@ fun NumberField(
     )
 }
 
+/**
+ * [NumberField] for a figure that can carry a fraction — 1.5 cm of gel, 2.5 ml.
+ *
+ * Both separators are accepted, because the number keyboard offers whichever
+ * the phone's locale uses and a parent who types 1,5 means one and a half. The
+ * field refuses everything else as it is typed rather than rejecting the value
+ * afterwards: there is nothing to explain if the stray character never lands.
+ */
+@Composable
+fun DecimalField(
+    label: String,
+    value: String,
+    onChange: (String) -> Unit,
+    suffix: String? = null,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { new ->
+            var separatorSeen = false
+            onChange(
+                buildString {
+                    new.forEach { ch ->
+                        when {
+                            ch.isDigit() -> append(ch)
+                            (ch == '.' || ch == ',') && !separatorSeen -> {
+                                separatorSeen = true
+                                append(ch)
+                            }
+                        }
+                    }
+                },
+            )
+        },
+        label = { Text(label) },
+        suffix = suffix?.let { { Text(it) } },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+
 @Composable
 fun NotesField(value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
     OutlinedTextField(

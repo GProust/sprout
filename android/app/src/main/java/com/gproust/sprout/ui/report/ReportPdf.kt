@@ -15,6 +15,9 @@ import android.text.TextPaint
 import com.gproust.sprout.R
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDate
+import com.gproust.sprout.ui.common.formatTime
+import com.gproust.sprout.ui.medicines.amountLabel
+import com.gproust.sprout.ui.medicines.intervalSummary
 import com.gproust.sprout.ui.diaper.label
 import com.gproust.sprout.ui.sleep.label
 import com.gproust.sprout.ui.stats.DayStats
@@ -215,6 +218,7 @@ class ReportPdf(
         }
         addAll(growthSection())
         addAll(treatmentSection())
+        addAll(medicineSection())
         addAll(dailySection())
         add(paragraph(string(R.string.report_about), smallPaint, topGap = 14f))
     }
@@ -788,6 +792,104 @@ class ReportPdf(
         return listOf(timeline) +
             tableBlocks(headers, rows, listOf(1.3f, 1.2f, 1.8f, 1f, 1f), List(5) { false }, true) +
             paragraph(string(R.string.report_treatment_note), smallPaint, topGap = 6f)
+    }
+
+    // --- as-needed medicine ----------------------------------------------
+
+    /**
+     * What was given when it was needed, and against which of the parent's own
+     * figures (BDR-18).
+     *
+     * Two tables: the medicines with the limits their parent typed, and then
+     * every dose with its time and, where there is one, its amount. No
+     * threshold is applied and nothing is flagged — a day that reached the
+     * maximum is printed as the number it reached, and what that means belongs
+     * to the clinician reading it (BDR-12).
+     */
+    private fun medicineSection(): List<Block> {
+        val records = report.medicines
+        if (records.isEmpty()) return emptyList()
+
+        val heading = Block(34f) { canvas, top ->
+            drawHeading(
+                canvas,
+                top,
+                string(R.string.screen_medicines),
+                string(R.string.report_over_the_period).uppercase(),
+            )
+        }
+
+        val summaryHeaders = listOf(
+            string(R.string.report_col_name),
+            string(R.string.report_col_dose),
+            string(R.string.report_col_limits),
+            string(R.string.report_col_given),
+            string(R.string.report_col_total),
+        )
+        val summaryRows = records.map { record ->
+            listOf(
+                record.medicine.name,
+                record.medicine.dose.orEmpty().ifEmpty { DASH },
+                limitsOf(record),
+                record.doses.size.toString(),
+                if (record.hasAmounts) {
+                    amountLabel(context, record.amountTotal, record.medicine.doseUnit) ?: DASH
+                } else {
+                    DASH
+                },
+            )
+        }
+
+        val doseHeaders = buildList {
+            add(string(R.string.report_col_date))
+            add(string(R.string.report_col_time))
+            add(string(R.string.report_col_name))
+            add(string(R.string.report_col_amount))
+            if (report.options.includeNotes) add(string(R.string.report_col_notes))
+        }
+        val doseRows = records
+            .flatMap { record -> record.doses.map { record.medicine to it } }
+            .sortedBy { it.second.time }
+            .map { (medicine, dose) ->
+                buildList {
+                    add(formatDate(context, dose.time))
+                    add(formatTime(dose.time))
+                    add(medicine.name)
+                    add(amountLabel(context, dose.amount, medicine.doseUnit) ?: DASH)
+                    if (report.options.includeNotes) add(dose.notes.orEmpty().ifEmpty { DASH })
+                }
+            }
+
+        val doseWeights = if (report.options.includeNotes) {
+            listOf(1f, 0.7f, 1.4f, 0.9f, 2f)
+        } else {
+            listOf(1f, 0.8f, 1.8f, 1f)
+        }
+        return listOf(heading) +
+            tableBlocks(
+                summaryHeaders,
+                summaryRows,
+                listOf(1.4f, 1f, 1.8f, 0.7f, 0.9f),
+                listOf(false, false, false, true, true),
+                true,
+            ) +
+            tableBlocks(doseHeaders, doseRows, doseWeights, List(doseWeights.size) { false }, true) +
+            paragraph(string(R.string.report_medicine_note), smallPaint, topGap = 6f)
+    }
+
+    /** The parent's own ceilings for a medicine, side by side and unjudged. */
+    private fun limitsOf(record: MedicineRecord): String {
+        val medicine = record.medicine
+        val parts = buildList {
+            add(intervalSummary(context, medicine))
+            medicine.maxPerDay?.let { add(string(R.string.report_limit_doses, it)) }
+            medicine.maxAmountPerDay?.let { max ->
+                amountLabel(context, max, medicine.doseUnit)?.let {
+                    add(string(R.string.report_limit_amount, it))
+                }
+            }
+        }
+        return parts.joinToString(string(R.string.feeding_detail_separator))
     }
 
     private fun scheduleOf(course: TreatmentCourse): String {

@@ -398,6 +398,12 @@ class SproutRepository(
      * (BDR-16), and with twins the selected baby and the card that was touched
      * are not the same thing — resolving the baby from the selection is how a
      * sibling's paracetamol ends up in the wrong history.
+     *
+     * The amount is the medicine's own, copied onto the dose rather than read
+     * back through it: the day's total has to keep meaning what it meant when
+     * the doses were given, and editing "1.5 cm" to "1 cm" tomorrow must not
+     * rewrite what was used yesterday. A parent who used less says so on the
+     * dose itself (BDR-18).
      */
     suspend fun giveMedicineDose(medicine: MedicineEntity, time: Long): Long =
         db.medicineDoseDao().insert(
@@ -405,6 +411,7 @@ class SproutRepository(
                 babyId = medicine.babyId,
                 medicineUid = medicine.uid,
                 time = time,
+                amount = medicine.doseAmount,
             ).stamped(),
         )
 
@@ -448,6 +455,13 @@ class SproutRepository(
 
     suspend fun medicinesForBabyOnce(babyId: Long): List<MedicineEntity> =
         db.medicineDao().observeForBaby(babyId).first()
+
+    /** Every medicine of a baby, retired ones included, and every dose — for the report. */
+    suspend fun allMedicinesForBabyOnce(babyId: Long): List<MedicineEntity> =
+        db.medicineDao().allForBabyOnce(babyId)
+
+    suspend fun medicineDosesForBabyOnce(babyId: Long): List<MedicineDoseEntity> =
+        db.medicineDoseDao().allForBabyOnce(babyId)
 
     // Pumping (expressed milk — the parent's stash, not a baby's log)
     val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()

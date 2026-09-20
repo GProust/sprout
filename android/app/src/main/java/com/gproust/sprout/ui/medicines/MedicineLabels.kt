@@ -15,6 +15,7 @@ import com.gproust.sprout.data.MedicineReadiness
 import com.gproust.sprout.data.TooSoonReason
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.ui.common.formatDateTime
+import com.gproust.sprout.ui.common.formatDecimal
 import com.gproust.sprout.ui.common.formatDuration
 
 /*
@@ -58,10 +59,15 @@ internal fun stateSentence(context: Context, readiness: MedicineReadiness, now: 
     when (readiness.level) {
         MedicineLevel.TOO_SOON -> {
             val left = formatDuration(context, (readiness.nextAllowedAt ?: now) - now)
-            if (readiness.reason == TooSoonReason.DAILY_MAXIMUM) {
-                context.getString(R.string.medicine_state_daily_max, left)
-            } else {
-                context.getString(R.string.medicine_state_too_soon, left)
+            when (readiness.reason) {
+                TooSoonReason.DAILY_MAXIMUM ->
+                    context.getString(R.string.medicine_state_daily_max, left)
+                // Named apart from the dose count, because "you have used the
+                // day's 1.5 cm" and "that would be the seventh today" are two
+                // different things to have run out of.
+                TooSoonReason.DAILY_AMOUNT ->
+                    context.getString(R.string.medicine_state_daily_amount, left)
+                else -> context.getString(R.string.medicine_state_too_soon, left)
             }
         }
         MedicineLevel.SOONER_THAN_IDEAL -> context.getString(
@@ -94,21 +100,50 @@ internal fun shortState(context: Context, readiness: MedicineReadiness, now: Lon
         MedicineLevel.READY -> null
     }
 
-/** "Last dose 03:20 · 2 of 4 in the last 24 h", or that it has never been given. */
+/**
+ * "Last dose 03:20 · 2 of 4 in the last 24 h · 0.5 of 1.5 cm", or that it has
+ * never been given.
+ *
+ * The quantity is only there when the parent gave a daily one to count against:
+ * a medicine measured in whole doses says nothing about millilitres, and a
+ * running total nobody set a limit for is a number with no question behind it.
+ */
 internal fun lastDoseLine(context: Context, readiness: MedicineReadiness): String {
     val last = readiness.lastDoseAt ?: return context.getString(R.string.medicine_never_given)
     val count = readiness.maxPerDay
         ?.let { context.getString(R.string.medicine_day_count, readiness.dosesInLastDay, it) }
         ?: context.getString(R.string.medicine_day_count_plain, readiness.dosesInLastDay)
-    return context.getString(
-        R.string.treatment_schedule_summary,
+    val separator = context.getString(R.string.feeding_detail_separator)
+    val amount = readiness.maxAmountPerDay?.let { max ->
+        context.getString(
+            R.string.medicine_day_amount,
+            formatDecimal(readiness.amountInLastDay),
+            formatDecimal(max),
+            readiness.unit.orEmpty(),
+        )
+    }
+    return listOfNotNull(
         context.getString(R.string.medicine_last_dose, formatDateTime(context, last)),
         count,
-    )
+        amount,
+    ).joinToString(separator)
 }
 
-/** "Every 6 h to 8 h", or "Every 6 h" when only a minimum was set. */
+/** "0.25 cm" — an amount in the medicine's own unit, or null when it has none. */
+internal fun amountLabel(context: Context, amount: Double?, unit: String?): String? {
+    if (amount == null) return null
+    val value = formatDecimal(amount)
+    return unit?.takeIf { it.isNotBlank() }
+        ?.let { context.getString(R.string.medicine_amount_value, value, it) }
+        ?: value
+}
+
+/**
+ * "Every 6 h to 8 h", "Every 6 h" when only a minimum was set, or "No set gap"
+ * for a medicine whose leaflet gave none at all (BDR-18).
+ */
 internal fun intervalSummary(context: Context, medicine: MedicineEntity): String {
+    if (medicine.minIntervalMinutes <= 0) return context.getString(R.string.medicine_no_gap)
     val min = formatDuration(context, medicine.minIntervalMinutes * 60_000L)
     val comfort = medicine.comfortIntervalMinutes
         ?.takeIf { it > medicine.minIntervalMinutes }

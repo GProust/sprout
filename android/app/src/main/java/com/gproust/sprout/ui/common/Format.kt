@@ -6,9 +6,23 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.text.DecimalFormat
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 import kotlin.math.abs
+
+/**
+ * A figure a parent typed, written back the way they would write it: "1.5",
+ * "2", "0.25" — no trailing zeros, and the locale's own decimal separator,
+ * because a parent who types 1,5 should read 1,5.
+ */
+fun formatDecimal(value: Double): String = DecimalFormat("0.###").format(value)
+
+/**
+ * Reads a decimal a parent typed, accepting either separator — a phone's number
+ * keyboard offers whichever its locale uses. Null when it is not a number.
+ */
+fun parseDecimal(text: String): Double? = text.trim().replace(',', '.').toDoubleOrNull()
 
 private val timeFmt = DateTimeFormatter.ofPattern("HH:mm")
 

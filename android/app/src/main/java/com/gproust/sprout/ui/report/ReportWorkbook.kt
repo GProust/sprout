@@ -35,6 +35,7 @@ object ReportWorkbook {
             add(nappies(report, zone))
             add(growth(report, zone))
             if (report.options.includeTreatments) add(treatments(report, zone))
+            if (report.medicines.isNotEmpty()) add(medicineDoses(report, zone))
         }
 
     fun bytes(report: ReportContent, zone: ZoneId = ZoneId.systemDefault()): ByteArray =
@@ -288,6 +289,48 @@ object ReportWorkbook {
                 row
             },
             widths = listOf(20, 16, 14, 18, 12, 12, 11, 40),
+        )
+    }
+
+    /**
+     * Every as-needed dose inside the range, one row each (BDR-18).
+     *
+     * Raw rows and nothing derived: the medicine's own ceilings travel as
+     * columns beside each dose so a pivot table can group by medicine and
+     * compare a day's total against the figure the parent was given, without
+     * the sheet having decided anything about it.
+     *
+     * `amount` is blank where the dose recorded none — a dose nobody measured
+     * is not a dose of nothing, and a zero would be added up as though it were.
+     */
+    private fun medicineDoses(report: ReportContent, zone: ZoneId): Xlsx.Sheet {
+        val headers = mutableListOf(
+            "date", "time", "medicine", "amount", "unit",
+            "min_interval_minutes", "max_per_day", "max_amount_per_day",
+        )
+        if (report.options.includeNotes) headers += "notes"
+
+        return Xlsx.Sheet(
+            name = "Medicines",
+            headers = headers,
+            rows = report.medicines
+                .flatMap { record -> record.doses.map { record.medicine to it } }
+                .sortedBy { it.second.time }
+                .map { (medicine, dose) ->
+                    val row = mutableListOf(
+                        Cell.Day(dose.time.day(zone)),
+                        Cell.Clock(dose.time.clock(zone)),
+                        Cell.Text(medicine.name),
+                        dose.amount?.let { Cell.Decimal(it) } ?: Cell.Blank,
+                        Cell.Text(medicine.doseUnit.orEmpty()),
+                        Cell.Whole(medicine.minIntervalMinutes.toLong()),
+                        medicine.maxPerDay?.let { Cell.Whole(it.toLong()) } ?: Cell.Blank,
+                        medicine.maxAmountPerDay?.let { Cell.Decimal(it) } ?: Cell.Blank,
+                    )
+                    if (report.options.includeNotes) row += Cell.Text(dose.notes.orEmpty())
+                    row
+                },
+            widths = listOf(12, 10, 20, 10, 8, 20, 13, 20, 40),
         )
     }
 

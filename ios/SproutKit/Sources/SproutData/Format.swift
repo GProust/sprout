@@ -82,6 +82,31 @@ public enum SproutFormat {
         return .other(epochMillis)
     }
 
+    // MARK: - Numbers
+
+    /// A figure a parent typed, written back the way they would write it:
+    /// "1.5", "2", "0.25" — no trailing zeros, and the locale's own decimal
+    /// separator, because a parent who types 1,5 should read 1,5.
+    public static func decimal(_ value: Double) -> String {
+        decimalFormatter.string(from: NSNumber(value: value)) ?? String(value)
+    }
+
+    /// Reads a decimal a parent typed, accepting either separator — a phone's
+    /// number keyboard offers whichever its locale uses. Nil when it is not a
+    /// number.
+    public static func parseDecimal(_ text: String) -> Double? {
+        Double(text.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ",", with: "."))
+    }
+
+    private static let decimalFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = false
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 3
+        return formatter
+    }()
+
     // MARK: - Greeting
 
     public enum Greeting: String, Equatable, Sendable {

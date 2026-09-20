@@ -37,7 +37,20 @@ public enum TooSoonReason: String, Sendable, Equatable {
     /// The parent's daily maximum has been reached; the interval alone would
     /// allow it.
     case dailyMaximum
+    /// The day's allowed *quantity* is used up — 1.5 cm of gel, not six of six
+    /// doses. A second ceiling because a leaflet often gives both, and three
+    /// generous applications can reach the amount before the count (BDR-18).
+    case dailyAmount
 }
+
+/// How close two amounts have to be to count as equal.
+///
+/// Amounts are the parent's own decimals and are added up in binary floating
+/// point, where 0.3 three times is not 0.9. Without a tolerance a day that has
+/// exactly reached its limit could read as a hair under it — and since nothing
+/// here blocks a dose anyway, the honest thing is for the arithmetic to agree
+/// with the parent's own sum rather than with the last bit of a Double.
+private let medicineAmountTolerance = 1e-6
 
 /// What the screen draws, and what a reminder is scheduled from.
 public struct MedicineReadiness: Sendable, Equatable {
@@ -57,6 +70,15 @@ public struct MedicineReadiness: Sendable, Equatable {
     /// The parent's own daily maximum, echoed back for the screen to draw the
     /// count against; `nil` when they set none.
     public let maxPerDay: Int?
+    /// How much was used in the last 24 hours, in the medicine's own unit. Zero
+    /// when nothing was recorded, which is not the same as nothing being used.
+    public let amountInLastDay: Double
+    /// The parent's own daily quantity, echoed back beside ``amountInLastDay``;
+    /// `nil` when they set none.
+    public let maxAmountPerDay: Double?
+    /// The medicine's own unit for the two amounts, echoed back so the screen
+    /// does not have to carry the medicine as well.
+    public let unit: String?
 
     public init(
         level: MedicineLevel,
@@ -65,7 +87,10 @@ public struct MedicineReadiness: Sendable, Equatable {
         nextAllowedAt: Int64? = nil,
         comfortableAt: Int64? = nil,
         dosesInLastDay: Int = 0,
-        maxPerDay: Int? = nil
+        maxPerDay: Int? = nil,
+        amountInLastDay: Double = 0,
+        maxAmountPerDay: Double? = nil,
+        unit: String? = nil
     ) {
         self.level = level
         self.reason = reason
@@ -74,6 +99,9 @@ public struct MedicineReadiness: Sendable, Equatable {
         self.comfortableAt = comfortableAt
         self.dosesInLastDay = dosesInLastDay
         self.maxPerDay = maxPerDay
+        self.amountInLastDay = amountInLastDay
+        self.maxAmountPerDay = maxAmountPerDay
+        self.unit = unit
     }
 }
 
@@ -102,7 +130,12 @@ public func medicineReadiness(
     // phone five minutes fast is the dose that was just given, not one to
     // ignore — so the wait runs from the latest of them either way.
     guard let lastDoseAt = mine.first?.time else {
-        return MedicineReadiness(level: .ready, maxPerDay: medicine.maxPerDay)
+        return MedicineReadiness(
+            level: .ready,
+            maxPerDay: medicine.maxPerDay,
+            maxAmountPerDay: medicine.maxAmountPerDay,
+            unit: medicine.doseUnit
+        )
     }
 
     let minGapMs = Int64(max(0, medicine.minIntervalMinutes)) * 60_000
@@ -127,9 +160,20 @@ public func medicineReadiness(
         inWindow.count >= limit ? inWindow[limit - 1].time + medicineDayMs : nil
     }
 
+    // The day's quantity, the same rolling window and the same shape as the
+    // count. Doses that recorded no amount add nothing — the arithmetic cannot
+    // total what was never typed, and guessing a size for them would be the app
+    // inventing a figure the parent never gave.
+    let amountUsed = inWindow.reduce(0.0) { $0 + ($1.amount ?? 0) }
+    let amountCap: Double? = medicine.maxAmountPerDay.flatMap { max -> Double? in
+        max > 0 ? max : nil
+    }
+    let amountReachedUntil: Int64? = amountCap.flatMap { amountFreeAt(inWindow, max: $0) }
+
     let blockedUntil: Int64? = [
         intervalEndsAt.after(now),
         capReachedUntil?.after(now),
+        amountReachedUntil?.after(now),
     ].compactMap { $0 }.max()
 
     if let blockedUntil {
@@ -138,12 +182,21 @@ public func medicineReadiness(
             // once it has elapsed, "the daily maximum" is the honest answer to
             // why the screen is still red.
             level: .tooSoon,
-            reason: intervalEndsAt > now ? .interval : .dailyMaximum,
+            // The interval keeps its precedence: while it is running it is what
+            // the parent is waiting on first, whichever ceiling is also spent.
+            reason: {
+                if intervalEndsAt > now { return .interval }
+                if let capReachedUntil, capReachedUntil > now { return .dailyMaximum }
+                return .dailyAmount
+            }(),
             lastDoseAt: lastDoseAt,
             nextAllowedAt: blockedUntil,
             comfortableAt: comfortEndsAt?.after(now),
             dosesInLastDay: inWindow.count,
-            maxPerDay: medicine.maxPerDay
+            maxPerDay: medicine.maxPerDay,
+            amountInLastDay: amountUsed,
+            maxAmountPerDay: medicine.maxAmountPerDay,
+            unit: medicine.doseUnit
         )
     }
 
@@ -153,8 +206,33 @@ public func medicineReadiness(
         lastDoseAt: lastDoseAt,
         comfortableAt: comfortEndsAt?.after(now),
         dosesInLastDay: inWindow.count,
-        maxPerDay: medicine.maxPerDay
+        maxPerDay: medicine.maxPerDay,
+        amountInLastDay: amountUsed,
+        maxAmountPerDay: medicine.maxAmountPerDay,
+        unit: medicine.doseUnit
     )
+}
+
+/// When the day's quantity drops back below `max`, or `nil` while it never
+/// reached it.
+///
+/// The same rule the dose count uses, applied to a total rather than a tally:
+/// doses age out of the rolling window oldest first, and the moment the ones
+/// still inside it add up to less than the limit is the moment there is room
+/// again. Doses that recorded no amount contribute nothing on the way in and
+/// free nothing on the way out.
+private func amountFreeAt(_ inWindow: [MedicineDose], max: Double) -> Int64? {
+    let oldestFirst = inWindow.sorted { $0.time < $1.time }
+    var remaining = oldestFirst.reduce(0.0) { $0 + ($1.amount ?? 0) }
+    if remaining < max - medicineAmountTolerance { return nil }
+
+    for dose in oldestFirst {
+        remaining -= dose.amount ?? 0
+        if remaining < max - medicineAmountTolerance { return dose.time + medicineDayMs }
+    }
+    // One dose was the whole day's allowance on its own: nothing is free until
+    // the last of them has aged out.
+    return oldestFirst.last.map { $0.time + medicineDayMs }
 }
 
 /// One medicine the dashboard should mention, and where it stands.

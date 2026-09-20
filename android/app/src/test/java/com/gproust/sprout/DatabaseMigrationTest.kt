@@ -105,6 +105,18 @@ class DatabaseMigrationTest {
         // querying tables that are not there.
         assertEquals("medicine rows", 0, database.countOf("medicine"))
         assertEquals("medicine_dose rows", 0, database.countOf("medicine_dose"))
+
+        // And the columns v17 -> v18 adds to both of them (BDR-18). Selecting
+        // them is the whole assertion: on a chain that stopped at v17 the
+        // query throws rather than returning nothing, which is exactly the
+        // failure a parent would otherwise meet on the as-needed screen.
+        database.query(
+            "SELECT doseAmount, doseUnit, maxAmountPerDay FROM `medicine`",
+            null,
+        ).use { c -> assertEquals("medicine amount columns", 0, c.count) }
+        database.query("SELECT amount FROM `medicine_dose`", null).use { c ->
+            assertEquals("dose amount column", 0, c.count)
+        }
     }
 
     @Test
@@ -209,7 +221,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(17, database.openHelper.writableDatabase.version)
+        assertEquals(18, database.openHelper.writableDatabase.version)
     }
 
     /**

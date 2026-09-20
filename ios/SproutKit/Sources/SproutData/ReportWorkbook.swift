@@ -23,6 +23,7 @@ public enum ReportWorkbook {
             growth(report),
         ]
         if report.options.includeTreatments { sheets.append(treatments(report)) }
+        if !report.medicines.isEmpty { sheets.append(medicineDoses(report)) }
         return sheets
     }
 
@@ -284,6 +285,56 @@ public enum ReportWorkbook {
             },
             widths: [20, 16, 14, 18, 12, 12, 11, 40]
         )
+    }
+
+    /// Every as-needed dose inside the range, one row each (BDR-18).
+    ///
+    /// Raw rows and nothing derived: the medicine's own ceilings travel as
+    /// columns beside each dose so a pivot table can group by medicine and
+    /// compare a day's total against the figure the parent was given, without
+    /// the sheet having decided anything about it.
+    ///
+    /// `amount` is blank where the dose recorded none — a dose nobody measured
+    /// is not a dose of nothing, and a zero would be added up as though it were.
+    private static func medicineDoses(_ report: ReportContent) -> Xlsx.Sheet {
+        var headers = [
+            "date", "time", "medicine", "amount", "unit",
+            "min_interval_minutes", "max_per_day", "max_amount_per_day",
+        ]
+        if report.options.includeNotes { headers.append("notes") }
+
+        return Xlsx.Sheet(
+            name: "Medicines",
+            headers: headers,
+            rows: dosesGiven(report).map { given in
+                let medicine = given.medicine
+                let dose = given.dose
+                var row: [Xlsx.Cell] = [
+                    .day(day(dose.time)),
+                    .clock(clock(dose.time)),
+                    .text(medicine.name),
+                    dose.amount.map { Xlsx.Cell.decimal($0) } ?? .blank,
+                    .text(medicine.doseUnit ?? ""),
+                    .whole(Int64(medicine.minIntervalMinutes)),
+                    medicine.maxPerDay.map { Xlsx.Cell.whole(Int64($0)) } ?? .blank,
+                    medicine.maxAmountPerDay.map { Xlsx.Cell.decimal($0) } ?? .blank,
+                ]
+                if report.options.includeNotes { row.append(.text(dose.notes ?? "")) }
+                return row
+            },
+            widths: [12, 10, 20, 10, 8, 20, 13, 20, 40]
+        )
+    }
+
+    /// Every dose in the range beside the medicine it was of, oldest first —
+    /// one flat list, because the sheet is rows of doses rather than a section
+    /// per medicine.
+    private static func dosesGiven(
+        _ report: ReportContent
+    ) -> [(medicine: Medicine, dose: MedicineDose)] {
+        report.medicines
+            .flatMap { record in record.doses.map { (medicine: record.medicine, dose: $0) } }
+            .sorted { $0.dose.time < $1.dose.time }
     }
 
     private static let widthsForDaily: [Int] = {

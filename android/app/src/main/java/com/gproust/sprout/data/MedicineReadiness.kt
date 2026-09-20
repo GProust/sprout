@@ -46,7 +46,25 @@ enum class TooSoonReason {
 
     /** The parent's daily maximum has been reached; the interval alone would allow it. */
     DAILY_MAXIMUM,
+
+    /**
+     * The day's allowed *quantity* is used up — 1.5 cm of gel, not six of six
+     * doses. A second ceiling because a leaflet often gives both, and three
+     * generous applications can reach the amount before the count (BDR-18).
+     */
+    DAILY_AMOUNT,
 }
+
+/**
+ * How close two amounts have to be to count as equal.
+ *
+ * Amounts are the parent's own decimals and are added up in binary floating
+ * point, where 0.3 three times is not 0.9. Without a tolerance a day that has
+ * exactly reached its limit could read as a hair under it — and since nothing
+ * here blocks a dose anyway, the honest thing is for the arithmetic to agree
+ * with the parent's own sum rather than with the last bit of a Double.
+ */
+private const val MEDICINE_AMOUNT_TOLERANCE = 1e-6
 
 /**
  * What the screen draws, and what a reminder is armed from.
@@ -61,6 +79,13 @@ enum class TooSoonReason {
  * @property dosesInLastDay how many doses were given in the last 24 hours.
  * @property maxPerDay the parent's own daily maximum, echoed back for the screen
  *   to draw the count against; null when they set none.
+ * @property amountInLastDay how much was used in the last 24 hours, in the
+ *   medicine's own unit. Zero when nothing was recorded, which is not the same
+ *   as nothing being used — see [MedicineDoseEntity.amount].
+ * @property maxAmountPerDay the parent's own daily quantity, echoed back beside
+ *   [amountInLastDay]; null when they set none.
+ * @property unit the medicine's own unit for the two amounts, echoed back so the
+ *   screen does not have to carry the medicine as well.
  */
 data class MedicineReadiness(
     val level: MedicineLevel,
@@ -70,6 +95,9 @@ data class MedicineReadiness(
     val comfortableAt: Long? = null,
     val dosesInLastDay: Int = 0,
     val maxPerDay: Int? = null,
+    val amountInLastDay: Double = 0.0,
+    val maxAmountPerDay: Double? = null,
+    val unit: String? = null,
 )
 
 /**
@@ -84,6 +112,10 @@ data class MedicineReadiness(
  * running, so there is nothing to wait for. That is the state the screen should
  * open in for a medicine added a moment ago, and the alternative — red, with an
  * unknown countdown — would be a lie.
+ *
+ * A medicine with **no gap rule at all** ([MedicineEntity.minIntervalMinutes]
+ * zero) is held only by its daily ceilings: it reads green from the moment it
+ * is given until the day's doses or the day's quantity run out (BDR-18).
  */
 fun medicineReadiness(
     medicine: MedicineEntity,
@@ -102,6 +134,8 @@ fun medicineReadiness(
         ?: return MedicineReadiness(
             level = MedicineLevel.READY,
             maxPerDay = medicine.maxPerDay,
+            maxAmountPerDay = medicine.maxAmountPerDay,
+            unit = medicine.doseUnit,
         )
 
     val minGapMs = medicine.minIntervalMinutes.coerceAtLeast(0) * 60_000L
@@ -126,9 +160,18 @@ fun medicineReadiness(
         // that has to age out of the window before another is allowed.
         ?.let { inWindow[it - 1].time + MEDICINE_DAY_MS }
 
+    // The day's quantity, the same rolling window and the same shape as the
+    // count. Doses that recorded no amount add nothing — the arithmetic cannot
+    // total what was never typed, and guessing a size for them would be the app
+    // inventing a figure the parent never gave.
+    val amountUsed = inWindow.sumOf { it.amount ?: 0.0 }
+    val amountCap = medicine.maxAmountPerDay?.takeIf { it > 0 }
+    val amountReachedUntil = amountCap?.let { amountFreeAt(inWindow, it) }
+
     val blockedUntil = listOfNotNull(
         intervalEndsAt.takeIf { it > now },
         capReachedUntil?.takeIf { it > now },
+        amountReachedUntil?.takeIf { it > now },
     ).maxOrNull()
 
     if (blockedUntil != null) {
@@ -137,12 +180,22 @@ fun medicineReadiness(
             // it has elapsed, "the daily maximum" is the honest answer to why the
             // screen is still red.
             level = MedicineLevel.TOO_SOON,
-            reason = if (intervalEndsAt > now) TooSoonReason.INTERVAL else TooSoonReason.DAILY_MAXIMUM,
+            reason = when {
+                // The interval keeps its precedence: while it is running it is
+                // what the parent is waiting on first, whichever ceiling also
+                // happens to be spent.
+                intervalEndsAt > now -> TooSoonReason.INTERVAL
+                capReachedUntil != null && capReachedUntil > now -> TooSoonReason.DAILY_MAXIMUM
+                else -> TooSoonReason.DAILY_AMOUNT
+            },
             lastDoseAt = lastDoseAt,
             nextAllowedAt = blockedUntil,
             comfortableAt = comfortEndsAt?.takeIf { it > now },
             dosesInLastDay = inWindow.size,
             maxPerDay = medicine.maxPerDay,
+            amountInLastDay = amountUsed,
+            maxAmountPerDay = medicine.maxAmountPerDay,
+            unit = medicine.doseUnit,
         )
     }
 
@@ -158,7 +211,34 @@ fun medicineReadiness(
         comfortableAt = comfortEndsAt?.takeIf { it > now },
         dosesInLastDay = inWindow.size,
         maxPerDay = medicine.maxPerDay,
+        amountInLastDay = amountUsed,
+        maxAmountPerDay = medicine.maxAmountPerDay,
+        unit = medicine.doseUnit,
     )
+}
+
+/**
+ * When the day's quantity drops back below [max], or null while it never
+ * reached it.
+ *
+ * The same rule the dose count uses, applied to a total rather than a tally:
+ * doses age out of the rolling window oldest first, and the moment the ones
+ * still inside it add up to less than the limit is the moment there is room
+ * again. Doses that recorded no amount contribute nothing on the way in and
+ * free nothing on the way out.
+ */
+private fun amountFreeAt(inWindow: List<MedicineDoseEntity>, max: Double): Long? {
+    val oldestFirst = inWindow.sortedBy { it.time }
+    var remaining = oldestFirst.sumOf { it.amount ?: 0.0 }
+    if (remaining < max - MEDICINE_AMOUNT_TOLERANCE) return null
+
+    for (dose in oldestFirst) {
+        remaining -= dose.amount ?: 0.0
+        if (remaining < max - MEDICINE_AMOUNT_TOLERANCE) return dose.time + MEDICINE_DAY_MS
+    }
+    // One dose was the whole day's allowance on its own: nothing is free until
+    // the last of them has aged out.
+    return oldestFirst.lastOrNull()?.time?.plus(MEDICINE_DAY_MS)
 }
 
 /**

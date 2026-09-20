@@ -45,6 +45,8 @@ final class ReportDataTests: XCTestCase {
         diapers: [Diaper] = [],
         growth: [Growth] = [],
         treatments: [Treatment] = [],
+        medicines: [Medicine] = [],
+        medicineDoses: [MedicineDose] = [],
         options: ReportOptions = ReportOptions(period: .week)
     ) -> ReportContent {
         buildReport(
@@ -54,6 +56,8 @@ final class ReportDataTests: XCTestCase {
             diapers: diapers,
             growth: growth,
             treatments: treatments,
+            medicines: medicines,
+            medicineDoses: medicineDoses,
             options: options,
             now: now
         )
@@ -331,5 +335,78 @@ final class ReportDataTests: XCTestCase {
         )
 
         XCTAssertTrue(content.treatments.isEmpty)
+    }
+
+    // MARK: - As-needed medicine in the doctor's record (BDR-18)
+
+    private func gel(uid: String = "gel") -> Medicine {
+        Medicine(
+            babyId: 1,
+            name: "Teething gel",
+            minIntervalMinutes: 0,
+            maxPerDay: 6,
+            doseAmount: 0.25,
+            doseUnit: "cm",
+            maxAmountPerDay: 1.5,
+            uid: uid
+        )
+    }
+
+    private func gelDose(_ at: Int64, amount: Double? = 0.25, uid: String = "gel") -> MedicineDose {
+        MedicineDose(babyId: 1, medicineUid: uid, time: at, amount: amount)
+    }
+
+    func testAMedicineReachesTheRecordWithTheDosesInsideTheRange() throws {
+        let content = report(
+            medicines: [gel()],
+            medicineDoses: [gelDose(at(today, 9)), gelDose(at(today, 14))]
+        )
+
+        let record = try XCTUnwrap(content.medicines.first)
+        XCTAssertEqual(content.medicines.count, 1)
+        XCTAssertEqual(record.medicine.name, "Teething gel")
+        XCTAssertEqual(record.doses.count, 2)
+        XCTAssertEqual(record.amountTotal, 0.5, accuracy: 1e-9)
+        XCTAssertTrue(record.hasAmounts)
+    }
+
+    /// A shelf is not an event: a medicine set up but not given says nothing.
+    func testAMedicineNeverGivenInsideTheRangeIsLeftOut() {
+        XCTAssertTrue(report(medicines: [gel()], medicineDoses: []).medicines.isEmpty)
+    }
+
+    func testADoseFromBeforeTheRangeDoesNotTravelWithIt() throws {
+        let content = report(
+            medicines: [gel()],
+            medicineDoses: [gelDose(at(born, 9)), gelDose(at(today, 9))]
+        )
+
+        let record = try XCTUnwrap(content.medicines.first)
+        XCTAssertEqual(record.doses.count, 1)
+    }
+
+    /// A dose that recorded no quantity is still a dose. It is listed, and adds
+    /// nothing to the total — which is why the total is only worth printing
+    /// when something was measured at all.
+    func testADoseWithNoAmountIsReportedWithoutInventingOne() throws {
+        let content = report(
+            medicines: [gel()],
+            medicineDoses: [gelDose(at(today, 9), amount: nil)]
+        )
+
+        let record = try XCTUnwrap(content.medicines.first)
+        XCTAssertEqual(record.doses.count, 1)
+        XCTAssertEqual(record.amountTotal, 0, accuracy: 1e-9)
+        XCTAssertFalse(record.hasAmounts)
+    }
+
+    func testTurningTheMedicinesOffLeavesThemOutOfTheDocument() {
+        let content = report(
+            medicines: [gel()],
+            medicineDoses: [gelDose(at(today, 9))],
+            options: ReportOptions(period: .week, includeMedicines: false)
+        )
+
+        XCTAssertTrue(content.medicines.isEmpty)
     }
 }

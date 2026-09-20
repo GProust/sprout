@@ -195,6 +195,10 @@ class ReportViewModel(
         _state.update { it.copy(options = it.options.copy(includeTreatments = include)) }
     }
 
+    fun setIncludeMedicines(include: Boolean) {
+        _state.update { it.copy(options = it.options.copy(includeMedicines = include)) }
+    }
+
     fun setIncludeNotes(include: Boolean) {
         _state.update { it.copy(options = it.options.copy(includeNotes = include)) }
     }
@@ -297,6 +301,8 @@ class ReportViewModel(
             diapers = repository.diapersForBabyOnce(id),
             growth = repository.growthForBabyOnce(id),
             treatments = repository.treatmentsForBabyOnce(id),
+            medicines = repository.allMedicinesForBabyOnce(id),
+            medicineDoses = repository.medicineDosesForBabyOnce(id),
             options = _state.value.options,
             now = System.currentTimeMillis(),
             zone = zone,
@@ -465,6 +471,12 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                 subtitle = stringResource(R.string.report_include_treatments_hint),
                 checked = state.options.includeTreatments,
                 onChange = vm::setIncludeTreatments,
+            )
+            ToggleRow(
+                title = stringResource(R.string.screen_medicines),
+                subtitle = stringResource(R.string.report_include_medicines_hint),
+                checked = state.options.includeMedicines,
+                onChange = vm::setIncludeMedicines,
             )
             ToggleRow(
                 title = stringResource(R.string.report_include_notes),
