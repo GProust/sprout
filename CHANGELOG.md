@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.12.0] — 2026-09-20
 
 - ⏸️ **A feed can stop for a burp and carry on.** The breastfeeding timer now has
   a **Pause** button, for the winding between the sides, the nappy halfway
