@@ -124,6 +124,12 @@
     <string name="feeding_switch_to_right">Passa a destra</string>
     <string name="feeding_last_switch">Ultimo cambio alle %1$s</string>
     <string name="feeding_stop_save">Ferma &amp; salva</string>
+    <string name="feeding_pause">Pausa</string>
+    <string name="feeding_paused">In pausa</string>
+    <string name="feeding_paused_for">In pausa · %1$s</string>
+    <string name="feeding_resume_left">Riprendi a sinistra</string>
+    <string name="feeding_resume_right">Riprendi a destra</string>
+    <string name="feeding_paused_total">In pausa %1$s</string>
     <string name="feeding_side_time">%1$s %2$s</string>
     <string name="feeding_total">Totale %1$s</string>
     <string name="feeding_segments">Questa poppata</string>

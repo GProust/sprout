@@ -51,5 +51,6 @@ ADR log and are cross-linked from here.
 | [0014](0014-what-a-sleep-records-beyond-its-hours.md) | What a sleep records beyond its hours, and why it isn't graded | Product / Domain | Accepted |
 | [0015](0015-medicine-given-when-needed-and-the-wait-between-doses.md) | Medicine given when it is needed, and the wait between doses | Product / Domain | Accepted |
 | [0016](0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md) | A running wait on the dashboard, and a dose from the notification | Product / UX | Accepted |
+| [0017](0017-a-breastfeed-can-stop-and-carry-on.md) | A breastfeed can stop and carry on, and the break is not time at the breast | Product / Domain | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

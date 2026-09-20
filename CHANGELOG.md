@@ -3,6 +3,24 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- ⏸️ **A feed can stop for a burp and carry on.** The breastfeeding timer now has
+  a **Pause** button, for the winding between the sides, the nappy halfway
+  through, the doorbell. The feed stays open and keeps its start time — you come
+  back to the same feed rather than saving one and starting another — and when
+  you're ready, **Resume left** or **Resume right** picks up wherever you're
+  actually carrying on.
+- ⏱️ **The break doesn't count as feeding.** While it's paused the clock at the
+  breast stops and the break runs its own, so the minutes spent burping never
+  turn into minutes at the breast. It's shown rather than hidden: in the
+  session's list where it happened, and on the finished feed as *Paused 5m*
+  beside the totals. Your statistics and the doctor's record already counted the
+  time on each side rather than the whole span, so those numbers don't move.
+- 🤫 **And it never nags.** No maximum, no "are you still feeding?", nothing that
+  stops a session on its own. If you doze off with a break running, the feed you
+  save is still the time you actually fed.
+
 ## [1.11.0] — 2026-09-16
 
 - 📱 **Automatic sharing can now reach an iPhone.** Sprout's second app is being

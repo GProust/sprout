@@ -87,18 +87,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/**
- * A breastfeeding session being timed live but not yet saved. [segments] holds
- * the *completed* back-and-forth stretches; the breast currently nursing runs
- * from [segmentStart] until the next switch or stop, ticking off the clock.
- */
-data class NursingSession(
-    val sessionStart: Long,
-    val currentSide: BreastSide,
-    val segmentStart: Long,
-    val segments: List<NursingSegment> = emptyList(),
-)
-
 class FeedingViewModel(
     private val repository: SproutRepository,
     private val context: Context,
@@ -147,17 +135,25 @@ class FeedingViewModel(
     /** Bank the current breast as a completed segment and switch to the other. */
     fun switchBreast() {
         val s = nursing.value ?: return
-        val now = System.currentTimeMillis()
-        val completed = NursingSegment(s.currentSide, s.segmentStart, now)
-        val next = if (s.currentSide == BreastSide.LEFT) BreastSide.RIGHT else BreastSide.LEFT
-        NursingSessionStore.save(
-            context,
-            s.copy(
-                currentSide = next,
-                segmentStart = now,
-                segments = s.segments + completed,
-            ),
-        )
+        NursingSessionStore.save(context, s.switched(System.currentTimeMillis()))
+        refreshWidget()
+    }
+
+    /**
+     * Bank the breast being nursed and start a break — the burp between the
+     * sides, the nappy halfway through. The session stays open and keeps its
+     * start time; only the clock at the breast stops.
+     */
+    fun pauseNursing() {
+        val s = nursing.value ?: return
+        NursingSessionStore.save(context, s.paused(System.currentTimeMillis()))
+        refreshWidget()
+    }
+
+    /** Come back from a break, on whichever breast the feed carries on with. */
+    fun resumeNursing(side: BreastSide) {
+        val s = nursing.value ?: return
+        NursingSessionStore.save(context, s.resumed(side, System.currentTimeMillis()))
         refreshWidget()
     }
 
@@ -172,7 +168,7 @@ class FeedingViewModel(
     fun stopNursing(notes: String = "") {
         val s = NursingSessionStore.consume(context) ?: return
         val now = System.currentTimeMillis()
-        val all = s.segments + NursingSegment(s.currentSide, s.segmentStart, now)
+        val all = s.segmentsAt(now)
         val leftMs = all.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
         val rightMs = all.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
         val side = when {
@@ -186,7 +182,10 @@ class FeedingViewModel(
                 type = FeedType.BREAST,
                 side = side,
                 startTime = s.sessionStart,
-                endTime = now,
+                // The feed ended when the last stretch did, not when Save was
+                // tapped: a session saved from a break would otherwise carry
+                // the whole break as feeding time it never was.
+                endTime = all.lastOrNull()?.endTime ?: now,
                 leftDurationMs = leftMs.takeIf { it > 0 },
                 rightDurationMs = rightMs.takeIf { it > 0 },
                 segments = all,
@@ -299,8 +298,9 @@ fun FeedingScreen(
 /**
  * The breastfeeding start/stop controls, pinned to the bottom of the feeding
  * screen. Idle: a Left and a Right button (positioned to match the breast).
- * Running: a single button that re-opens the live timer, showing elapsed time
- * so a session left in the background is never forgotten.
+ * Running: a single button that re-opens the live timer, showing the time at
+ * the breast so a session left in the background — or left on a break — is
+ * never forgotten.
  */
 @Composable
 private fun NursingBar(
@@ -332,10 +332,17 @@ private fun NursingBar(
                         delay(1000)
                     }
                 }
-                val completed = session.segments.sumOf { it.endTime - it.startTime }
-                val totalMs = (completed + (now - session.segmentStart)).coerceAtLeast(0L)
+                // The time at the breast, which is not the time since the feed
+                // began: a session on a break shows a clock that has stopped.
+                val totalMs = session.nursedMs(now)
                 Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.feeding_resume, formatClock(totalMs)))
+                    Text(
+                        if (session.isPaused) {
+                            stringResource(R.string.feeding_paused_for, formatClock(totalMs))
+                        } else {
+                            stringResource(R.string.feeding_resume, formatClock(totalMs))
+                        },
+                    )
                 }
             }
         }
@@ -344,9 +351,9 @@ private fun NursingBar(
 
 /**
  * Full-screen live breastfeeding timer. Started from the feeding screen's
- * Left/Right buttons; lets you switch sides (banking each segment's duration)
- * and stop to save, or cancel to discard. Leaving via Back keeps the session
- * running so it can be resumed.
+ * Left/Right buttons; lets you switch sides (banking each segment's duration),
+ * pause for a burp and come back on either breast, and stop to save, or cancel
+ * to discard. Leaving via Back keeps the session running so it can be resumed.
  */
 @Composable
 fun NursingScreen(
@@ -394,6 +401,8 @@ fun NursingScreen(
             NursingRunning(
                 session = s,
                 onSwitch = vm::switchBreast,
+                onPause = vm::pauseNursing,
+                onResume = vm::resumeNursing,
                 onStop = { notes -> vm.stopNursing(notes); onDone() },
                 onCancel = { vm.cancelNursing(); onDone() },
                 modifier = Modifier.fillMaxSize().padding(padding),
@@ -406,6 +415,8 @@ fun NursingScreen(
 private fun NursingRunning(
     session: NursingSession,
     onSwitch: () -> Unit,
+    onPause: () -> Unit,
+    onResume: (BreastSide) -> Unit,
     onStop: (String) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -422,15 +433,14 @@ private fun NursingRunning(
         }
     }
 
-    val currentSegment = (now - session.segmentStart).coerceAtLeast(0L)
+    val paused = session.isPaused
     val onLeft = session.currentSide == BreastSide.LEFT
-    val completedLeft = session.segments.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
-    val completedRight = session.segments.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
-    val leftMs = completedLeft + if (onLeft) currentSegment else 0L
-    val rightMs = completedRight + if (!onLeft) currentSegment else 0L
+    val leftMs = session.nursedMs(BreastSide.LEFT, now)
+    val rightMs = session.nursedMs(BreastSide.RIGHT, now)
     val totalMs = leftMs + rightMs
-    // Every stretch so far, including the one in progress (ends at `now`).
-    val liveSegments = session.segments + NursingSegment(session.currentSide, session.segmentStart, now)
+    // Every stretch so far, including the one in progress (ends at `now`). On a
+    // break there is none in progress — it was banked when the break began.
+    val liveSegments = session.segmentsAt(now)
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
@@ -443,32 +453,93 @@ private fun NursingRunning(
             fontWeight = FontWeight.Bold,
         )
         Text(
-            stringResource(if (onLeft) R.string.feeding_on_left else R.string.feeding_on_right),
+            when {
+                paused -> stringResource(R.string.feeding_paused_for, formatClock(session.pausedMs(now)))
+                onLeft -> stringResource(R.string.feeding_on_left)
+                else -> stringResource(R.string.feeding_on_right)
+            },
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = if (paused) MaterialTheme.colorScheme.onSurfaceVariant
+            else MaterialTheme.colorScheme.primary,
         )
 
         Spacer(Modifier.height(24.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            SideTotal(label = stringResource(R.string.side_left), value = formatClock(leftMs), active = onLeft)
-            SideTotal(label = stringResource(R.string.side_right), value = formatClock(rightMs), active = !onLeft)
+            SideTotal(
+                label = stringResource(R.string.side_left),
+                value = formatClock(leftMs),
+                active = onLeft && !paused,
+            )
+            SideTotal(
+                label = stringResource(R.string.side_right),
+                value = formatClock(rightMs),
+                active = !onLeft && !paused,
+            )
         }
 
         // Each back-and-forth stretch with its own time range and duration.
         Spacer(Modifier.height(20.dp))
         FieldLabel(stringResource(R.string.feeding_segments))
         liveSegments.forEachIndexed { i, seg ->
+            // The gap a break left behind, shown where it happened rather than
+            // as a total at the bottom: what a parent wants back is *when* the
+            // last one was, to know whether this one has gone on too long.
+            val gap = if (i == 0) 0L else seg.startTime - liveSegments[i - 1].endTime
+            if (gap > 0L) {
+                BreakRow(
+                    range = rangeLabel(liveSegments[i - 1].endTime, seg.startTime),
+                    duration = formatDuration(context, gap),
+                    active = false,
+                )
+            }
             SegmentRow(
                 side = seg.side.label(context),
                 range = segmentRange(seg),
                 duration = formatDuration(context, (seg.endTime - seg.startTime).coerceAtLeast(0L)),
-                active = i == liveSegments.lastIndex,
+                active = !paused && i == liveSegments.lastIndex,
+            )
+        }
+        session.pausedAt?.let { start ->
+            BreakRow(
+                range = rangeLabel(start, now),
+                duration = formatDuration(context, session.pausedMs(now)),
+                active = true,
             )
         }
 
         Spacer(Modifier.height(24.dp))
-        FilledTonalButton(onClick = onSwitch, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(if (onLeft) R.string.feeding_switch_to_right else R.string.feeding_switch_to_left))
+        if (paused) {
+            // Resuming names the breast rather than saying "resume", because
+            // the whole point of the break is that the next stretch is often
+            // the other side — and after a burp nobody remembers which.
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                FilledTonalButton(
+                    onClick = { onResume(BreastSide.LEFT) },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(R.string.feeding_resume_left))
+                }
+                FilledTonalButton(
+                    onClick = { onResume(BreastSide.RIGHT) },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(R.string.feeding_resume_right))
+                }
+            }
+        } else {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.feeding_pause))
+                }
+                FilledTonalButton(onClick = onSwitch, modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(
+                            if (onLeft) R.string.feeding_switch_to_right
+                            else R.string.feeding_switch_to_left,
+                        ),
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -528,6 +599,41 @@ private fun SegmentRow(side: String, range: String, duration: String, active: Bo
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
             color = color,
+        )
+    }
+}
+
+/**
+ * A break in the middle of a session — the burp between the sides, the nappy.
+ * The same three columns as a stretch so the session reads as one timeline,
+ * and named rather than left as a hole in it, but quieter: it is the part of
+ * the feed where nothing was being drunk.
+ */
+@Composable
+private fun BreakRow(range: String, duration: String, active: Boolean) {
+    val weight = if (active) FontWeight.Bold else FontWeight.Normal
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.feeding_paused),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = weight,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            range,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            duration,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = weight,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -627,6 +733,9 @@ private fun FeedingForm(
         if (breast) {
             var cursor = start
             for (seg in segs) {
+                // A break the session recorded stays a break: editing the
+                // minutes at the breast must not quietly swallow the burp.
+                cursor += seg.gapBeforeMs
                 val segEnd = if (byEnd) seg.end else seg.durationMin.toLongOrNull()?.let { cursor + it * 60_000L }
                 if (segEnd != null && segEnd > cursor) {
                     built += NursingSegment(seg.side, cursor, segEnd)
@@ -774,6 +883,13 @@ private data class SegInput(
     val side: BreastSide,
     val durationMin: String,
     val end: Long,
+    /**
+     * The break between the previous stretch and this one, carried through an
+     * edit untouched. There is nothing in the form to change it — a break is
+     * something that happened, not a figure to type — but dropping it would
+     * turn every edited session into one that ran straight through.
+     */
+    val gapBeforeMs: Long = 0L,
 )
 
 /** Pre-fills the segment rows when editing (or one empty Left row when adding). */
@@ -782,8 +898,16 @@ private fun initialSegInputs(initial: FeedingEntity?, now: Long): List<SegInput>
         return listOf(SegInput(BreastSide.LEFT, "", now))
     }
     if (initial.segments.isNotEmpty()) {
-        return initial.segments.map {
-            SegInput(it.side, ((it.endTime - it.startTime) / 60_000L).toString(), it.endTime)
+        var prevEnd = initial.startTime
+        return initial.segments.map { seg ->
+            val row = SegInput(
+                side = seg.side,
+                durationMin = ((seg.endTime - seg.startTime) / 60_000L).toString(),
+                end = seg.endTime,
+                gapBeforeMs = (seg.startTime - prevEnd).coerceAtLeast(0L),
+            )
+            prevEnd = seg.endTime
+            row
         }
     }
     // Older entry without per-segment timing: rebuild rows from the per-side
@@ -855,9 +979,11 @@ private fun feedingTitle(context: Context, entry: FeedingEntity): String {
     }
 }
 
-/** "10:00–10:08" — the clock range a segment covers. */
-private fun segmentRange(seg: NursingSegment): String =
-    "${formatTime(seg.startTime)}–${formatTime(seg.endTime)}"
+/** "10:00–10:08" — a clock range, for a stretch at the breast or a break. */
+private fun rangeLabel(start: Long, end: Long): String =
+    "${formatTime(start)}–${formatTime(end)}"
+
+private fun segmentRange(seg: NursingSegment): String = rangeLabel(seg.startTime, seg.endTime)
 
 /** "Left 8m · 10:00–10:08" for one nursing segment. */
 private fun segmentLine(context: Context, seg: NursingSegment): String = context.getString(
@@ -865,6 +991,14 @@ private fun segmentLine(context: Context, seg: NursingSegment): String = context
     seg.side.label(context),
     formatDuration(context, (seg.endTime - seg.startTime).coerceAtLeast(0L)),
     segmentRange(seg),
+)
+
+/** "Paused 4m · 10:08–10:12" for a break between two stretches. */
+private fun breakLine(context: Context, start: Long, end: Long): String = context.getString(
+    R.string.feeding_segment_line,
+    context.getString(R.string.feeding_paused),
+    formatDuration(context, (end - start).coerceAtLeast(0L)),
+    rangeLabel(start, end),
 )
 
 /**
@@ -895,6 +1029,11 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
             if (left != null && right != null) {
                 parts += context.getString(R.string.feeding_total, formatDuration(context, left + right))
             }
+            // Only when there was one: a feed that ran straight through says
+            // nothing about breaks, the way it always has.
+            breastfeedPausedMillis(entry.segments).takeIf { it > 0L }?.let {
+                parts += context.getString(R.string.feeding_paused_total, formatDuration(context, it))
+            }
         } else {
             // A quick breastfeed with only an overall length.
             entry.endTime?.takeIf { it > entry.startTime }?.let {
@@ -911,7 +1050,17 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
 private fun FeedingSegmentDetails(segments: List<NursingSegment>) {
     val context = LocalContext.current
     Column {
-        segments.forEach { seg ->
+        segments.forEachIndexed { i, seg ->
+            // The break is the gap the stretches leave; nothing records one of
+            // its own, so a feed logged before breaks existed shows none.
+            val gap = if (i == 0) 0L else seg.startTime - segments[i - 1].endTime
+            if (gap > 0L) {
+                Text(
+                    breakLine(context, segments[i - 1].endTime, seg.startTime),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 segmentLine(context, seg),
                 style = MaterialTheme.typography.bodySmall,

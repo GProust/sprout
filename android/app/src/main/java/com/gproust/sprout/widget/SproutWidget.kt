@@ -338,16 +338,27 @@ private fun openFeedingScreen(context: Context) = actionStartActivity(
 @Composable
 private fun NursingLines(session: NursingSession, babyName: String?) {
     val context = LocalContext.current
-    CaptionText(babyName, context.getString(R.string.feeding_breastfeeding))
+    CaptionText(
+        babyName,
+        context.getString(
+            if (session.isPaused) R.string.feeding_paused else R.string.feeding_breastfeeding,
+        ),
+    )
     SideText(session.currentSide)
     // Glance has no chronometer, so embed classic RemoteViews: the launcher
     // ticks it every second with no widget refreshes at all.
+    //
+    // It counts the time at the breast rather than the time since the feed
+    // began — the number the app shows — so a break leaves the two agreeing.
+    // The launcher cannot be asked to pause a chronometer, so a stopped one is
+    // told where to stand and left there until the widget is next redrawn.
+    val nursed = session.nursedMs(System.currentTimeMillis())
     val timer = RemoteViews(context.packageName, R.layout.widget_nursing_timer).apply {
         setChronometer(
             R.id.widgetNursingTimer,
-            SystemClock.elapsedRealtime() - (System.currentTimeMillis() - session.sessionStart),
+            SystemClock.elapsedRealtime() - nursed,
             null,
-            true,
+            !session.isPaused,
         )
     }
     AndroidRemoteViews(remoteViews = timer)

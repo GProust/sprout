@@ -104,6 +104,33 @@ class NursingSessionStoreTest {
         assertEquals(session.sessionStart, NursingSessionStore.load(context)?.sessionStart)
     }
 
+    /**
+     * A feed put down for a burp and left there while the phone is killed has
+     * to come back as a feed on a break — not as one that has been nursing all
+     * along, which is the reading a missing flag would give it.
+     */
+    @Test
+    fun aBreakSurvivesProcessDeath() {
+        val pausedAt = session.sessionStart + 8 * 60_000L
+        NursingSessionStore.save(context, session.paused(pausedAt))
+        NursingSessionStore.forgetInMemory()
+
+        val loaded = NursingSessionStore.load(context)
+
+        assertEquals(pausedAt, loaded?.pausedAt)
+        assertEquals(1, loaded?.segments?.size)
+        assertEquals(8 * 60_000L, loaded?.nursedMs(pausedAt + 5 * 60_000L))
+    }
+
+    /** A session stored before breaks existed is one that was nursing. */
+    @Test
+    fun aSessionWithNoBreakReadsBackAsNursing() {
+        NursingSessionStore.save(context, session)
+        NursingSessionStore.forgetInMemory()
+
+        assertNull(NursingSessionStore.load(context)?.pausedAt)
+    }
+
     @Test
     fun startingWhileIdleStartsTheSession() {
         val running = NursingSessionStore.startIfIdle(context, session)

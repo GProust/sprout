@@ -152,6 +152,12 @@
     <string name="feeding_switch_to_right">Passer à droite</string>
     <string name="feeding_last_switch">Dernier changement à %1$s</string>
     <string name="feeding_stop_save">Arrêter et enregistrer</string>
+    <string name="feeding_pause">Pause</string>
+    <string name="feeding_paused">En pause</string>
+    <string name="feeding_paused_for">En pause · %1$s</string>
+    <string name="feeding_resume_left">Reprendre à gauche</string>
+    <string name="feeding_resume_right">Reprendre à droite</string>
+    <string name="feeding_paused_total">En pause %1$s</string>
     <!-- Côté + durée, p. ex. « Gauche 8m » -->
     <string name="feeding_side_time">%1$s %2$s</string>
     <string name="feeding_total">Total %1$s</string>

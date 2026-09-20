@@ -37,6 +37,13 @@ final class FeedingViewModel {
 
     func switchBreast() { store.switchBreast(at: Clock.millis) }
 
+    /// Bank the breast being nursed and start a break — the burp between the
+    /// sides, the nappy halfway through (BDR-17).
+    func pauseNursing() { store.pause(at: Clock.millis) }
+
+    /// Come back from a break, on whichever breast the feed carries on with.
+    func resumeNursing(on side: BreastSide) { store.resume(on: side, at: Clock.millis) }
+
     /// Finish the session and persist it as a feed.
     ///
     /// The session is *taken* from the store before anything is saved, so that
@@ -46,6 +53,8 @@ final class FeedingViewModel {
     func stopNursing(notes: String = "") {
         guard let session = store.consume() else { return }
         let now = Clock.millis
+        // On a break there is no stretch in progress, so what was nursed is
+        // exactly what was banked.
         let all = session.allSegments(endingAt: now)
 
         let left = all.filter { $0.side == .LEFT }.reduce(Int64(0)) { $0 + $1.durationMs }
@@ -62,7 +71,10 @@ final class FeedingViewModel {
                 type: .BREAST,
                 side: side,
                 startTime: session.sessionStart,
-                endTime: now,
+                // The feed ended when the last stretch did, not when Save was
+                // tapped: a session saved from a break would otherwise carry
+                // the whole break as feeding time it never was.
+                endTime: all.last?.endTime ?? now,
                 leftDurationMs: left > 0 ? left : nil,
                 rightDurationMs: right > 0 ? right : nil,
                 segments: all,
@@ -165,24 +177,56 @@ private struct FeedCard: View {
             onDelete: onDelete,
             details: {
                 // The per-side breakdown, only where there is one to show.
-                if !entry.nursingSegments.isEmpty {
+                let segments = entry.nursingSegments
+                if !segments.isEmpty {
                     VStack(alignment: .leading, spacing: Spacing.hairline) {
-                        ForEach(Array(entry.nursingSegments.enumerated()), id: \.offset) { _, segment in
-                            Text(
-                                Str.t(
-                                    "feeding_segment_line",
-                                    segment.side.label,
-                                    SproutFormat.duration(millis: segment.durationMs).text
+                        ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
+                            // The break is the gap the stretches leave; nothing
+                            // records one of its own, so a feed logged before
+                            // breaks existed shows none.
+                            let previousEnd = index == 0 ? segment.startTime : segments[index - 1].endTime
+                            if segment.startTime > previousEnd {
+                                TimelineLine(
+                                    label: Str.t("feeding_paused"),
+                                    millis: segment.startTime - previousEnd,
+                                    start: previousEnd,
+                                    end: segment.startTime
                                 )
+                            }
+                            TimelineLine(
+                                label: segment.side.label,
+                                millis: segment.durationMs,
+                                start: segment.startTime,
+                                end: segment.endTime
                             )
-                            .font(.footnote)
-                            .foregroundStyle(SproutColor.onSurfaceVariant)
                         }
                     }
                 }
             },
             action: { EmptyView() }
         )
+    }
+}
+
+/// One line of a session's timeline: a stretch at a breast, or a break between
+/// two of them. "Left 8m · 10:00–10:08".
+private struct TimelineLine: View {
+    let label: String
+    let millis: Int64
+    let start: Int64
+    let end: Int64
+
+    var body: some View {
+        Text(
+            Str.t(
+                "feeding_segment_line",
+                label,
+                SproutFormat.duration(millis: millis).text,
+                "\(SproutDateStyle.time(start))–\(SproutDateStyle.time(end))"
+            )
+        )
+        .font(.footnote)
+        .foregroundStyle(SproutColor.onSurfaceVariant)
     }
 }
 
@@ -213,7 +257,18 @@ extension Feeding {
 
     var subtitle: String {
         var parts: [String] = []
-        if let end = endTime {
+        if type == .BREAST {
+            // Time at the breast, which is not the wall clock the feed spanned:
+            // the burp in the middle is not something the baby drank (BDR-17).
+            let nursed = breastfeedMillis(self)
+            if nursed > 0 { parts.append(SproutFormat.duration(millis: nursed).text) }
+            let paused = breastfeedPausedMillis(nursingSegments)
+            if paused > 0 {
+                parts.append(
+                    Str.t("feeding_paused_total", SproutFormat.duration(millis: paused).text)
+                )
+            }
+        } else if let end = endTime {
             parts.append(SproutFormat.duration(millis: end - startTime).text)
         }
         if let notes = notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
@@ -256,11 +311,13 @@ private struct RunningSessionBar: View {
     var body: some View {
         Button(action: onOpen) {
             HStack {
-                Image(systemName: "timer")
+                Image(systemName: session.isPaused ? "pause.circle" : "timer")
                 Text(
-                    session.currentSide == .LEFT
-                        ? Str.t("feeding_on_left")
-                        : Str.t("feeding_on_right")
+                    session.isPaused
+                        ? Str.t("feeding_paused")
+                        : (session.currentSide == .LEFT
+                            ? Str.t("feeding_on_left")
+                            : Str.t("feeding_on_right"))
                 )
                 .font(.body.weight(.medium))
                 Spacer()
@@ -292,14 +349,18 @@ private struct NursingTimerScreen: View {
             VStack(spacing: Spacing.loose) {
                 if let session = model.nursing {
                     Text(
-                        session.currentSide == .LEFT
-                            ? Str.t("feeding_on_left")
-                            : Str.t("feeding_on_right")
+                        session.isPaused
+                            ? Str.t("feeding_paused_for", SproutFormat.clock(millis: session.pausedMs(at: now)))
+                            : (session.currentSide == .LEFT
+                                ? Str.t("feeding_on_left")
+                                : Str.t("feeding_on_right"))
                     )
                     .font(.title3.weight(.medium))
                     .foregroundStyle(SproutColor.onSurfaceVariant)
 
-                    Text(SproutFormat.clock(millis: now - session.sessionStart))
+                    // Time at the breast, not time since the feed began: the
+                    // clock stops while the break runs (BDR-17).
+                    Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
                         .font(.system(size: 64, weight: .light, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(SproutColor.onSurface)
@@ -307,48 +368,109 @@ private struct NursingTimerScreen: View {
                         // not shuffle as the minutes tick over.
                         .contentTransition(.numericText())
 
-                    Text(
-                        Str.t(
-                            "feeding_side_time",
-                            SproutFormat.clock(millis: now - session.segmentStart)
+                    if !session.isPaused {
+                        Text(
+                            Str.t(
+                                "feeding_side_time",
+                                session.currentSide.label,
+                                SproutFormat.clock(millis: now - session.segmentStart)
+                            )
                         )
-                    )
-                    .font(.callout)
-                    .foregroundStyle(SproutColor.onSurfaceVariant)
+                        .font(.callout)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                    }
 
-                    if !session.segments.isEmpty {
+                    let stretches = session.segments
+                    if !stretches.isEmpty || session.isPaused {
                         VStack(alignment: .leading, spacing: Spacing.hairline) {
-                            ForEach(Array(session.segments.enumerated()), id: \.offset) { _, segment in
-                                Text(
-                                    Str.t(
-                                        "feeding_segment_line",
-                                        segment.side.label,
-                                        SproutFormat.duration(millis: segment.durationMs).text
+                            ForEach(Array(stretches.enumerated()), id: \.offset) { index, segment in
+                                // A break is shown where it happened rather
+                                // than as a total at the bottom: what a parent
+                                // wants back is *when* the last one was.
+                                let previousEnd = index == 0 ? segment.startTime : stretches[index - 1].endTime
+                                if segment.startTime > previousEnd {
+                                    TimelineLine(
+                                        label: Str.t("feeding_paused"),
+                                        millis: segment.startTime - previousEnd,
+                                        start: previousEnd,
+                                        end: segment.startTime
                                     )
+                                }
+                                TimelineLine(
+                                    label: segment.side.label,
+                                    millis: segment.durationMs,
+                                    start: segment.startTime,
+                                    end: segment.endTime
                                 )
-                                .font(.footnote)
-                                .foregroundStyle(SproutColor.onSurfaceVariant)
+                            }
+                            if let pausedAt = session.pausedAt {
+                                TimelineLine(
+                                    label: Str.t("feeding_paused"),
+                                    millis: session.pausedMs(at: now),
+                                    start: pausedAt,
+                                    end: now
+                                )
                             }
                         }
                     }
 
                     Spacer()
 
-                    Button {
-                        model.switchBreast()
-                    } label: {
-                        Text(
-                            session.currentSide == .LEFT
-                                ? Str.t("feeding_switch_to_right")
-                                : Str.t("feeding_switch_to_left")
-                        )
-                        .font(.body.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Spacing.regular)
-                        .background(SproutColor.primaryContainer, in: Capsule())
-                        .foregroundStyle(SproutColor.onPrimaryContainer)
+                    if session.isPaused {
+                        // Resuming names the breast rather than saying
+                        // "resume", because the whole point of the break is
+                        // that the next stretch is often the other side — and
+                        // after a burp nobody remembers which.
+                        HStack(spacing: Spacing.snug) {
+                            ForEach([BreastSide.LEFT, BreastSide.RIGHT], id: \.self) { side in
+                                Button {
+                                    model.resumeNursing(on: side)
+                                } label: {
+                                    Text(
+                                        side == .LEFT
+                                            ? Str.t("feeding_resume_left")
+                                            : Str.t("feeding_resume_right")
+                                    )
+                                    .font(.body.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, Spacing.regular)
+                                    .background(SproutColor.primaryContainer, in: Capsule())
+                                    .foregroundStyle(SproutColor.onPrimaryContainer)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    } else {
+                        HStack(spacing: Spacing.snug) {
+                            Button {
+                                model.pauseNursing()
+                            } label: {
+                                Text(Str.t("feeding_pause"))
+                                    .font(.body.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, Spacing.regular)
+                                    .background(SproutColor.surfaceVariant, in: Capsule())
+                                    .foregroundStyle(SproutColor.onSurfaceVariant)
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                model.switchBreast()
+                            } label: {
+                                Text(
+                                    session.currentSide == .LEFT
+                                        ? Str.t("feeding_switch_to_right")
+                                        : Str.t("feeding_switch_to_left")
+                                )
+                                .font(.body.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, Spacing.regular)
+                                .background(SproutColor.primaryContainer, in: Capsule())
+                                .foregroundStyle(SproutColor.onPrimaryContainer)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .buttonStyle(.plain)
 
                     NotesField(text: $notes)
 
