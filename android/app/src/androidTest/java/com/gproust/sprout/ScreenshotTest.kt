@@ -24,6 +24,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceTheme
@@ -548,6 +550,10 @@ class ScreenshotTest {
         settle()
         // The joined feed is the oldest on the list, so its Details is the last.
         rule.onAllNodesWithText("Details").onLast().performClick()
+        settle()
+        // Opened, its timeline runs below the fold; the list is short, so one
+        // swipe reaches the end and shows the break where it happened.
+        rule.onNodeWithTag("feedingList").performTouchInput { swipeUp() }
         settle()
         save("05-feeding-8-join-3-joined")
         // Widget (idle): captured before any live session starts, so it shows
