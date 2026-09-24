@@ -198,7 +198,13 @@ final class ScreenshotTests: XCTestCase {
     /// It writes to the seeded database, so everything captured after it sees
     /// the pair as one feed — which is what the app would show by then.
     private func captureFeedingJoin(_ app: XCUIApplication, language: String) throws {
+        // Back up to it: the last log captured sits at the bottom of the grid,
+        // and the dashboard comes back scrolled to where that tile was — below
+        // the feeding tile, which `scroll(_:to:)` only ever swipes away from.
         let tile = app.buttons["log-tile-feeding"]
+        for _ in 0..<6 where !(tile.exists && tile.isHittable) {
+            app.swipeDown()
+        }
         XCTAssertTrue(
             scroll(app, to: tile),
             "02-feeding-2-join: no feeding tile on the dashboard, even after scrolling"
