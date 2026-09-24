@@ -113,6 +113,104 @@ final class SproutRepositoryTests: XCTestCase {
         }
     }
 
+    // MARK: - Joining two breastfeeds (BDR-19)
+
+    /// The left side, then the right five minutes later; returned earlier first.
+    private func twoHalves() throws -> (earlier: Feeding, later: Feeding) {
+        func half(_ side: BreastSide, from: Int64, to: Int64) -> Feeding {
+            Feeding(
+                type: .BREAST,
+                side: side,
+                startTime: from,
+                endTime: to,
+                segments: [NursingSegment(side: side, startTime: from, endTime: to)]
+            )
+        }
+        let minute: Int64 = 60_000
+        try repository.addFeeding(half(.LEFT, from: clock, to: clock + 9 * minute))
+        try repository.addFeeding(half(.RIGHT, from: clock + 14 * minute, to: clock + 20 * minute))
+        let feeds = try read { db in try Feeding.order(Column("startTime")).fetchAll(db) }
+        XCTAssertEqual(feeds.count, 2)
+        return (feeds[0], feeds[1])
+    }
+
+    /// One act, not two: the other phone must never be handed a joined feed
+    /// beside the half that was folded into it.
+    func testJoiningLeavesOneFeedAndFlagsTheOther() throws {
+        _ = try makeBaby()
+        let (earlier, later) = try twoHalves()
+
+        XCTAssertTrue(try repository.joinBreastfeeds(earlier, later))
+
+        try read { db in
+            let live = try Feeding.filter(Column("deletedAt") == nil).fetchAll(db)
+            XCTAssertEqual(live.count, 1)
+            let joined = try XCTUnwrap(live.first)
+            XCTAssertEqual(joined.uid, earlier.uid)
+            XCTAssertEqual(joined.startTime, earlier.startTime)
+            XCTAssertEqual(joined.endTime, later.endTime)
+            XCTAssertEqual(joined.side, .BOTH)
+            XCTAssertEqual(joined.nursingSegments.count, 2)
+            XCTAssertEqual(joined.updatedAt, clock, "stamped, so the join wins the merge")
+
+            // Flagged rather than erased, so the deletion travels too.
+            let gone = try XCTUnwrap(
+                try Feeding.filter(Column("uid") == later.uid).fetchOne(db)
+            )
+            XCTAssertEqual(gone.deletedAt, clock)
+            XCTAssertEqual(gone.updatedAt, clock)
+        }
+    }
+
+    func testAFeedDeletedWhileTheConfirmationWasOpenIsNotJoined() throws {
+        _ = try makeBaby()
+        let (earlier, later) = try twoHalves()
+        try repository.deleteFeeding(later)
+
+        XCTAssertFalse(try repository.joinBreastfeeds(earlier, later))
+
+        let kept = try read { db in try Feeding.filter(Column("uid") == earlier.uid).fetchOne(db) }
+        XCTAssertEqual(kept, earlier, "nothing was written")
+    }
+
+    /// Joined from what the database holds, not from the copies the
+    /// confirmation was opened on.
+    func testTheJoinReadsTheFeedsAsTheyAreNow() throws {
+        _ = try makeBaby()
+        let (earlier, later) = try twoHalves()
+        // Edited on the other phone and merged in while the dialog was up.
+        var edited = later
+        edited.notes = "Hiccups"
+        try repository.addFeeding(edited)
+
+        XCTAssertTrue(try repository.joinBreastfeeds(earlier, later))
+
+        let joined = try read { db in try Feeding.filter(Column("uid") == earlier.uid).fetchOne(db) }
+        XCTAssertEqual(joined?.notes, "Hiccups")
+    }
+
+    func testFeedsThatNoLongerQualifyAreLeftAlone() throws {
+        _ = try makeBaby()
+        let (earlier, later) = try twoHalves()
+        // Moved an hour later by an edit: no longer a burp apart.
+        let hour: Int64 = 60 * 60_000
+        var moved = later
+        moved.startTime += hour
+        moved.endTime = (later.endTime ?? 0) + hour
+        moved.segments = NursingSegmentCoding.encode(
+            later.nursingSegments.map {
+                NursingSegment(side: $0.side, startTime: $0.startTime + hour, endTime: $0.endTime + hour)
+            }
+        )
+        try repository.addFeeding(moved)
+
+        XCTAssertFalse(try repository.joinBreastfeeds(earlier, later))
+
+        try read { db in
+            XCTAssertEqual(try Feeding.filter(Column("deletedAt") == nil).fetchCount(db), 2)
+        }
+    }
+
     // MARK: - The active baby
 
     func testTheFirstBabyBecomesActiveAndLaterOnesDoNot() throws {

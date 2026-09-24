@@ -39,6 +39,7 @@ final class ScreenshotTests: XCTestCase {
             try captureLog(app, tile: log, named: String(format: "%02d-%@", index + 2, log), language: language)
         }
 
+        try captureFeedingJoin(app, language: language)
         try captureMedicines(app, language: language)
 
         // Then the other tabs. Three in total with the seeded single baby: the
@@ -180,6 +181,61 @@ final class ScreenshotTests: XCTestCase {
             "07-medicines-2-new: no cancel button in the medicine editor"
         )
         cancel.tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+    }
+
+    /// Two breastfeeds five minutes apart, joined back into the one feed they
+    /// were (BDR-19).
+    ///
+    /// Its own function rather than a step inside `captureLog`, which every
+    /// tile goes through, and numbered under the feeding capture the way
+    /// `captureMedicines` shares the treatments number — adding to `logs`
+    /// would renumber every file after it. Three captures: the quiet offer on
+    /// the later card, the confirmation that names both feeds and shows the one
+    /// they would make, and the list with a single feed carrying the five
+    /// minutes as a break.
+    ///
+    /// It writes to the seeded database, so everything captured after it sees
+    /// the pair as one feed — which is what the app would show by then.
+    private func captureFeedingJoin(_ app: XCUIApplication, language: String) throws {
+        let tile = app.buttons["log-tile-feeding"]
+        XCTAssertTrue(
+            scroll(app, to: tile),
+            "02-feeding-2-join: no feeding tile on the dashboard, even after scrolling"
+        )
+        tile.tap()
+
+        let join = app.buttons["feeding-join"]
+        XCTAssertTrue(
+            scroll(app, to: join),
+            "02-feeding-2-join: the seeded pair was not offered as a join"
+        )
+        try file(app, named: "02-feeding-2-join-offered", language: language)
+
+        join.tap()
+        let alert = app.alerts.firstMatch
+        XCTAssertTrue(
+            alert.waitForExistence(timeout: 10),
+            "02-feeding-3-join-confirm: tapping Join asked nothing"
+        )
+        try file(app, named: "02-feeding-3-join-confirm", language: language, waitingFor: alert)
+
+        // By identifier where SwiftUI passes one through to the alert, and
+        // otherwise by position — never by label, which is in seven languages.
+        // An alert with a cancel button puts it first, so the confirmation is
+        // the last.
+        let byIdentifier = alert.buttons["feeding-join-confirm"]
+        let confirm = byIdentifier.exists
+            ? byIdentifier
+            : alert.buttons.element(boundBy: alert.buttons.count - 1)
+        confirm.tap()
+
+        // The join is a write the list then observes: wait for the offer to go,
+        // which is the list redrawn with one feed where there were two.
+        let joined = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: join)
+        wait(for: [joined], timeout: 10)
+        try file(app, named: "02-feeding-4-joined", language: language)
+
         app.navigationBars.buttons.element(boundBy: 0).tap()
     }
 

@@ -165,6 +165,33 @@ enum ScreenshotSeed {
                 ]
             )
         )
+        // One feed saved as two: the left side stopped and saved, five minutes
+        // of winding, the right side started afresh. The history offers to join
+        // them back into the one feed they were (BDR-19) — the same two halves,
+        // five minutes apart, as Android's `ScreenshotTest`.
+        let half = now - 3 * hour - 40 * minute
+        try repository.addFeeding(
+            Feeding(
+                type: .BREAST,
+                side: .LEFT,
+                startTime: half,
+                endTime: half + 9 * minute,
+                leftDurationMs: 9 * minute,
+                segments: [NursingSegment(side: .LEFT, startTime: half, endTime: half + 9 * minute)]
+            )
+        )
+        try repository.addFeeding(
+            Feeding(
+                type: .BREAST,
+                side: .RIGHT,
+                startTime: half + 14 * minute,
+                endTime: half + 20 * minute,
+                rightDurationMs: 6 * minute,
+                segments: [
+                    NursingSegment(side: .RIGHT, startTime: half + 14 * minute, endTime: half + 20 * minute),
+                ]
+            )
+        )
         try repository.addFeeding(
             Feeding(type: .BOTTLE, amountMl: 90, startTime: now - 5 * hour, notes: "Expressed")
         )

@@ -170,6 +170,14 @@
     <string name="feeding_segments">This session</string>
     <!-- Side, duration, time range — e.g. "Left 8m · 10:00–10:08" -->
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <!-- Two breastfeeds saved apart, joined back into the one feed they were (BDR-19) -->
+    <string name="feeding_join">Join with previous</string>
+    <string name="feeding_join_title">Join these two feeds?</string>
+    <!-- The two feeds' start times, then the gap between them, e.g. "The feeds at 10:00 and 10:20 become one. The 5m between them…" -->
+    <string name="feeding_join_body">The feeds at %1$s and %2$s become one. The %3$s between them stays a break and isn\'t counted as feeding. This can\'t be undone.</string>
+    <!-- The same, for two feeds with no gap between them at all -->
+    <string name="feeding_join_body_no_gap">The feeds at %1$s and %2$s become one. This can\'t be undone.</string>
+    <string name="feeding_join_confirm">Join</string>
 
     <!-- Sleep -->
     <string name="screen_sleep">Sleep</string>

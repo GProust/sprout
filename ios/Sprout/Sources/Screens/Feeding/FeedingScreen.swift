@@ -26,6 +26,15 @@ final class FeedingViewModel {
     func add(_ feeding: Feeding) { try? repository.addFeeding(feeding) }
     func delete(_ feeding: Feeding) { try? repository.deleteFeeding(feeding) }
 
+    /// Join two breastfeeds saved apart into the one feed they were (BDR-19).
+    func join(_ earlier: Feeding, _ later: Feeding) {
+        try? repository.joinBreastfeeds(earlier, later)
+    }
+
+    /// Which cards can be joined to the feed below them: the later of two
+    /// neighbouring breastfeeds a short break apart, keyed by its uid.
+    var joinOffers: [String: Feeding] { breastfeedJoinOffers(feedings) }
+
     /// Begin timing on `side`. A session already running is left alone: two ways
     /// into the timer opening at once is not a reason to time the feed twice.
     func startNursing(on side: BreastSide) {
@@ -98,6 +107,9 @@ struct FeedingScreen: View {
     @State private var model: FeedingViewModel?
     @State private var adding = false
     @State private var pendingDelete: Feeding?
+    /// The two feeds awaiting a "yes, join them". Joining can't be taken back
+    /// either, so it asks the way a delete does.
+    @State private var pendingJoin: FeedJoin?
     @State private var showingTimer = false
 
     var body: some View {
@@ -115,6 +127,7 @@ struct FeedingScreen: View {
 
     @ViewBuilder
     private func content(_ model: FeedingViewModel) -> some View {
+        let joinOffers = model.joinOffers
         ZStack(alignment: .bottomTrailing) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.snug) {
@@ -135,7 +148,12 @@ struct FeedingScreen: View {
                     ForEach(model.byDay, id: \.day) { group in
                         DayHeader(dayStartMillis: group.day, now: Clock.millis)
                         ForEach(group.entries) { entry in
-                            FeedCard(entry: entry) { pendingDelete = entry }
+                            FeedCard(
+                                entry: entry,
+                                onJoin: joinOffers[entry.uid].map { (earlier: Feeding) -> (() -> Void) in
+                                    { pendingJoin = FeedJoin(earlier: earlier, later: entry) }
+                                }
+                            ) { pendingDelete = entry }
                         }
                     }
                 }
@@ -159,6 +177,65 @@ struct FeedingScreen: View {
             if let entry = pendingDelete { model.delete(entry) }
             pendingDelete = nil
         }
+        .alert(
+            Str.t("feeding_join_title"),
+            isPresented: Binding(get: { pendingJoin != nil }, set: { if !$0 { pendingJoin = nil } }),
+            presenting: pendingJoin
+        ) { join in
+            Button(Str.t("action_cancel"), role: .cancel) {}
+            Button(Str.t("feeding_join_confirm")) { model.join(join.earlier, join.later) }
+                .accessibilityIdentifier("feeding-join-confirm")
+        } message: { join in
+            Text(join.message)
+        }
+    }
+}
+
+// MARK: - Joining two feeds
+
+/// Two breastfeeds saved apart, on their way to being the one feed they were
+/// (BDR-19) — held while the confirmation is up.
+private struct FeedJoin {
+    let earlier: Feeding
+    let later: Feeding
+
+    /// Names both feeds by their start times and the gap between them, then
+    /// shows the joined feed's timeline, so what the parent agrees to is
+    /// exactly what they will get. An alert can only hold text, so the
+    /// timeline is written out the way the card's details write it.
+    var message: String {
+        let gap = breastfeedJoinGap(earlier, later) ?? 0
+        let sentence = gap > 0
+            ? Str.t(
+                "feeding_join_body",
+                SproutDateStyle.time(earlier.startTime),
+                SproutDateStyle.time(later.startTime),
+                SproutFormat.duration(millis: gap).text
+            )
+            : Str.t(
+                "feeding_join_body_no_gap",
+                SproutDateStyle.time(earlier.startTime),
+                SproutDateStyle.time(later.startTime)
+            )
+        let timeline = timelineLines(joinedBreastfeed(earlier, later).nursingSegments)
+        return ([sentence, ""] + timeline).joined(separator: "\n")
+    }
+}
+
+/// The quiet way into a join: small, in the muted colour of the rest of the
+/// card, and never anything that suggests the two feeds *should* be one. Only
+/// the parent who was there knows that.
+private struct JoinWithPreviousButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(Str.t("feeding_join"), systemImage: "link")
+                .font(.footnote)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(SproutColor.onSurfaceVariant)
+        .accessibilityIdentifier("feeding-join")
     }
 }
 
@@ -166,46 +243,110 @@ struct FeedingScreen: View {
 
 private struct FeedCard: View {
     let entry: Feeding
+    /// Set when the feed below can be joined to this one (BDR-19).
+    var onJoin: (() -> Void)?
     let onDelete: () -> Void
 
+    // Each branch hands `EntryCard` a concrete type, because it decides whether
+    // to draw the Details row from the *type* of what it is given: an `if`
+    // inside one builder is never `EmptyView`, and put a Details button on
+    // every bottle with nothing behind it.
     var body: some View {
+        let segments = entry.nursingSegments
+        if segments.isEmpty {
+            card(details: { EmptyView() }, action: { EmptyView() })
+        } else if let onJoin {
+            // Beside Details, in the row a joinable card already has — so
+            // nothing grows to make room for it.
+            card(
+                details: { SegmentTimeline(segments: segments) },
+                action: { JoinWithPreviousButton(action: onJoin) }
+            )
+        } else {
+            card(details: { SegmentTimeline(segments: segments) }, action: { EmptyView() })
+        }
+    }
+
+    private func card<Details: View, Action: View>(
+        @ViewBuilder details: @escaping () -> Details,
+        @ViewBuilder action: @escaping () -> Action
+    ) -> some View {
         EntryCard(
             title: entry.title,
             subtitle: entry.subtitle,
             meta: SproutDateStyle.time(entry.startTime),
             systemImage: entry.type.systemImage,
             onDelete: onDelete,
-            details: {
-                // The per-side breakdown, only where there is one to show.
-                let segments = entry.nursingSegments
-                if !segments.isEmpty {
-                    VStack(alignment: .leading, spacing: Spacing.hairline) {
-                        ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
-                            // The break is the gap the stretches leave; nothing
-                            // records one of its own, so a feed logged before
-                            // breaks existed shows none.
-                            let previousEnd = index == 0 ? segment.startTime : segments[index - 1].endTime
-                            if segment.startTime > previousEnd {
-                                TimelineLine(
-                                    label: Str.t("feeding_paused"),
-                                    millis: segment.startTime - previousEnd,
-                                    start: previousEnd,
-                                    end: segment.startTime
-                                )
-                            }
-                            TimelineLine(
-                                label: segment.side.label,
-                                millis: segment.durationMs,
-                                start: segment.startTime,
-                                end: segment.endTime
-                            )
-                        }
-                    }
-                }
-            },
-            action: { EmptyView() }
+            details: details,
+            action: action
         )
     }
+}
+
+/// A finished breastfeed stretch by stretch, with its breaks where they happened.
+private struct SegmentTimeline: View {
+    let segments: [NursingSegment]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.hairline) {
+            ForEach(Array(segments.enumerated()), id: \.offset) { index, segment in
+                // The break is the gap the stretches leave; nothing records one
+                // of its own, so a feed logged before breaks existed shows none.
+                let previousEnd = index == 0 ? segment.startTime : segments[index - 1].endTime
+                if segment.startTime > previousEnd {
+                    TimelineLine(
+                        label: Str.t("feeding_paused"),
+                        millis: segment.startTime - previousEnd,
+                        start: previousEnd,
+                        end: segment.startTime
+                    )
+                }
+                TimelineLine(
+                    label: segment.side.label,
+                    millis: segment.durationMs,
+                    start: segment.startTime,
+                    end: segment.endTime
+                )
+            }
+        }
+    }
+}
+
+/// The same timeline as lines of text, for where only text will go.
+private func timelineLines(_ segments: [NursingSegment]) -> [String] {
+    var lines: [String] = []
+    for (index, segment) in segments.enumerated() {
+        let previousEnd = index == 0 ? segment.startTime : segments[index - 1].endTime
+        if segment.startTime > previousEnd {
+            lines.append(
+                timelineText(
+                    label: Str.t("feeding_paused"),
+                    millis: segment.startTime - previousEnd,
+                    start: previousEnd,
+                    end: segment.startTime
+                )
+            )
+        }
+        lines.append(
+            timelineText(
+                label: segment.side.label,
+                millis: segment.durationMs,
+                start: segment.startTime,
+                end: segment.endTime
+            )
+        )
+    }
+    return lines
+}
+
+/// "Left 8m · 10:00–10:08".
+private func timelineText(label: String, millis: Int64, start: Int64, end: Int64) -> String {
+    Str.t(
+        "feeding_segment_line",
+        label,
+        SproutFormat.duration(millis: millis).text,
+        "\(SproutDateStyle.time(start))–\(SproutDateStyle.time(end))"
+    )
 }
 
 /// One line of a session's timeline: a stretch at a breast, or a break between
@@ -217,16 +358,9 @@ private struct TimelineLine: View {
     let end: Int64
 
     var body: some View {
-        Text(
-            Str.t(
-                "feeding_segment_line",
-                label,
-                SproutFormat.duration(millis: millis).text,
-                "\(SproutDateStyle.time(start))–\(SproutDateStyle.time(end))"
-            )
-        )
-        .font(.footnote)
-        .foregroundStyle(SproutColor.onSurfaceVariant)
+        Text(timelineText(label: label, millis: millis, start: start, end: end))
+            .font(.footnote)
+            .foregroundStyle(SproutColor.onSurfaceVariant)
     }
 }
 

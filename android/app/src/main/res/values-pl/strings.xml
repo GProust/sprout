@@ -140,6 +140,11 @@
     <string name="feeding_total">Razem %1$s</string>
     <string name="feeding_segments">Ta sesja</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Połącz z poprzednim</string>
+    <string name="feeding_join_title">Połączyć te dwa karmienia?</string>
+    <string name="feeding_join_body">Karmienia o %1$s i %2$s staną się jednym. Odstęp %3$s między nimi zostaje przerwą i nie liczy się jako karmienie. Tej operacji nie można cofnąć.</string>
+    <string name="feeding_join_body_no_gap">Karmienia o %1$s i %2$s staną się jednym. Tej operacji nie można cofnąć.</string>
+    <string name="feeding_join_confirm">Połącz</string>
     <string name="screen_sleep">Sen</string>
     <string name="sleep_empty">Brak zapisanego snu.</string>
     <string name="sleep_log_title">Zapisz sen</string>

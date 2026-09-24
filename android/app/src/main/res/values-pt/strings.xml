@@ -134,6 +134,11 @@
     <string name="feeding_total">Total %1$s</string>
     <string name="feeding_segments">Esta mamada</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Juntar à anterior</string>
+    <string name="feeding_join_title">Juntar estas duas mamadas?</string>
+    <string name="feeding_join_body">As mamadas de %1$s e %2$s passam a ser uma só. O intervalo de %3$s entre elas fica como pausa e não conta como mamada. Esta ação não pode ser anulada.</string>
+    <string name="feeding_join_body_no_gap">As mamadas de %1$s e %2$s passam a ser uma só. Esta ação não pode ser anulada.</string>
+    <string name="feeding_join_confirm">Juntar</string>
     <string name="screen_sleep">Sono</string>
     <string name="sleep_empty">Ainda não há sono registado.</string>
     <string name="sleep_log_title">Registar sono</string>

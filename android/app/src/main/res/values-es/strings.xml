@@ -134,6 +134,11 @@
     <string name="feeding_total">Total %1$s</string>
     <string name="feeding_segments">Esta toma</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Unir con la anterior</string>
+    <string name="feeding_join_title">¿Unir estas dos tomas?</string>
+    <string name="feeding_join_body">Las tomas de %1$s y %2$s pasan a ser una sola. El intervalo de %3$s entre ellas queda como pausa y no cuenta como toma. Esta acción no se puede deshacer.</string>
+    <string name="feeding_join_body_no_gap">Las tomas de %1$s y %2$s pasan a ser una sola. Esta acción no se puede deshacer.</string>
+    <string name="feeding_join_confirm">Unir</string>
     <string name="screen_sleep">Sueño</string>
     <string name="sleep_empty">Aún no hay sueño registrado.</string>
     <string name="sleep_log_title">Registrar sueño</string>

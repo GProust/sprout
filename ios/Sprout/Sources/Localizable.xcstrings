@@ -4669,6 +4669,236 @@
         }
       }
     },
+    "feeding_join": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit vorheriger verbinden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join with previous"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unir con la anterior"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionner avec la précédente"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unisci alla precedente"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połącz z poprzednim"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juntar à anterior"
+          }
+        }
+      }
+    },
+    "feeding_join_body": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Mahlzeiten um %1$@ und %2$@ werden zu einer. Der Abstand von %3$@ dazwischen bleibt eine Pause und zählt nicht als Stillzeit. Das lässt sich nicht rückgängig machen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The feeds at %1$@ and %2$@ become one. The %3$@ between them stays a break and isn't counted as feeding. This can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las tomas de %1$@ y %2$@ pasan a ser una sola. El intervalo de %3$@ entre ellas queda como pausa y no cuenta como toma. Esta acción no se puede deshacer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les tétées de %1$@ et de %2$@ n'en font plus qu'une. L'écart de %3$@ entre les deux reste une pause et ne compte pas comme tétée. Cette action est irréversible."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le poppate di %1$@ e %2$@ diventano una sola. L'intervallo di %3$@ tra le due resta una pausa e non conta come poppata. L'operazione non può essere annullata."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienia o %1$@ i %2$@ staną się jednym. Odstęp %3$@ między nimi zostaje przerwą i nie liczy się jako karmienie. Tej operacji nie można cofnąć."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As mamadas de %1$@ e %2$@ passam a ser uma só. O intervalo de %3$@ entre elas fica como pausa e não conta como mamada. Esta ação não pode ser anulada."
+          }
+        }
+      }
+    },
+    "feeding_join_body_no_gap": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Mahlzeiten um %1$@ und %2$@ werden zu einer. Das lässt sich nicht rückgängig machen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The feeds at %1$@ and %2$@ become one. This can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las tomas de %1$@ y %2$@ pasan a ser una sola. Esta acción no se puede deshacer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les tétées de %1$@ et de %2$@ n'en font plus qu'une. Cette action est irréversible."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le poppate di %1$@ e %2$@ diventano una sola. L'operazione non può essere annullata."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienia o %1$@ i %2$@ staną się jednym. Tej operacji nie można cofnąć."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As mamadas de %1$@ e %2$@ passam a ser uma só. Esta ação não pode ser anulada."
+          }
+        }
+      }
+    },
+    "feeding_join_confirm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbinden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionner"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unisci"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połącz"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juntar"
+          }
+        }
+      }
+    },
+    "feeding_join_title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese beiden Mahlzeiten verbinden?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join these two feeds?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Unir estas dos tomas?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionner ces deux tétées ?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unire queste due poppate?"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połączyć te dwa karmienia?"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juntar estas duas mamadas?"
+          }
+        }
+      }
+    },
     "feeding_last_switch": {
       "localizations": {
         "de": {

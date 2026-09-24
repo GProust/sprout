@@ -134,6 +134,11 @@
     <string name="feeding_total">Totale %1$s</string>
     <string name="feeding_segments">Questa poppata</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Unisci alla precedente</string>
+    <string name="feeding_join_title">Unire queste due poppate?</string>
+    <string name="feeding_join_body">Le poppate di %1$s e %2$s diventano una sola. L\'intervallo di %3$s tra le due resta una pausa e non conta come poppata. L\'operazione non può essere annullata.</string>
+    <string name="feeding_join_body_no_gap">Le poppate di %1$s e %2$s diventano una sola. L\'operazione non può essere annullata.</string>
+    <string name="feeding_join_confirm">Unisci</string>
     <string name="screen_sleep">Sonno</string>
     <string name="sleep_empty">Nessun sonno registrato finora.</string>
     <string name="sleep_log_title">Registra il sonno</string>

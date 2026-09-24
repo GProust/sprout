@@ -12,6 +12,9 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -152,6 +155,30 @@ class ScreenshotTest {
             ),
         )
         repo.addFeeding(FeedingEntity(type = FeedType.BOTTLE, amountMl = 120, startTime = now - 5 * hour))
+        // One feed saved as two: the left side stopped and saved, five minutes
+        // of winding, the right side started afresh. The history offers to
+        // join them back into the one feed they were (BDR-19).
+        val halfStart = now - 7 * hour
+        repo.addFeeding(
+            FeedingEntity(
+                type = FeedType.BREAST,
+                side = BreastSide.LEFT,
+                startTime = halfStart,
+                endTime = halfStart + 9 * min,
+                leftDurationMs = 9 * min,
+                segments = listOf(NursingSegment(BreastSide.LEFT, halfStart, halfStart + 9 * min)),
+            ),
+        )
+        repo.addFeeding(
+            FeedingEntity(
+                type = FeedType.BREAST,
+                side = BreastSide.RIGHT,
+                startTime = halfStart + 14 * min,
+                endTime = halfStart + 20 * min,
+                rightDurationMs = 6 * min,
+                segments = listOf(NursingSegment(BreastSide.RIGHT, halfStart + 14 * min, halfStart + 20 * min)),
+            ),
+        )
         // Expressed milk: a bottle in the fridge, two bags in the freezer, and
         // one already given — so the stash card shows both places and the
         // history shows a used batch alongside stored ones.
@@ -496,8 +523,33 @@ class ScreenshotTest {
         // preview (per-side + total); "Details" expands the per-stretch
         // breakdown. Captured before any live session so the list is idle.
         rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Details"))
-        tap("Details")
+        // The first of several: the two halves further down have one each.
+        rule.onAllNodesWithText("Details").onFirst().performClick()
+        settle()
         save("05-feeding-6-history-details")
+        // Two breastfeeds five minutes apart (BDR-19): the later one carries a
+        // quiet "Join with previous" beside its Details, the confirmation shows
+        // the feed they would make, and the joined feed keeps the five minutes
+        // as a break. The dialog is its own window, so it goes through the
+        // full-screen path.
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Join with previous"))
+        settle()
+        save("05-feeding-8-join-1-offered")
+        tap("Join with previous")
+        saveScreen("05-feeding-8-join-2-confirm")
+        tap("Join")
+        // The join is a database write the list then observes, which the
+        // compose clock knows nothing about — so wait for the offer to go,
+        // which is the list redrawn with one feed where there were two.
+        rule.waitUntil(timeoutMillis = 5_000) {
+            rule.onAllNodesWithText("Join with previous").fetchSemanticsNodes().isEmpty()
+        }
+        rule.onNodeWithTag("feedingList").performScrollToNode(hasText("Paused 5m", substring = true))
+        settle()
+        // The joined feed is the oldest on the list, so its Details is the last.
+        rule.onAllNodesWithText("Details").onLast().performClick()
+        settle()
+        save("05-feeding-8-join-3-joined")
         // Widget (idle): captured before any live session starts, so it shows
         // the last logged breastfeed. Named 13-* to sort with the widget shots.
         saveWidget("13-widget-last-breastfeed")
