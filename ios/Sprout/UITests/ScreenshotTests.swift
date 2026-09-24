@@ -229,8 +229,10 @@ final class ScreenshotTests: XCTestCase {
         // By identifier where SwiftUI passes one through to the alert, and
         // otherwise by position — never by label, which is in seven languages.
         // An alert with a cancel button puts it first, so the confirmation is
-        // the last.
-        let byIdentifier = alert.buttons["feeding-join-confirm"]
+        // the last. `firstMatch`, because the identifier lands on the alert's
+        // action *and* the button view inside it, and a query that matches two
+        // elements refuses to tap either.
+        let byIdentifier = alert.buttons.matching(identifier: "feeding-join-confirm").firstMatch
         let confirm = byIdentifier.exists
             ? byIdentifier
             : alert.buttons.element(boundBy: alert.buttons.count - 1)
