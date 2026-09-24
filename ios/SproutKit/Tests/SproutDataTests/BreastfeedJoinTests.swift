@@ -107,7 +107,7 @@ final class BreastfeedJoinTests: XCTestCase {
             endTime: start + min(9)
         )
         var laterUntimed = untimed
-        laterUntimed.uid = newUid()
+        laterUntimed.uid = "a-later-untimed-feed"
         laterUntimed.startTime = start + min(14)
         laterUntimed.endTime = start + min(20)
 
