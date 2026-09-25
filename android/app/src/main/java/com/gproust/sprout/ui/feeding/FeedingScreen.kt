@@ -18,8 +18,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -57,6 +59,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.breastfeedJoinGap
+import com.gproust.sprout.data.breastfeedJoinOffers
+import com.gproust.sprout.data.joinedBreastfeed
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
@@ -116,6 +121,17 @@ class FeedingViewModel(
     fun delete(entity: FeedingEntity) = viewModelScope.launch {
         repository.deleteFeeding(entity)
         FeedingReminders.rescheduleActiveBaby(context, repository)
+    }
+
+    /**
+     * Join two breastfeeds saved apart into the one feed they were (BDR-19).
+     * If the later one was the last feed, the last feed now began when the
+     * earlier one did — so the reminder moves with it.
+     */
+    fun join(earlier: FeedingEntity, later: FeedingEntity) = viewModelScope.launch {
+        if (repository.joinBreastfeeds(earlier, later)) {
+            FeedingReminders.rescheduleActiveBaby(context, repository)
+        }
     }
 
     /**
@@ -215,6 +231,9 @@ fun FeedingScreen(
     var adding by remember { mutableStateOf(false) }
     // The feed awaiting a "yes, delete it" — deletes are permanent.
     var deleting by remember { mutableStateOf<FeedingEntity?>(null) }
+    // The two feeds awaiting a "yes, join them" — earlier first. Joining can't
+    // be taken back either, so it asks the same way a delete does.
+    var joining by remember { mutableStateOf<Pair<FeedingEntity, FeedingEntity>?>(null) }
 
     editing?.let { entry ->
         EditFeedingDialog(
@@ -231,6 +250,15 @@ fun FeedingScreen(
         ConfirmDeleteDialog(
             onConfirm = { vm.delete(entry); deleting = null; editing = null },
             onDismiss = { deleting = null },
+        )
+    }
+
+    joining?.let { (earlier, later) ->
+        ConfirmJoinDialog(
+            earlier = earlier,
+            later = later,
+            onConfirm = { vm.join(earlier, later); joining = null },
+            onDismiss = { joining = null },
         )
     }
 
@@ -251,6 +279,9 @@ fun FeedingScreen(
     // happens in a bottom sheet behind the "+" button, so the last feed is
     // always visible at a glance.
     val byDay = remember(feedings) { feedings.groupBy { startOfDay(it.startTime) } }
+    // Which cards can be joined to the feed below them (BDR-19): the later of
+    // two neighbouring breastfeeds a short break apart, keyed by its uid.
+    val joinable = remember(feedings) { breastfeedJoinOffers(feedings) }
 
     Scaffold(
         topBar = { SproutTopBar(stringResource(R.string.screen_feeding), onBack = onBack) },
@@ -276,6 +307,7 @@ fun FeedingScreen(
             byDay.forEach { (day, entries) ->
                 item(key = "day-$day") { DayHeader(day) }
                 items(entries, key = { it.id }) { entry ->
+                    val joinsTo = joinable[entry.uid]
                     EntryCard(
                         title = feedingTitle(context, entry),
                         subtitle = feedingSubtitle(context, entry),
@@ -285,6 +317,13 @@ fun FeedingScreen(
                         onClick = { editing = entry },
                         details = if (entry.type == FeedType.BREAST && entry.segments.isNotEmpty()) {
                             { FeedingSegmentDetails(entry.segments) }
+                        } else {
+                            null
+                        },
+                        // Offered on the later feed only, beside Details — the
+                        // row a joinable card already has, so nothing grows.
+                        action = if (joinsTo != null) {
+                            { JoinWithPreviousButton { joining = joinsTo to entry } }
                         } else {
                             null
                         },
@@ -653,6 +692,73 @@ private fun SideTotal(label: String, value: String, active: Boolean) {
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
         )
     }
+}
+
+/**
+ * The quiet way into a join: small, in the muted colour of the rest of the
+ * card, and never anything that suggests the two feeds *should* be one. Only
+ * the parent who was there knows that (BDR-19).
+ */
+@Composable
+private fun JoinWithPreviousButton(onClick: () -> Unit) {
+    TextButton(
+        onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+    ) {
+        Icon(Icons.Filled.Link, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(stringResource(R.string.feeding_join), style = MaterialTheme.typography.labelMedium)
+    }
+}
+
+/**
+ * "Join these two feeds?" — names both by their start times and the gap
+ * between them, and shows the joined feed's timeline before anything is
+ * written, so what the parent agrees to is exactly what they will get.
+ */
+@Composable
+private fun ConfirmJoinDialog(
+    earlier: FeedingEntity,
+    later: FeedingEntity,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val gap = breastfeedJoinGap(earlier, later) ?: 0L
+    val preview = remember(earlier, later) { joinedBreastfeed(earlier, later) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.feeding_join_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    if (gap > 0L) {
+                        stringResource(
+                            R.string.feeding_join_body,
+                            formatTime(earlier.startTime),
+                            formatTime(later.startTime),
+                            formatDuration(context, gap),
+                        )
+                    } else {
+                        stringResource(
+                            R.string.feeding_join_body_no_gap,
+                            formatTime(earlier.startTime),
+                            formatTime(later.startTime),
+                        )
+                    },
+                )
+                FeedingSegmentDetails(preview.segments)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.feeding_join_confirm)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
 }
 
 /** Edit (or delete) an existing feed in a dialog, reusing [FeedingForm]. */

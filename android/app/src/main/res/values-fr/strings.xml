@@ -163,6 +163,11 @@
     <string name="feeding_total">Total %1$s</string>
     <string name="feeding_segments">Cette tétée</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Fusionner avec la précédente</string>
+    <string name="feeding_join_title">Fusionner ces deux tétées ?</string>
+    <string name="feeding_join_body">Les tétées de %1$s et de %2$s n\'en font plus qu\'une. L\'écart de %3$s entre les deux reste une pause et ne compte pas comme tétée. Cette action est irréversible.</string>
+    <string name="feeding_join_body_no_gap">Les tétées de %1$s et de %2$s n\'en font plus qu\'une. Cette action est irréversible.</string>
+    <string name="feeding_join_confirm">Fusionner</string>
 
     <!-- Sleep -->
     <string name="screen_sleep">Sommeil</string>

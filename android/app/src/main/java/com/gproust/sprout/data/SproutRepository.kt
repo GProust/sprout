@@ -259,6 +259,36 @@ class SproutRepository(
         onWidgetDataChanged()
     }
 
+    /**
+     * Joins two breastfeeds saved apart into the one feed they were (BDR-19):
+     * [earlier] gains [later]'s stretches, with the minutes between them kept
+     * as a break, and [later] is deleted. Returns whether anything was written.
+     *
+     * Both rows are read again inside the transaction rather than trusted from
+     * the screen. The confirmation can sit open while an exchange with another
+     * phone edits or deletes one of them, and joining a copy that has since
+     * changed would quietly undo that edit — or bring a deleted feed back
+     * inside another one.
+     *
+     * One transaction, so no phone is ever left holding a joined feed while the
+     * later one still exists — which would count its stretches twice.
+     */
+    suspend fun joinBreastfeeds(earlier: FeedingEntity, later: FeedingEntity): Boolean {
+        val joined = db.withTransaction {
+            val first = db.feedingDao().findByUid(earlier.uid)?.takeIf { it.deletedAt == null }
+            val second = db.feedingDao().findByUid(later.uid)?.takeIf { it.deletedAt == null }
+            if (first == null || second == null || breastfeedJoinGap(first, second) == null) {
+                return@withTransaction false
+            }
+            val at = now()
+            db.feedingDao().insert(joinedBreastfeed(first, second).copy(updatedAt = at))
+            db.feedingDao().softDelete(second.id, at)
+            true
+        }
+        if (joined) onWidgetDataChanged()
+        return joined
+    }
+
     /** Epoch millis of a baby's most recent feed, or null if none yet. */
     suspend fun lastFeedTime(babyId: Long): Long? = db.feedingDao().lastFeedTime(babyId)
 

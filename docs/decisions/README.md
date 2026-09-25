@@ -53,5 +53,6 @@ ADR log and are cross-linked from here.
 | [0016](0016-a-running-wait-on-the-dashboard-and-a-dose-from-the-notification.md) | A running wait on the dashboard, and a dose from the notification | Product / UX | Accepted |
 | [0017](0017-a-breastfeed-can-stop-and-carry-on.md) | A breastfeed can stop and carry on, and the break is not time at the breast | Product / Domain | Accepted |
 | [0018](0018-a-medicine-measured-by-amount.md) | A medicine measured by amount, and a leaflet that gives no gap at all | Product / Domain | Accepted |
+| [0019](0019-two-breastfeeds-saved-apart-can-be-joined.md) | Two breastfeeds saved apart can be joined into the one feed they were | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

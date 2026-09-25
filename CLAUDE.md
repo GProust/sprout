@@ -208,6 +208,20 @@ things a change can quietly undo:
 - **Nothing about a break is judged.** No maximum, no nudge, no automatic stop,
   and pausing twice must not restart the break's clock.
 
+Two feeds saved apart can also be joined back into the one feed they were
+([BDR-19](docs/decisions/0019-two-breastfeeds-saved-apart-can-be-joined.md)) —
+the same break, after the fact. `data/BreastfeedJoin.kt` and
+`SproutData/BreastfeedJoin.swift` are the arithmetic, tested with the same cases:
+
+- **The earlier row stays and the later one is soft-deleted, in one
+  transaction**, after both are read again inside it. Two writes apart would hand
+  the other phone a joined feed beside the half folded into it; joining the
+  screen's copies would undo an edit that arrived while the dialog was up.
+- **The thirty minutes is where the offer appears, not a maximum break.** It is
+  offered only between neighbouring breastfeeds of one baby, both timed stretch
+  by stretch, with nothing logged between them — and never suggested or done
+  automatically. Only the parent who was there knows two feeds were one.
+
 ## Medicine given when it is needed
 
 Separate from the calendar-shaped `treatment` table, and deliberately so: the

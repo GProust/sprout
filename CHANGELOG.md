@@ -3,6 +3,21 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🔗 **Two feeds that were really one can be joined.** If you stopped and saved
+  after the first side and started the second a few minutes later, the feeding
+  history now offers a small **Join with previous** on the second of the two.
+  It asks first — naming both feeds and showing the one they'll become — and
+  then keeps the minutes in between as a break, exactly as if you'd pressed
+  *Pause* at the time. Your feed count, the time between feeds and the reminder
+  go back to counting one feed; the time at the breast doesn't change, because
+  the break was never feeding.
+- 🤫 **It stays out of the way.** It's only offered between two breastfeeds less
+  than half an hour apart with nothing else logged between them, and it's never
+  suggested: no banner, no "these look like one feed", and nothing is ever
+  joined on its own. Whether two feeds were one is yours to say.
+
 ## [1.12.0] — 2026-09-20
 
 - ⏸️ **A feed can stop for a burp and carry on.** The breastfeeding timer now has

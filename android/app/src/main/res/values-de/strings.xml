@@ -134,6 +134,11 @@
     <string name="feeding_total">Gesamt %1$s</string>
     <string name="feeding_segments">Diese Sitzung</string>
     <string name="feeding_segment_line">%1$s %2$s · %3$s</string>
+    <string name="feeding_join">Mit vorheriger verbinden</string>
+    <string name="feeding_join_title">Diese beiden Mahlzeiten verbinden?</string>
+    <string name="feeding_join_body">Die Mahlzeiten um %1$s und %2$s werden zu einer. Der Abstand von %3$s dazwischen bleibt eine Pause und zählt nicht als Stillzeit. Das lässt sich nicht rückgängig machen.</string>
+    <string name="feeding_join_body_no_gap">Die Mahlzeiten um %1$s und %2$s werden zu einer. Das lässt sich nicht rückgängig machen.</string>
+    <string name="feeding_join_confirm">Verbinden</string>
     <string name="screen_sleep">Schlaf</string>
     <string name="sleep_empty">Noch kein Schlaf eingetragen.</string>
     <string name="sleep_log_title">Schlaf eintragen</string>
