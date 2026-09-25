@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.13.0] — 2026-09-25
 
 - 🔗 **Two feeds that were really one can be joined.** If you stopped and saved
   after the first side and started the second a few minutes later, the feeding
