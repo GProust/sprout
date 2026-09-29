@@ -287,11 +287,31 @@ what the `paths:` filters in `ci.yml` and `ios.yml` exist to keep in check.
   a pipe and not otherwise. Two physical phones are the only proof.
 - **Produce anything installable.** Not a TestFlight build, not an `.ipa`, not
   something you can put on your own phone.
-- **Capture the *listing* screenshots.** The review set below is captured on
-  whatever simulator the runner happens to ship. App Store Connect wants
-  specific device sizes, which means naming those simulators and a job of its
-  own — the counterpart of `screenshots.yml`'s `tablet-7` / `tablet-10` runs.
-  Not built, because there is nothing to upload it to yet.
+
+### The listing screenshots
+
+The review set below is captured on whatever simulator the runner happens to
+ship, and none of its sizes are ones App Store Connect takes. The listing set
+has its own workflow, [`ios-listing-screenshots.yml`](../.github/workflows/ios-listing-screenshots.yml)
+— the counterpart of `screenshots.yml`'s `tablet-7` / `tablet-10` runs:
+**Actions → App Store screenshots → Run workflow**, pick the slot, and download
+the `app-store-screenshots-<size>in` artifact. It holds one folder per App Store
+locale (`en-US`, `fr-FR`, `de-DE`, `es-ES`, `it`, `pl`, `pt-PT`), every image
+checked for size and transparency before upload.
+
+| Slot | Simulator | Pixels |
+|------|-----------|--------|
+| 6.5" | iPhone 14 Plus | 1284 × 2778 |
+| 6.9" | iPhone 16 Pro Max | 1320 × 2868 |
+
+Apple needs one of the two, not both. Nothing is committed: the images belong
+to the listing, not to the repository.
+
+**The app is iPhone-only** (`TARGETED_DEVICE_FAMILY: '1'` in `project.yml`), so
+there is no iPad slot to fill. Declaring an iPad would mean a second set of
+screenshots and — the app being portrait-only — an upload App Store Connect
+refuses, because an iPad app that can multitask must support every orientation.
+An iPhone app still runs on an iPad, in the iPhone-sized window.
 
 ### The review screenshots, in the repository
 
@@ -366,7 +386,7 @@ before the Phase 0 spike says the app is worth shipping.
 | **A distribution certificate + provisioning profile** | signs the build | free with the above |
 | **An App Store Connect API key** | lets CI upload to TestFlight without a human | free with the above |
 | **App Privacy answers** in App Store Connect | Apple requires them | free — every answer is *Data Not Collected* |
-| **An export-compliance answer** | the export is AES-256 (BDR-13) | free — "exempt, standard cryptography" |
+| **An export-compliance answer** | the export is AES-256 (BDR-13) | free — given in `Info.plist` as `ITSAppUsesNonExemptEncryption: false`, because every cipher is the OS's own (CryptoKit, CommonCrypto) |
 
 Those two are the least work here and the most work for most apps: every answer
 on the App Privacy card is *Data Not Collected*, because there is no network call
