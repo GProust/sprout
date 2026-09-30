@@ -110,7 +110,7 @@
     <string name="side_right">Destro</string>
     <string name="side_both">Entrambi</string>
     <string name="unit_ml">ml</string>
-    <string name="feeding_detail_separator"> · </string>
+    <string name="feeding_detail_separator">" · "</string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="field_amount_solid">Quantità mangiata</string>
     <string name="feeding_amount_g">%1$d g</string>
@@ -171,7 +171,7 @@
     <string name="diaper_stool">Feci</string>
     <string name="diaper_both">Urine + feci</string>
     <string name="diaper_stool_color">Colore delle feci</string>
-    <string name="diaper_separator"> · </string>
+    <string name="diaper_separator">" · "</string>
     <string name="stool_color_yellow">Giallo</string>
     <string name="stool_color_green">Verde</string>
     <string name="stool_color_brown">Marrone</string>

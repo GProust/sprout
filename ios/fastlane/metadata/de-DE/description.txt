@@ -1,0 +1,25 @@
+Sprout ist ein ruhiges, privates Tagebuch für die ersten Wochen und Monate deines Neugeborenen und für den Elternteil, der sich von der Geburt erholt.
+
+Alles bleibt auf deinem iPhone. Kein Konto, keine Cloud, keine Werbung, kein Tracking. Sprout baut überhaupt keine Netzwerkverbindung auf: Nichts verlässt dein Handy, außer du entscheidest dich, es zu senden.
+
+WAS DU ERFASSEN KANNST
+
+• Mahlzeiten: Brust, Fläschchen und Beikost. Ein Live-Stilltimer wechselt die Seite mit einem Tipp und lässt sich fürs Bäuerchen pausieren, ohne dass die Pause als Stillzeit zählt.
+• Abpumpen: wie viel, welche Seite und wohin die Milch kam, mit einem Milchvorrat, der zusammenzählt, was im Kühlschrank und im Gefrierfach liegt.
+• Schlaf: Nickerchen und Nächte, und wo dein Baby geschlafen hat, wenn du es festhalten möchtest.
+• Windeln: nass, voll oder beides, mit einer Farbskala für den Stuhl.
+• Wachstum: Gewicht, Größe und Kopfumfang, abgelesen an den WHO-Wachstumsstandards.
+• Medikamente: geplante Behandlungen mit Erinnerungen und Medikamente bei Bedarf, mit dem Abstand zwischen zwei Gaben, der dir genannt wurde.
+• Deine Erholung: ein kurzer täglicher Check-in zur Stimmung und, wenn es dich betrifft, zur Heilung und zum Brustbefinden. Du kannst ihn jederzeit abschalten.
+
+FÜR ALLE FAMILIEN
+
+• Mehrere Babys, auch Zwillinge, nebeneinander.
+• Teile das Tagebuch eines Babys mit den anderen Handys deines Haushalts, indem du eine Datei sendest. Ohne Konto und ohne Server; das geteilte Tagebuch ist verschlüsselt.
+• Statistiken pro Tag und Woche und ein PDF-Bericht oder eine Tabelle für den Arzttermin, auf Wunsch mit Passwort geschützt.
+• Optionale Erinnerungen an Mahlzeiten und Behandlungen, direkt auf dem Handy geplant.
+• Auf Deutsch, Englisch, Französisch, Spanisch, Italienisch, Polnisch und Portugiesisch.
+
+Sprout hält fest, was du einträgst. Es gibt keinen medizinischen Rat und ersetzt keine medizinische Fachperson.
+
+Sprout ist freie Open-Source-Software (GNU GPLv3), ohne Werbung und ohne In-App-Käufe.

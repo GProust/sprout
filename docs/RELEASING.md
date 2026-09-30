@@ -366,13 +366,47 @@ Two differences, both Apple's rather than ours:
   already uses — so the release step, when there is one, copies the highest
   build's file into place rather than the notes being edited in situ and lost.
 
-The rest of the listing — title, subtitle, description, keywords — is
-**deliberately not duplicated here**. Android's already exists in all seven
-languages, and a second copy of the same marketing text is a second thing to
-keep in step; the App Store's field limits differ enough (a 30-character
-subtitle against Play's 80-character short description) that it wants
-generating from one source rather than copying, the way the string catalog
-already is. Not needed until there is a listing to fill in.
+### The listing, in the repository
+
+`ios/fastlane/metadata/<locale>/` also holds the rest of the App Store listing,
+one file per field: `name`, `subtitle`, `description`, `keywords`,
+`promotional_text` and the three links, plus `copyright.txt` beside the
+language folders. It was once planned as a copy generated from Play's, and it
+is not one, because it does not say the same things: it is an iPhone listing,
+sharing on iOS is by file only until the radio is written, and Apple's fields
+are shaped differently (a 30-character subtitle, 100 characters of keywords).
+
+**The name is "Sprout: …" in every language.** App Store names are unique per
+language, "Sprout" alone was already taken in some, and a name shared with
+another app in the same store is a dispute its owner can win after launch. The
+part after the colon says what the app is — the words search weighs most — and
+the icon on the phone still reads "Sprout".
+
+[`ios-listing.yml`](../.github/workflows/ios-listing.yml) is how it gets there:
+
+- **On a pull request** it runs [`ios/tools/check_listing.py`](../ios/tools/check_listing.py):
+  every field in every language, Apple's limits (keywords in bytes, so an "ä"
+  cannot tip them over), no keyword repeating a word the name or subtitle
+  already has, no other platform named, the same links everywhere. No
+  credentials, nothing sent.
+- **From Actions → App Store listing → Run workflow** it captures the screenshots
+  (the workflow above), keeps the ones
+  [`ios/fastlane/listing-screenshots.txt`](../ios/fastlane/listing-screenshots.txt)
+  names in that order, and runs fastlane's `deliver` with the App Store Connect
+  API key (§9). Untick *screenshots* for a text-only run of a minute or two.
+
+**The repository wins.** An upload replaces what App Store Connect held for every
+field it carries, in every language it carries, and replaces the 6.5"
+screenshots. Edit the listing here and run the workflow; an edit made in App
+Store Connect lasts until the next run.
+
+It does not upload a build, submit anything for review, or answer what App
+Store Connect asks once: App Privacy (every answer *Data Not Collected*), the
+age rating, the category, the price and the App Review contact.
+
+fastlane is pinned in [`ios/Gemfile`](../ios/Gemfile) and its lock file, and
+told not to report usage — the release tooling of an app that sends nothing
+should not send things either.
 
 ### What publishing will need, when the screens land
 
@@ -492,18 +526,20 @@ choice is not made yet and does not need to be until there is an Apple account.
 
 Both stores' metadata already sits in fastlane's own layout —
 `android/fastlane/metadata/android/<locale>/` is exactly what `supply` reads, and
-`ios/fastlane/metadata/<locale>/` is what `deliver` reads. **fastlane itself is
-not set up**: there is no `Fastfile`, no `Gemfile`, and `release.yml` builds and
-signs the Android artifact but uploads it by hand (§5).
+`ios/fastlane/metadata/<locale>/` is what `deliver` reads. **The App Store
+listing is uploaded** by `ios-listing.yml` (§8), with fastlane pinned in
+`ios/Gemfile`. `release.yml` builds and signs the Android artifact but uploads
+it by hand (§5).
 
-So the work, when the credentials exist, is:
+So the work still to do is:
 
 - **Play:** add `supply` and one job. The metadata and the release notes are
   already in the right directories, which is most of what that job would
   otherwise need.
-- **App Store:** add `deliver` (listing) and `pilot` (TestFlight), plus the step
-  that copies `changelogs/<build>.txt` into `release_notes.txt` — see §8.
+- **App Store:** add `pilot` (TestFlight) — it needs the distribution
+  certificate and provisioning profile as well as the API key — plus the step
+  that copies `changelogs/<build>.txt` into `release_notes.txt` for every
+  version after the first (§8).
 
-Neither is worth writing before the accounts exist, because neither can be
-tested. What *can* be done first is everything that needs no account at all,
-which §8 lists and which is already done.
+Neither is worth writing before its credentials exist, because neither can be
+tested without them.

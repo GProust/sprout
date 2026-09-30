@@ -21,6 +21,7 @@ name: App Store screenshots
 # Run it from Actions → App Store screenshots → Run workflow. It also runs on a
 # pull request that changes this file, so a change to it is seen working before
 # it lands — workflow_dispatch only offers workflows that are already on main.
+# And `ios-listing.yml` calls it, to capture the set it then uploads.
 
 on:
   workflow_dispatch:
@@ -29,6 +30,11 @@ on:
         description: 'The App Store Connect slot to fill: 6.5 (iPhone 14 Plus, 1284 × 2778) or 6.9 (iPhone 16 Pro Max, 1320 × 2868).'
         type: choice
         options: [ '6.5', '6.9' ]
+        default: '6.5'
+  workflow_call:
+    inputs:
+      display:
+        type: string
         default: '6.5'
   pull_request:
     branches: [ main ]
