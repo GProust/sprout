@@ -1,0 +1,166 @@
+name: App Store listing
+
+# Puts the App Store listing in App Store Connect: the name, subtitle,
+# description, keywords, promotional text and links in all seven languages,
+# from ios/fastlane/metadata/, and the screenshots named in
+# ios/fastlane/listing-screenshots.txt, captured fresh at 1284 × 2778.
+#
+# The repository is the listing's source, the way android/fastlane/ is Play's:
+# whatever this uploads replaces what App Store Connect held, field by field
+# and language by language, and a language it adds is added. Change the text
+# here, not there, or the next run puts this back.
+#
+# On a pull request it only checks the listing against Apple's limits
+# (ios/tools/check_listing.py) — no credentials, nothing sent. The upload runs
+# only from Actions → App Store listing → Run workflow, with the App Store
+# Connect API key in the repository secrets (docs/RELEASING.md §9).
+#
+# What it does not do: upload a build, answer the App Privacy, age-rating or
+# export questions, set the price or category, fill in the App Review contact,
+# or submit anything for review. Those are in App Store Connect, once.
+
+on:
+  workflow_dispatch:
+    inputs:
+      screenshots:
+        description: 'Capture the screenshots again and replace the ones in App Store Connect (about 20 minutes). Off: text only.'
+        type: boolean
+        default: true
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ios/fastlane/**'
+      - 'ios/Gemfile'
+      - 'ios/Gemfile.lock'
+      - 'ios/tools/check_listing.py'
+      - '.github/workflows/ios-listing.yml'
+
+permissions:
+  contents: read
+
+# Never two uploads at once, and never one cancelled halfway: a half-finished
+# upload leaves some languages on the new text and some on the old.
+concurrency:
+  group: ios-listing-upload-${{ github.head_ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check the listing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Check the listing against Apple's limits
+        run: python3 ios/tools/check_listing.py
+
+  screenshots:
+    name: Screenshots
+    needs: check
+    if: github.event_name == 'workflow_dispatch' && inputs.screenshots
+    uses: ./.github/workflows/ios-listing-screenshots.yml
+    with:
+      display: '6.5'
+
+  upload:
+    name: Upload to App Store Connect
+    needs: [ check, screenshots ]
+    # The screenshots job is skipped for a text-only run, and a job whose
+    # dependency was skipped is skipped too unless it says otherwise.
+    if: >-
+      github.event_name == 'workflow_dispatch' && !cancelled() &&
+      needs.check.result == 'success' &&
+      (needs.screenshots.result == 'success' || needs.screenshots.result == 'skipped')
+    runs-on: ubuntu-latest
+    env:
+      WITH_SCREENSHOTS: ${{ inputs.screenshots }}
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      # fastlane reports anonymous usage to its authors unless told not to. An
+      # app whose claim is that it sends nothing should not have its release
+      # tooling send things either.
+      FASTLANE_OPT_OUT_USAGE: '1'
+      FASTLANE_SKIP_UPDATE_CHECK: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby and fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Download the screenshots
+        if: env.WITH_SCREENSHOTS == 'true'
+        uses: actions/download-artifact@v7
+        with:
+          name: app-store-screenshots-6.5in
+          path: ${{ runner.temp }}/captured
+
+      # The capture holds every screen in every language; the listing shows the
+      # ones listing-screenshots.txt names, numbered into its order.
+      - name: Choose the listing's screenshots
+        if: env.WITH_SCREENSHOTS == 'true'
+        run: python3 ios/tools/check_listing.py stage "$RUNNER_TEMP/captured" "$RUNNER_TEMP/screenshots"
+
+      # The key goes to a file only this job can read and is never printed.
+      # fastlane takes it as JSON; the three values are the secrets RELEASING.md
+      # §9 describes.
+      - name: Write the App Store Connect API key
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEY_ID" ] || [ -z "$ISSUER_ID" ] || [ -z "$PRIVATE_KEY" ]; then
+            echo "::error::APP_STORE_CONNECT_KEY_ID, _ISSUER_ID and _PRIVATE_KEY must all be set as repository secrets"
+            exit 1
+          fi
+          umask 077
+          python3 - <<'PY'
+          import json, os
+          path = os.path.join(os.environ["RUNNER_TEMP"], "app-store-connect.json")
+          with open(path, "w") as f:
+              json.dump({
+                  "key_id": os.environ["KEY_ID"],
+                  "issuer_id": os.environ["ISSUER_ID"],
+                  "key": os.environ["PRIVATE_KEY"],
+                  "in_house": False,
+              }, f)
+          PY
+
+      # The version the listing belongs to is the one the app is built as, so
+      # a listing can never be filed against a version the build does not say.
+      - name: Upload
+        working-directory: ios
+        run: |
+          set -euo pipefail
+          version="$(sed -n "s/^ *MARKETING_VERSION: *'\{0,1\}\([0-9.]*\)'\{0,1\}.*/\1/p" Sprout/project.yml | head -n1)"
+          if [ -z "$version" ]; then
+            echo "::error::could not read MARKETING_VERSION from ios/Sprout/project.yml"
+            exit 1
+          fi
+          echo "Uploading the listing for version $version"
+          screenshots=(--skip_screenshots true)
+          if [ "$WITH_SCREENSHOTS" = "true" ]; then
+            screenshots=(--screenshots_path "$RUNNER_TEMP/screenshots" --overwrite_screenshots true)
+          fi
+          bundle exec fastlane deliver \
+            --api_key_path "$RUNNER_TEMP/app-store-connect.json" \
+            --app_identifier com.gproust.sprout \
+            --platform ios \
+            --app_version "$version" \
+            --metadata_path fastlane/metadata \
+            "${screenshots[@]}" \
+            --skip_binary_upload true \
+            --submit_for_review false \
+            --run_precheck_before_submit false \
+            --force true
+
+      - name: Remove the key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/app-store-connect.json"

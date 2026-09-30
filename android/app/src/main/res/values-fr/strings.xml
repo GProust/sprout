@@ -136,7 +136,7 @@
     <string name="side_right">Droit</string>
     <string name="side_both">Les deux</string>
     <string name="unit_ml">ml</string>
-    <string name="feeding_detail_separator"> · </string>
+    <string name="feeding_detail_separator">" · "</string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="field_amount_solid">Quantité mangée</string>
     <string name="feeding_amount_g">%1$d g</string>
@@ -205,7 +205,7 @@
     <string name="diaper_both">Urines + selles</string>
     <string name="diaper_stool_color">Couleur des selles</string>
     <!-- Sépare les détails d\'un historique, p. ex. « Jaune · molles » -->
-    <string name="diaper_separator"> · </string>
+    <string name="diaper_separator">" · "</string>
     <!-- Couleurs de selles prédéfinies -->
     <string name="stool_color_yellow">Jaune</string>
     <string name="stool_color_green">Vert</string>

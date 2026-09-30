@@ -1,0 +1,25 @@
+Sprout es un registro tranquilo y privado para las primeras semanas y meses de tu recién nacido, y para quien se recupera del parto.
+
+Todo se queda en tu iPhone. Sin cuenta que crear, sin nube, sin anuncios y sin rastreo. Sprout no establece ninguna conexión de red: nada sale de tu teléfono salvo que decidas enviarlo.
+
+QUÉ PUEDES REGISTRAR
+
+• Tomas: pecho, biberón y sólidos. Un temporizador de lactancia en directo cambia de pecho con un toque y se puede pausar para el eructo sin contar la pausa como tiempo al pecho.
+• Extracción: cuánta leche, de qué pecho y dónde se guardó, con una reserva que suma lo que hay en la nevera y en el congelador.
+• Sueño: siestas y noches, y dónde durmió tu bebé si quieres anotarlo.
+• Pañales: mojados, sucios o ambos, con una escala de color de las heces.
+• Crecimiento: peso, altura y perímetro craneal, comparados con los estándares de crecimiento de la OMS.
+• Medicamentos: tratamientos programados con recordatorios, y medicamentos que se dan cuando hacen falta, con la espera entre dosis que te indicaron.
+• Tu recuperación: un breve seguimiento diario del ánimo y, si te corresponde, de la cicatrización y la comodidad del pecho. Puedes desactivarlo cuando quieras.
+
+PARA TODAS LAS FAMILIAS
+
+• Varios bebés, gemelos incluidos, uno al lado del otro.
+• Comparte el registro de un bebé con los demás teléfonos de tu hogar enviando un archivo. Sin cuenta ni servidor; el registro compartido va cifrado.
+• Estadísticas por día y por semana, y un informe PDF o una hoja de cálculo para llevar a la consulta, que puedes proteger con contraseña.
+• Recordatorios opcionales de tomas y tratamientos, programados en el propio teléfono.
+• En español, inglés, francés, alemán, italiano, polaco y portugués.
+
+Sprout guarda lo que anotas. No da consejo médico ni sustituye a un profesional sanitario.
+
+Sprout es software libre y de código abierto (GNU GPLv3), sin anuncios ni compras dentro de la app.

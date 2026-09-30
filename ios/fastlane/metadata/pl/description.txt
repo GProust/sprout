@@ -1,0 +1,25 @@
+Sprout to spokojny, prywatny dziennik na pierwsze tygodnie i miesiące Twojego noworodka, a także dla osoby, która dochodzi do siebie po porodzie.
+
+Wszystko zostaje na Twoim iPhonie. Bez zakładania konta, bez chmury, bez reklam i bez śledzenia. Sprout nie nawiązuje żadnych połączeń sieciowych: nic nie opuszcza telefonu, chyba że zdecydujesz się to wysłać.
+
+CO MOŻNA ZAPISYWAĆ
+
+• Karmienia: pierś, butelka i posiłki stałe. Licznik karmienia piersią na żywo zmienia pierś jednym dotknięciem i można go wstrzymać na odbicie, a przerwa nie liczy się jako czas przy piersi.
+• Odciąganie: ile mleka, z której piersi i gdzie trafiło, z zapasem, który sumuje to, co jest w lodówce i w zamrażarce.
+• Sen: drzemki i noce, a jeśli chcesz, także miejsce, w którym dziecko spało.
+• Pieluchy: mokre, brudne lub jedno i drugie, ze skalą kolorów stolca.
+• Wzrost: waga, długość ciała i obwód głowy na tle siatek centylowych WHO.
+• Leki: leczenie według harmonogramu z przypomnieniami oraz leki podawane doraźnie, z zaleconym odstępem między dawkami.
+• Twoja regeneracja: krótkie codzienne podsumowanie nastroju, a jeśli to Ciebie dotyczy, także gojenia i komfortu piersi. Można je wyłączyć w każdej chwili.
+
+DLA KAŻDEJ RODZINY
+
+• Kilkoro dzieci, także bliźnięta, obok siebie.
+• Udostępnij zapis dziecka innym telefonom w domu, wysyłając plik. Bez konta i bez serwera; udostępniony zapis jest zaszyfrowany.
+• Statystyki dzienne i tygodniowe oraz raport PDF lub arkusz na wizytę u lekarza, który można zabezpieczyć hasłem.
+• Opcjonalne przypomnienia o karmieniach i leczeniu, planowane w samym telefonie.
+• Po polsku, angielsku, francusku, niemiecku, hiszpańsku, włosku i portugalsku.
+
+Sprout zapisuje to, co wprowadzasz. Nie udziela porad medycznych i nie zastępuje specjalisty.
+
+Sprout to wolne oprogramowanie o otwartym kodzie źródłowym (GNU GPLv3), bez reklam i bez zakupów w aplikacji.

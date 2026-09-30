@@ -1,0 +1,193 @@
+name: App Store screenshots
+
+# The iPhone screenshots App Store Connect asks for, in all seven languages, at
+# a size it accepts.
+#
+# The Screenshots job in ios.yml captures the same screens for review, on
+# whatever simulator the runner happens to have — 750 × 1334 on the image this
+# was written against, which is none of the sizes the listing takes. App Store
+# Connect wants a phone's native pixels, and a simulator produces its own
+# model's native size and no other, so this names the model:
+#
+#   6.5"  iPhone 14 Plus      1284 × 2778   the slot App Store Connect shows first
+#   6.9"  iPhone 16 Pro Max   1320 × 2868   the larger slot, if it is ever asked for
+#
+# The same UI test, the same seeded database and the same frozen clock as the
+# review set, once per language — so the seven sets show the same numbers in
+# the same places. Nothing is committed: the images are the listing's, not the
+# repository's, and they arrive as one artifact with a folder per App Store
+# locale (en-US, fr-FR, de-DE, es-ES, it, pl, pt-PT), ready to drag in.
+#
+# Run it from Actions → App Store screenshots → Run workflow. It also runs on a
+# pull request that changes this file, so a change to it is seen working before
+# it lands — workflow_dispatch only offers workflows that are already on main.
+# And `ios-listing.yml` calls it, to capture the set it then uploads.
+
+on:
+  workflow_dispatch:
+    inputs:
+      display:
+        description: 'The App Store Connect slot to fill: 6.5 (iPhone 14 Plus, 1284 × 2778) or 6.9 (iPhone 16 Pro Max, 1320 × 2868).'
+        type: choice
+        options: [ '6.5', '6.9' ]
+        default: '6.5'
+  workflow_call:
+    inputs:
+      display:
+        type: string
+        default: '6.5'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/ios-listing-screenshots.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-listing-${{ github.head_ref || github.ref }}-${{ inputs.display || '6.5' }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    name: Capture (${{ inputs.display || '6.5' }}")
+    runs-on: macos-15
+    env:
+      DISPLAY_SIZE: ${{ inputs.display || '6.5' }}
+      OUT: app-store-screenshots
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Generate the project
+        run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
+
+      - name: Choose the model
+        id: model
+        run: |
+          set -euo pipefail
+          case "$DISPLAY_SIZE" in
+            6.5) model=iPhone-14-Plus;    size=1284x2778 ;;
+            6.9) model=iPhone-16-Pro-Max; size=1320x2868 ;;
+            *) echo "::error::no model for a $DISPLAY_SIZE\" display"; exit 1 ;;
+          esac
+          # Assigned, not echoed inline, so a failure here fails the step.
+          udid="$(python3 ios/tools/pick_simulator.py --model "$model")"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+
+      # 9:41, a full battery and full bars: what every App Store screenshot
+      # shows, and what keeps the seven languages' status bars identical.
+      - name: Freeze the status bar
+        run: |
+          set -euo pipefail
+          udid="${{ steps.model.outputs.udid }}"
+          xcrun simctl boot "$udid" 2>/dev/null || true
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override \
+            --time "9:41" \
+            --batteryState charged --batteryLevel 100 \
+            --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4
+
+      # Built once, run seven times: the app is the same in every language,
+      # only the launch arguments the test passes differ.
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project ios/Sprout/Sprout.xcodeproj \
+            -scheme Sprout \
+            -destination "id=${{ steps.model.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/derived" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      # ScreenshotTests reads SPROUT_LANGUAGE from its own environment, and
+      # xcodebuild hands the test runner every TEST_RUNNER_-prefixed variable
+      # with the prefix taken off. The folder is named for the App Store locale
+      # the images belong to, which is not always the app's own language code.
+      #
+      # One failed language does not stop the others: six good sets and a clear
+      # error beat none.
+      - name: Capture every language
+        run: |
+          set -uo pipefail
+          failed=""
+          for pair in en:en-US fr:fr-FR de:de-DE es:es-ES it:it pl:pl pt:pt-PT; do
+            lang="${pair%%:*}"
+            locale="${pair#*:}"
+            bundle="$RUNNER_TEMP/$lang.xcresult"
+            echo "::group::$locale"
+            if ! TEST_RUNNER_SPROUT_LANGUAGE="$lang" xcodebuild test-without-building \
+                  -project ios/Sprout/Sprout.xcodeproj \
+                  -scheme Sprout \
+                  -destination "id=${{ steps.model.outputs.udid }}" \
+                  -derivedDataPath "$RUNNER_TEMP/derived" \
+                  -only-testing:SproutUITests/ScreenshotTests \
+                  -resultBundlePath "$bundle" \
+                  CODE_SIGNING_ALLOWED=NO \
+                  CODE_SIGNING_REQUIRED=NO; then
+              failed="$failed $locale"
+            fi
+            if [ -d "$bundle" ]; then
+              xcrun xcresulttool export attachments --path "$bundle" --output-path "$RUNNER_TEMP/raw-$lang" \
+                && python3 ios/tools/name_screenshots.py "$RUNNER_TEMP/raw-$lang" "$OUT/$locale" \
+                || failed="$failed $locale(export)"
+            else
+              failed="$failed $locale(no-result)"
+            fi
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then
+            echo "::error::capture failed for:$failed"
+            exit 1
+          fi
+
+      # App Store Connect rejects an image a pixel off, and says so only after
+      # the upload. Checked here instead, along with the transparency it also
+      # refuses.
+      - name: Check every image is a size App Store Connect takes
+        if: always()
+        run: |
+          set -euo pipefail
+          want="${{ steps.model.outputs.size }}"
+          count=0; bad=0
+          while IFS= read -r -d '' f; do
+            count=$((count + 1))
+            w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+            h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/ {print $2}')
+            alpha=$(sips -g hasAlpha "$f" | awk '/hasAlpha/ {print $2}')
+            if [ "${w}x${h}" != "$want" ]; then
+              echo "::error file=$f::${w}x${h}, but the $DISPLAY_SIZE\" slot takes $want"
+              bad=1
+            fi
+            if [ "$alpha" = "yes" ]; then
+              echo "::error file=$f::has an alpha channel, which App Store Connect refuses"
+              bad=1
+            fi
+          done < <(find "$OUT" -name '*.png' -print0)
+          if [ "$count" -eq 0 ]; then
+            echo "::error::no screenshots were captured"
+            exit 1
+          fi
+          echo "$count screenshots across $(find "$OUT" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') languages, all $want"
+          exit $bad
+
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-store-screenshots-${{ env.DISPLAY_SIZE }}in
+          path: ${{ env.OUT }}/
+          if-no-files-found: warn
+
+      # On a failure the result bundles hold the hierarchy dumps and the screen
+      # recording — the evidence for why a screen was never reached.
+      - name: Upload the result bundles
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-store-screenshots-${{ env.DISPLAY_SIZE }}in-results
+          path: ${{ runner.temp }}/*.xcresult
+          if-no-files-found: ignore

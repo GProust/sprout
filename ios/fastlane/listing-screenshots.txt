@@ -1,0 +1,25 @@
+# The screenshots the App Store listing shows, in the order it shows them.
+#
+# App Store Connect takes up to ten per language, and search results show only
+# the first three, so the order is the pitch: the dashboard, the feed, the
+# medicine waits. Each name is one of the captures in ios/screenshots/ — the
+# listing set is the same screens, captured again at 1284 × 2778 in every
+# language.
+#
+# Statistics, growth, pumping and treatments are left out on purpose: the
+# screenshot seed (App/ScreenshotSeed.swift) has only today's feeds and no
+# measurements, so those screens read "0.0" and "No measurements logged yet" —
+# the last thing a listing should show. Seed a week of history and they can
+# come back.
+#
+# `ios/tools/check_listing.py` fails if a name here is not one the UI test
+# captures, and `ios-listing.yml` uploads exactly these, in this order.
+
+01-home
+02-feeding
+07-medicines
+04-sleep
+02-feeding-4-joined
+05-diaper
+08-wellbeing
+10-you

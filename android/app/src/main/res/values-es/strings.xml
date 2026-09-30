@@ -110,7 +110,7 @@
     <string name="side_right">Derecho</string>
     <string name="side_both">Ambos</string>
     <string name="unit_ml">ml</string>
-    <string name="feeding_detail_separator"> · </string>
+    <string name="feeding_detail_separator">" · "</string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="field_amount_solid">Cantidad comida</string>
     <string name="feeding_amount_g">%1$d g</string>
@@ -171,7 +171,7 @@
     <string name="diaper_stool">Heces</string>
     <string name="diaper_both">Orina + heces</string>
     <string name="diaper_stool_color">Color de las heces</string>
-    <string name="diaper_separator"> · </string>
+    <string name="diaper_separator">" · "</string>
     <string name="stool_color_yellow">Amarillo</string>
     <string name="stool_color_green">Verde</string>
     <string name="stool_color_brown">Marrón</string>

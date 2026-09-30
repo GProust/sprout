@@ -1,0 +1,25 @@
+Sprout is a calm, private log for a newborn's first weeks and months, and for the parent recovering from the birth.
+
+Everything stays on your iPhone. There's no account to create, no cloud, no ads and no tracking. Sprout makes no network connections at all: nothing leaves your phone unless you choose to send it.
+
+WHAT YOU CAN LOG
+
+• Feeds: breast, bottle and solids. A live breastfeeding timer switches sides with one tap, and can pause for a burp without counting the break as feeding.
+• Pumping: how much, which side and where the milk went, with a milk stash that adds up what's in the fridge and the freezer.
+• Sleep: naps and nights, and where your baby slept if you want to note it.
+• Diapers: wet, dirty or both, with a stool color scale.
+• Growth: weight, height and head circumference, read against the WHO growth standards.
+• Medicines: scheduled treatments with reminders, and medicines given as needed, with the wait between doses you were told to keep.
+• Your recovery: a short daily check-in on mood, and on healing and breast comfort when they apply to you. You can turn it off at any time.
+
+FOR REAL FAMILIES
+
+• Several babies, twins included, side by side.
+• Share a baby's record with the other phones in your household by sending a file. No account and no server; the shared record is encrypted.
+• Daily and weekly statistics, and a PDF report or spreadsheet to bring to an appointment, which you can lock with a password.
+• Optional reminders for feeds and treatments, scheduled on the phone itself.
+• In English, French, German, Spanish, Italian, Polish and Portuguese.
+
+Sprout keeps a record of what you enter. It gives no medical advice and does not replace a health professional.
+
+Sprout is free, open-source software (GNU GPLv3), with no ads and no in-app purchases.

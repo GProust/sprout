@@ -137,7 +137,9 @@
     <string name="side_right">Right</string>
     <string name="side_both">Both</string>
     <string name="unit_ml">ml</string>
-    <string name="feeding_detail_separator"> · </string>
+    <!-- In quotes because Android drops a value's unquoted leading and trailing
+         spaces, and "Breast·Left" is what that looks like. -->
+    <string name="feeding_detail_separator">" · "</string>
     <string name="feeding_amount_ml">%1$d ml</string>
     <string name="field_amount_solid">Amount eaten</string>
     <string name="feeding_amount_g">%1$d g</string>
@@ -215,7 +217,7 @@
     <string name="diaper_both">Urine + stool</string>
     <string name="diaper_stool_color">Stool color</string>
     <!-- Joins details in a history entry, e.g. "Yellow · soft" -->
-    <string name="diaper_separator"> · </string>
+    <string name="diaper_separator">" · "</string>
     <!-- Predefined stool colours -->
     <string name="stool_color_yellow">Yellow</string>
     <string name="stool_color_green">Green</string>
