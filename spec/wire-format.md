@@ -216,7 +216,7 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   "createdAt": 1757400000000,
   "babies": [], "feedings": [], "sleeps": [], "diapers": [],
   "growth": [], "treatments": [], "medicines": [], "medicineDoses": [],
-  "pumpings": [], "tombstones": []
+  "allergies": [], "pumpings": [], "tombstones": []
 }
 ```
 
@@ -284,9 +284,17 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   ([BDR-18](../docs/decisions/0018-a-medicine-measured-by-amount.md)); a reader
   that treats zero as "give it now" is already right, which is why this needed
   no new key.
-- **A tombstone's `entity` is the table name**, so the two new ones are
-  `medicine` and `medicine_dose` — underscored, because that is what the table
-  is called. Both readers hold a closed list of names and ignore any other, so a
+- **An allergy is a row of its own**, baby-scoped like a medicine
+  ([BDR-21](../docs/decisions/0021-a-babys-allergies-as-the-household-knows-them.md)):
+  `name` always, `confirmed` always (`false` is "noted by the parents", not
+  "doubtful"), and `ref` (an id from the food list, read as foods are),
+  `noticedAt` (epoch milliseconds) and `notes` when given. A replica written
+  before allergies existed has no `allergies` key, which is a household that
+  noted none. A reader applying a pairing cut-off ("share from the pairing
+  forward") does not apply it to allergies, as it does not to babies.
+- **A tombstone's `entity` is the table name**, so the newer ones are
+  `medicine`, `medicine_dose` and `allergy` — underscored, because that is what
+  the table is called. Both readers hold a closed list of names and ignore any other, so a
   table from a newer Sprout leaves the tombstone in place and touches nothing.
 
 **Vector:** `replica.json` — a document with one of every row type, and the

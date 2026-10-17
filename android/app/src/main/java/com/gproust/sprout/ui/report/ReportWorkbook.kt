@@ -37,6 +37,7 @@ object ReportWorkbook {
             if (report.options.includeTreatments) add(treatments(report, zone))
             if (report.medicines.isNotEmpty()) add(medicineDoses(report, zone))
             if (report.foods.isNotEmpty()) add(foods(report, zone))
+            if (report.allergies.isNotEmpty()) add(allergies(report, zone))
         }
 
     fun bytes(report: ReportContent, zone: ZoneId = ZoneId.systemDefault()): ByteArray =
@@ -366,6 +367,33 @@ object ReportWorkbook {
             },
         widths = listOf(12, 10, 22, 14, 10, 11, 14),
     )
+
+    /**
+     * The baby's allergies as the household noted them (BDR-21), one row each.
+     * `list_id` is the food list's id where there is one, `confirmed` the
+     * parents' own statement that a health professional confirmed it, and
+     * `notes` follows the same switch as every other sheet's.
+     */
+    private fun allergies(report: ReportContent, zone: ZoneId): Xlsx.Sheet {
+        val headers = mutableListOf("allergy", "list_id", "confirmed", "noticed_on")
+        if (report.options.includeNotes) headers += "notes"
+
+        return Xlsx.Sheet(
+            name = "Allergies",
+            headers = headers,
+            rows = report.allergies.map { allergy ->
+                val row = mutableListOf(
+                    Cell.Text(allergy.name),
+                    allergy.ref?.let { Cell.Text(it) } ?: Cell.Blank,
+                    Cell.Flag(allergy.confirmed),
+                    allergy.noticedAt?.let { Cell.Day(it.day(zone)) } ?: Cell.Blank,
+                )
+                if (report.options.includeNotes) row += Cell.Text(allergy.notes.orEmpty())
+                row
+            },
+            widths = listOf(24, 14, 11, 13, 40),
+        )
+    }
 
     // --- small conversions ------------------------------------------------
 

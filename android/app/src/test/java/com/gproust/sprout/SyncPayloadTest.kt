@@ -1,5 +1,6 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
@@ -225,6 +226,23 @@ class SyncPayloadTest {
                 ),
             ),
         ),
+        allergies = listOf(
+            // From the list, confirmed, with a date and the parent's words (BDR-21)...
+            BabyScoped(
+                babyUid,
+                AllergyEntity(
+                    name = "Kiwi",
+                    ref = "kiwi",
+                    noticedAt = 1_700_002_800_000,
+                    confirmed = true,
+                    notes = "lèvres gonflées, vu par le Dr Martin",
+                    uid = "allergy-1",
+                    updatedAt = 44,
+                ),
+            ),
+            // ...and the household's own, noted with nothing else.
+            BabyScoped(babyUid, AllergyEntity(name = "Protéines de lait de vache", uid = "allergy-2", updatedAt = 45)),
+        ),
         pumpings = listOf(
             PumpingEntity(
                 time = 1_700_003_000_000,
@@ -254,6 +272,7 @@ class SyncPayloadTest {
         assertEquals(original.treatments, decoded.treatments)
         assertEquals(original.medicines, decoded.medicines)
         assertEquals(original.medicineDoses, decoded.medicineDoses)
+        assertEquals(original.allergies, decoded.allergies)
         assertEquals(original.pumpings, decoded.pumpings)
         assertEquals(original.tombstones, decoded.tombstones)
     }
@@ -426,5 +445,16 @@ class SyncPayloadTest {
         assertEquals(6, code.length)
         assertTrue("no characters that get misheard aloud", code.none { it in "01OI" })
         assertNotEquals(code, SyncSecret.random().verificationCode())
+    }
+
+    /** A replica from before allergies existed carries no key for them, and is a household that noted none. */
+    @Test
+    fun `a replica without allergies reads as one with none`() {
+        val bytes = SyncPayloadCodec.encode(fullPayload())
+        val json = org.json.JSONObject(String(bytes, Charsets.UTF_8)).apply { remove("allergies") }
+
+        val decoded = SyncPayloadCodec.decode(json.toString().toByteArray(Charsets.UTF_8), currentSchemaVersion = 15)
+
+        assertEquals(emptyList<Any>(), decoded.allergies)
     }
 }

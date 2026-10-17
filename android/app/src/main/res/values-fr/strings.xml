@@ -822,6 +822,29 @@
         <item quantity="other">%1$d repas</item>
     </plurals>
     <string name="food_correct_change">Choisir un autre</string>
+    <string name="allergies_title">Allergies</string>
+    <string name="allergies_none">Aucune notée.</string>
+    <string name="allergy_add">Noter une allergie</string>
+    <string name="allergy_edit_title">Allergie</string>
+    <string name="allergy_what">Allergique à</string>
+    <string name="allergy_noticed">Remarquée le</string>
+    <string name="allergy_noticed_add">Ajouter le jour où elle a été remarquée</string>
+    <string name="allergy_noticed_clear">Retirer la date</string>
+    <string name="allergy_confirmed">Confirmée par un professionnel de santé</string>
+    <string name="allergy_confirmed_hint">Laissez désactivé pour ce que vous avez remarqué vous-mêmes.</string>
+    <string name="allergy_confirmed_short">Confirmée par un professionnel de santé</string>
+    <string name="allergy_noted_short">Notée par la famille</string>
+    <string name="allergy_noticed_line">Remarquée le %1$s</string>
+    <string name="allergy_marker">Allergie notée</string>
+    <string name="allergy_hint">Sprout garde ce que vous notez ici et le signale sur l\'aliment dans chaque repas. Il ne pose aucun diagnostic : si vous pensez que votre bébé a réagi à un aliment, demandez à un médecin. Les notes figurent sur la liste que vous partagez.</string>
+    <string name="allergies_share">Partager la liste</string>
+    <string name="allergies_share_subject">%1$s – allergies</string>
+    <string name="allergy_list_identity">Né(e) le %1$s · %2$s · liste au %3$s</string>
+    <string name="allergy_list_as_noted">Telles que notées par la famille</string>
+    <string name="allergy_list_note">Telles que notées par la famille dans Sprout. « Confirmée par un professionnel de santé » indique que la famille a noté qu\'un professionnel l\'a confirmée. Sprout ne pose pas de diagnostic, et cette liste n\'est pas un document médical.</string>
+    <string name="report_col_status">Statut</string>
+    <string name="report_col_noticed">Remarquée</string>
+    <string name="report_include_allergies_hint">Ce à quoi le bébé est noté allergique, quelle que soit la période</string>
 
     <!-- Liste d'aliments (BDR-20) -->
     <string name="meal_food_search">Rechercher ou ajouter un aliment</string>

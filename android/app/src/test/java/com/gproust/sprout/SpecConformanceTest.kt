@@ -23,6 +23,7 @@ import com.gproust.sprout.data.sync.nearby.SyncSession
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -307,6 +308,19 @@ class SpecConformanceTest {
         assertEquals(paracetamol.uid, dose.medicineUid)
         assertEquals(1_757_402_800_000L, dose.time)
         assertEquals(2.5, dose.amount!!, 1e-9)
+
+        // An allergy is its own baby-scoped row (BDR-21); everything but its
+        // name and `confirmed` is absent when not given.
+        val (kiwi, milk) = payload.allergies.map { it.row }
+        assertEquals("kiwi", kiwi.ref)
+        assertEquals(1_757_403_000_000L, kiwi.noticedAt)
+        assertTrue(kiwi.confirmed)
+        assertEquals("lips swelled; seen by the GP", kiwi.notes)
+        assertEquals("Cow's milk protein", milk.name)
+        assertNull(milk.ref)
+        assertNull(milk.noticedAt)
+        assertFalse(milk.confirmed)
+        assertNull(milk.notes)
 
         // A measure nobody took is an absent key, not a zero.
         assertNull(payload.growth.first().row.heightMm)

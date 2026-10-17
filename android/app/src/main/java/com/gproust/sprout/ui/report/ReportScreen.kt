@@ -200,6 +200,10 @@ class ReportViewModel(
         _state.update { it.copy(options = it.options.copy(includeMedicines = include)) }
     }
 
+    fun setIncludeAllergies(include: Boolean) {
+        _state.update { it.copy(options = it.options.copy(includeAllergies = include)) }
+    }
+
     fun setIncludeFoods(include: Boolean) {
         _state.update { it.copy(options = it.options.copy(includeFoods = include)) }
     }
@@ -312,6 +316,7 @@ class ReportViewModel(
             now = System.currentTimeMillis(),
             zone = zone,
             foodName = { ref -> catalogName(context, ref) },
+            allergies = repository.allergiesForBabyOnce(id),
         )
     }
 
@@ -483,6 +488,12 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                 subtitle = stringResource(R.string.report_include_medicines_hint),
                 checked = state.options.includeMedicines,
                 onChange = vm::setIncludeMedicines,
+            )
+            ToggleRow(
+                title = stringResource(R.string.allergies_title),
+                subtitle = stringResource(R.string.report_include_allergies_hint),
+                checked = state.options.includeAllergies,
+                onChange = vm::setIncludeAllergies,
             )
             ToggleRow(
                 title = stringResource(R.string.screen_foods),

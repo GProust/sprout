@@ -763,6 +763,29 @@
         <item quantity="other">%1$d refeições</item>
     </plurals>
     <string name="food_correct_change">Escolher outro</string>
+    <string name="allergies_title">Alergias</string>
+    <string name="allergies_none">Nenhuma registada.</string>
+    <string name="allergy_add">Registar uma alergia</string>
+    <string name="allergy_edit_title">Alergia</string>
+    <string name="allergy_what">Alérgico a</string>
+    <string name="allergy_noticed">Notada em</string>
+    <string name="allergy_noticed_add">Adicionar o dia em que foi notada</string>
+    <string name="allergy_noticed_clear">Remover a data</string>
+    <string name="allergy_confirmed">Confirmada por um profissional de saúde</string>
+    <string name="allergy_confirmed_hint">Deixe desligado se foi algo que notaram vocês mesmos.</string>
+    <string name="allergy_confirmed_short">Confirmada por um profissional de saúde</string>
+    <string name="allergy_noted_short">Registada pela família</string>
+    <string name="allergy_noticed_line">Notada em %1$s</string>
+    <string name="allergy_marker">Alergia registada</string>
+    <string name="allergy_hint">O Sprout guarda o que registar aqui e assinala o alimento em cada refeição. Não faz diagnósticos: se acha que o seu bebé reagiu a um alimento, pergunte a um médico. As notas aparecem na lista que partilhar.</string>
+    <string name="allergies_share">Partilhar a lista</string>
+    <string name="allergies_share_subject">%1$s – alergias</string>
+    <string name="allergy_list_identity">Nascido/a a %1$s · %2$s · lista a %3$s</string>
+    <string name="allergy_list_as_noted">Tal como registadas pela família</string>
+    <string name="allergy_list_note">Tal como registadas pela família no Sprout. «Confirmada por um profissional de saúde» é o registo da família de que um profissional a confirmou. O Sprout não faz diagnósticos e esta lista não é um documento médico.</string>
+    <string name="report_col_status">Estado</string>
+    <string name="report_col_noticed">Notada</string>
+    <string name="report_include_allergies_hint">A que o bebé está registado como alérgico, seja qual for o período</string>
 
     <!-- Lista de alimentos (BDR-20) -->
     <string name="meal_food_search">Procurar ou adicionar um alimento</string>

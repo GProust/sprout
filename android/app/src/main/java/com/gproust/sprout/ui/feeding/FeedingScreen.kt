@@ -62,6 +62,7 @@ import com.gproust.sprout.data.FoodHistory
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.breastfeedJoinGap
 import com.gproust.sprout.data.breastfeedJoinOffers
+import com.gproust.sprout.data.allergyIdentities
 import com.gproust.sprout.data.foodHistories
 import com.gproust.sprout.data.joinedBreastfeed
 import com.gproust.sprout.data.local.BreastSide
@@ -110,6 +111,11 @@ class FeedingViewModel(
     val knownFoods = repository.householdMealsWithFoods
         .map(::foodHistories)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** The active baby's allergies, marked on the meal form's foods (BDR-21). */
+    val allergies = repository.allergies
+        .map(::allergyIdentities)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
 
     /**
      * The live session, straight from the store rather than a copy of it. There
@@ -238,6 +244,7 @@ fun FeedingScreen(
 ) {
     val feedings by vm.feedings.collectAsState()
     val knownFoods by vm.knownFoods.collectAsState()
+    val allergies by vm.allergies.collectAsState()
     val nursing by vm.nursing.collectAsState()
     val context = LocalContext.current
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
@@ -252,6 +259,7 @@ fun FeedingScreen(
         EditFeedingDialog(
             entry = entry,
             knownFoods = knownFoods,
+            allergies = allergies,
             onDismiss = { editing = null },
             onSave = { vm.add(it); editing = null },
             onDelete = { deleting = entry },
@@ -286,6 +294,7 @@ fun FeedingScreen(
                 submitLabel = stringResource(R.string.feeding_add),
                 onSubmit = { vm.add(it); adding = false },
                 knownFoods = knownFoods,
+                allergies = allergies,
             )
         }
     }
@@ -790,6 +799,7 @@ internal fun EditFeedingDialog(
     onDelete: () -> Unit,
     title: String = stringResource(R.string.feeding_edit_title),
     fixedType: FeedType? = null,
+    allergies: Set<String> = emptySet(),
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
@@ -806,6 +816,7 @@ internal fun EditFeedingDialog(
                     onDelete = onDelete,
                     knownFoods = knownFoods,
                     fixedType = fixedType,
+                    allergies = allergies,
                 )
             }
         }
@@ -819,7 +830,8 @@ internal fun EditFeedingDialog(
  *
  * [fixedType] holds the form to one kind of feed and hides the choice — the
  * First foods page logs solid meals and nothing else. [knownFoods] is what a
- * solid meal's food list offers back (BDR-20).
+ * solid meal's food list offers back (BDR-20), and [allergies] the foods it
+ * marks as ones the baby is noted as allergic to (BDR-21).
  */
 @Composable
 internal fun FeedingForm(
@@ -829,6 +841,7 @@ internal fun FeedingForm(
     onDelete: (() -> Unit)? = null,
     knownFoods: List<FoodHistory> = emptyList(),
     fixedType: FeedType? = null,
+    allergies: Set<String> = emptySet(),
 ) {
     val context = LocalContext.current
     val now = System.currentTimeMillis()
@@ -933,7 +946,7 @@ internal fun FeedingForm(
     // feed with no number is still worth logging. It is the meal's — what gets
     // weighed is the bowl, not each food in it (BDR-20).
     if (type == FeedType.SOLID) {
-        MealFoodsEditor(foods = foods, onChange = { foods = it }, known = knownFoods)
+        MealFoodsEditor(foods = foods, onChange = { foods = it }, known = knownFoods, allergies = allergies)
         FieldLabel(stringResource(R.string.field_amount_solid))
         NumberField(
             label = stringResource(R.string.field_amount_solid),

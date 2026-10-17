@@ -763,6 +763,29 @@
         <item quantity="other">%1$d pasti</item>
     </plurals>
     <string name="food_correct_change">Scegli un altro</string>
+    <string name="allergies_title">Allergie</string>
+    <string name="allergies_none">Nessuna annotata.</string>
+    <string name="allergy_add">Annota un\'allergia</string>
+    <string name="allergy_edit_title">Allergia</string>
+    <string name="allergy_what">Allergico a</string>
+    <string name="allergy_noticed">Notata il</string>
+    <string name="allergy_noticed_add">Aggiungi il giorno in cui è stata notata</string>
+    <string name="allergy_noticed_clear">Togli la data</string>
+    <string name="allergy_confirmed">Confermata da un professionista sanitario</string>
+    <string name="allergy_confirmed_hint">Lascia disattivato per ciò che avete notato voi.</string>
+    <string name="allergy_confirmed_short">Confermata da un professionista sanitario</string>
+    <string name="allergy_noted_short">Annotata dalla famiglia</string>
+    <string name="allergy_noticed_line">Notata il %1$s</string>
+    <string name="allergy_marker">Allergia annotata</string>
+    <string name="allergy_hint">Sprout conserva ciò che annoti qui e lo segnala sull\'alimento in ogni pasto. Non fa diagnosi: se pensi che il tuo bambino abbia reagito a un alimento, chiedi a un medico. Le note compaiono nell\'elenco che condividi.</string>
+    <string name="allergies_share">Condividi l\'elenco</string>
+    <string name="allergies_share_subject">%1$s – allergie</string>
+    <string name="allergy_list_identity">Nato/a il %1$s · %2$s · elenco al %3$s</string>
+    <string name="allergy_list_as_noted">Come annotate dalla famiglia</string>
+    <string name="allergy_list_note">Come annotate dalla famiglia in Sprout. «Confermata da un professionista sanitario» è l\'annotazione della famiglia che un professionista l\'ha confermata. Sprout non fa diagnosi e questo elenco non è un documento medico.</string>
+    <string name="report_col_status">Stato</string>
+    <string name="report_col_noticed">Notata</string>
+    <string name="report_include_allergies_hint">A cosa il bambino è annotato come allergico, qualunque sia il periodo</string>
 
     <!-- Elenco degli alimenti (BDR-20) -->
     <string name="meal_food_search">Cerca o aggiungi un alimento</string>

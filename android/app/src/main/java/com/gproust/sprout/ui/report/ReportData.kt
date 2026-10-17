@@ -2,6 +2,7 @@ package com.gproust.sprout.ui.report
 
 import com.gproust.sprout.data.FoodOffer
 import com.gproust.sprout.data.foodHistories
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
@@ -62,6 +63,8 @@ data class ReportOptions(
     val includeMedicines: Boolean = true,
     /** The foods offered in the range, each with its count (BDR-20). */
     val includeFoods: Boolean = true,
+    /** The baby's allergies as the household noted them (BDR-21). */
+    val includeAllergies: Boolean = true,
     /** Off by default: free text is where a parent writes what they meant for themselves. */
     val includeNotes: Boolean = false,
 )
@@ -154,6 +157,58 @@ data class FoodRecord(
     fun timesReceived(reception: FoodReception): Int = offers.count { it.reception == reception }
 }
 
+/**
+ * One allergy, as it goes into a document (BDR-21): its name already in the
+ * phone's language when it is a food from the list, and the rest exactly as
+ * the parent noted it. [confirmed] is their statement that a health
+ * professional confirmed it — the document says so, and says nothing else
+ * about it.
+ */
+data class AllergyRecord(
+    val name: String,
+    /** Its id on Sprout's food list, or null. */
+    val ref: String?,
+    val noticedAt: Long?,
+    val confirmed: Boolean,
+    val notes: String?,
+)
+
+/** The allergy list on its own — the one-page document shared from the First foods page. */
+data class AllergyList(
+    val babyName: String,
+    val birthDate: Long,
+    val generatedAt: Long,
+    val allergies: List<AllergyRecord>,
+)
+
+/**
+ * The allergies that still stand, named and in alphabetical order — an order
+ * that ranks nothing. Assembled here once for both documents that carry them,
+ * so the list a nursery is handed and the one in the doctor's record agree.
+ */
+fun allergyRecords(
+    allergies: List<AllergyEntity>,
+    foodName: (ref: String) -> String? = { null },
+): List<AllergyRecord> = allergies
+    .filter { it.deletedAt == null }
+    .map { allergy ->
+        AllergyRecord(
+            name = allergy.ref?.let(foodName) ?: allergy.name.trim(),
+            ref = allergy.ref,
+            noticedAt = allergy.noticedAt,
+            confirmed = allergy.confirmed,
+            notes = allergy.notes?.trim()?.ifEmpty { null },
+        )
+    }
+    .sortedWith(compareBy({ it.name.lowercase(Locale.ROOT) }, { it.ref.orEmpty() }))
+
+fun allergyList(
+    baby: BabyEntity,
+    allergies: List<AllergyEntity>,
+    now: Long,
+    foodName: (ref: String) -> String? = { null },
+): AllergyList = AllergyList(baby.name, baby.birthDate, now, allergyRecords(allergies, foodName))
+
 /** The whole of a report, ready to be drawn or written out. */
 data class ReportContent(
     val babyName: String,
@@ -190,6 +245,11 @@ data class ReportContent(
     val medicines: List<MedicineRecord>,
     /** The foods offered inside the range, in the order they were first offered. */
     val foods: List<FoodRecord>,
+    /**
+     * The baby's allergies as they stand when the report is made — not limited
+     * to the range: an allergy noted in March is still one in June.
+     */
+    val allergies: List<AllergyRecord>,
     /** The raw entries inside the range, oldest first, for the workbook. */
     val feedings: List<FeedingEntity>,
     val sleeps: List<SleepEntity>,
@@ -237,6 +297,7 @@ fun buildReport(
     now: Long,
     zone: ZoneId = ZoneId.systemDefault(),
     foodName: (ref: String) -> String? = { null },
+    allergies: List<AllergyEntity> = emptyList(),
 ): ReportContent {
     val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
     val birthDay = Instant.ofEpochMilli(baby.birthDate).atZone(zone).toLocalDate()
@@ -301,6 +362,7 @@ fun buildReport(
         } else {
             emptyList()
         },
+        allergies = if (options.includeAllergies) allergyRecords(allergies, foodName) else emptyList(),
         feedings = feedsInRange,
         sleeps = sleepsInRange,
         diapers = diapersInRange,

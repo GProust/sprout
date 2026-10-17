@@ -3,6 +3,7 @@
 package com.gproust.sprout.ui.foods
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +57,9 @@ import com.gproust.sprout.data.FoodHistory
 import com.gproust.sprout.data.FoodOffer
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.foodHistories
+import com.gproust.sprout.data.allergyIdentities
+import com.gproust.sprout.data.export.ExportFiles
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodReception
@@ -70,12 +75,18 @@ import com.gproust.sprout.ui.common.dayLabel
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.feeding.EditFeedingDialog
 import com.gproust.sprout.ui.feeding.FeedingForm
+import com.gproust.sprout.ui.report.AllergyListPdf
+import com.gproust.sprout.ui.report.allergyList
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import java.text.Collator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** What the First foods page draws from: the baby's meals, read back per food. */
 data class FoodsState(
@@ -85,7 +96,12 @@ data class FoodsState(
     val foods: List<FoodHistory> = emptyList(),
     /** The household's foods, which the meal form offers back. */
     val known: List<FoodHistory> = emptyList(),
-)
+    /** The active baby's allergies, as the household noted them (BDR-21). */
+    val allergies: List<AllergyEntity> = emptyList(),
+) {
+    /** The foods those allergies are to, by [com.gproust.sprout.data.foodIdentity]. */
+    val allergic: Set<String> get() = allergyIdentities(allergies)
+}
 
 /**
  * The foods a baby has been offered, one at a time (BDR-20).
@@ -103,9 +119,18 @@ class FoodsViewModel(
      * One state rather than three, so a recomposition never pairs a food's
      * count with a list of meals it was not counted from.
      */
-    val state = combine(repository.feedings, repository.householdMealsWithFoods) { feedings, household ->
-        FoodsState(feedings, foodHistories(feedings), foodHistories(household))
+    val state = combine(
+        repository.feedings,
+        repository.householdMealsWithFoods,
+        repository.allergies,
+    ) { feedings, household, allergies ->
+        FoodsState(feedings, foodHistories(feedings), foodHistories(household), allergies)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FoodsState())
+
+    private val _share = MutableStateFlow<Intent?>(null)
+
+    /** The share sheet for the allergy list, once it is written; consumed by the screen. */
+    val share = _share.asStateFlow()
 
     /** A meal is a feed: logging one moves the feeding reminder, as it always has. */
     fun save(entity: FeedingEntity) = viewModelScope.launch {
@@ -127,6 +152,46 @@ class FoodsViewModel(
         val babyId = state.value.feedings.firstOrNull { it.uid == uid }?.babyId ?: return@launch
         repository.relabelFood(babyId, from = food.key, to = to)
     }
+
+    fun saveAllergy(entity: AllergyEntity) = viewModelScope.launch {
+        if (entity.id == 0L) repository.addAllergy(entity) else repository.updateAllergy(entity)
+    }
+
+    fun deleteAllergy(entity: AllergyEntity) = viewModelScope.launch { repository.deleteAllergy(entity) }
+
+    /**
+     * The allergy list on its own, as a one-page PDF handed to the share sheet
+     * (BDR-21) — for a nursery, a babysitter, a doctor who only needs that.
+     * Written off the main thread, staged where the report is staged, and
+     * replaced by the next export like the report is.
+     */
+    fun shareAllergies() = viewModelScope.launch {
+        val babyId = repository.activeBabyIdNow() ?: return@launch
+        val intent = runCatching {
+            withContext(Dispatchers.IO) {
+                val baby = repository.activeBaby(babyId) ?: return@withContext null
+                val list = allergyList(
+                    baby = baby,
+                    allergies = repository.allergiesForBabyOnce(babyId),
+                    now = System.currentTimeMillis(),
+                    foodName = { ref -> catalogName(context, ref) },
+                )
+                val uri = ExportFiles.stage(context, ExportFiles.allergyFileName(baby.name)) { out ->
+                    AllergyListPdf(context, list).write(out)
+                }
+                ExportFiles.shareIntent(
+                    uri,
+                    ExportFiles.PDF_MIME,
+                    context.getString(R.string.allergies_share_subject, baby.name),
+                )
+            }
+        }.getOrNull()
+        _share.value = intent
+    }
+
+    fun shared() {
+        _share.value = null
+    }
 }
 
 /** The two orders a parent can read the list in — neither of them by how well a food is going. */
@@ -142,6 +207,17 @@ fun FoodsScreen(
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
     var deleting by remember { mutableStateOf<FeedingEntity?>(null) }
     var correcting by remember { mutableStateOf<FoodHistory?>(null) }
+    var addingAllergy by remember { mutableStateOf(false) }
+    var editingAllergy by remember { mutableStateOf<AllergyEntity?>(null) }
+    var deletingAllergy by remember { mutableStateOf<AllergyEntity?>(null) }
+    val share by vm.share.collectAsState()
+    val shareContext = LocalContext.current
+    LaunchedEffect(share) {
+        share?.let {
+            shareContext.startActivity(it)
+            vm.shared()
+        }
+    }
     var order by rememberSaveable { mutableStateOf(FoodOrder.RECENT) }
 
     if (adding) {
@@ -155,8 +231,43 @@ fun FoodsScreen(
                 onSubmit = { vm.save(it); adding = false },
                 knownFoods = state.known,
                 fixedType = FeedType.SOLID,
+                allergies = state.allergic,
             )
         }
+    }
+
+    if (addingAllergy) {
+        AddEntrySheet(
+            title = stringResource(R.string.allergy_add),
+            onDismiss = { addingAllergy = false },
+        ) {
+            AllergyForm(
+                initial = null,
+                known = state.known,
+                onSave = { vm.saveAllergy(it); addingAllergy = false },
+            )
+        }
+    }
+
+    editingAllergy?.let { allergy ->
+        AddEntrySheet(
+            title = stringResource(R.string.allergy_edit_title),
+            onDismiss = { editingAllergy = null },
+        ) {
+            AllergyForm(
+                initial = allergy,
+                known = state.known,
+                onSave = { vm.saveAllergy(it); editingAllergy = null },
+                onDelete = { deletingAllergy = allergy },
+            )
+        }
+    }
+
+    deletingAllergy?.let { allergy ->
+        ConfirmDeleteDialog(
+            onConfirm = { vm.deleteAllergy(allergy); deletingAllergy = null; editingAllergy = null },
+            onDismiss = { deletingAllergy = null },
+        )
     }
 
     editing?.let { meal ->
@@ -168,6 +279,7 @@ fun FoodsScreen(
             onDelete = { deleting = meal },
             title = stringResource(R.string.meal_edit_title),
             fixedType = FeedType.SOLID,
+            allergies = state.allergic,
         )
     }
 
@@ -210,6 +322,14 @@ fun FoodsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            item(key = "allergies") {
+                AllergiesCard(
+                    allergies = state.allergies,
+                    onAdd = { addingAllergy = true },
+                    onOpen = { editingAllergy = it },
+                    onShare = vm::shareAllergies,
+                )
+            }
             if (foods.isEmpty()) {
                 item { EmptyHint(stringResource(R.string.foods_empty)) }
             } else {
@@ -240,6 +360,7 @@ fun FoodsScreen(
                         now = now,
                         onOpenMeal = { uid -> editing = state.feedings.firstOrNull { it.uid == uid } },
                         onCorrect = { correcting = food },
+                        allergic = food.key in state.allergic,
                     )
                 }
             }
@@ -256,7 +377,13 @@ fun FoodsScreen(
  * the meals that were logged, never progress toward a number Sprout chose.
  */
 @Composable
-private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit, onCorrect: () -> Unit) {
+private fun FoodCard(
+    food: FoodHistory,
+    now: Long,
+    onOpenMeal: (String) -> Unit,
+    onCorrect: () -> Unit,
+    allergic: Boolean = false,
+) {
     val context = LocalContext.current
     // Android trims the spaces off the resource's " · ", so they go back on
     // here; the dot itself stays the translators' to change.
@@ -277,6 +404,7 @@ private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
+            if (allergic) AllergyMarker(Modifier.padding(bottom = 2.dp))
             Text(
                 portionsLine(context, food, sep),
                 style = MaterialTheme.typography.bodyMedium,

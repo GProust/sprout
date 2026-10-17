@@ -209,6 +209,9 @@ class ReportPdf(
 
     private fun blocks(): List<Block> = buildList {
         add(header())
+        // Straight after whose record it is, before any figure: an allergy is
+        // about who the baby is, not about the period (BDR-21).
+        addAll(allergySection())
         if (!report.hasEntries) {
             add(paragraph(string(R.string.report_nothing_logged), mutedPaint, topGap = 14f))
         } else {
@@ -877,6 +880,38 @@ class ReportPdf(
             ) +
             tableBlocks(doseHeaders, doseRows, doseWeights, List(doseWeights.size) { false }, true) +
             paragraph(string(R.string.report_medicine_note), smallPaint, topGap = 6f)
+    }
+
+    /**
+     * The baby's allergies as the household noted them (BDR-21): what, whether
+     * the parents recorded it as confirmed by a health professional, and since
+     * when. Read as written — no colour, no mark beyond the word.
+     */
+    private fun allergySection(): List<Block> {
+        val allergies = report.allergies
+        if (allergies.isEmpty()) return emptyList()
+
+        val heading = Block(34f) { canvas, top ->
+            drawHeading(canvas, top, string(R.string.allergies_title), string(R.string.allergy_list_as_noted).uppercase())
+        }
+        val headers = buildList {
+            add(string(R.string.report_col_name))
+            add(string(R.string.report_col_status))
+            add(string(R.string.report_col_noticed))
+            if (report.options.includeNotes) add(string(R.string.report_col_notes))
+        }
+        val rows = allergies.map { allergy ->
+            buildList {
+                add(allergy.name)
+                add(string(if (allergy.confirmed) R.string.allergy_confirmed_short else R.string.allergy_noted_short))
+                add(allergy.noticedAt?.let { formatDate(context, it) } ?: DASH)
+                if (report.options.includeNotes) add(allergy.notes ?: DASH)
+            }
+        }
+        val weights = if (report.options.includeNotes) listOf(1.4f, 1.4f, 0.9f, 2f) else listOf(1.6f, 1.6f, 1f)
+        return listOf(heading) +
+            tableBlocks(headers, rows, weights, List(weights.size) { false }, true) +
+            paragraph(string(R.string.allergy_list_note), smallPaint, topGap = 6f)
     }
 
     /**

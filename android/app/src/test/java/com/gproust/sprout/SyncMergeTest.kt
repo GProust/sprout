@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.foodHistories
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodPortion
@@ -443,5 +444,92 @@ class SyncMergeTest {
             assertEquals(phone.name, "ref:carrot", carrot.key)
             assertEquals(phone.name, 2, carrot.timesOffered)
         }
+    }
+
+    // --- allergies (BDR-21) ------------------------------------------------
+
+    private suspend fun Phone.liveAllergies() = db.allergyDao().allForSync().filter { it.deletedAt == null }
+
+    /** Two parents each noting one on the same day keep both: each is its own row. */
+    @Test
+    fun `allergies noted on both phones are both kept`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+        sam.repository.setActiveBaby(sam.babyId())
+
+        alex.clock += 1_000
+        alex.repository.addAllergy(AllergyEntity(name = "Œuf"))
+        sam.clock += 1_000
+        sam.repository.addAllergy(AllergyEntity(name = "Carrot", ref = "carrot", confirmed = true))
+        alex.engine.merge(sam.replica())
+        sam.engine.merge(alex.replica())
+
+        for (phone in listOf(alex, sam)) {
+            assertEquals(phone.name, setOf("Œuf", "Carrot"), phone.liveAllergies().map { it.name }.toSet())
+            assertTrue(phone.name, phone.liveAllergies().single { it.ref == "carrot" }.confirmed)
+        }
+    }
+
+    /**
+     * "Share from the pairing forward" leaves earlier entries at home, but not
+     * an allergy: it is about who the baby is, like the baby itself, and the
+     * parent pairing later is the one who most needs to know it.
+     */
+    @Test
+    fun `an allergy noted before pairing still reaches the other phone`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.repository.addAllergy(AllergyEntity(name = "Cow's milk protein"))
+        alex.logFeed(90, at = 1_700_000_100_000)
+        val pairedAt = alex.clock + 1
+        alex.clock += 10_000
+
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica(), since = pairedAt)
+
+        assertTrue("the feed stayed at home", sam.db.feedingDao().allForSync().isEmpty())
+        assertEquals(listOf("Cow's milk protein"), sam.liveAllergies().map { it.name })
+    }
+
+    @Test
+    fun `an allergy taken off on one phone is taken off on the other`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.repository.addAllergy(AllergyEntity(name = "Kiwi", ref = "kiwi"))
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+
+        alex.clock += 5_000
+        alex.repository.deleteAllergy(alex.liveAllergies().single())
+        sam.engine.merge(alex.replica())
+
+        assertTrue(sam.liveAllergies().isEmpty())
+    }
+
+    /** Erasing a baby erases its allergies, and the erasure travels with the rest. */
+    @Test
+    fun `an erased baby's allergies go with it on both phones`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.repository.addAllergy(AllergyEntity(name = "Kiwi", ref = "kiwi"))
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+
+        alex.clock += 5_000
+        alex.repository.deleteBaby(alex.babyId())
+        sam.engine.merge(alex.replica())
+
+        assertTrue(alex.db.allergyDao().allForSync().isEmpty())
+        assertTrue(sam.db.allergyDao().allForSync().isEmpty())
     }
 }

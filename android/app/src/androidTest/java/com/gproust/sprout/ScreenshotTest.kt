@@ -38,6 +38,7 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.DiaperEntity
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodPortion
@@ -372,6 +373,9 @@ class ScreenshotTest {
                 listed("salmon", "Salmon", FoodPortion.TASTE),
             ),
         )
+        // One allergy, noted by the family, so the page's allergy card and the
+        // marker on its food are in the capture (BDR-21).
+        repo.addAllergy(AllergyEntity(name = "Salmon", ref = "salmon", noticedAt = noon - 2 * day))
         // And one the household added itself, which is not on any list.
         repo.addFeeding(meal(1, null, MealFood("Ratatouille", FoodPortion.TASTE, FoodReception.MIXED)))
     }
@@ -379,6 +383,7 @@ class ScreenshotTest {
     private fun clearMeals() = runBlocking {
         val repo = app.repository
         repo.feedings.first().filter { it.type == FeedType.SOLID }.forEach { repo.deleteFeeding(it) }
+        repo.allergies.first().forEach { repo.deleteAllergy(it) }
     }
 
     private fun settle() {

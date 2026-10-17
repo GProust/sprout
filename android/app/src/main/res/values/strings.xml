@@ -848,6 +848,29 @@
         <item quantity="other">%1$d meals</item>
     </plurals>
     <string name="food_correct_change">Choose another</string>
+    <string name="allergies_title">Allergies</string>
+    <string name="allergies_none">None noted.</string>
+    <string name="allergy_add">Note an allergy</string>
+    <string name="allergy_edit_title">Allergy</string>
+    <string name="allergy_what">Allergic to</string>
+    <string name="allergy_noticed">Noticed on</string>
+    <string name="allergy_noticed_add">Add the day it was noticed</string>
+    <string name="allergy_noticed_clear">Remove the date</string>
+    <string name="allergy_confirmed">Confirmed by a health professional</string>
+    <string name="allergy_confirmed_hint">Leave this off for something you have noticed yourselves.</string>
+    <string name="allergy_confirmed_short">Confirmed by a health professional</string>
+    <string name="allergy_noted_short">Noted by the family</string>
+    <string name="allergy_noticed_line">Noticed %1$s</string>
+    <string name="allergy_marker">Allergy noted</string>
+    <string name="allergy_hint">Sprout keeps what you note here and marks the food on every meal. It does not diagnose anything: if you think your baby reacted to a food, ask a doctor. The notes appear on the list you share.</string>
+    <string name="allergies_share">Share the list</string>
+    <string name="allergies_share_subject">%1$s – allergies</string>
+    <string name="allergy_list_identity">Born %1$s · %2$s · list as of %3$s</string>
+    <string name="allergy_list_as_noted">As noted by the family</string>
+    <string name="allergy_list_note">As noted by the family in Sprout. “Confirmed by a health professional” is the family’s own record that a professional confirmed it. Sprout does not diagnose, and this list is not a medical document.</string>
+    <string name="report_col_status">Status</string>
+    <string name="report_col_noticed">Noticed</string>
+    <string name="report_include_allergies_hint">What the baby is noted as allergic to, whatever the period</string>
 
     <!-- The food list (BDR-20): plain names in seven languages, keyed by an id that
          travels with the meal. Names only — no ages, no order, nothing marked. -->

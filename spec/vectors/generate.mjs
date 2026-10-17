@@ -389,6 +389,29 @@ const replica = {
       notes: 'after the 38.4 reading',
     },
   ],
+  // A baby's allergies, as the household noted them (BDR-21): one from the
+  // food list, confirmed, with the day it was noticed; one in the parent's own
+  // words with nothing else. `ref`, `noticedAt` and `notes` are absent when not
+  // given; `confirmed` is always written.
+  allergies: [
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'c9f0f895-fb98-4b91-8d2e-3f4a5b6c7d8e',
+      updatedAt: 1_757_403_000_000,
+      name: 'Kiwi',
+      ref: 'kiwi',
+      noticedAt: 1_757_403_000_000,
+      confirmed: true,
+      notes: 'lips swelled; seen by the GP',
+    },
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: '45c48cce-2e2d-4fbd-9a1b-0c1d2e3f4a5b',
+      updatedAt: 1_757_403_100_000,
+      name: "Cow's milk protein",
+      confirmed: false,
+    },
+  ],
   pumpings: [
     {
       uid: 'aab32389-8d69-4bc2-9d0c-4e1f2a3b4c5d',
@@ -431,7 +454,7 @@ write('replica.json', {
     replica.babies.length + replica.feedings.length + replica.sleeps.length +
     replica.diapers.length + replica.growth.length + replica.treatments.length +
     replica.medicines.length + replica.medicineDoses.length +
-    replica.pumpings.length + replica.tombstones.length,
+    replica.allergies.length + replica.pumpings.length + replica.tombstones.length,
   refuses: [
     { name: 'a newer document format', json: JSON.stringify({ ...replica, formatVersion: 2 }), reason: 'tooNew' },
     { name: 'a newer database schema', json: JSON.stringify({ ...replica, schemaVersion: 99 }), reason: 'tooNew' },

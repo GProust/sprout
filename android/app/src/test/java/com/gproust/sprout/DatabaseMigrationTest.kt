@@ -120,6 +120,19 @@ class DatabaseMigrationTest {
     }
 
     @Test
+    fun `the allergy table v20 adds is there after the whole chain`() {
+        createV10Database()
+        val database = openWithMigrations()
+
+        // Every column BDR-21 reads, selected by name: a chain that stopped at
+        // v19 throws here rather than returning nothing.
+        database.query(
+            "SELECT babyId, name, ref, noticedAt, confirmed, notes, uid, updatedAt, deletedAt FROM `allergy`",
+            null,
+        ).use { c -> assertEquals("allergy rows", 0, c.count) }
+    }
+
+    @Test
     fun `a meal logged before v19 named no foods, rather than failing to read`() {
         createV10Database()
         val database = openWithMigrations()
@@ -237,7 +250,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(19, database.openHelper.writableDatabase.version)
+        assertEquals(20, database.openHelper.writableDatabase.version)
     }
 
     /**

@@ -520,6 +520,46 @@ interface MedicineDoseDao {
 }
 
 @Dao
+interface AllergyDao {
+    /** A baby's allergies, by name (BDR-21). */
+    @Query("SELECT * FROM allergy WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY name COLLATE NOCASE ASC")
+    fun observeForBaby(babyId: Long): Flow<List<AllergyEntity>>
+
+    /** The same, once — what the documents that leave read. */
+    @Query("SELECT * FROM allergy WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY name COLLATE NOCASE ASC")
+    suspend fun allForBabyOnce(babyId: Long): List<AllergyEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: AllergyEntity): Long
+
+    @Update
+    suspend fun update(entity: AllergyEntity)
+
+    @Query("UPDATE allergy SET deletedAt = :now, updatedAt = :now WHERE id = :id")
+    suspend fun softDelete(id: Long, now: Long)
+
+    @Query("SELECT uid FROM allergy WHERE babyId = :babyId")
+    suspend fun uidsForBaby(babyId: Long): List<String>
+
+    @Query("DELETE FROM allergy WHERE babyId = :babyId")
+    suspend fun purgeForBaby(babyId: Long)
+
+    @Query("DELETE FROM allergy WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
+    suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007).
+
+    @Query("SELECT * FROM allergy")
+    suspend fun allForSync(): List<AllergyEntity>
+
+    @Query("SELECT * FROM allergy WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): AllergyEntity?
+
+    @Query("DELETE FROM allergy WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
+}
+
+@Dao
 interface PumpingDao {
     /** Every pumping session, newest first (the parent's, not a baby's). */
     @Query("SELECT * FROM pumping WHERE deletedAt IS NULL ORDER BY time DESC")

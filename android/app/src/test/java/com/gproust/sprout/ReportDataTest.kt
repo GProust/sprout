@@ -1,5 +1,6 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
@@ -64,6 +65,7 @@ class ReportDataTest {
         medicineDoses: List<MedicineDoseEntity> = emptyList(),
         options: ReportOptions = ReportOptions(period = ReportPeriod.WEEK),
         foodName: (String) -> String? = { null },
+        allergies: List<AllergyEntity> = emptyList(),
     ) = buildReport(
         baby = baby,
         feedings = feedings,
@@ -77,6 +79,7 @@ class ReportDataTest {
         now = now,
         zone = zone,
         foodName = foodName,
+        allergies = allergies,
     )
 
     private fun bottle(date: LocalDate, hour: Int, ml: Int?) = FeedingEntity(
@@ -491,5 +494,49 @@ class ReportDataTest {
         )
 
         assertTrue(report.foods.isEmpty())
+    }
+
+    // --- allergies in the doctor's record (BDR-21) ------------------------
+
+    /** About who the baby is, not about the period: one noted in March is in June's report. */
+    @Test
+    fun `allergies reach the record whatever the period, named and in alphabetical order`() {
+        val report = report(
+            allergies = listOf(
+                AllergyEntity(babyId = 1, name = "Œuf", noticedAt = at(born, 9)),
+                AllergyEntity(babyId = 1, name = "Kiwi", ref = "kiwi", confirmed = true, notes = " lips "),
+                AllergyEntity(babyId = 1, name = "Gone", deletedAt = 1L),
+            ),
+            foodName = { ref -> if (ref == "kiwi") "Kiwi fruit" else null },
+        )
+
+        assertEquals(listOf("Kiwi fruit", "Œuf"), report.allergies.map { it.name })
+        val kiwi = report.allergies.first()
+        assertTrue(kiwi.confirmed)
+        assertEquals("lips", kiwi.notes)
+        assertEquals(at(born, 9), report.allergies.last().noticedAt)
+        assertFalse(report.allergies.last().confirmed)
+    }
+
+    @Test
+    fun `turning the allergies off leaves them out of the document`() {
+        val report = report(
+            allergies = listOf(AllergyEntity(babyId = 1, name = "Kiwi")),
+            options = ReportOptions(period = ReportPeriod.WEEK, includeAllergies = false),
+        )
+
+        assertTrue(report.allergies.isEmpty())
+    }
+
+    /** The list shared on its own is assembled the same way, so the two documents agree. */
+    @Test
+    fun `the allergy list says whose it is and carries the same records`() {
+        val allergies = listOf(AllergyEntity(babyId = 1, name = "Kiwi", ref = "kiwi"))
+        val list = com.gproust.sprout.ui.report.allergyList(baby, allergies, now) { "Kiwi fruit" }
+
+        assertEquals("Louise", list.babyName)
+        assertEquals(baby.birthDate, list.birthDate)
+        assertEquals(now, list.generatedAt)
+        assertEquals(report(allergies = allergies, foodName = { "Kiwi fruit" }).allergies, list.allergies)
     }
 }

@@ -763,6 +763,29 @@
         <item quantity="other">%1$d Mahlzeiten</item>
     </plurals>
     <string name="food_correct_change">Anderes wählen</string>
+    <string name="allergies_title">Allergien</string>
+    <string name="allergies_none">Keine eingetragen.</string>
+    <string name="allergy_add">Allergie eintragen</string>
+    <string name="allergy_edit_title">Allergie</string>
+    <string name="allergy_what">Allergisch gegen</string>
+    <string name="allergy_noticed">Bemerkt am</string>
+    <string name="allergy_noticed_add">Tag hinzufügen, an dem sie bemerkt wurde</string>
+    <string name="allergy_noticed_clear">Datum entfernen</string>
+    <string name="allergy_confirmed">Von medizinischem Fachpersonal bestätigt</string>
+    <string name="allergy_confirmed_hint">Aus lassen, wenn ihr es selbst bemerkt habt.</string>
+    <string name="allergy_confirmed_short">Von medizinischem Fachpersonal bestätigt</string>
+    <string name="allergy_noted_short">Von der Familie eingetragen</string>
+    <string name="allergy_noticed_line">Bemerkt am %1$s</string>
+    <string name="allergy_marker">Allergie eingetragen</string>
+    <string name="allergy_hint">Sprout speichert, was du hier einträgst, und markiert das Lebensmittel in jeder Mahlzeit. Es stellt keine Diagnose: Wenn du glaubst, dass dein Baby auf ein Lebensmittel reagiert hat, frag eine Ärztin oder einen Arzt. Die Notizen stehen auf der Liste, die du teilst.</string>
+    <string name="allergies_share">Liste teilen</string>
+    <string name="allergies_share_subject">%1$s – Allergien</string>
+    <string name="allergy_list_identity">Geboren am %1$s · %2$s · Stand %3$s</string>
+    <string name="allergy_list_as_noted">Wie von der Familie eingetragen</string>
+    <string name="allergy_list_note">Wie von der Familie in Sprout eingetragen. „Von medizinischem Fachpersonal bestätigt“ heißt, dass die Familie eingetragen hat, dass eine Fachperson sie bestätigt hat. Sprout stellt keine Diagnosen, und diese Liste ist kein medizinisches Dokument.</string>
+    <string name="report_col_status">Status</string>
+    <string name="report_col_noticed">Bemerkt</string>
+    <string name="report_include_allergies_hint">Wogegen das Baby als allergisch eingetragen ist, unabhängig vom Zeitraum</string>
 
     <!-- Lebensmittelliste (BDR-20) -->
     <string name="meal_food_search">Lebensmittel suchen oder hinzufügen</string>

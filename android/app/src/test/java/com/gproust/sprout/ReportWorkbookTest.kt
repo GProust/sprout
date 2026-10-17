@@ -1,5 +1,6 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
@@ -113,6 +114,9 @@ class ReportWorkbookTest {
             now = now,
             zone = zone,
             foodName = { ref -> if (ref == "carrot") "Carrot" else null },
+            allergies = listOf(
+                AllergyEntity(babyId = 1, name = "Kiwi", ref = "kiwi", confirmed = true, noticedAt = at(born, 9), notes = "lips"),
+            ),
         )
         return ReportWorkbook.build(report, zone)
     }
@@ -122,7 +126,7 @@ class ReportWorkbookTest {
         assertEquals(
             listOf(
                 "Summary", "Day by day", "Feeding", "Sleep", "Nappies", "Growth",
-                "Treatments", "Medicines", "Foods",
+                "Treatments", "Medicines", "Foods", "Allergies",
             ),
             sheets().map { it.name },
         )
@@ -224,6 +228,20 @@ class ReportWorkbookTest {
         assertEquals(Xlsx.Cell.Text("taste"), ratatouille[4])
         assertEquals(Xlsx.Cell.Blank, ratatouille[5])
         assertEquals(Xlsx.Cell.Day(today), ratatouille[6])
+    }
+
+    /** One row per allergy; notes only when notes are switched on, as on every sheet (BDR-21). */
+    @Test
+    fun theAllergiesSheetCarriesWhatTheFamilyNoted() {
+        val sheet = sheets().first { it.name == "Allergies" }
+        assertEquals(listOf("allergy", "list_id", "confirmed", "noticed_on"), sheet.headers)
+        assertEquals(
+            listOf(Xlsx.Cell.Text("Kiwi"), Xlsx.Cell.Text("kiwi"), Xlsx.Cell.Flag(true), Xlsx.Cell.Day(born)),
+            sheet.rows.single(),
+        )
+
+        val withNotes = sheets(ReportOptions(period = ReportPeriod.WEEK, includeNotes = true)).first { it.name == "Allergies" }
+        assertEquals(Xlsx.Cell.Text("lips"), withNotes.rows.single()[withNotes.headers.indexOf("notes")])
     }
 
     @Test

@@ -19,12 +19,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         TreatmentEntity::class,
         MedicineEntity::class,
         MedicineDoseEntity::class,
+        AllergyEntity::class,
         PumpingEntity::class,
         WellbeingEntity::class,
         ParentProfileEntity::class,
         TombstoneEntity::class,
     ],
-    version = 19,
+    version = 20,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -40,6 +41,7 @@ abstract class SproutDatabase : RoomDatabase() {
     abstract fun treatmentDao(): TreatmentDao
     abstract fun medicineDao(): MedicineDao
     abstract fun medicineDoseDao(): MedicineDoseDao
+    abstract fun allergyDao(): AllergyDao
     abstract fun pumpingDao(): PumpingDao
     abstract fun wellbeingDao(): WellbeingDao
     abstract fun parentProfileDao(): ParentProfileDao
@@ -350,6 +352,31 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * v19 -> v20: a baby's allergies, as the household came to know them
+         * (BDR-21).
+         *
+         * A table of its own rather than a mark on a food or a column on the
+         * baby: each allergy is a row with its own uid, so two phones that each
+         * note one on the same day keep both — a list on the baby row would be
+         * one row, and the merge would keep whichever phone wrote last. Created
+         * with the sync columns on it, as the medicine tables were.
+         */
+        private val MIGRATION_19_20 = object : Migration(19, 20) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `allergy` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`babyId` INTEGER NOT NULL, `name` TEXT NOT NULL, `ref` TEXT, " +
+                        "`noticedAt` INTEGER, `confirmed` INTEGER NOT NULL, `notes` TEXT, " +
+                        "`uid` TEXT NOT NULL DEFAULT '', " +
+                        "`updatedAt` INTEGER NOT NULL DEFAULT 0, `deletedAt` INTEGER)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_allergy_babyId` ON `allergy` (`babyId`)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_allergy_uid` ON `allergy` (`uid`)")
+            }
+        }
+
+        /**
          * The tables partner sync merges, and so the ones that gain the sync
          * columns in [MIGRATION_13_14]. `wellbeing` and `parent_profile` are
          * absent on purpose — they never leave the device (ADR-0007).
@@ -468,6 +495,7 @@ abstract class SproutDatabase : RoomDatabase() {
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
             MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
             MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
+            MIGRATION_19_20,
         )
 
         fun getInstance(context: Context): SproutDatabase =

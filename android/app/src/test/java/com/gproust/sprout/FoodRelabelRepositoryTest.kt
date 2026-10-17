@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.foodHistories
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodPortion
@@ -96,5 +97,22 @@ class FoodRelabelRepositoryTest {
         assertEquals(0, repository.relabelFood(sam, from = "carottes", to = carrot))
 
         assertEquals(listOf("carottes", "carottes"), all().map { it.foods.single().name })
+    }
+
+    /** An allergy noted against the food follows it, so the mark stays on the line the parent sees (BDR-21). */
+    @Test
+    fun anAllergyNotedAgainstTheFoodFollowsTheCorrection() = runBlocking {
+        val sam = repository.addBaby("Sam", birthDate = 1_700_000_000_000)
+        repository.addFeedingFor(sam, meal(clock, MealFood("carottes")))
+        repository.addAllergy(AllergyEntity(name = "carottes", confirmed = true))
+        clock += hour
+
+        repository.relabelFood(sam, from = "carottes", to = carrot)
+
+        val allergy = db.allergyDao().allForSync().single()
+        assertEquals("Carotte", allergy.name)
+        assertEquals("carrot", allergy.ref)
+        assertEquals("still the parent's own statement", true, allergy.confirmed)
+        assertEquals("stamped, so it travels", clock, allergy.updatedAt)
     }
 }

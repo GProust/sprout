@@ -102,13 +102,15 @@ private const val MIN_CONTAINED = 5
  * it went if the parent noticed.
  *
  * Below the meal's foods, [FoodSearch] finds what to add. A new food starts as
- * a taste; one logged before starts as whatever it was last time.
+ * a taste; one logged before starts as whatever it was last time. A food in
+ * [allergies] carries the allergy marker, and nothing else changes for it.
  */
 @Composable
 fun MealFoodsEditor(
     foods: List<MealFood>,
     onChange: (List<MealFood>) -> Unit,
     known: List<FoodHistory>,
+    allergies: Set<String> = emptySet(),
 ) {
     val lastPortion = known.associate { it.key to it.lastPortion }
 
@@ -123,6 +125,7 @@ fun MealFoodsEditor(
     foods.forEachIndexed { i, food ->
         MealFoodRow(
             food = food,
+            allergic = foodIdentity(food) in allergies,
             onChange = { changed -> onChange(foods.mapIndexed { j, f -> if (j == i) changed else f }) },
             onRemove = { onChange(foods.filterIndexed { j, _ -> j != i }) },
         )
@@ -292,6 +295,7 @@ private fun MealFoodRow(
     food: MealFood,
     onChange: (MealFood) -> Unit,
     onRemove: () -> Unit,
+    allergic: Boolean = false,
 ) {
     val context = LocalContext.current
     OutlinedCard(Modifier.fillMaxWidth().padding(top = 8.dp)) {
@@ -310,6 +314,9 @@ private fun MealFoodRow(
                     )
                 }
             }
+            // Said, not stopped: the parent may be logging the very meal that
+            // showed it, or one the doctor asked for (BDR-21).
+            if (allergic) AllergyMarker(Modifier.padding(bottom = 4.dp))
             ChoiceChips(
                 options = FoodPortion.entries,
                 selected = food.portion,
