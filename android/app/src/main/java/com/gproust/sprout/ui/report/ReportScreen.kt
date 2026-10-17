@@ -62,6 +62,7 @@ import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDate
+import com.gproust.sprout.ui.foods.catalogName
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.stats.WhoSex
 import kotlinx.coroutines.Dispatchers
@@ -199,6 +200,10 @@ class ReportViewModel(
         _state.update { it.copy(options = it.options.copy(includeMedicines = include)) }
     }
 
+    fun setIncludeFoods(include: Boolean) {
+        _state.update { it.copy(options = it.options.copy(includeFoods = include)) }
+    }
+
     fun setIncludeNotes(include: Boolean) {
         _state.update { it.copy(options = it.options.copy(includeNotes = include)) }
     }
@@ -306,6 +311,7 @@ class ReportViewModel(
             options = _state.value.options,
             now = System.currentTimeMillis(),
             zone = zone,
+            foodName = { ref -> catalogName(context, ref) },
         )
     }
 
@@ -477,6 +483,12 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
                 subtitle = stringResource(R.string.report_include_medicines_hint),
                 checked = state.options.includeMedicines,
                 onChange = vm::setIncludeMedicines,
+            )
+            ToggleRow(
+                title = stringResource(R.string.screen_foods),
+                subtitle = stringResource(R.string.report_include_foods_hint),
+                checked = state.options.includeFoods,
+                onChange = vm::setIncludeFoods,
             )
             ToggleRow(
                 title = stringResource(R.string.report_include_notes),

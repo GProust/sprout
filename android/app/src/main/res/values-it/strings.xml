@@ -679,6 +679,12 @@
     <string name="report_col_notes">Note</string>
     <string name="report_include_medicines_hint">Medicinali al bisogno e ogni dose del periodo</string>
     <string name="report_medicine_note">Dosi così come sono state registrate, accanto ai limiti inseriti dal genitore da una prescrizione o dal foglietto. Sprout non applica limiti propri e non trae alcuna conclusione da questi numeri.</string>
+    <string name="report_include_foods_hint">Ogni alimento proposto nel periodo, con il suo conteggio</string>
+    <string name="report_col_first_offered">Prima volta</string>
+    <string name="report_col_offered">Proposto</string>
+    <string name="report_col_tastes">Assaggi</string>
+    <string name="report_col_servings">Porzioni</string>
+    <string name="report_foods_note">Ogni alimento come è stato indicato in un pasto: quanti pasti del periodo lo includevano, quanti erano un assaggio e quanti una porzione, e com\'è andata quando il genitore l\'ha annotato. «Prima volta» è il primo pasto in cui è stato registrato, anche prima del periodo. Sprout non registra reazioni e non trae conclusioni da questi dati.</string>
     <string name="report_col_day">Giorno</string>
     <string name="report_col_week">Settimana</string>
     <string name="report_col_at_breast">Al seno</string>

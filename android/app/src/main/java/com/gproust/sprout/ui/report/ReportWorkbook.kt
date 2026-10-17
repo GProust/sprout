@@ -36,6 +36,7 @@ object ReportWorkbook {
             add(growth(report, zone))
             if (report.options.includeTreatments) add(treatments(report, zone))
             if (report.medicines.isNotEmpty()) add(medicineDoses(report, zone))
+            if (report.foods.isNotEmpty()) add(foods(report, zone))
         }
 
     fun bytes(report: ReportContent, zone: ZoneId = ZoneId.systemDefault()): ByteArray =
@@ -333,6 +334,38 @@ object ReportWorkbook {
             widths = listOf(12, 10, 20, 10, 8, 20, 13, 20, 40),
         )
     }
+
+    /**
+     * Every food offered inside the range, one row per food per meal (BDR-20).
+     *
+     * Raw rows, as for the medicines: a pivot by `food` gives the PDF's counts,
+     * and nothing here has been summed or judged first. `list_id` is the food's
+     * id on Sprout's list — the same on every phone and in every language, so
+     * it is what to group by — and blank for a food the household added, whose
+     * `food` is the parent's own words. `portion` and `reception` are keys, in
+     * English, like `stool_colour`; a reception nobody noted is blank, not a
+     * fourth answer. `first_offered` is the food's first meal ever, which may
+     * be before the range.
+     */
+    private fun foods(report: ReportContent, zone: ZoneId) = Xlsx.Sheet(
+        name = "Foods",
+        headers = listOf("date", "time", "food", "list_id", "portion", "reception", "first_offered"),
+        rows = report.foods
+            .flatMap { food -> food.offers.map { food to it } }
+            .sortedWith(compareBy({ it.second.time }, { it.second.feedUid }))
+            .map { (food, offer) ->
+                listOf(
+                    Cell.Day(offer.time.day(zone)),
+                    Cell.Clock(offer.time.clock(zone)),
+                    Cell.Text(food.name),
+                    food.ref?.let { Cell.Text(it) } ?: Cell.Blank,
+                    Cell.Text(offer.portion.name.lowercase()),
+                    offer.reception?.let { Cell.Text(it.name.lowercase()) } ?: Cell.Blank,
+                    Cell.Day(food.firstOffered.day(zone)),
+                )
+            },
+        widths = listOf(12, 10, 22, 14, 10, 11, 14),
+    )
 
     // --- small conversions ------------------------------------------------
 

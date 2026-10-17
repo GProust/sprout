@@ -20733,6 +20733,52 @@
         }
       }
     },
+    "report_col_first_offered": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstmals"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First offered"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primera vez"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Première fois"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prima volta"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pierwszy raz"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primeira vez"
+          }
+        }
+      }
+    },
     "report_col_given": {
       "localizations": {
         "de": {
@@ -20963,6 +21009,52 @@
         }
       }
     },
+    "report_col_offered": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angeboten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offered"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ofrecido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proposé"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proposto"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Podano"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oferecido"
+          }
+        }
+      }
+    },
     "report_col_schedule": {
       "localizations": {
         "de": {
@@ -21009,6 +21101,52 @@
         }
       }
     },
+    "report_col_servings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Portionen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Servings"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Portions"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porzioni"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porcje"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Porções"
+          }
+        }
+      }
+    },
     "report_col_settled": {
       "localizations": {
         "de": {
@@ -21051,6 +21189,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adormec."
+          }
+        }
+      }
+    },
+    "report_col_tastes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Probiert"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Probadas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goûts"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assaggi"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Próby"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provas"
           }
         }
       }
@@ -21837,6 +22021,52 @@
         }
       }
     },
+    "report_foods_note": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes Lebensmittel so, wie es bei einer Mahlzeit eingetragen wurde: in wie vielen Mahlzeiten des Zeitraums es war, wie oft nur probiert und wie oft als Portion, und wie es ankam, wenn die Eltern das notiert haben. „Erstmals“ ist die erste Mahlzeit, in der es je eingetragen wurde, auch vor dem Zeitraum. Sprout erfasst keine Reaktionen und zieht aus diesen Zahlen keine Schlüsse."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each food as it was listed at a meal: how many meals in the period included it, how many were a taste and how many a serving, and how it went when the parent noted it. “First offered” is the first meal it was ever logged in, which may be before the period. Sprout records no reactions and draws no conclusion from these figures."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento tal como se anotó en una comida: cuántas comidas del periodo lo incluyeron, cuántas fueron solo para probar y cuántas una ración, y cómo fue cuando los padres lo anotaron. «Primera vez» es la primera comida en que se anotó, que puede ser anterior al periodo. Sprout no registra reacciones ni saca conclusiones de estas cifras."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque aliment tel qu'il a été noté dans un repas : combien de repas de la période l'ont contenu, combien étaient un simple goût et combien une portion, et comment ça s'est passé quand le parent l'a noté. « Première fois » est le premier repas où il a été noté, parfois avant la période. Sprout n'enregistre aucune réaction et ne tire aucune conclusion de ces chiffres."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni alimento come è stato indicato in un pasto: quanti pasti del periodo lo includevano, quanti erano un assaggio e quanti una porzione, e com'è andata quando il genitore l'ha annotato. «Prima volta» è il primo pasto in cui è stato registrato, anche prima del periodo. Sprout non registra reazioni e non trae conclusioni da questi dati."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy pokarm tak, jak wpisano go w posiłku: w ilu posiłkach z tego okresu był, ile razy tylko do spróbowania, a ile jako porcja, i jak poszło, jeśli rodzic to zapisał. „Pierwszy raz” to pierwszy posiłek, w którym go zapisano — także przed tym okresem. Sprout nie zapisuje reakcji i nie wyciąga z tych liczb żadnych wniosków."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento tal como foi indicado numa refeição: quantas refeições do período o incluíram, quantas foram só para provar e quantas uma porção, e como correu quando os pais o registaram. «Primeira vez» é a primeira refeição em que foi registado, que pode ser anterior ao período. O Sprout não regista reações nem tira conclusões destes números."
+          }
+        }
+      }
+    },
     "report_footer": {
       "localizations": {
         "de": {
@@ -22017,6 +22247,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uma linha por dia, no fim"
+          }
+        }
+      }
+    },
+    "report_include_foods_hint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes im Zeitraum angebotene Lebensmittel, mit seiner Anzahl"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each food offered in the period, with its count"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento ofrecido en el periodo, con su recuento"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque aliment proposé sur la période, avec son compte"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni alimento proposto nel periodo, con il suo conteggio"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy pokarm podany w tym okresie, z licznikiem"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento oferecido no período, com a sua contagem"
           }
         }
       }

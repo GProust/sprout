@@ -359,7 +359,11 @@ one array of objects inside a row. Four things a change can quietly undo:
   there is no allergy field — the meal's note is where a parent writes what they
   saw. A taste counts as an offer; tastes and servings are shown apart.
 
-The meal's weight stays `amountGrams`: what gets weighed is the bowl. And the
+The meal's weight stays `amountGrams`: what gets weighed is the bowl. The
+doctor's record carries the foods as `ReportContent.foods` — named through the
+`foodName` passed to `buildReport`, because the data layer has no strings and the
+two renderers must not each look a name up — and the workbook's `Foods` sheet
+keys them by `list_id`. And the
 feeding form now carries the edited row's `uid` through — it used to mint a new
 one, which reached the other phone as a second feed beside the first.
 

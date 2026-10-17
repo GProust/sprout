@@ -679,6 +679,12 @@
     <string name="report_col_notes">Notizen</string>
     <string name="report_include_medicines_hint">Bei Bedarf gegebene Mittel und jede Gabe im Zeitraum</string>
     <string name="report_medicine_note">Gaben so, wie sie eingetragen wurden, neben den Vorgaben, die der Elternteil aus Verordnung oder Beipackzettel übernommen hat. Sprout setzt keine eigenen Grenzen und zieht aus diesen Zahlen keinen Schluss.</string>
+    <string name="report_include_foods_hint">Jedes im Zeitraum angebotene Lebensmittel, mit seiner Anzahl</string>
+    <string name="report_col_first_offered">Erstmals</string>
+    <string name="report_col_offered">Angeboten</string>
+    <string name="report_col_tastes">Probiert</string>
+    <string name="report_col_servings">Portionen</string>
+    <string name="report_foods_note">Jedes Lebensmittel so, wie es bei einer Mahlzeit eingetragen wurde: in wie vielen Mahlzeiten des Zeitraums es war, wie oft nur probiert und wie oft als Portion, und wie es ankam, wenn die Eltern das notiert haben. „Erstmals“ ist die erste Mahlzeit, in der es je eingetragen wurde, auch vor dem Zeitraum. Sprout erfasst keine Reaktionen und zieht aus diesen Zahlen keine Schlüsse.</string>
     <string name="report_col_day">Tag</string>
     <string name="report_col_week">Woche</string>
     <string name="report_col_at_breast">An der Brust</string>

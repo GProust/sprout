@@ -1,9 +1,13 @@
 package com.gproust.sprout.ui.report
 
+import com.gproust.sprout.data.FoodOffer
+import com.gproust.sprout.data.foodHistories
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.StoolColor
@@ -25,6 +29,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 /**
  * Everything a report says, worked out once from the entries the family made.
@@ -55,6 +60,8 @@ data class ReportOptions(
     val includeTreatments: Boolean = true,
     /** The as-needed medicines, and the doses given inside the range (BDR-18). */
     val includeMedicines: Boolean = true,
+    /** The foods offered in the range, each with its count (BDR-20). */
+    val includeFoods: Boolean = true,
     /** Off by default: free text is where a parent writes what they meant for themselves. */
     val includeNotes: Boolean = false,
 )
@@ -120,6 +127,33 @@ data class MedicineRecord(
     val hasAmounts: Boolean get() = doses.any { it.amount != null }
 }
 
+/**
+ * One food offered inside the range (BDR-20), and the meals it was in there.
+ *
+ * [firstOffered] is the first meal it was ever logged in, which may be before
+ * the range: "first offered on 3 September" is the line a parent keeps on the
+ * fridge, and a report that started the count at the range's first day would
+ * call every food new. Counts, a date and the parent's own answers — what a
+ * food was *like* for the baby is not something the document says (BDR-12).
+ */
+data class FoodRecord(
+    /** Its identity: the list's id, or the name the household gave it. */
+    val key: String,
+    /** The list's name in the phone's language, or the household's own words. */
+    val name: String,
+    /** Its id on Sprout's list, or null for a food the household added. */
+    val ref: String?,
+    val firstOffered: Long,
+    /** The meals inside the range it was part of, oldest first. */
+    val offers: List<FoodOffer>,
+) {
+    val tastes: Int get() = offers.count { it.portion == FoodPortion.TASTE }
+    val servings: Int get() = offers.count { it.portion == FoodPortion.SERVING }
+
+    /** Meals in the range it went [reception] at; meals that noted nothing count for none. */
+    fun timesReceived(reception: FoodReception): Int = offers.count { it.reception == reception }
+}
+
 /** The whole of a report, ready to be drawn or written out. */
 data class ReportContent(
     val babyName: String,
@@ -154,6 +188,8 @@ data class ReportContent(
      * document reports what happened, and a shelf is not an event.
      */
     val medicines: List<MedicineRecord>,
+    /** The foods offered inside the range, in the order they were first offered. */
+    val foods: List<FoodRecord>,
     /** The raw entries inside the range, oldest first, for the workbook. */
     val feedings: List<FeedingEntity>,
     val sleeps: List<SleepEntity>,
@@ -182,6 +218,10 @@ data class ReportContent(
  * being in the range when any part of it is: a night that began the evening
  * before belongs to the morning it woke into, which is the same rule the daily
  * figures are split by.
+ *
+ * [foodName] names a food from Sprout's list in the phone's language; this
+ * function has no resources to look it up in, and the two renderers must not
+ * each look it up for themselves.
  */
 @Suppress("LongParameterList")
 fun buildReport(
@@ -196,6 +236,7 @@ fun buildReport(
     options: ReportOptions,
     now: Long,
     zone: ZoneId = ZoneId.systemDefault(),
+    foodName: (ref: String) -> String? = { null },
 ): ReportContent {
     val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
     val birthDay = Instant.ofEpochMilli(baby.birthDate).atZone(zone).toLocalDate()
@@ -255,6 +296,11 @@ fun buildReport(
         } else {
             emptyList()
         },
+        foods = if (options.includeFoods) {
+            foodRecords(feedings, startMillis, endMillis, foodName)
+        } else {
+            emptyList()
+        },
         feedings = feedsInRange,
         sleeps = sleepsInRange,
         diapers = diapersInRange,
@@ -290,6 +336,34 @@ fun medicineRecords(
         }
         .sortedBy { it.medicine.name.lowercase() }
 }
+
+/**
+ * The foods offered inside the range, read the way the First foods page reads
+ * them (BDR-20) — [feedings] is the baby's whole history, so a food's first
+ * offer can be found before the range.
+ *
+ * Ordered by when each food was first offered, oldest first: the order a parent
+ * introduced them in, and an order that says nothing about how any of them is
+ * going. Two first offered at the same meal are taken alphabetically.
+ */
+fun foodRecords(
+    feedings: List<FeedingEntity>,
+    startMillis: Long,
+    endMillis: Long,
+    foodName: (ref: String) -> String? = { null },
+): List<FoodRecord> = foodHistories(feedings)
+    .mapNotNull { history ->
+        val inRange = history.offers.filter { it.time in startMillis until endMillis }.reversed()
+        if (inRange.isEmpty()) return@mapNotNull null
+        FoodRecord(
+            key = history.key,
+            name = history.ref?.let(foodName) ?: history.name,
+            ref = history.ref,
+            firstOffered = history.firstOffered,
+            offers = inRange,
+        )
+    }
+    .sortedWith(compareBy({ it.firstOffered }, { it.name.lowercase(Locale.ROOT) }, { it.key }))
 
 /**
  * Every measurement read against the references, oldest first.

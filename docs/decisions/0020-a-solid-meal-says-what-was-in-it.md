@@ -179,11 +179,20 @@ setting.
   row it edited, with a new `uid`; the other phone then saw a new meal beside the
   old one instead of a correction. The form now carries the `uid` through, which
   matters more now that a meal holds a list a parent may come back to.
-- **The doctor's record is unchanged by this decision.** The workbook already
-  carries each solid meal and its grams; adding the foods to it, and deciding
-  what a printed page of "refused" implies, is a separate change with its own
-  thinking to do — as it was for as-needed medicine
-  ([BDR-15](0015-medicine-given-when-needed-and-the-wait-between-doses.md)).
+- **The doctor's record carries the foods**, under the rules of
+  [BDR-12](0012-a-record-for-the-doctor.md): a switch on the export screen, on by
+  default like the medicines. The PDF prints one row per food offered in the
+  period, in the order the foods were first offered — the first time ever, which
+  may be before the period — with the meals, the tastes and servings apart, and
+  the three answers counted where they were noted; a note under the table says
+  what the figures are and that Sprout records no reactions and draws no
+  conclusion. A *Refused* column is a count beside two other counts: no colour, no
+  mark, no sentence. The workbook's `Foods` sheet is one row per food per meal,
+  with the list's id beside the name so a pivot table groups a carrot logged in
+  two languages as one, and the portion and the answer as English keys like every
+  other sheet's. Both read one `ReportContent.foods`, assembled with the list's
+  names already in the phone's language, so the two files cannot disagree. A food
+  offered only before the period is left out — the document reports the period.
 
 ## Alternatives considered
 

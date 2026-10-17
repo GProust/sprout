@@ -28,6 +28,12 @@ All notable changes to Sprout are documented here. This project follows
   was: every meal that named it follows, and the two lines become one — tastes,
   servings and how it went kept as they were. Searching for "carottes" now also
   offers the carrot from the list first.
+- 🩺 **First foods in the record for your doctor.** The PDF now lists each food
+  offered in the period — when it was first offered, how many times since,
+  tastes and servings, and how it went where you noted it — and the spreadsheet
+  has a **Foods** sheet with one row per food per meal. Just the counts, no
+  comment on them; switch it off on the export screen if you'd rather leave it
+  out.
 - 🤝 **Shared like every other feed.** If your household's phones share, the
   foods go with each meal — the ones you added yourself included, which then
   turn up in the other phone's suggestions too. Correct a meal on one phone and

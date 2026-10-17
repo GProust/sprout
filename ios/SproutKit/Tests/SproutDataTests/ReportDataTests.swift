@@ -47,7 +47,8 @@ final class ReportDataTests: XCTestCase {
         treatments: [Treatment] = [],
         medicines: [Medicine] = [],
         medicineDoses: [MedicineDose] = [],
-        options: ReportOptions = ReportOptions(period: .week)
+        options: ReportOptions = ReportOptions(period: .week),
+        foodName: (String) -> String? = { _ in nil }
     ) -> ReportContent {
         buildReport(
             baby: baby,
@@ -59,7 +60,8 @@ final class ReportDataTests: XCTestCase {
             medicines: medicines,
             medicineDoses: medicineDoses,
             options: options,
-            now: now
+            now: now,
+            foodName: foodName
         )
     }
 
@@ -408,5 +410,102 @@ final class ReportDataTests: XCTestCase {
         )
 
         XCTAssertTrue(content.medicines.isEmpty)
+    }
+
+    // MARK: - First foods in the doctor's record (BDR-20)
+
+    private func meal(_ date: CalendarDay, _ hour: Int, _ foods: MealFood...) -> Feeding {
+        Feeding(babyId: 1, type: .SOLID, startTime: at(date, hour), foods: foods, uid: "meal-\(at(date, hour))")
+    }
+
+    func testAFoodReachesTheRecordWithTheMealsInsideTheRangeAndItsFirstEver() throws {
+        let content = report(
+            feedings: [
+                meal(today.adding(days: -30), 12, MealFood(name: "Carotte", ref: "carrot")),
+                meal(today.adding(days: -2), 12, MealFood(name: "Carrot", portion: .SERVING, reception: .LIKED, ref: "carrot")),
+                meal(today, 12, MealFood(name: "Carotte", ref: "carrot"), MealFood(name: "Ratatouille")),
+            ],
+            foodName: { $0 == "carrot" ? "Carrot" : nil }
+        )
+
+        XCTAssertEqual(content.foods.count, 2)
+        let carrot = content.foods[0]
+        XCTAssertEqual(carrot.name, "Carrot")
+        XCTAssertEqual(carrot.ref, "carrot")
+        XCTAssertEqual(carrot.offers.count, 2)
+        XCTAssertEqual(carrot.tastes, 1)
+        XCTAssertEqual(carrot.servings, 1)
+        XCTAssertEqual(carrot.timesReceived(.LIKED), 1)
+        XCTAssertEqual(carrot.firstOffered, at(today.adding(days: -30), 12), "the first ever, not the first in the range")
+        XCTAssertLessThan(try XCTUnwrap(carrot.offers.first).time, try XCTUnwrap(carrot.offers.last).time, "oldest first")
+
+        XCTAssertEqual(content.foods[1].name, "Ratatouille")
+        XCTAssertNil(content.foods[1].ref)
+    }
+
+    /// In the order they were first offered — never by how well each is going.
+    func testFoodsAreListedInTheOrderTheyWereIntroduced() {
+        let content = report(feedings: [
+            meal(today, 12, MealFood(name: "Pea"), MealFood(name: "Apple")),
+            meal(today.adding(days: -3), 12, MealFood(name: "Leek", reception: .REFUSED)),
+        ])
+
+        XCTAssertEqual(content.foods.map(\.name), ["Leek", "Apple", "Pea"])
+    }
+
+    func testAFoodOfferedOnlyBeforeTheRangeIsLeftOut() {
+        XCTAssertTrue(report(feedings: [meal(born, 12, MealFood(name: "Leek"))]).foods.isEmpty)
+    }
+
+    func testTurningTheFoodsOffLeavesThemOutOfTheDocument() {
+        let content = report(
+            feedings: [meal(today, 12, MealFood(name: "Leek"))],
+            options: ReportOptions(period: .week, includeFoods: false)
+        )
+
+        XCTAssertTrue(content.foods.isEmpty)
+    }
+
+    /// One row per food per meal inside the range: the list's id to group by,
+    /// keys rather than translated words, and a reception nobody noted left blank
+    /// rather than made into an answer. From `ReportWorkbookTest.kt`.
+    func testTheFoodsSheetHasARowPerFoodPerMeal() throws {
+        let content = report(
+            feedings: [
+                meal(today.adding(days: -20), 12, MealFood(name: "Carotte", ref: "carrot")),
+                meal(
+                    today, 12,
+                    MealFood(name: "Carotte", portion: .SERVING, reception: .LIKED, ref: "carrot"),
+                    MealFood(name: "Ratatouille")
+                ),
+            ],
+            foodName: { $0 == "carrot" ? "Carrot" : nil }
+        )
+        let sheet = try XCTUnwrap(ReportWorkbook.build(content).first { $0.name == "Foods" })
+
+        XCTAssertEqual(sheet.headers, ["date", "time", "food", "list_id", "portion", "reception", "first_offered"])
+        XCTAssertEqual(sheet.rows.count, 2)
+        let carrot = sheet.rows[0]
+        XCTAssertEqual(carrot[2], .text("Carrot"), "named in the export's language, whatever it was saved under")
+        XCTAssertEqual(carrot[3], .text("carrot"))
+        XCTAssertEqual(carrot[4], .text("serving"))
+        XCTAssertEqual(carrot[5], .text("liked"))
+        XCTAssertEqual(carrot[6], .day(today.adding(days: -20)))
+
+        let ratatouille = sheet.rows[1]
+        XCTAssertEqual(ratatouille[2], .text("Ratatouille"))
+        XCTAssertEqual(ratatouille[3], .blank)
+        XCTAssertEqual(ratatouille[4], .text("taste"))
+        XCTAssertEqual(ratatouille[5], .blank)
+        XCTAssertEqual(ratatouille[6], .day(today))
+    }
+
+    func testTheFoodsSheetGoesWhenFoodsDo() {
+        let content = report(
+            feedings: [meal(today, 12, MealFood(name: "Leek"))],
+            options: ReportOptions(period: .week, includeFoods: false)
+        )
+
+        XCTAssertFalse(ReportWorkbook.build(content).map(\.name).contains("Foods"))
     }
 }

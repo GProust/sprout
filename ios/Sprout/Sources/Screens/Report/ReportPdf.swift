@@ -284,6 +284,7 @@ extension ReportPdf {
         blocks.append(contentsOf: growthSection())
         blocks.append(contentsOf: treatmentSection())
         blocks.append(contentsOf: medicineSection())
+        blocks.append(contentsOf: foodSection())
         blocks.append(contentsOf: dailySection())
         blocks.append(paragraph(Str.t("report_about"), size: 7.4, colour: muted, topGap: 14))
         return blocks
@@ -663,6 +664,45 @@ extension ReportPdf {
         )
             + table(title: Str.t("medicine_history"), columns: doseColumns, rows: doseRows)
             + [paragraph(Str.t("report_medicine_note"), size: 7.4, colour: muted, topGap: 6)]
+    }
+
+    /// The foods offered in the period (BDR-20), one row each, in the order they
+    /// were first offered: how many meals included it, tastes and servings apart,
+    /// and how it went where that was noted. From `foodSection` in
+    /// `ReportPdf.kt`. No column is coloured and none is a verdict — *Refused* is
+    /// a count, like the others.
+    func foodSection() -> [Block] {
+        let foods = report.foods
+        guard !foods.isEmpty else { return [] }
+
+        // Right-aligned columns end 40 points past their offset; these leave
+        // room for the longest header in any of the seven languages.
+        let columns: [(String, CGFloat, Align)] = [
+            (Str.t("report_col_name"), 0, .left),
+            (Str.t("report_col_first_offered"), 110, .left),
+            (Str.t("report_col_offered"), 185, .right),
+            (Str.t("report_col_tastes"), 235, .right),
+            (Str.t("report_col_servings"), 290, .right),
+            (Str.t("food_reception_liked"), 350, .right),
+            (Str.t("food_reception_mixed"), 418, .right),
+            (Str.t("food_reception_refused"), 469, .right),
+        ]
+        func count(_ n: Int) -> String { n == 0 ? "—" : String(n) }
+        let rows: [[String]] = foods.map { food in
+            [
+                food.name,
+                SproutDateStyle.date(food.firstOffered),
+                String(food.offers.count),
+                count(food.tastes),
+                count(food.servings),
+                count(food.timesReceived(.LIKED)),
+                count(food.timesReceived(.MIXED)),
+                count(food.timesReceived(.REFUSED)),
+            ]
+        }
+
+        return table(title: Str.t("screen_foods"), columns: columns, rows: rows)
+            + [paragraph(Str.t("report_foods_note"), size: 7.4, colour: muted, topGap: 6)]
     }
 
     /// The parent's own ceilings for a medicine, side by side and unjudged.

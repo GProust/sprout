@@ -13,6 +13,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import com.gproust.sprout.R
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDate
 import com.gproust.sprout.ui.common.formatTime
@@ -219,6 +220,7 @@ class ReportPdf(
         addAll(growthSection())
         addAll(treatmentSection())
         addAll(medicineSection())
+        addAll(foodSection())
         addAll(dailySection())
         add(paragraph(string(R.string.report_about), smallPaint, topGap = 14f))
     }
@@ -875,6 +877,58 @@ class ReportPdf(
             ) +
             tableBlocks(doseHeaders, doseRows, doseWeights, List(doseWeights.size) { false }, true) +
             paragraph(string(R.string.report_medicine_note), smallPaint, topGap = 6f)
+    }
+
+    /**
+     * The foods offered in the period (BDR-20), one row each, in the order they
+     * were first offered: how many meals included it, tastes and servings
+     * apart, and how it went where that was noted. No column is coloured and
+     * none is a verdict — *Refused* is a count, like the others.
+     */
+    private fun foodSection(): List<Block> {
+        val foods = report.foods
+        if (foods.isEmpty()) return emptyList()
+
+        val heading = Block(34f) { canvas, top ->
+            drawHeading(
+                canvas,
+                top,
+                string(R.string.screen_foods),
+                string(R.string.report_over_the_period).uppercase(),
+            )
+        }
+        val headers = listOf(
+            string(R.string.report_col_name),
+            string(R.string.report_col_first_offered),
+            string(R.string.report_col_offered),
+            string(R.string.report_col_tastes),
+            string(R.string.report_col_servings),
+            string(R.string.food_reception_liked),
+            string(R.string.food_reception_mixed),
+            string(R.string.food_reception_refused),
+        )
+        fun count(n: Int) = if (n == 0) DASH else n.toString()
+        val rows = foods.map { food ->
+            listOf(
+                food.name,
+                formatDate(context, food.firstOffered),
+                food.offers.size.toString(),
+                count(food.tastes),
+                count(food.servings),
+                count(food.timesReceived(FoodReception.LIKED)),
+                count(food.timesReceived(FoodReception.MIXED)),
+                count(food.timesReceived(FoodReception.REFUSED)),
+            )
+        }
+        return listOf(heading) +
+            tableBlocks(
+                headers,
+                rows,
+                listOf(1.8f, 1.2f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f),
+                listOf(false, false, true, true, true, true, true, true),
+                true,
+            ) +
+            paragraph(string(R.string.report_foods_note), smallPaint, topGap = 6f)
     }
 
     /** The parent's own ceilings for a medicine, side by side and unjudged. */

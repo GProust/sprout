@@ -763,6 +763,12 @@
     <string name="report_col_notes">Notes</string>
     <string name="report_include_medicines_hint">Medicines given when needed, and every dose in the period</string>
     <string name="report_medicine_note">Doses as they were logged, against the limits the parent entered from a prescriber or a leaflet. Sprout applies no limits of its own and draws no conclusion from these figures.</string>
+    <string name="report_include_foods_hint">Each food offered in the period, with its count</string>
+    <string name="report_col_first_offered">First offered</string>
+    <string name="report_col_offered">Offered</string>
+    <string name="report_col_tastes">Tastes</string>
+    <string name="report_col_servings">Servings</string>
+    <string name="report_foods_note">Each food as it was listed at a meal: how many meals in the period included it, how many were a taste and how many a serving, and how it went when the parent noted it. “First offered” is the first meal it was ever logged in, which may be before the period. Sprout records no reactions and draws no conclusion from these figures.</string>
     <string name="report_col_day">Day</string>
     <string name="report_col_week">Week</string>
     <string name="report_col_at_breast">At breast</string>

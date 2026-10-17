@@ -698,6 +698,12 @@
     <string name="report_col_notes">Notatki</string>
     <string name="report_include_medicines_hint">Leki podawane doraźnie i każda dawka w okresie</string>
     <string name="report_medicine_note">Dawki tak, jak je zapisano, obok limitów wpisanych przez rodzica z recepty lub ulotki. Sprout nie stosuje własnych limitów i nie wyciąga z tych liczb żadnych wniosków.</string>
+    <string name="report_include_foods_hint">Każdy pokarm podany w tym okresie, z licznikiem</string>
+    <string name="report_col_first_offered">Pierwszy raz</string>
+    <string name="report_col_offered">Podano</string>
+    <string name="report_col_tastes">Próby</string>
+    <string name="report_col_servings">Porcje</string>
+    <string name="report_foods_note">Każdy pokarm tak, jak wpisano go w posiłku: w ilu posiłkach z tego okresu był, ile razy tylko do spróbowania, a ile jako porcja, i jak poszło, jeśli rodzic to zapisał. „Pierwszy raz” to pierwszy posiłek, w którym go zapisano — także przed tym okresem. Sprout nie zapisuje reakcji i nie wyciąga z tych liczb żadnych wniosków.</string>
     <string name="report_col_day">Dzień</string>
     <string name="report_col_week">Tydzień</string>
     <string name="report_col_at_breast">Przy piersi</string>

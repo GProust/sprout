@@ -738,6 +738,12 @@
     <string name="report_col_notes">Notes</string>
     <string name="report_include_medicines_hint">Médicaments donnés au besoin, et chaque prise de la période</string>
     <string name="report_medicine_note">Prises telles qu\'elles ont été enregistrées, en regard des limites saisies par le parent depuis une ordonnance ou une notice. Sprout n\'applique aucune limite propre et ne tire aucune conclusion de ces chiffres.</string>
+    <string name="report_include_foods_hint">Chaque aliment proposé sur la période, avec son compte</string>
+    <string name="report_col_first_offered">Première fois</string>
+    <string name="report_col_offered">Proposé</string>
+    <string name="report_col_tastes">Goûts</string>
+    <string name="report_col_servings">Portions</string>
+    <string name="report_foods_note">Chaque aliment tel qu\'il a été noté dans un repas : combien de repas de la période l\'ont contenu, combien étaient un simple goût et combien une portion, et comment ça s\'est passé quand le parent l\'a noté. « Première fois » est le premier repas où il a été noté, parfois avant la période. Sprout n\'enregistre aucune réaction et ne tire aucune conclusion de ces chiffres.</string>
     <string name="report_col_day">Jour</string>
     <string name="report_col_week">Semaine</string>
     <string name="report_col_at_breast">Au sein</string>

@@ -4,7 +4,10 @@ import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
@@ -60,6 +63,7 @@ class ReportDataTest {
         medicines: List<MedicineEntity> = emptyList(),
         medicineDoses: List<MedicineDoseEntity> = emptyList(),
         options: ReportOptions = ReportOptions(period = ReportPeriod.WEEK),
+        foodName: (String) -> String? = { null },
     ) = buildReport(
         baby = baby,
         feedings = feedings,
@@ -72,6 +76,7 @@ class ReportDataTest {
         options = options,
         now = now,
         zone = zone,
+        foodName = foodName,
     )
 
     private fun bottle(date: LocalDate, hour: Int, ml: Int?) = FeedingEntity(
@@ -425,5 +430,66 @@ class ReportDataTest {
         )
 
         assertTrue(report.medicines.isEmpty())
+    }
+
+    // --- first foods in the doctor's record (BDR-20) ----------------------
+
+    private fun meal(date: LocalDate, hour: Int, vararg foods: MealFood, uid: String = "meal-$date-$hour") =
+        FeedingEntity(babyId = 1, type = FeedType.SOLID, startTime = at(date, hour), foods = foods.toList(), uid = uid)
+
+    @Test
+    fun `a food reaches the record with the meals inside the range, and its first ever`() {
+        val report = report(
+            feedings = listOf(
+                meal(today.minusDays(30), 12, MealFood("Carotte", ref = "carrot")),
+                meal(today.minusDays(2), 12, MealFood("Carrot", FoodPortion.SERVING, FoodReception.LIKED, ref = "carrot")),
+                meal(today, 12, MealFood("Carotte", ref = "carrot"), MealFood("Ratatouille")),
+            ),
+            foodName = { ref -> if (ref == "carrot") "Carrot" else null },
+        )
+
+        val (carrot, ratatouille) = report.foods
+        assertEquals("Carrot", carrot.name)
+        assertEquals("carrot", carrot.ref)
+        assertEquals(2, carrot.offers.size)
+        assertEquals(1, carrot.tastes)
+        assertEquals(1, carrot.servings)
+        assertEquals(1, carrot.timesReceived(FoodReception.LIKED))
+        // The first ever, not the first in the range.
+        assertEquals(at(today.minusDays(30), 12), carrot.firstOffered)
+        assertTrue("oldest first", carrot.offers.first().time < carrot.offers.last().time)
+
+        assertEquals("Ratatouille", ratatouille.name)
+        assertNull(ratatouille.ref)
+    }
+
+    /** In the order they were first offered — never by how well each is going. */
+    @Test
+    fun `foods are listed in the order they were introduced`() {
+        val report = report(
+            feedings = listOf(
+                meal(today, 12, MealFood("Pea"), MealFood("Apple")),
+                meal(today.minusDays(3), 12, MealFood("Leek", reception = FoodReception.REFUSED)),
+            ),
+        )
+
+        assertEquals(listOf("Leek", "Apple", "Pea"), report.foods.map { it.name })
+    }
+
+    @Test
+    fun `a food offered only before the range is left out`() {
+        val report = report(feedings = listOf(meal(born, 12, MealFood("Leek"))))
+
+        assertTrue(report.foods.isEmpty())
+    }
+
+    @Test
+    fun `turning the foods off leaves them out of the document`() {
+        val report = report(
+            feedings = listOf(meal(today, 12, MealFood("Leek"))),
+            options = ReportOptions(period = ReportPeriod.WEEK, includeFoods = false),
+        )
+
+        assertTrue(report.foods.isEmpty())
     }
 }

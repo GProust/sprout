@@ -55,9 +55,10 @@ choose the period it covers.
   cannot send them anywhere. It writes the file and hands it to Android's share
   sheet — the same one every app uses — and *you* choose where it goes.
 - **What is in them** is your baby's record: feeding, sleep, nappies, growth
-  measurements and the treatments you set up, over the period you picked. The
-  free text you type on entries (the "notes") is **left out unless you switch it
-  on**.
+  measurements, the treatments and medicines you set up, and the foods your baby
+  was offered, over the period you picked. Each of the last three can be
+  switched off for that file. The free text you type on entries (the "notes") is
+  **left out unless you switch it on**.
 - **Your own check-ins and your pumping log are never included.** They belong to
   you rather than to your baby, and a report for a paediatric appointment is not
   where they go.
@@ -125,7 +126,13 @@ them back to you.
   or when, and records no reactions or allergies — if you want to note what you
   saw, the meal's own note is where it goes, and it stays with that meal.
 - **The foods are part of the meal**, so they are stored, shared with your
-  household's other phones and deleted exactly as the meal is.
+  household's other phones and deleted exactly as the meal is. Correcting a food
+  afterwards — making a carrot you typed into the carrot from the list — is an
+  edit to each of those meals, and travels the same way.
+- **The record for a doctor can include them**: each food offered in the period,
+  how many times, tastes and servings apart, and how it went where you noted it.
+  It is a list of what was logged, with no comment on it, and you can switch it
+  off for that file.
 
 ## Children's data
 
@@ -214,8 +221,9 @@ one you can check.
 - Added the section on **first foods**. A solid meal can now list the foods that
   were in it — a taste or a serving, and how it went — and a page counts them.
   The foods are picked from a list built into the app or typed in, and are
-  stored, shared and deleted with the meal they belong to. Sprout records no
-  reactions. Nothing about what Sprout collects or sends has changed.
+  stored, shared and deleted with the meal they belong to, and the record for a
+  doctor can list them. Sprout records no reactions. Nothing about what Sprout
+  collects or sends has changed.
 
 ### 2026-09-16
 
