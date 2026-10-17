@@ -748,6 +748,15 @@
     <string name="meal_food_remove">Quitar %1$s</string>
     <string name="meal_foods_hint">Cada alimento que anotes aquí tiene su propio recuento en Alimentos.</string>
     <string name="meal_edit_title">Editar comida</string>
+    <string name="food_correct">Corregir</string>
+    <string name="food_correct_title">Corregir «%1$s»</string>
+    <string name="food_correct_hint">¿Qué era? Elige un alimento de la lista o uno ya anotado. Cada comida de este bebé que lo incluye lo llamará así — cómo se dio y cómo fue no cambian.</string>
+    <string name="food_correct_summary">«%1$s» pasa a ser «%2$s» en %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d comida</item>
+        <item quantity="other">%1$d comidas</item>
+    </plurals>
+    <string name="food_correct_change">Elegir otro</string>
 
     <!-- Lista de alimentos (BDR-20) -->
     <string name="meal_food_search">Buscar o añadir un alimento</string>

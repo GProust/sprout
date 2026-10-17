@@ -91,21 +91,68 @@ private fun searchKey(text: String): String =
 private val COMBINING_MARKS = Regex("\\p{Mn}+")
 
 /**
+ * How short a name on the list may be and still be found inside a longer word:
+ * "carotte" inside "carottes" or "purée de carottes", but not "pois" — four
+ * letters — inside "poisson". A search hint only; nothing is merged by it.
+ */
+private const val MIN_CONTAINED = 5
+
+/**
  * The foods of one solid meal (BDR-20): each one a taste or a serving, and how
  * it went if the parent noticed.
  *
- * One field does both jobs. Typing searches Sprout's list — vegetables, fruit,
- * meat and fish, in the phone's language — and every food the household has
- * logged before; the shelves can be browsed without typing at all. Anything
- * that is not found is added as typed (a ratatouille, a grandmother's soup) and
- * is one tap away from then on. A new food starts as a taste; one logged before
- * starts as whatever it was last time.
+ * Below the meal's foods, [FoodSearch] finds what to add. A new food starts as
+ * a taste; one logged before starts as whatever it was last time.
  */
 @Composable
 fun MealFoodsEditor(
     foods: List<MealFood>,
     onChange: (List<MealFood>) -> Unit,
     known: List<FoodHistory>,
+) {
+    val lastPortion = known.associate { it.key to it.lastPortion }
+
+    FieldLabel(stringResource(R.string.meal_foods))
+    if (foods.isEmpty()) {
+        Text(
+            stringResource(R.string.meal_foods_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    foods.forEachIndexed { i, food ->
+        MealFoodRow(
+            food = food,
+            onChange = { changed -> onChange(foods.mapIndexed { j, f -> if (j == i) changed else f }) },
+            onRemove = { onChange(foods.filterIndexed { j, _ -> j != i }) },
+        )
+    }
+
+    Spacer(Modifier.height(8.dp))
+    FoodSearch(
+        known = known,
+        hidden = foods.map(::foodIdentity).toSet(),
+        onPick = { food -> onChange(foods + food.copy(portion = lastPortion[foodIdentity(food)] ?: food.portion)) },
+    )
+}
+
+/**
+ * One field that finds a food: typing searches Sprout's list — vegetables,
+ * fruit, meat and fish, in the phone's language — and every food the household
+ * has logged before; the shelves can be browsed without typing at all. Anything
+ * that is not found is offered as typed (a ratatouille, a grandmother's soup)
+ * and is one tap away from then on.
+ *
+ * A word longer than a name on the list still finds it: "carottes" offers the
+ * carrot from the list first, above "carottes" as typed, so a plural does not
+ * quietly become a food of its own. [hidden] are the foods (by [foodIdentity])
+ * not to offer — the ones already on the meal.
+ */
+@Composable
+fun FoodSearch(
+    known: List<FoodHistory>,
+    hidden: Set<String>,
+    onPick: (MealFood) -> Unit,
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -126,48 +173,27 @@ fun MealFoodsEditor(
             key = history.key,
         )
     }
-    val lastPortion = known.associate { it.key to it.lastPortion }
-    val onMeal = foods.map(::foodIdentity).toSet()
     val query = searchKey(typed)
     val everything = (household + catalog).distinctBy { it.key }
     val exact = everything.firstOrNull { searchKey(it.label) == query }
 
-    fun add(choice: FoodChoice) {
-        if (choice.key !in onMeal) {
-            onChange(foods + choice.food.copy(portion = lastPortion[choice.key] ?: choice.food.portion))
-        }
+    fun pick(choice: FoodChoice) {
+        if (choice.key !in hidden) onPick(choice.food)
         typed = ""
     }
 
     // What was typed, as a food: the one it names on the list or in the
     // household if there is one, so "carotte" typed out in full is still the
     // carrot from the list, and otherwise a food of the household's own.
-    fun addTyped() {
+    fun pickTyped() {
         val clean = typed.trim()
         when {
             query.isEmpty() -> typed = ""
-            exact != null -> add(exact)
-            else -> add(FoodChoice(clean, MealFood(clean), foodKey(clean)))
+            exact != null -> pick(exact)
+            else -> pick(FoodChoice(clean, MealFood(clean), foodKey(clean)))
         }
     }
 
-    FieldLabel(stringResource(R.string.meal_foods))
-    if (foods.isEmpty()) {
-        Text(
-            stringResource(R.string.meal_foods_hint),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-    foods.forEachIndexed { i, food ->
-        MealFoodRow(
-            food = food,
-            onChange = { changed -> onChange(foods.mapIndexed { j, f -> if (j == i) changed else f }) },
-            onRemove = { onChange(foods.filterIndexed { j, _ -> j != i }) },
-        )
-    }
-
-    Spacer(Modifier.height(8.dp))
     OutlinedTextField(
         value = typed,
         onValueChange = { typed = it },
@@ -178,9 +204,9 @@ fun MealFoodsEditor(
             capitalization = KeyboardCapitalization.Sentences,
             imeAction = ImeAction.Done,
         ),
-        keyboardActions = KeyboardActions(onDone = { addTyped() }),
+        keyboardActions = KeyboardActions(onDone = { pickTyped() }),
         trailingIcon = {
-            IconButton(onClick = { addTyped() }, enabled = query.isNotEmpty()) {
+            IconButton(onClick = { pickTyped() }, enabled = query.isNotEmpty()) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.meal_food_add))
             }
         },
@@ -201,8 +227,8 @@ fun MealFoodsEditor(
             .filter { it.category == shelf && (query.isEmpty() || searchKey(it.label).contains(query)) }
             .sortedWith { a, b -> collator.compare(a.label, b.label) }
         query.isEmpty() -> household.take(MAX_RECENT)
-        else -> everything.filter { searchKey(it.label).contains(query) }.take(MAX_MATCHES)
-    }.filter { it.key !in onMeal }
+        else -> matches(everything, query).take(MAX_MATCHES)
+    }.filter { it.key !in hidden }
 
     if (shelf == null && query.isEmpty() && shown.isNotEmpty()) {
         Text(
@@ -214,7 +240,8 @@ fun MealFoodsEditor(
     }
     // Something typed that matches nothing exactly is offered as a food of its
     // own, by name, so adding the ratatouille is a tap and not a hunt for the
-    // keyboard's Done key.
+    // keyboard's Done key. It comes after the matches: "carottes" is far more
+    // often the carrot than a food of its own.
     val offerTyped = query.isNotEmpty() && exact == null
     if (shown.isNotEmpty() || offerTyped) {
         FlowRow(
@@ -223,7 +250,7 @@ fun MealFoodsEditor(
         ) {
             shown.forEach { choice ->
                 AssistChip(
-                    onClick = { add(choice) },
+                    onClick = { pick(choice) },
                     label = { Text(choice.label) },
                     leadingIcon = {
                         Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -232,7 +259,7 @@ fun MealFoodsEditor(
             }
             if (offerTyped) {
                 AssistChip(
-                    onClick = { addTyped() },
+                    onClick = { pickTyped() },
                     label = { Text(stringResource(R.string.meal_food_add_named, typed.trim())) },
                     leadingIcon = {
                         Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -241,6 +268,22 @@ fun MealFoodsEditor(
             }
         }
     }
+}
+
+/**
+ * What a search for [query] offers, best first: the name that is exactly what
+ * was typed; then the names found *inside* it, the longest first, so
+ * "carottes" offers the carrot and "purée de carottes" offers it before
+ * anything shorter; then the names that contain it.
+ */
+private fun matches(choices: List<FoodChoice>, query: String): List<FoodChoice> {
+    val keyed = choices.map { it to searchKey(it.label) }
+    val exact = keyed.filter { (_, key) -> key == query }
+    val inside = keyed
+        .filter { (_, key) -> key.length >= MIN_CONTAINED && key != query && query.contains(key) }
+        .sortedByDescending { (_, key) -> key.length }
+    val containing = keyed.filter { (_, key) -> key.contains(query) }
+    return (exact + inside + containing).map { it.first }.distinctBy { it.key }
 }
 
 /** One food on the meal: its name, a taste or a serving, and how it went. */

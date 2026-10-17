@@ -748,6 +748,15 @@
     <string name="meal_food_remove">Rimuovi %1$s</string>
     <string name="meal_foods_hint">Ogni alimento indicato qui ha il suo conteggio in Svezzamento.</string>
     <string name="meal_edit_title">Modifica pasto</string>
+    <string name="food_correct">Correggi</string>
+    <string name="food_correct_title">Correggi «%1$s»</string>
+    <string name="food_correct_hint">Che cos\'era? Scegli un alimento dalla lista o uno già registrato. Ogni pasto di questo bambino che lo indica lo chiamerà così — come è stato dato e com\'è andata restano invariati.</string>
+    <string name="food_correct_summary">«%1$s» diventa «%2$s» in %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d pasto</item>
+        <item quantity="other">%1$d pasti</item>
+    </plurals>
+    <string name="food_correct_change">Scegli un altro</string>
 
     <!-- Elenco degli alimenti (BDR-20) -->
     <string name="meal_food_search">Cerca o aggiungi un alimento</string>

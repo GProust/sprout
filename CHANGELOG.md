@@ -23,6 +23,11 @@ All notable changes to Sprout are documented here. This project follows
 - ✍️ **And anything else, in your words.** A ratatouille, a cheese, grandma's
   soup: type it once and it's one tap away from then on, for every baby in the
   household. The meal's weight stays where it was, and optional.
+- 🧹 **Put a food right after the fact.** Typed "carottes" by hand before you
+  found the carrot in the list? Tap **Correct** on that food and pick what it
+  was: every meal that named it follows, and the two lines become one — tastes,
+  servings and how it went kept as they were. Searching for "carottes" now also
+  offers the carrot from the list first.
 - 🤝 **Shared like every other feed.** If your household's phones share, the
   foods go with each meal — the ones you added yourself included, which then
   turn up in the other phone's suggestions too. Correct a meal on one phone and

@@ -748,6 +748,15 @@
     <string name="meal_food_remove">%1$s entfernen</string>
     <string name="meal_foods_hint">Jedes Lebensmittel hier wird unter Beikost einzeln gezählt.</string>
     <string name="meal_edit_title">Mahlzeit bearbeiten</string>
+    <string name="food_correct">Korrigieren</string>
+    <string name="food_correct_title">„%1$s“ korrigieren</string>
+    <string name="food_correct_hint">Was war es? Wähl ein Lebensmittel aus der Liste oder ein bereits eingetragenes. Jede Mahlzeit dieses Babys, in der es steht, nennt es dann so — wie es gegeben wurde und wie es ankam, bleibt, wie es war.</string>
+    <string name="food_correct_summary">Aus „%1$s“ wird „%2$s“ in %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d Mahlzeit</item>
+        <item quantity="other">%1$d Mahlzeiten</item>
+    </plurals>
+    <string name="food_correct_change">Anderes wählen</string>
 
     <!-- Lebensmittelliste (BDR-20) -->
     <string name="meal_food_search">Lebensmittel suchen oder hinzufügen</string>

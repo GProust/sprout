@@ -833,6 +833,15 @@
     <string name="meal_food_remove">Remove %1$s</string>
     <string name="meal_foods_hint">Each food you list gets its own count under First foods.</string>
     <string name="meal_edit_title">Edit meal</string>
+    <string name="food_correct">Correct</string>
+    <string name="food_correct_title">Correct “%1$s”</string>
+    <string name="food_correct_hint">What was it? Choose a food from the list, or one already logged. Every meal of this baby\'s that lists it will name it that way — how it was given and how it went stay as they were.</string>
+    <string name="food_correct_summary">“%1$s” becomes “%2$s” in %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d meal</item>
+        <item quantity="other">%1$d meals</item>
+    </plurals>
+    <string name="food_correct_change">Choose another</string>
 
     <!-- The food list (BDR-20): plain names in seven languages, keyed by an id that
          travels with the meal. Names only — no ages, no order, nothing marked. -->

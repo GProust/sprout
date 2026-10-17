@@ -133,3 +133,35 @@ public func foodHistories(_ feeds: [Feeding]) -> [FoodHistory] {
         )
     }
 }
+
+/// A meal's foods once the food `from` (a ``foodIdentity(_:)``) has been
+/// corrected to `to` — "carottes" typed by hand made into the carrot from the
+/// list, say, or a typo put right. Nil when the meal does not name `from`, so the
+/// caller can leave that row alone.
+///
+/// The corrected food keeps the portion and the "how it went" it was logged
+/// with: only what it *is* changes. Where the meal already named the food it
+/// becomes, the two are one offer, read the way ``foodHistories(_:)`` reads a
+/// food named twice — a serving if either was, the first answer that was noted.
+public func relabelledFoods(_ foods: [MealFood], from: String, to: MealFood) -> [MealFood]? {
+    guard foods.contains(where: { foodIdentity($0) == from }) else { return nil }
+    var order: [String] = []
+    var merged: [String: MealFood] = [:]
+    for food in foods {
+        var corrected = food
+        if foodIdentity(food) == from {
+            corrected.name = to.name
+            corrected.ref = to.ref
+        }
+        let key = foodIdentity(corrected)
+        if var seen = merged[key] {
+            if corrected.portion == .SERVING { seen.portion = .SERVING }
+            seen.reception = seen.reception ?? corrected.reception
+            merged[key] = seen
+        } else {
+            merged[key] = corrected
+            order.append(key)
+        }
+    }
+    return order.map { merged[$0]! }
+}

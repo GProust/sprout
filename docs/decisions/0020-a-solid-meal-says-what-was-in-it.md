@@ -100,6 +100,20 @@ without regard to case or spacing: "Ratatouille" and " ratatouille " are one
 food, shown as it was most recently written; "carrot" and "carrots" are two,
 because Sprout does not know the language well enough to say otherwise. A food
 the household typed is never silently turned into a list food after the fact.
+The search leans the other way before the fact: a word longer than a name on the
+list still finds it, so typing "carottes" offers the carrot from the list first
+and "carottes" as typed after it.
+
+**A food can be corrected after the fact — by the parent, on every meal at
+once.** From the page, a food can be made into another: "carottes" typed by hand
+into the carrot from the list, a misspelling into the food it meant, or one of
+the household's own foods into another it turned out to be. Every meal of that
+baby's that named it is rewritten, in one go, and keeps what it said about the
+food — a taste or a serving, and how it went; a meal that already named the food
+it becomes keeps one offer of it. It is never suggested and never done on its
+own: only the parent knows that "carottes" was the carrot and not a dish. It
+reaches the baby whose page it is, not a twin's meals, which are the other
+baby's record.
 
 **Nothing on the page is a target, and nothing is graded.** There is no number of
 offers the app considers enough, no progress toward one, no reminder to offer a
@@ -146,9 +160,17 @@ setting.
   us something worth a decision of its own.
 - **Spelling is the parent's to keep consistent, for the foods they add.** Two
   spellings of one added food are two lines on the page until the parent corrects
-  a meal; the form's suggestions keep that rare. A carrot typed in by hand before
-  it was picked from the list stays its own line — merging it would be the app
-  deciding that two things the parent logged differently were the same.
+  one into the other; the form's suggestions keep that rare. A carrot typed in by
+  hand before it was picked from the list stays its own line until then —
+  merging it unasked would be the app deciding that two things the parent logged
+  differently were the same.
+- **A correction is an edit to each meal it touches.** It is the same write as
+  opening each of those meals and changing the food by hand: each row is stamped
+  and travels as an edited meal, with no new kind of record and nothing on the
+  wire. The meals are read again inside the one transaction, so a meal that
+  arrived from the other phone while the dialog was open is corrected too. A meal
+  the other phone edits before the two meet is a row both changed, and the later
+  edit wins it, as for any feed ([ADR-0007](../adr/0007-partner-sync-by-direct-device-to-device-exchange.md)).
 - **A list is something to keep honest.** Every name on it is a translation that
   can be wrong in one language, and it will be asked to grow. It grows by names
   only: a shelf of cereals or of dairy is the same decision, a field that says

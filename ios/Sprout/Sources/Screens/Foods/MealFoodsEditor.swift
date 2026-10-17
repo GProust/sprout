@@ -27,21 +27,19 @@ private func searchKey(_ text: String) -> String {
     foodKey(text).folding(options: [.diacriticInsensitive], locale: nil)
 }
 
+/// How short a name on the list may be and still be found inside a longer word:
+/// "carotte" inside "carottes" or "purée de carottes", but not "pois" — four
+/// letters — inside "poisson". A search hint only; nothing is merged by it.
+private let minContained = 5
+
 /// The foods of one solid meal (BDR-20), from `ui/foods/MealFoodsEditor.kt`: each
 /// one a taste or a serving, and how it went if the parent noticed.
 ///
-/// One field does both jobs. Typing searches Sprout's list — vegetables, fruit,
-/// meat and fish, in the phone's language — and every food the household has
-/// logged before; the shelves can be browsed without typing at all. Anything that
-/// is not found is added as typed (a ratatouille, a grandmother's soup) and is
-/// one tap away from then on. A new food starts as a taste; one logged before
-/// starts as whatever it was last time.
+/// Below the meal's foods, ``FoodSearch`` finds what to add. A new food starts as
+/// a taste; one logged before starts as whatever it was last time.
 struct MealFoodsEditor: View {
     @Binding var foods: [MealFood]
     let known: [FoodHistory]
-
-    @State private var typed = ""
-    @State private var shelf: FoodCategory?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.tight) {
@@ -56,15 +54,52 @@ struct MealFoodsEditor: View {
                     if foods.indices.contains(index) { foods.remove(at: index) }
                 }
             }
+            FoodSearch(known: known, hidden: Set(foods.map(foodIdentity))) { picked in
+                var food = picked
+                food.portion = known.first { $0.key == foodIdentity(picked) }?.lastPortion ?? food.portion
+                foods.append(food)
+            }
+        }
+    }
 
+    /// A binding that survives the row it belongs to being removed: SwiftUI can
+    /// ask once more for a row that is on its way out.
+    private func food(at index: Int) -> Binding<MealFood> {
+        Binding(
+            get: { foods.indices.contains(index) ? foods[index] : MealFood(name: "") },
+            set: { if foods.indices.contains(index) { foods[index] = $0 } }
+        )
+    }
+}
+
+/// One field that finds a food, from `FoodSearch` in `MealFoodsEditor.kt`: typing
+/// searches Sprout's list — vegetables, fruit, meat and fish, in the phone's
+/// language — and every food the household has logged before; the shelves can be
+/// browsed without typing at all. Anything that is not found is offered as typed
+/// (a ratatouille, a grandmother's soup) and is one tap away from then on.
+///
+/// A word longer than a name on the list still finds it: "carottes" offers the
+/// carrot from the list first, above "carottes" as typed, so a plural does not
+/// quietly become a food of its own. `hidden` are the foods (by
+/// ``foodIdentity(_:)``) not to offer — the ones already on the meal.
+struct FoodSearch: View {
+    let known: [FoodHistory]
+    let hidden: Set<String>
+    let onPick: (MealFood) -> Void
+
+    @State private var typed = ""
+    @State private var shelf: FoodCategory?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.tight) {
             HStack {
                 Image(systemName: "magnifyingglass").foregroundStyle(SproutColor.onSurfaceVariant)
                 TextField(Str.t("meal_food_search"), text: $typed)
                     .textInputAutocapitalization(.sentences)
                     .submitLabel(.done)
-                    .onSubmit { addTyped() }
+                    .onSubmit { pickTyped() }
                     .accessibilityIdentifier("meal-food-field")
-                Button { addTyped() } label: {
+                Button { pickTyped() } label: {
                     Image(systemName: "plus.circle.fill").font(.title3)
                 }
                 // Borderless, or a Form row fires every button in it at once.
@@ -94,15 +129,17 @@ struct MealFoodsEditor: View {
             if !shown.isEmpty || offerTyped {
                 FlowLayout(spacing: Spacing.tight) {
                     ForEach(shown) { choice in
-                        chip(choice.label, systemImage: "plus") { add(choice) }
+                        chip(choice.label, systemImage: "plus") { pick(choice) }
                     }
                     // Something typed that matches nothing exactly is offered as a
                     // food of its own, by name, so adding the ratatouille is a tap.
+                    // It comes after the matches: "carottes" is far more often the
+                    // carrot than a food of its own.
                     if offerTyped {
                         chip(
                             Str.t("meal_food_add_named", typed.trimmingCharacters(in: .whitespacesAndNewlines)),
                             systemImage: "pencil"
-                        ) { addTyped() }
+                        ) { pickTyped() }
                     }
                 }
             }
@@ -160,7 +197,6 @@ struct MealFoodsEditor: View {
 
     private var shown: [FoodChoice] {
         let query = searchKey(typed)
-        let onMeal = Set(foods.map(foodIdentity))
         let choices: [FoodChoice]
         if let shelf {
             choices = catalog
@@ -169,41 +205,43 @@ struct MealFoodsEditor: View {
         } else if query.isEmpty {
             choices = Array(household.prefix(maxRecent))
         } else {
-            choices = Array(everything.filter { searchKey($0.label).contains(query) }.prefix(maxMatches))
+            choices = Array(matches(everything, query).prefix(maxMatches))
         }
-        return choices.filter { !onMeal.contains($0.key) }
+        return choices.filter { !hidden.contains($0.key) }
     }
 
-    private func add(_ choice: FoodChoice) {
-        if !foods.contains(where: { foodIdentity($0) == choice.key }) {
-            var food = choice.food
-            food.portion = known.first { $0.key == choice.key }?.lastPortion ?? food.portion
-            foods.append(food)
-        }
+    private func pick(_ choice: FoodChoice) {
+        if !hidden.contains(choice.key) { onPick(choice.food) }
         typed = ""
     }
 
     /// What was typed, as a food: the one it names on the list or in the
     /// household if there is one, and otherwise a food of the household's own.
-    private func addTyped() {
+    private func pickTyped() {
         let clean = typed.trimmingCharacters(in: .whitespacesAndNewlines)
         if searchKey(clean).isEmpty {
             typed = ""
         } else if let exact {
-            add(exact)
+            pick(exact)
         } else {
-            add(FoodChoice(label: clean, food: MealFood(name: clean), key: foodKey(clean)))
+            pick(FoodChoice(label: clean, food: MealFood(name: clean), key: foodKey(clean)))
         }
     }
+}
 
-    /// A binding that survives the row it belongs to being removed: SwiftUI can
-    /// ask once more for a row that is on its way out.
-    private func food(at index: Int) -> Binding<MealFood> {
-        Binding(
-            get: { foods.indices.contains(index) ? foods[index] : MealFood(name: "") },
-            set: { if foods.indices.contains(index) { foods[index] = $0 } }
-        )
-    }
+/// What a search for `query` offers, best first: the name that is exactly what
+/// was typed; then the names found *inside* it, the longest first, so
+/// "carottes" offers the carrot and "purée de carottes" offers it before
+/// anything shorter; then the names that contain it.
+private func matches(_ choices: [FoodChoice], _ query: String) -> [FoodChoice] {
+    let keyed = choices.map { ($0, searchKey($0.label)) }
+    let exact = keyed.filter { $0.1 == query }
+    let inside = keyed
+        .filter { $0.1.count >= minContained && $0.1 != query && query.contains($0.1) }
+        .sorted { $0.1.count > $1.1.count }
+    let containing = keyed.filter { $0.1.contains(query) }
+    var seen = Set<String>()
+    return (exact + inside + containing).map(\.0).filter { seen.insert($0.key).inserted }
 }
 
 /// One food on the meal: its name, a taste or a serving, and how it went.

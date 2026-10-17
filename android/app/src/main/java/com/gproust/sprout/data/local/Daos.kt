@@ -164,6 +164,13 @@ interface FeedingDao {
     )
     fun observeMealsWithFoods(): Flow<List<FeedingEntity>>
 
+    /** One baby's meals that named any food, for correcting one of them everywhere (BDR-20). */
+    @Query(
+        "SELECT * FROM feeding WHERE babyId = :babyId AND type = 'SOLID' AND foods != '' " +
+            "AND deletedAt IS NULL",
+    )
+    suspend fun mealsWithFoods(babyId: Long): List<FeedingEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 

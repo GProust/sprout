@@ -5,6 +5,7 @@ import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
@@ -294,6 +295,30 @@ class SproutRepository(
         }
         if (joined) onWidgetDataChanged()
         return joined
+    }
+
+    /**
+     * Corrects one food on every meal of [babyId]'s that names it (BDR-20): the
+     * food whose [foodIdentity] is [from] becomes [to] — "carottes" typed by
+     * hand made into the carrot from the list, or merged into a food the
+     * household already has. How each meal gave it and how it went are kept.
+     * Returns how many meals were rewritten.
+     *
+     * The meals are read inside the transaction rather than taken from the
+     * screen, for the reason [joinBreastfeeds] gives: a meal that arrived from
+     * the other phone while the dialog was open is corrected too, and an edit
+     * that arrived is not undone. Each rewritten meal is stamped, so the
+     * correction reaches the other phone as the meals it changed.
+     */
+    suspend fun relabelFood(babyId: Long, from: String, to: MealFood): Int = db.withTransaction {
+        val at = now()
+        var changed = 0
+        for (meal in db.feedingDao().mealsWithFoods(babyId)) {
+            val foods = relabelledFoods(meal.foods, from, to) ?: continue
+            db.feedingDao().insert(meal.copy(foods = foods, updatedAt = at))
+            changed++
+        }
+        changed
     }
 
     /** Epoch millis of a baby's most recent feed, or null if none yet. */

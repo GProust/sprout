@@ -13,14 +13,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +58,7 @@ import com.gproust.sprout.data.foodHistories
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
@@ -112,6 +117,16 @@ class FoodsViewModel(
         repository.deleteFeeding(entity)
         FeedingReminders.rescheduleActiveBaby(context, repository)
     }
+
+    /**
+     * Makes [food] into [to] on every meal of this baby's that named it — the
+     * baby whose page this is, found from one of the meals the food was in.
+     */
+    fun correct(food: FoodHistory, to: MealFood) = viewModelScope.launch {
+        val uid = food.offers.firstOrNull()?.feedUid ?: return@launch
+        val babyId = state.value.feedings.firstOrNull { it.uid == uid }?.babyId ?: return@launch
+        repository.relabelFood(babyId, from = food.key, to = to)
+    }
 }
 
 /** The two orders a parent can read the list in — neither of them by how well a food is going. */
@@ -126,6 +141,7 @@ fun FoodsScreen(
     var adding by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
     var deleting by remember { mutableStateOf<FeedingEntity?>(null) }
+    var correcting by remember { mutableStateOf<FoodHistory?>(null) }
     var order by rememberSaveable { mutableStateOf(FoodOrder.RECENT) }
 
     if (adding) {
@@ -159,6 +175,15 @@ fun FoodsScreen(
         ConfirmDeleteDialog(
             onConfirm = { vm.delete(meal); deleting = null; editing = null },
             onDismiss = { deleting = null },
+        )
+    }
+
+    correcting?.let { food ->
+        CorrectFoodDialog(
+            food = food,
+            known = state.known,
+            onConfirm = { to -> vm.correct(food, to); correcting = null },
+            onDismiss = { correcting = null },
         )
     }
 
@@ -214,6 +239,7 @@ fun FoodsScreen(
                         food = food,
                         now = now,
                         onOpenMeal = { uid -> editing = state.feedings.firstOrNull { it.uid == uid } },
+                        onCorrect = { correcting = food },
                     )
                 }
             }
@@ -230,7 +256,7 @@ fun FoodsScreen(
  * the meals that were logged, never progress toward a number Sprout chose.
  */
 @Composable
-private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit) {
+private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit, onCorrect: () -> Unit) {
     val context = LocalContext.current
     // Android trims the spaces off the resource's " · ", so they go back on
     // here; the dot itself stays the translators' to change.
@@ -290,12 +316,14 @@ private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit)
                 }
             }
         }
-        TextButton(
-            onClick = { expanded = !expanded },
-            modifier = Modifier.padding(start = 4.dp),
-        ) {
-            Text(stringResource(R.string.action_details))
-            Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
+        Row(Modifier.padding(start = 4.dp)) {
+            TextButton(onClick = { expanded = !expanded }) {
+                Text(stringResource(R.string.action_details))
+                Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
+            }
+            TextButton(onClick = onCorrect) {
+                Text(stringResource(R.string.food_correct))
+            }
         }
         if (expanded) {
             Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
@@ -313,6 +341,58 @@ private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit)
             }
         }
     }
+}
+
+/**
+ * Correcting what a food was, after the fact (BDR-20): "carottes" typed by
+ * hand made into the carrot from the list, so its meals stop counting as a
+ * food of their own — or a food merged into one the household already has.
+ *
+ * Choosing is one step and applying another, with the change spelled out in
+ * between: it rewrites every meal of this baby's that named the food.
+ */
+@Composable
+private fun CorrectFoodDialog(
+    food: FoodHistory,
+    known: List<FoodHistory>,
+    onConfirm: (MealFood) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    var target by remember(food.key) { mutableStateOf<MealFood?>(null) }
+    val name = food.displayName(context)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.food_correct_title, name)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                val chosen = target
+                if (chosen == null) {
+                    Text(stringResource(R.string.food_correct_hint), style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.height(8.dp))
+                    FoodSearch(known = known, hidden = setOf(food.key), onPick = { target = it })
+                } else {
+                    val meals = pluralStringResource(R.plurals.food_correct_meals, food.timesOffered, food.timesOffered)
+                    Text(
+                        stringResource(R.string.food_correct_summary, name, chosen.displayName(context), meals),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    TextButton(onClick = { target = null }) {
+                        Text(stringResource(R.string.food_correct_change))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { target?.let(onConfirm) }, enabled = target != null) {
+                Text(stringResource(R.string.food_correct))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
 }
 
 /** "3 tastes · 2 servings" — whichever of the two there are. */

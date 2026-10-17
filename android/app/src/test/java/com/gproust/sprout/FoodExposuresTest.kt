@@ -13,6 +13,7 @@ import com.gproust.sprout.data.local.FoodReception.LIKED
 import com.gproust.sprout.data.local.FoodReception.MIXED
 import com.gproust.sprout.data.local.FoodReception.REFUSED
 import com.gproust.sprout.data.local.MealFood
+import com.gproust.sprout.data.relabelledFoods
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -174,5 +175,51 @@ class FoodExposuresTest {
         assertNull(carrot.offers.single().reception)
         FoodReception.entries.forEach { assertEquals(0, carrot.timesReceived(it)) }
         assertEquals("a new food starts as a taste", TASTE, carrot.lastPortion)
+    }
+
+    @Test
+    fun `a food corrected to one from the list takes its id and keeps how it was given`() {
+        val carrot = MealFood("Carotte", ref = "carrot")
+        val corrected = relabelledFoods(
+            listOf(food("carottes", SERVING, LIKED), food("Pea")),
+            from = "carottes",
+            to = carrot,
+        )
+
+        assertEquals(
+            listOf(MealFood("Carotte", SERVING, LIKED, ref = "carrot"), food("Pea")),
+            corrected,
+        )
+    }
+
+    @Test
+    fun `a meal that already named the food it becomes keeps one offer of it`() {
+        val corrected = relabelledFoods(
+            listOf(MealFood("Carotte", TASTE, ref = "carrot"), food("carottes", SERVING, MIXED)),
+            from = "carottes",
+            to = MealFood("Carotte", ref = "carrot"),
+        )
+
+        assertEquals(listOf(MealFood("Carotte", SERVING, MIXED, ref = "carrot")), corrected)
+    }
+
+    @Test
+    fun `a meal that does not name the food is left alone`() {
+        assertNull(relabelledFoods(listOf(food("Pea")), from = "carottes", to = food("Carrot")))
+    }
+
+    @Test
+    fun `after a correction the two lines are one food`() {
+        val meals = listOf(
+            meal("m1", t0, food("carottes")),
+            meal("m2", t0 + day, MealFood("Carotte", SERVING, ref = "carrot")),
+        )
+        val fixed = meals.map { m ->
+            relabelledFoods(m.foods, "carottes", MealFood("Carotte", ref = "carrot"))?.let { m.copy(foods = it) } ?: m
+        }
+
+        val carrot = foodHistories(fixed).single()
+        assertEquals("ref:carrot", carrot.key)
+        assertEquals(2, carrot.timesOffered)
     }
 }

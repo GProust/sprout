@@ -807,6 +807,15 @@
     <string name="meal_food_remove">Retirer %1$s</string>
     <string name="meal_foods_hint">Chaque aliment indiqué ici a son propre compteur dans Diversification.</string>
     <string name="meal_edit_title">Modifier le repas</string>
+    <string name="food_correct">Corriger</string>
+    <string name="food_correct_title">Corriger « %1$s »</string>
+    <string name="food_correct_hint">Qu\'était-ce ? Choisissez un aliment de la liste, ou un aliment déjà noté. Chaque repas de ce bébé qui le mentionne le nommera ainsi — la portion et la façon dont ça s\'est passé restent telles quelles.</string>
+    <string name="food_correct_summary">« %1$s » devient « %2$s » dans %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d repas</item>
+        <item quantity="other">%1$d repas</item>
+    </plurals>
+    <string name="food_correct_change">Choisir un autre</string>
 
     <!-- Liste d'aliments (BDR-20) -->
     <string name="meal_food_search">Rechercher ou ajouter un aliment</string>

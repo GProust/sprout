@@ -775,6 +775,17 @@
     <string name="meal_food_remove">Usuń %1$s</string>
     <string name="meal_foods_hint">Każdy wpisany tu pokarm ma własny licznik w sekcji Nowe pokarmy.</string>
     <string name="meal_edit_title">Edytuj posiłek</string>
+    <string name="food_correct">Popraw</string>
+    <string name="food_correct_title">Popraw „%1$s”</string>
+    <string name="food_correct_hint">Co to było? Wybierz pokarm z listy albo już zapisany. Każdy posiłek tego dziecka, w którym występuje, będzie go tak nazywał — porcja i to, jak poszło, zostają bez zmian.</string>
+    <string name="food_correct_summary">„%1$s” staje się „%2$s” w %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d posiłku</item>
+        <item quantity="few">%1$d posiłkach</item>
+        <item quantity="many">%1$d posiłkach</item>
+        <item quantity="other">%1$d posiłku</item>
+    </plurals>
+    <string name="food_correct_change">Wybierz inny</string>
 
     <!-- Lista pokarmów (BDR-20) -->
     <string name="meal_food_search">Wyszukaj lub dodaj pokarm</string>

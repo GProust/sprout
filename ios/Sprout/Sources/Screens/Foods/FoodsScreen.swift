@@ -49,6 +49,13 @@ final class FoodsViewModel {
     func save(_ meal: Feeding) { try? repository.addFeeding(meal) }
 
     func delete(_ meal: Feeding) { try? repository.deleteFeeding(meal) }
+
+    /// Makes `food` into `to` on every meal of this baby's that named it — the
+    /// baby whose page this is, found from one of the meals the food was in.
+    func correct(_ food: FoodHistory, to: MealFood) {
+        guard let uid = food.offers.first?.feedUid, let babyId = meal(uid: uid)?.babyId else { return }
+        _ = try? repository.relabelFood(babyId: babyId, from: food.key, to: to)
+    }
 }
 
 struct FoodsScreen: View {
@@ -56,6 +63,7 @@ struct FoodsScreen: View {
     @State private var model: FoodsViewModel?
     @State private var adding = false
     @State private var editing: Feeding?
+    @State private var correcting: FoodHistory?
     /// The two orders a parent can read the list in — neither of them by how
     /// well a food is going.
     @State private var byName = false
@@ -92,7 +100,12 @@ struct FoodsScreen: View {
                             label: { $0 ? Str.t("foods_sort_name") : Str.t("foods_sort_recent") }
                         )
                         ForEach(foods) { food in
-                            FoodCard(food: food, now: now) { uid in editing = model.meal(uid: uid) }
+                            FoodCard(
+                                food: food,
+                                now: now,
+                                onOpenMeal: { uid in editing = model.meal(uid: uid) },
+                                onCorrect: { correcting = food }
+                            )
                         }
                     }
                 }
@@ -118,6 +131,12 @@ struct FoodsScreen: View {
                 onDelete: { model.delete(meal); editing = nil }
             )
         }
+        .sheet(item: $correcting) { food in
+            CorrectFoodSheet(food: food, known: model.known) { to in
+                model.correct(food, to: to)
+                correcting = nil
+            }
+        }
     }
 
     private func ordered(_ foods: [FoodHistory]) -> [FoodHistory] {
@@ -136,6 +155,7 @@ private struct FoodCard: View {
     let food: FoodHistory
     let now: Int64
     let onOpenMeal: (String) -> Void
+    let onCorrect: () -> Void
 
     @State private var expanded = false
 
@@ -180,15 +200,18 @@ private struct FoodCard: View {
                 .padding(.top, Spacing.hairline)
             }
 
-            Button {
-                withAnimation(.snappy) { expanded.toggle() }
-            } label: {
-                HStack(spacing: Spacing.hairline) {
-                    Text(Str.t("action_details"))
-                    Image(systemName: expanded ? "chevron.up" : "chevron.down")
+            HStack(spacing: Spacing.regular) {
+                Button {
+                    withAnimation(.snappy) { expanded.toggle() }
+                } label: {
+                    HStack(spacing: Spacing.hairline) {
+                        Text(Str.t("action_details"))
+                        Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                    }
                 }
-                .font(.footnote)
+                Button(Str.t("food_correct"), action: onCorrect)
             }
+            .font(.footnote)
             .buttonStyle(.plain)
             .foregroundStyle(SproutColor.primary)
             .padding(.top, Spacing.hairline)
@@ -234,5 +257,55 @@ private struct FoodCard: View {
         ]
         if let reception = offer.reception { parts.append(reception.label) }
         return parts.joined(separator: separator)
+    }
+}
+
+/// Correcting what a food was, after the fact (BDR-20), from
+/// `CorrectFoodDialog` in `FoodsScreen.kt`: "carottes" typed by hand made into
+/// the carrot from the list, so its meals stop counting as a food of their own
+/// — or a food merged into one the household already has.
+///
+/// Choosing is one step and applying another, with the change spelled out in
+/// between: it rewrites every meal of this baby's that named the food.
+private struct CorrectFoodSheet: View {
+    let food: FoodHistory
+    let known: [FoodHistory]
+    let onConfirm: (MealFood) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var target: MealFood?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    if let target {
+                        Text(Str.t(
+                            "food_correct_summary",
+                            food.displayName,
+                            target.displayName,
+                            Str.t("food_correct_meals", food.timesOffered)
+                        ))
+                        Button(Str.t("food_correct_change")) { self.target = nil }
+                    } else {
+                        Text(Str.t("food_correct_hint"))
+                            .font(.callout)
+                            .foregroundStyle(SproutColor.onSurfaceVariant)
+                        FoodSearch(known: known, hidden: [food.key]) { target = $0 }
+                    }
+                }
+            }
+            .navigationTitle(Str.t("food_correct_title", food.displayName))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(Str.t("action_cancel")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(Str.t("food_correct")) { if let target { onConfirm(target) } }
+                        .disabled(target == nil)
+                }
+            }
+        }
     }
 }

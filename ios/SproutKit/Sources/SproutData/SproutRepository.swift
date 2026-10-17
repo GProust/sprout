@@ -431,6 +431,39 @@ public final class SproutRepository: @unchecked Sendable {
         return joined
     }
 
+    /// Corrects one food on every meal of `babyId`'s that names it (BDR-20): the
+    /// food whose ``foodIdentity(_:)`` is `from` becomes `to` — "carottes" typed
+    /// by hand made into the carrot from the list, or merged into a food the
+    /// household already has. How each meal gave it and how it went are kept.
+    /// Returns how many meals were rewritten.
+    ///
+    /// The meals are read inside the transaction rather than taken from the
+    /// screen, for the reason ``joinBreastfeeds(_:_:)`` gives: a meal that arrived
+    /// from the other phone while the dialog was open is corrected too, and an
+    /// edit that arrived is not undone. Each rewritten meal is stamped, so the
+    /// correction reaches the other phone as the meals it changed.
+    @discardableResult
+    public func relabelFood(babyId: Int64, from: String, to: MealFood) throws -> Int {
+        let timestamp = now()
+        return try database.write { db -> Int in
+            let meals = try Feeding
+                .filter(
+                    Column("babyId") == babyId && Column("type") == FeedType.SOLID.rawValue
+                        && Column("foods") != "" && Column("deletedAt") == nil
+                )
+                .fetchAll(db)
+            var changed = 0
+            for var meal in meals {
+                guard let foods = relabelledFoods(meal.mealFoods, from: from, to: to) else { continue }
+                meal.mealFoods = foods
+                meal.updatedAt = timestamp
+                try meal.update(db)
+                changed += 1
+            }
+            return changed
+        }
+    }
+
     public func addSleep(_ sleep: Sleep) throws {
         guard let babyId = try activeBabyIdNow() else { return }
         try upsert(sleep, babyId: babyId)

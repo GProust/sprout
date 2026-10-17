@@ -135,3 +135,33 @@ fun foodHistories(feeds: List<FeedingEntity>): List<FoodHistory> {
         FoodHistory(key, latest.name.trim(), offers.getValue(key), latest.ref)
     }
 }
+
+/**
+ * A meal's foods once the food [from] (a [foodIdentity]) has been corrected to
+ * [to] — "carottes" typed by hand made into the carrot from the list, say, or a
+ * typo put right. Null when the meal does not name [from], so the caller can
+ * leave that row alone.
+ *
+ * The corrected food keeps the portion and the "how it went" it was logged
+ * with: only what it *is* changes. Where the meal already named the food it
+ * becomes, the two are one offer, read the way [foodHistories] reads a food
+ * named twice — a serving if either was, the first answer that was noted.
+ */
+fun relabelledFoods(foods: List<MealFood>, from: String, to: MealFood): List<MealFood>? {
+    if (foods.none { foodIdentity(it) == from }) return null
+    val merged = LinkedHashMap<String, MealFood>()
+    for (food in foods) {
+        val corrected = if (foodIdentity(food) == from) food.copy(name = to.name, ref = to.ref) else food
+        val key = foodIdentity(corrected)
+        val seen = merged[key]
+        merged[key] = if (seen == null) {
+            corrected
+        } else {
+            seen.copy(
+                portion = if (corrected.portion == FoodPortion.SERVING) FoodPortion.SERVING else seen.portion,
+                reception = seen.reception ?: corrected.reception,
+            )
+        }
+    }
+    return merged.values.toList()
+}

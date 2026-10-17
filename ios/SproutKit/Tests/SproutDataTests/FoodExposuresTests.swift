@@ -155,4 +155,50 @@ final class FoodExposuresTests: XCTestCase {
         }
         XCTAssertEqual(carrot.lastPortion, .TASTE, "a new food starts as a taste")
     }
+
+    func testAFoodCorrectedToOneFromTheListTakesItsIdAndKeepsHowItWasGiven() {
+        let corrected = relabelledFoods(
+            [food("carottes", .SERVING, .LIKED), food("Pea")],
+            from: "carottes",
+            to: MealFood(name: "Carotte", ref: "carrot")
+        )
+
+        XCTAssertEqual(
+            corrected,
+            [MealFood(name: "Carotte", portion: .SERVING, reception: .LIKED, ref: "carrot"), food("Pea")]
+        )
+    }
+
+    func testAMealThatAlreadyNamedTheFoodItBecomesKeepsOneOfferOfIt() {
+        let corrected = relabelledFoods(
+            [MealFood(name: "Carotte", portion: .TASTE, ref: "carrot"), food("carottes", .SERVING, .MIXED)],
+            from: "carottes",
+            to: MealFood(name: "Carotte", ref: "carrot")
+        )
+
+        XCTAssertEqual(corrected, [MealFood(name: "Carotte", portion: .SERVING, reception: .MIXED, ref: "carrot")])
+    }
+
+    func testAMealThatDoesNotNameTheFoodIsLeftAlone() {
+        XCTAssertNil(relabelledFoods([food("Pea")], from: "carottes", to: food("Carrot")))
+    }
+
+    func testAfterACorrectionTheTwoLinesAreOneFood() throws {
+        let meals = [
+            meal("m1", t0, food("carottes")),
+            meal("m2", t0 + day, MealFood(name: "Carotte", portion: .SERVING, ref: "carrot")),
+        ]
+        let fixed = meals.map { m -> Feeding in
+            guard let foods = relabelledFoods(m.mealFoods, from: "carottes", to: MealFood(name: "Carotte", ref: "carrot"))
+            else { return m }
+            var copy = m
+            copy.mealFoods = foods
+            return copy
+        }
+
+        let carrot = try XCTUnwrap(foodHistories(fixed).first)
+        XCTAssertEqual(foodHistories(fixed).count, 1)
+        XCTAssertEqual(carrot.key, "ref:carrot")
+        XCTAssertEqual(carrot.timesOffered, 2)
+    }
 }

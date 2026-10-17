@@ -748,6 +748,15 @@
     <string name="meal_food_remove">Remover %1$s</string>
     <string name="meal_foods_hint">Cada alimento indicado aqui tem a sua própria contagem em Diversificação.</string>
     <string name="meal_edit_title">Editar refeição</string>
+    <string name="food_correct">Corrigir</string>
+    <string name="food_correct_title">Corrigir «%1$s»</string>
+    <string name="food_correct_hint">O que era? Escolha um alimento da lista ou um já registado. Cada refeição deste bebé que o indica passará a chamá-lo assim — como foi dado e como correu ficam como estavam.</string>
+    <string name="food_correct_summary">«%1$s» passa a «%2$s» em %3$s.</string>
+    <plurals name="food_correct_meals">
+        <item quantity="one">%1$d refeição</item>
+        <item quantity="other">%1$d refeições</item>
+    </plurals>
+    <string name="food_correct_change">Escolher outro</string>
 
     <!-- Lista de alimentos (BDR-20) -->
     <string name="meal_food_search">Procurar ou adicionar um alimento</string>
