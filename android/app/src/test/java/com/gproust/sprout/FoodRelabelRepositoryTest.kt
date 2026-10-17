@@ -78,7 +78,7 @@ class FoodRelabelRepositoryTest {
         assertEquals(before.getValue(untouched.uid).updatedAt, untouched.updatedAt)
 
         val foods = foodHistories(after)
-        assertEquals(listOf("ref:carrot", "pea"), foods.map { it.key }.sorted())
+        assertEquals(listOf("pea", "ref:carrot"), foods.map { it.key }.sorted())
         // Each meal keeps its own uid: the other phone is handed the same meals, corrected.
         assertEquals(before.keys, after.map { it.uid }.toSet())
     }
