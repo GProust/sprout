@@ -29,15 +29,25 @@ import java.util.Locale
  * the language well enough to say they are one, and guessing would merge foods
  * a parent meant apart.
  */
-fun foodKey(name: String): String =
-    name.split(WHITESPACE).filter { it.isNotEmpty() }.joinToString(" ").lowercase(Locale.ROOT)
-
-/**
- * Unicode's own whitespace, a no-break space included — the same property
- * Swift's `Character.isWhitespace` reads, so a name pasted from somewhere with
- * odd spacing keys the same on both phones.
- */
-private val WHITESPACE = Regex("(?U)\\s+")
+fun foodKey(name: String): String {
+    // A scan rather than a regex: Android's regex engine is ICU, which refuses
+    // the `(?U)` that makes Java's `\s` Unicode-aware — a pattern the JVM tests
+    // accept and the phone throws on. `isWhitespace` is Unicode's own, a
+    // no-break space included, which is the property Swift's
+    // `Character.isWhitespace` reads, so a name pasted from somewhere with odd
+    // spacing keys the same on both phones.
+    val words = mutableListOf<String>()
+    val word = StringBuilder()
+    for (c in name) {
+        if (c.isWhitespace()) {
+            if (word.isNotEmpty()) words += word.toString().also { word.clear() }
+        } else {
+            word.append(c)
+        }
+    }
+    if (word.isNotEmpty()) words += word.toString()
+    return words.joinToString(" ").lowercase(Locale.ROOT)
+}
 
 /**
  * What makes two foods on two meals the same food: the list's id for a food

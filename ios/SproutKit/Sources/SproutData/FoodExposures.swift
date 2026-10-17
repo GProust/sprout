@@ -15,8 +15,8 @@ import Foundation
 /// collapsed to one space, and lower-cased without regard to the phone's
 /// language — so "Carrot", "carrot" and " carrot " are one food on every phone.
 ///
-/// Whitespace is Unicode's own, a no-break space included, which is the same
-/// property Kotlin's `(?U)\s` reads.
+/// Whitespace is Unicode's own, a no-break space included, which is what
+/// Kotlin's `Char.isWhitespace` reads on the other phone.
 ///
 /// Nothing cleverer. "Carrots" stays apart from "carrot": Sprout does not know
 /// the language well enough to say they are one, and guessing would merge foods
