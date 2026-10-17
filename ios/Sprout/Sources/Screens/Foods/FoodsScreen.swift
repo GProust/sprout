@@ -15,6 +15,10 @@ final class FoodsViewModel {
     /// Every meal in the household that named a food — what the form offers
     /// back.
     var household: [Feeding] = []
+    /// The active baby's allergies, as the household noted them (BDR-21).
+    var allergies: [Allergy] = []
+    /// The allergy list, once written, waiting for the share sheet.
+    var share: URL?
 
     private let repository: SproutRepository
 
@@ -33,6 +37,9 @@ final class FoodsViewModel {
             group.addTask {
                 await observe(repository.householdMealsWithFoods) { [weak self] in self?.household = $0 }
             }
+            group.addTask {
+                await observe(repository.allergies) { [weak self] in self?.allergies = $0 }
+            }
         }
     }
 
@@ -41,6 +48,9 @@ final class FoodsViewModel {
 
     /// The household's foods, for the meal form's suggestions.
     var known: [FoodHistory] { foodHistories(household) }
+
+    /// The foods the baby is noted as allergic to, by ``foodIdentity(_:)``.
+    var allergic: Set<String> { allergyIdentities(allergies) }
 
     func meal(uid: String) -> Feeding? { feedings.first { $0.uid == uid } }
 
@@ -52,6 +62,25 @@ final class FoodsViewModel {
 
     /// Makes `food` into `to` on every meal of this baby's that named it — the
     /// baby whose page this is, found from one of the meals the food was in.
+    func saveAllergy(_ allergy: Allergy) { try? repository.saveAllergy(allergy) }
+
+    func deleteAllergy(_ allergy: Allergy) { try? repository.deleteAllergy(allergy) }
+
+    /// The allergy list on its own, as a one-page PDF handed to the share sheet
+    /// (BDR-21), staged where the report is staged and replaced by the next
+    /// export like the report is.
+    func shareAllergies() {
+        guard let babyId = try? repository.activeBabyIdNow(),
+              let baby = try? repository.activeBaby(id: babyId),
+              let allergies = try? repository.allergiesForBabyOnce(babyId)
+        else { return }
+        let list = allergyList(baby: baby, allergies: allergies, now: Clock.millis) { catalogName($0) }
+        share = try? ExportFiles.stage(
+            AllergyListPdf(list: list).data(),
+            named: ExportFiles.allergyFileName(babyName: baby.name)
+        )
+    }
+
     func correct(_ food: FoodHistory, to: MealFood) {
         guard let uid = food.offers.first?.feedUid, let babyId = meal(uid: uid)?.babyId else { return }
         _ = try? repository.relabelFood(babyId: babyId, from: food.key, to: to)
@@ -64,6 +93,8 @@ struct FoodsScreen: View {
     @State private var adding = false
     @State private var editing: Feeding?
     @State private var correcting: FoodHistory?
+    @State private var addingAllergy = false
+    @State private var editingAllergy: Allergy?
     /// The two orders a parent can read the list in — neither of them by how
     /// well a food is going.
     @State private var byName = false
@@ -88,6 +119,12 @@ struct FoodsScreen: View {
         ZStack(alignment: .bottomTrailing) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.snug) {
+                    AllergiesCard(
+                        allergies: model.allergies,
+                        onAdd: { addingAllergy = true },
+                        onOpen: { editingAllergy = $0 },
+                        onShare: { model.shareAllergies() }
+                    )
                     if foods.isEmpty {
                         EmptyHint(Str.t("foods_empty"))
                     } else {
@@ -104,7 +141,8 @@ struct FoodsScreen: View {
                                 food: food,
                                 now: now,
                                 onOpenMeal: { uid in editing = model.meal(uid: uid) },
-                                onCorrect: { correcting = food }
+                                onCorrect: { correcting = food },
+                                allergic: model.allergic.contains(food.key)
                             )
                         }
                     }
@@ -121,15 +159,35 @@ struct FoodsScreen: View {
         }
         .sproutStyle()
         .sheet(isPresented: $adding) {
-            MealForm(initial: nil, known: model.known) { model.save($0); adding = false }
+            MealForm(initial: nil, known: model.known, allergies: model.allergic) { model.save($0); adding = false }
         }
         .sheet(item: $editing) { meal in
             MealForm(
                 initial: meal,
                 known: model.known,
+                allergies: model.allergic,
                 onSave: { model.save($0); editing = nil },
                 onDelete: { model.delete(meal); editing = nil }
             )
+        }
+        .sheet(isPresented: $addingAllergy) {
+            AllergyForm(initial: nil, known: model.known) { model.saveAllergy($0); addingAllergy = false }
+        }
+        .sheet(item: $editingAllergy) { allergy in
+            AllergyForm(
+                initial: allergy,
+                known: model.known,
+                onSave: { model.saveAllergy($0); editingAllergy = nil },
+                onDelete: { model.deleteAllergy(allergy); editingAllergy = nil }
+            )
+        }
+        // The share sheet, once the list is written. `item:` rather than a flag,
+        // so the sheet cannot open before the file exists.
+        .sheet(item: Binding(
+            get: { model.share.map(SharedFile.init) },
+            set: { if $0 == nil { model.share = nil } }
+        )) { file in
+            ShareSheet(url: file.url)
         }
         .sheet(item: $correcting) { food in
             CorrectFoodSheet(food: food, known: model.known) { to in
@@ -156,6 +214,7 @@ private struct FoodCard: View {
     let now: Int64
     let onOpenMeal: (String) -> Void
     let onCorrect: () -> Void
+    var allergic = false
 
     @State private var expanded = false
 
@@ -172,6 +231,7 @@ private struct FoodCard: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(SproutColor.primary)
             }
+            if allergic { AllergyMarker() }
             Text(portionsLine)
                 .font(.callout)
                 .foregroundStyle(SproutColor.onSurfaceVariant)

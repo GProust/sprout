@@ -121,12 +121,15 @@ food again, and no badge. *Refused* has its own icon and its own word and no
 warning colour; it is a fact about one meal. The order is by recency or by name,
 never by how well a food is going.
 
-**"How it went" is not a reaction.** There is no allergy field, no symptom
+**"How it went" is not a reaction.** There is no allergy field on a meal, no symptom
 checklist and no "reaction" flag. A rash after the first egg is something to
 tell a doctor about, and a box in a feeding log would be a clinical sign Sprout
 then had to do something with — warn, colour, remember — when the only right
 thing it could do is tell the parent to ask someone qualified. The meal's note is
-where a parent writes down what they saw, and it stays with that meal.
+where a parent writes down what they saw, and it stays with that meal. An allergy
+the household has come to *know* is a different thing — a fact about the baby,
+not an observation on a meal — and has a record of its own
+([BDR-21](0021-a-babys-allergies-as-the-household-knows-them.md)).
 
 **Per baby, and shared.** The foods belong to the meal, so they belong to its
 baby, travel between the household's phones with it and are deleted with it. The
@@ -220,8 +223,9 @@ setting.
   quoted is a range, about children in general, and a parent whose child accepts
   a food at the third offer or never has done nothing wrong. A count is a fact;
   a target is advice.
-- **An allergy or reaction field.** See above: a field invites the app to act on
-  what is entered in it, and the only right action belongs to a clinician.
+- **An allergy or reaction field on the meal.** See above: a field invites the
+  app to act on what is entered in it, and the only right action belongs to a
+  clinician. Known allergies are kept apart, by BDR-21.
 - **Hiding the tile until the baby is four or six months old.** The age is
   guidance that differs by country and by child, and a parent starting early on
   a doctor's advice would find the page missing.

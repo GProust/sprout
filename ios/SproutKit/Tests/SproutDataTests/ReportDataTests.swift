@@ -48,7 +48,8 @@ final class ReportDataTests: XCTestCase {
         medicines: [Medicine] = [],
         medicineDoses: [MedicineDose] = [],
         options: ReportOptions = ReportOptions(period: .week),
-        foodName: (String) -> String? = { _ in nil }
+        foodName: (String) -> String? = { _ in nil },
+        allergies: [Allergy] = []
     ) -> ReportContent {
         buildReport(
             baby: baby,
@@ -61,7 +62,8 @@ final class ReportDataTests: XCTestCase {
             medicineDoses: medicineDoses,
             options: options,
             now: now,
-            foodName: foodName
+            foodName: foodName,
+            allergies: allergies
         )
     }
 
@@ -507,5 +509,66 @@ final class ReportDataTests: XCTestCase {
         )
 
         XCTAssertFalse(ReportWorkbook.build(content).map(\.name).contains("Foods"))
+    }
+
+    // MARK: - Allergies in the doctor's record (BDR-21)
+
+    /// About who the baby is, not about the period: one noted in March is in
+    /// June's report. From `ReportDataTest.kt`.
+    func testAllergiesReachTheRecordWhateverThePeriodNamedAndInAlphabeticalOrder() throws {
+        let content = report(
+            foodName: { $0 == "kiwi" ? "Kiwi fruit" : nil },
+            allergies: [
+                Allergy(babyId: 1, name: "Œuf", noticedAt: at(born, 9)),
+                Allergy(babyId: 1, name: "Kiwi", ref: "kiwi", confirmed: true, notes: " lips "),
+                Allergy(babyId: 1, name: "Gone", deletedAt: 1),
+            ]
+        )
+
+        XCTAssertEqual(content.allergies.map(\.name), ["Kiwi fruit", "Œuf"])
+        let kiwi = try XCTUnwrap(content.allergies.first)
+        XCTAssertTrue(kiwi.confirmed)
+        XCTAssertEqual(kiwi.notes, "lips")
+        XCTAssertEqual(content.allergies.last?.noticedAt, at(born, 9))
+        XCTAssertEqual(content.allergies.last?.confirmed, false)
+    }
+
+    func testTurningTheAllergiesOffLeavesThemOutOfTheDocument() {
+        let content = report(
+            options: ReportOptions(period: .week, includeAllergies: false),
+            allergies: [Allergy(babyId: 1, name: "Kiwi")]
+        )
+
+        XCTAssertTrue(content.allergies.isEmpty)
+    }
+
+    /// The list shared on its own is assembled the same way, so the two documents
+    /// agree.
+    func testTheAllergyListSaysWhoseItIsAndCarriesTheSameRecords() {
+        let allergies = [Allergy(babyId: 1, name: "Kiwi", ref: "kiwi")]
+        let list = allergyList(baby: baby, allergies: allergies, now: now) { _ in "Kiwi fruit" }
+
+        XCTAssertEqual(list.babyName, "Louise")
+        XCTAssertEqual(list.birthDate, baby.birthDate)
+        XCTAssertEqual(list.generatedAt, now)
+        XCTAssertEqual(list.allergies, report(foodName: { _ in "Kiwi fruit" }, allergies: allergies).allergies)
+    }
+
+    /// One row per allergy; notes only when notes are switched on, as on every
+    /// sheet. From `ReportWorkbookTest.kt`.
+    func testTheAllergiesSheetCarriesWhatTheFamilyNoted() throws {
+        let allergies = [
+            Allergy(babyId: 1, name: "Kiwi", ref: "kiwi", noticedAt: at(born, 9), confirmed: true, notes: "lips"),
+        ]
+        let sheet = try XCTUnwrap(ReportWorkbook.build(report(allergies: allergies)).first { $0.name == "Allergies" })
+        XCTAssertEqual(sheet.headers, ["allergy", "list_id", "confirmed", "noticed_on"])
+        XCTAssertEqual(sheet.rows.first, [.text("Kiwi"), .text("kiwi"), .flag(true), .day(born)])
+
+        let withNotes = try XCTUnwrap(
+            ReportWorkbook.build(
+                report(options: ReportOptions(period: .week, includeNotes: true), allergies: allergies)
+            ).first { $0.name == "Allergies" }
+        )
+        XCTAssertEqual(withNotes.rows.first?.last, .text("lips"))
     }
 }

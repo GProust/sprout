@@ -31,6 +31,8 @@ public struct ReportOptions: Equatable, Sendable {
     public var includeMedicines = true
     /// The foods offered in the range, each with its count (BDR-20).
     public var includeFoods = true
+    /// The baby's allergies as the household noted them (BDR-21).
+    public var includeAllergies = true
     /// Off by default: free text is where a parent writes what they meant for
     /// themselves.
     public var includeNotes = false
@@ -44,6 +46,7 @@ public struct ReportOptions: Equatable, Sendable {
         includeTreatments: Bool = true,
         includeMedicines: Bool = true,
         includeFoods: Bool = true,
+        includeAllergies: Bool = true,
         includeNotes: Bool = false
     ) {
         self.period = period
@@ -54,6 +57,7 @@ public struct ReportOptions: Equatable, Sendable {
         self.includeTreatments = includeTreatments
         self.includeMedicines = includeMedicines
         self.includeFoods = includeFoods
+        self.includeAllergies = includeAllergies
         self.includeNotes = includeNotes
     }
 }
@@ -148,6 +152,68 @@ public struct FoodRecord: Equatable, Sendable {
     }
 }
 
+/// One allergy, as it goes into a document (BDR-21): its name already in the
+/// phone's language when it is a food from the list, and the rest exactly as the
+/// parent noted it. `confirmed` is their statement that a health professional
+/// confirmed it — the document says so, and says nothing else about it.
+public struct AllergyRecord: Equatable, Sendable {
+    public let name: String
+    /// Its id on Sprout's food list, or `nil`.
+    public let ref: String?
+    public let noticedAt: Int64?
+    public let confirmed: Bool
+    public let notes: String?
+}
+
+/// The allergy list on its own — the one-page document shared from the First
+/// foods page.
+public struct AllergyList: Equatable, Sendable {
+    public let babyName: String
+    public let birthDate: Int64
+    public let generatedAt: Int64
+    public let allergies: [AllergyRecord]
+}
+
+/// The allergies that still stand, named and in alphabetical order — an order
+/// that ranks nothing. Assembled here once for both documents that carry them,
+/// so the list a nursery is handed and the one in the doctor's record agree.
+public func allergyRecords(
+    _ allergies: [Allergy],
+    foodName: (String) -> String? = { _ in nil }
+) -> [AllergyRecord] {
+    allergies
+        .filter { $0.deletedAt == nil }
+        .map { allergy in
+            let notes = allergy.notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return AllergyRecord(
+                name: allergy.ref.flatMap(foodName) ?? allergy.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                ref: allergy.ref,
+                noticedAt: allergy.noticedAt,
+                confirmed: allergy.confirmed,
+                notes: (notes?.isEmpty ?? true) ? nil : notes
+            )
+        }
+        .sorted { a, b in
+            a.name.lowercased() != b.name.lowercased()
+                ? a.name.lowercased() < b.name.lowercased()
+                : (a.ref ?? "") < (b.ref ?? "")
+        }
+}
+
+public func allergyList(
+    baby: Baby,
+    allergies: [Allergy],
+    now: Int64,
+    foodName: (String) -> String? = { _ in nil }
+) -> AllergyList {
+    AllergyList(
+        babyName: baby.name,
+        birthDate: baby.birthDate,
+        generatedAt: now,
+        allergies: allergyRecords(allergies, foodName: foodName)
+    )
+}
+
 /// The whole of a report, ready to be drawn or written out.
 public struct ReportContent: Sendable {
     public let babyName: String
@@ -182,6 +248,9 @@ public struct ReportContent: Sendable {
     public let medicines: [MedicineRecord]
     /// The foods offered inside the range, in the order they were first offered.
     public let foods: [FoodRecord]
+    /// The baby's allergies as they stand when the report is made — not limited
+    /// to the range: an allergy noted in March is still one in June.
+    public let allergies: [AllergyRecord]
     /// The raw entries inside the range, oldest first, for the workbook.
     public let feedings: [Feeding]
     public let sleeps: [Sleep]
@@ -224,7 +293,8 @@ public func buildReport(
     medicineDoses: [MedicineDose],
     options: ReportOptions,
     now: Int64,
-    foodName: (String) -> String? = { _ in nil }
+    foodName: (String) -> String? = { _ in nil },
+    allergies: [Allergy] = []
 ) -> ReportContent {
     let today = CalendarDay(millis: now)
     let birthDay = CalendarDay(millis: baby.birthDate)
@@ -305,6 +375,7 @@ public func buildReport(
         foods: options.includeFoods
             ? foodRecords(feedings, from: startMillis, to: endMillis, foodName: foodName)
             : [],
+        allergies: options.includeAllergies ? allergyRecords(allergies, foodName: foodName) : [],
         feedings: feedsInRange,
         sleeps: sleepsInRange,
         diapers: diapersInRange

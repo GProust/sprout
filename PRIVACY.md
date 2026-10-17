@@ -55,9 +55,10 @@ choose the period it covers.
   cannot send them anywhere. It writes the file and hands it to Android's share
   sheet — the same one every app uses — and *you* choose where it goes.
 - **What is in them** is your baby's record: feeding, sleep, nappies, growth
-  measurements, the treatments and medicines you set up, and the foods your baby
-  was offered, over the period you picked. Each of the last three can be
-  switched off for that file. The free text you type on entries (the "notes") is
+  measurements, the treatments and medicines you set up, the foods your baby
+  was offered and the allergies you noted, over the period you picked (the
+  allergies whatever the period). Each of the last four can be switched off for
+  that file. The free text you type on entries (the "notes") is
   **left out unless you switch it on**.
 - **Your own check-ins and your pumping log are never included.** They belong to
   you rather than to your baby, and a report for a paediatric appointment is not
@@ -123,12 +124,23 @@ them back to you.
   logged. Nothing is compared against any guidance.
 - **Nothing here is advice or an assessment.** The page counts the meals you
   logged. It has no target number of tries, does not tell you what to offer next
-  or when, and records no reactions or allergies — if you want to note what you
-  saw, the meal's own note is where it goes, and it stays with that meal.
+  or when, and records no reaction on a meal — if you want to note what you saw,
+  the meal's own note is where it goes. An allergy is noted only when you note
+  one; Sprout never suggests or infers it.
 - **The foods are part of the meal**, so they are stored, shared with your
   household's other phones and deleted exactly as the meal is. Correcting a food
   afterwards — making a carrot you typed into the carrot from the list — is an
   edit to each of those meals, and travels the same way.
+- **Allergies you note are kept the same way.** What your baby is allergic to,
+  when it was noticed, whether a doctor confirmed it and your notes are stored on
+  your phone and shared with your household's other phones, like every entry.
+  Sprout ships no list of allergens and suggests none.
+- **The allergy list can leave on its own**, as a one-page PDF you send through
+  the share sheet — to a nursery, say. It carries your baby's name and date of
+  birth, each allergy and its notes. Unlike the record for a doctor it is not
+  password-protected, because it is meant to be read by several people; think of
+  where you send it as you would any paper with your child's name on it. It is
+  not kept on the phone afterwards.
 - **The record for a doctor can include them**: each food offered in the period,
   how many times, tastes and servings apart, and how it went where you noted it.
   It is a list of what was logged, with no comment on it, and you can switch it
@@ -222,8 +234,11 @@ one you can check.
   were in it — a taste or a serving, and how it went — and a page counts them.
   The foods are picked from a list built into the app or typed in, and are
   stored, shared and deleted with the meal they belong to, and the record for a
-  doctor can list them. Sprout records no reactions. Nothing about what Sprout
-  collects or sends has changed.
+  doctor can list them. Sprout records no reactions on a meal.
+- Added **allergies**: what the family notes the baby is allergic to, stored and
+  shared like every entry, and a one-page allergy list that can be shared on its
+  own, without a password. Nothing about what Sprout collects or sends has
+  changed.
 
 ### 2026-09-16
 

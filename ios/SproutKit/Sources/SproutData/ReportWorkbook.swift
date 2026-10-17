@@ -25,6 +25,7 @@ public enum ReportWorkbook {
         if report.options.includeTreatments { sheets.append(treatments(report)) }
         if !report.medicines.isEmpty { sheets.append(medicineDoses(report)) }
         if !report.foods.isEmpty { sheets.append(foods(report)) }
+        if !report.allergies.isEmpty { sheets.append(allergies(report)) }
         return sheets
     }
 
@@ -369,6 +370,31 @@ public enum ReportWorkbook {
                 ]
             },
             widths: [12, 10, 22, 14, 10, 11, 14]
+        )
+    }
+
+    /// The baby's allergies as the household noted them (BDR-21), one row each.
+    /// `list_id` is the food list's id where there is one, `confirmed` the
+    /// parents' own statement that a health professional confirmed it, and
+    /// `notes` follows the same switch as every other sheet's.
+    private static func allergies(_ report: ReportContent) -> Xlsx.Sheet {
+        var headers = ["allergy", "list_id", "confirmed", "noticed_on"]
+        if report.options.includeNotes { headers.append("notes") }
+
+        return Xlsx.Sheet(
+            name: "Allergies",
+            headers: headers,
+            rows: report.allergies.map { allergy -> [Xlsx.Cell] in
+                var row: [Xlsx.Cell] = [
+                    .text(allergy.name),
+                    allergy.ref.map { Xlsx.Cell.text($0) } ?? .blank,
+                    .flag(allergy.confirmed),
+                    allergy.noticedAt.map { Xlsx.Cell.day(day($0)) } ?? .blank,
+                ]
+                if report.options.includeNotes { row.append(.text(allergy.notes ?? "")) }
+                return row
+            },
+            widths: [24, 14, 11, 13, 40]
         )
     }
 

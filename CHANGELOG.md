@@ -28,6 +28,17 @@ All notable changes to Sprout are documented here. This project follows
   was: every meal that named it follows, and the two lines become one — tastes,
   servings and how it went kept as they were. Searching for "carottes" now also
   offers the carrot from the list first.
+- 🛡️ **Allergies, as you come to know them.** Note what your baby is allergic
+  to — a food from the list, or anything in your own words (cow's milk protein,
+  egg, a medicine) — with the day you noticed it, whether a doctor confirmed it,
+  and what you saw. It's marked on that food on the First foods page and when you
+  add it to a meal, without ever getting in the way of logging. Both phones keep
+  it, even if you only started sharing later.
+- 📄 **Share the allergy list on its own.** One tap gives a one-page PDF — your
+  baby's name, each allergy and what you noted — for a nursery, a childminder or
+  a grandparent, without the rest of the record. The record for your doctor now
+  starts with the allergies too. Sprout doesn't diagnose anything: if you think
+  your baby reacted to something, ask a doctor.
 - 🩺 **First foods in the record for your doctor.** The PDF now lists each food
   offered in the period — when it was first offered, how many times since,
   tastes and servings, and how it went where you noted it — and the spreadsheet

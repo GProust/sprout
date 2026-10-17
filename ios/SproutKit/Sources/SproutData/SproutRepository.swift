@@ -442,6 +442,10 @@ public final class SproutRepository: @unchecked Sendable {
     /// from the other phone while the dialog was open is corrected too, and an
     /// edit that arrived is not undone. Each rewritten meal is stamped, so the
     /// correction reaches the other phone as the meals it changed.
+    ///
+    /// An allergy noted against the food follows it (BDR-21): leaving it on a
+    /// name no meal uses any more would take the mark off every line the parent
+    /// can see.
     @discardableResult
     public func relabelFood(babyId: Int64, from: String, to: MealFood) throws -> Int {
         let timestamp = now()
@@ -459,6 +463,15 @@ public final class SproutRepository: @unchecked Sendable {
                 meal.updatedAt = timestamp
                 try meal.update(db)
                 changed += 1
+            }
+            let allergies = try Allergy
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .fetchAll(db)
+            for var allergy in allergies where allergyIdentity(allergy) == from {
+                allergy.name = to.name
+                allergy.ref = to.ref
+                allergy.updatedAt = timestamp
+                try allergy.update(db)
             }
             return changed
         }
@@ -741,7 +754,7 @@ public final class SproutRepository: @unchecked Sendable {
             }
 
             var tombstones: [Tombstone] = []
-            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose"] {
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose", "allergy"] {
                 tombstones += try uids(table).map {
                     Tombstone(uid: $0, entity: table, deletedAt: timestamp)
                 }
@@ -753,7 +766,7 @@ public final class SproutRepository: @unchecked Sendable {
             }
             for tombstone in tombstones { try tombstone.insert(db) }
 
-            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose"] {
+            for table in ["feeding", "sleep", "diaper", "growth", "treatment", "medicine", "medicine_dose", "allergy"] {
                 try db.execute(sql: "DELETE FROM \(table) WHERE babyId = ?", arguments: [id])
             }
             try db.execute(sql: "DELETE FROM baby WHERE id = ?", arguments: [id])
@@ -814,6 +827,34 @@ public final class SproutRepository: @unchecked Sendable {
         try allForBaby(babyId, ordered: "time")
     }
 
+    // MARK: - Allergies (BDR-21)
+
+    /// The active baby's allergies, as the household noted them, by name.
+    public var allergies: AsyncValueObservation<[Allergy]> {
+        observeForActiveBaby { db, babyId in
+            try Allergy
+                .filter(Column("babyId") == babyId && Column("deletedAt") == nil)
+                .order(Column("name").collating(.nocase))
+                .fetchAll(db)
+        }
+    }
+
+    /// Notes an allergy on the active baby, or saves a correction to one.
+    public func saveAllergy(_ allergy: Allergy) throws {
+        if allergy.id == nil {
+            guard let babyId = try activeBabyIdNow() else { return }
+            try upsert(allergy, babyId: babyId)
+        } else {
+            try upsert(allergy, babyId: allergy.babyId)
+        }
+    }
+
+    public func deleteAllergy(_ allergy: Allergy) throws { try softDelete(allergy) }
+
+    public func allergiesForBabyOnce(_ babyId: Int64) throws -> [Allergy] {
+        try allForBaby(babyId, ordered: "name")
+    }
+
     private func allForBaby<T: FetchableRecord & TableRecord>(
         _ babyId: Int64,
         ordered column: String
@@ -836,7 +877,7 @@ public final class SproutRepository: @unchecked Sendable {
             try db.execute(sql: "DELETE FROM tombstone WHERE deletedAt < ?", arguments: [cutoff])
             for table in [
                 "baby", "feeding", "sleep", "diaper", "growth", "treatment",
-                "medicine", "medicine_dose", "pumping",
+                "medicine", "medicine_dose", "allergy", "pumping",
             ] {
                 try db.execute(
                     sql: "DELETE FROM \(table) WHERE deletedAt IS NOT NULL AND deletedAt < ?",

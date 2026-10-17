@@ -607,6 +607,64 @@ public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, S
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }
 
+/// Something a baby is allergic to, as the household came to know it (BDR-21).
+/// From `AllergyEntity` in `Entities.kt`.
+///
+/// The parent's record and nothing more: what it is, when it was noticed, and
+/// whether a health professional confirmed it. Sprout does not diagnose,
+/// suggest or infer one, and checks nothing against a list of allergens — it
+/// ships none.
+///
+/// What it names is a food in the First foods sense (BDR-20): `ref` is its id on
+/// Sprout's list when it was picked from there, so the label follows the carrot
+/// in every language; otherwise `name` is the parent's own words.
+public struct Allergy: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord, BabyScoped {
+    public static let databaseTableName = "allergy"
+
+    public var id: Int64?
+    public var babyId: Int64 = 0
+    /// What it is, as it was written when noted.
+    public var name: String
+    /// Its id on Sprout's food list (``FoodCatalog``), or `nil`.
+    public var ref: String?
+    /// The day it was first noticed, when the parent gave one.
+    public var noticedAt: Int64?
+    /// Whether a health professional confirmed it. `false` is "noted by us", not
+    /// "doubtful".
+    public var confirmed: Bool = false
+    /// What was seen, what the doctor said — the parent's words, as typed.
+    public var notes: String?
+    public var uid: String = newUid()
+    public var updatedAt: Int64 = 0
+    public var deletedAt: Int64?
+
+    public init(
+        id: Int64? = nil,
+        babyId: Int64 = 0,
+        name: String,
+        ref: String? = nil,
+        noticedAt: Int64? = nil,
+        confirmed: Bool = false,
+        notes: String? = nil,
+        uid: String = newUid(),
+        updatedAt: Int64 = 0,
+        deletedAt: Int64? = nil
+    ) {
+        self.id = id
+        self.babyId = babyId
+        self.name = name
+        self.ref = ref
+        self.noticedAt = noticedAt
+        self.confirmed = confirmed
+        self.notes = notes
+        self.uid = uid
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+    }
+
+    public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
+}
+
 /// A pumping session. Belongs to the parent, not to a baby (BDR-0007), which is
 /// why there is no `babyId`.
 public struct Pumping: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord {

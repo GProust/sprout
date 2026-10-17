@@ -116,6 +116,21 @@ final class SyncPayloadTests: XCTestCase {
         XCTAssertEqual(dose.row.time, 1_757_402_800_000)
         XCTAssertEqual(dose.row.amount ?? 0, 2.5, accuracy: 1e-9)
 
+        // An allergy is its own baby-scoped row (BDR-21); everything but its name
+        // and `confirmed` is absent when not given.
+        XCTAssertEqual(payload.allergies.count, 2)
+        let kiwi = try XCTUnwrap(payload.allergies.first).row
+        XCTAssertEqual(kiwi.ref, "kiwi")
+        XCTAssertEqual(kiwi.noticedAt, 1_757_403_000_000)
+        XCTAssertTrue(kiwi.confirmed)
+        XCTAssertEqual(kiwi.notes, "lips swelled; seen by the GP")
+        let milk = try XCTUnwrap(payload.allergies.last).row
+        XCTAssertEqual(milk.name, "Cow's milk protein")
+        XCTAssertNil(milk.ref)
+        XCTAssertNil(milk.noticedAt)
+        XCTAssertFalse(milk.confirmed)
+        XCTAssertNil(milk.notes)
+
         let pumping = try XCTUnwrap(payload.pumpings.first)
         XCTAssertEqual(pumping.storage, .FRIDGE)
         XCTAssertEqual(pumping.amountMl, 120)

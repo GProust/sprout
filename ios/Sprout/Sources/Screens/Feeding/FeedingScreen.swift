@@ -9,6 +9,8 @@ final class FeedingViewModel {
     /// Every meal in the household that named a food, for the solid meal form's
     /// suggestions (BDR-20).
     var household: [Feeding] = []
+    /// The active baby's allergies, marked on the meal form's foods (BDR-21).
+    var allergies: [Allergy] = []
 
     private let repository: SproutRepository
     private let store = NursingSessionStore.shared
@@ -31,11 +33,17 @@ final class FeedingViewModel {
             group.addTask {
                 await observe(repository.householdMealsWithFoods) { [weak self] in self?.household = $0 }
             }
+            group.addTask {
+                await observe(repository.allergies) { [weak self] in self?.allergies = $0 }
+            }
         }
     }
 
     /// The household's foods, most recently offered first.
     var knownFoods: [FoodHistory] { foodHistories(household) }
+
+    /// The foods the baby is noted as allergic to, by ``foodIdentity(_:)``.
+    var allergic: Set<String> { allergyIdentities(allergies) }
 
     func add(_ feeding: Feeding) { try? repository.addFeeding(feeding) }
     func delete(_ feeding: Feeding) { try? repository.deleteFeeding(feeding) }
@@ -180,7 +188,7 @@ struct FeedingScreen: View {
         }
         .sproutStyle()
         .sheet(isPresented: $adding) {
-            FeedingForm(known: model.knownFoods) { model.add($0); adding = false }
+            FeedingForm(known: model.knownFoods, allergies: model.allergic) { model.add($0); adding = false }
         }
         .fullScreenCover(isPresented: $showingTimer) {
             NursingTimerScreen(model: model)
@@ -671,6 +679,8 @@ private struct NursingTimerScreen: View {
 private struct FeedingForm: View {
     /// The household's foods, which a solid meal's list offers back (BDR-20).
     let known: [FoodHistory]
+    /// The foods the baby is noted as allergic to, marked on the meal (BDR-21).
+    var allergies: Set<String> = []
     let onAdd: (Feeding) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -712,7 +722,7 @@ private struct FeedingForm: View {
                     case .SOLID:
                         // What was in it first, then how much: the weight is
                         // the meal's, because what gets weighed is the bowl.
-                        MealFoodsEditor(foods: $foods, known: known)
+                        MealFoodsEditor(foods: $foods, known: known, allergies: allergies)
                         NumberField(label: Str.t("field_amount_solid"), text: $amount, suffix: "g")
                     }
                 }

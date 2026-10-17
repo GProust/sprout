@@ -327,7 +327,7 @@ fun FoodsScreen(
                     allergies = state.allergies,
                     onAdd = { addingAllergy = true },
                     onOpen = { editingAllergy = it },
-                    onShare = vm::shareAllergies,
+                    onShare = { vm.shareAllergies() },
                 )
             }
             if (foods.isEmpty()) {

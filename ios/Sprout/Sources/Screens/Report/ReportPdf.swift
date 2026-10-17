@@ -270,6 +270,9 @@ extension ReportPdf {
 
     func blocks() -> [Block] {
         var blocks: [Block] = [header()]
+        // Straight after whose record it is, before any figure: an allergy is
+        // about who the baby is, not about the period (BDR-21).
+        blocks.append(contentsOf: allergySection())
 
         if report.hasEntries {
             blocks.append(glanceTable())
@@ -664,6 +667,42 @@ extension ReportPdf {
         )
             + table(title: Str.t("medicine_history"), columns: doseColumns, rows: doseRows)
             + [paragraph(Str.t("report_medicine_note"), size: 7.4, colour: muted, topGap: 6)]
+    }
+
+    /// The baby's allergies as the household noted them (BDR-21): what, whether
+    /// the parents recorded it as confirmed by a health professional, and since
+    /// when. From `allergySection` in `ReportPdf.kt`. Read as written — no
+    /// colour, no mark beyond the word.
+    func allergySection() -> [Block] {
+        let allergies = report.allergies
+        guard !allergies.isEmpty else { return [] }
+
+        var columns: [(String, CGFloat, Align)] = [
+            (Str.t("report_col_name"), 0, .left),
+            (Str.t("report_col_status"), 150, .left),
+            (Str.t("report_col_noticed"), 320, .left),
+        ]
+        if report.options.includeNotes {
+            columns.append((Str.t("report_col_notes"), 400, .left))
+        }
+        let rows: [[String]] = allergies.map { allergy in
+            var row = [
+                allergy.name,
+                Str.t(allergy.confirmed ? "allergy_confirmed_short" : "allergy_noted_short"),
+                allergy.noticedAt.map { SproutDateStyle.date($0) } ?? "—",
+            ]
+            // A table cell does not wrap, so a long note is cut rather than run
+            // off the page; the shared allergy list prints it whole.
+            if report.options.includeNotes { row.append(clipped(allergy.notes ?? "—", to: 22)) }
+            return row
+        }
+
+        return table(title: Str.t("allergies_title"), columns: columns, rows: rows)
+            + [paragraph(Str.t("allergy_list_note"), size: 7.4, colour: muted, topGap: 6)]
+    }
+
+    func clipped(_ text: String, to length: Int) -> String {
+        text.count <= length ? text : String(text.prefix(length - 1)) + "…"
     }
 
     /// The foods offered in the period (BDR-20), one row each, in the order they

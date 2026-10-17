@@ -40,6 +40,9 @@ private let minContained = 5
 struct MealFoodsEditor: View {
     @Binding var foods: [MealFood]
     let known: [FoodHistory]
+    /// The foods the baby is noted as allergic to (BDR-21): marked, and nothing
+    /// else changes for them.
+    var allergies: Set<String> = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.tight) {
@@ -49,8 +52,8 @@ struct MealFoodsEditor: View {
                     .font(.caption)
                     .foregroundStyle(SproutColor.onSurfaceVariant)
             }
-            ForEach(Array(foods.enumerated()), id: \.offset) { index, _ in
-                MealFoodRow(food: food(at: index)) {
+            ForEach(Array(foods.enumerated()), id: \.offset) { index, item in
+                MealFoodRow(food: food(at: index), allergic: allergies.contains(foodIdentity(item))) {
                     if foods.indices.contains(index) { foods.remove(at: index) }
                 }
             }
@@ -247,6 +250,7 @@ private func matches(_ choices: [FoodChoice], _ query: String) -> [FoodChoice] {
 /// One food on the meal: its name, a taste or a serving, and how it went.
 private struct MealFoodRow: View {
     @Binding var food: MealFood
+    var allergic = false
     let onRemove: () -> Void
 
     var body: some View {
@@ -261,6 +265,9 @@ private struct MealFoodRow: View {
                 .buttonStyle(.borderless)
                 .accessibilityLabel(Str.t("meal_food_remove", food.displayName))
             }
+            // Said, not stopped: the parent may be logging the very meal that
+            // showed it, or one the doctor asked for (BDR-21).
+            if allergic { AllergyMarker() }
             ChoiceChips(
                 options: FoodPortion.allCases,
                 selection: Binding(get: { food.portion }, set: { food.portion = $0 ?? food.portion }),
@@ -289,6 +296,7 @@ private struct MealFoodRow: View {
 struct MealForm: View {
     let initial: Feeding?
     let known: [FoodHistory]
+    var allergies: Set<String> = []
     let onSave: (Feeding) -> Void
     var onDelete: (() -> Void)?
 
@@ -302,11 +310,13 @@ struct MealForm: View {
     init(
         initial: Feeding?,
         known: [FoodHistory],
+        allergies: Set<String> = [],
         onSave: @escaping (Feeding) -> Void,
         onDelete: (() -> Void)? = nil
     ) {
         self.initial = initial
         self.known = known
+        self.allergies = allergies
         self.onSave = onSave
         self.onDelete = onDelete
         _foods = State(initialValue: initial?.mealFoods ?? [])
@@ -319,7 +329,7 @@ struct MealForm: View {
         NavigationStack {
             Form {
                 Section {
-                    MealFoodsEditor(foods: $foods, known: known)
+                    MealFoodsEditor(foods: $foods, known: known, allergies: allergies)
                 }
                 // The meal's weight, optional as it always was: what gets
                 // weighed is the bowl, not each food in it.

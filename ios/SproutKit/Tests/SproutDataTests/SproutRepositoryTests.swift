@@ -494,4 +494,22 @@ final class SproutRepositoryTests: XCTestCase {
         let names = try read { db in try Feeding.fetchAll(db) }.map { $0.mealFoods.first?.name }
         XCTAssertEqual(names, ["carottes", "carottes"])
     }
+
+    /// An allergy noted against the food follows it, so the mark stays on the
+    /// line the parent sees (BDR-21).
+    func testAnAllergyNotedAgainstTheFoodFollowsTheCorrection() throws {
+        let sam = try makeBaby("Sam")
+        try repository.addFeeding(meal(clock, MealFood(name: "carottes")), for: sam)
+        try repository.saveAllergy(Allergy(name: "carottes", confirmed: true))
+        let later = clock + 60 * 60_000
+        repository = SproutRepository(database: queue, now: { later })
+
+        try repository.relabelFood(babyId: sam, from: "carottes", to: MealFood(name: "Carotte", ref: "carrot"))
+
+        let allergy = try XCTUnwrap(try read { db in try Allergy.fetchOne(db) })
+        XCTAssertEqual(allergy.name, "Carotte")
+        XCTAssertEqual(allergy.ref, "carrot")
+        XCTAssertTrue(allergy.confirmed, "still the parent's own statement")
+        XCTAssertEqual(allergy.updatedAt, later, "stamped, so it travels")
+    }
 }

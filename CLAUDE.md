@@ -356,8 +356,27 @@ one array of objects inside a row. Four things a change can quietly undo:
 - **Nothing is a target or a grade, and nothing is a reaction.** No number of
   offers counts as enough, *Refused* has an icon and no warning colour, the list
   is ordered by recency or by name and never by how well a food is going, and
-  there is no allergy field — the meal's note is where a parent writes what they
+  there is no reaction field on a meal — the meal's note is where a parent writes what they
   saw. A taste counts as an offer; tastes and servings are shown apart.
+
+A baby's known allergies are a record of their own
+([BDR-21](docs/decisions/0021-a-babys-allergies-as-the-household-knows-them.md)):
+the synced `allergy` table (Room 19 → 20, iOS `v20-allergies`), one row each so
+two phones noting one each keep both. Four things a change can quietly undo:
+
+- **Sprout never proposes, infers or grades one.** No allergy from a refusal or a
+  note, no allergen marks on the food list, no severity scale. "Confirmed by a
+  health professional" is the parent's statement, shown in words wherever the
+  allergy is.
+- **The marker never stops anything.** "Allergy noted" — icon and words, ordinary
+  ink — on the food's line and on the meal form; no alert, no confirmation, no
+  disabled button.
+- **It is about who the baby is.** The merge applies no pairing cut-off to it
+  (as for babies), a report carries it whatever the period, and `relabelFood`
+  moves an allergy with the food it names (`allergyIdentity`).
+- **The list leaves alone, too.** `AllergyListPdf` on both sides, from the same
+  `allergyRecords` the report uses, carrying the notes and the sentence that it
+  is the family's record and not a medical document.
 
 The meal's weight stays `amountGrams`: what gets weighed is the bowl. The
 doctor's record carries the foods as `ReportContent.foods` — named through the

@@ -519,4 +519,86 @@ final class SyncMergeTests: XCTestCase {
             XCTAssertEqual(foods.first?.timesOffered, 2, phone.name)
         }
     }
+
+    // MARK: - Allergies (BDR-21)
+
+    private func liveAllergies(_ phone: Phone) throws -> [Allergy] {
+        try phone.allRows(Allergy.self).filter { $0.deletedAt == nil }
+    }
+
+    /// Two parents each noting one on the same day keep both: each is its own row.
+    func testAllergiesNotedOnBothPhonesAreBothKept() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+        try sam.repository.setActiveBaby(id: try sam.babyId())
+
+        alex.clock.now += 1_000
+        try alex.repository.saveAllergy(Allergy(name: "Œuf"))
+        sam.clock.now += 1_000
+        try sam.repository.saveAllergy(Allergy(name: "Carrot", ref: "carrot", confirmed: true))
+        _ = try alex.engine.merge(try sam.replica())
+        _ = try sam.engine.merge(try alex.replica())
+
+        for phone in [alex, sam] {
+            XCTAssertEqual(Set(try liveAllergies(phone).map(\.name)), ["Œuf", "Carrot"], phone.name)
+            XCTAssertEqual(try liveAllergies(phone).first { $0.ref == "carrot" }?.confirmed, true, phone.name)
+        }
+    }
+
+    /// "Share from the pairing forward" leaves earlier entries at home, but not an
+    /// allergy: it is about who the baby is, like the baby itself.
+    func testAnAllergyNotedBeforePairingStillReachesTheOtherPhone() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.repository.saveAllergy(Allergy(name: "Cow's milk protein"))
+        try alex.logFeed(90, at: 1_700_000_100_000)
+        let pairedAt = alex.clock.now + 1
+        alex.clock.now += 10_000
+
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica(), since: pairedAt)
+
+        XCTAssertTrue(try sam.allRows(Feeding.self).isEmpty, "the feed stayed at home")
+        XCTAssertEqual(try liveAllergies(sam).map(\.name), ["Cow's milk protein"])
+    }
+
+    func testAnAllergyTakenOffOnOnePhoneIsTakenOffOnTheOther() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.repository.saveAllergy(Allergy(name: "Kiwi", ref: "kiwi"))
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+
+        alex.clock.now += 5_000
+        try alex.repository.deleteAllergy(try XCTUnwrap(try liveAllergies(alex).first))
+        _ = try sam.engine.merge(try alex.replica())
+
+        XCTAssertTrue(try liveAllergies(sam).isEmpty)
+    }
+
+    /// Erasing a baby erases its allergies, and the erasure travels with the rest.
+    func testAnErasedBabysAllergiesGoWithItOnBothPhones() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.repository.saveAllergy(Allergy(name: "Kiwi", ref: "kiwi"))
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+
+        alex.clock.now += 5_000
+        try alex.repository.deleteBaby(id: try alex.babyId())
+        _ = try sam.engine.merge(try alex.replica())
+
+        XCTAssertTrue(try alex.allRows(Allergy.self).isEmpty)
+        XCTAssertTrue(try sam.allRows(Allergy.self).isEmpty)
+    }
 }
