@@ -36,6 +36,16 @@ public enum SleepPlace: String, Codable, CaseIterable, Sendable {
     case OWN_BED, BEDSIDE_COT, PARENTS_BED, ON_A_PARENT, AT_BREAST, OTHER
 }
 
+/// How much of a food a solid meal held: a lick of the spoon, or a real helping.
+/// Both are an offer of the food, and both count (BDR-20).
+public enum FoodPortion: String, Codable, CaseIterable, Sendable { case TASTE, SERVING }
+
+/// How a food went at one meal, when the parent noticed — their reading, not
+/// Sprout's. `nil` is "not noted", never a fourth answer, and `REFUSED` is a fact
+/// about one meal rather than a reaction: there is deliberately no allergy field
+/// (BDR-20).
+public enum FoodReception: String, Codable, CaseIterable, Sendable { case LIKED, MIXED, REFUSED }
+
 /// Postpartum bleeding (lochia) intensity.
 public enum Bleeding: String, Codable, CaseIterable, Sendable { case NONE, LIGHT, MODERATE, HEAVY }
 
@@ -107,6 +117,21 @@ public struct NursingSegment: Equatable, Sendable {
     public var durationMs: Int64 { max(0, endTime - startTime) }
 }
 
+/// One food in a solid meal, in the parent's own words — Sprout ships no list of
+/// foods (BDR-20). Two meals offered the same food when their names match
+/// ignoring case and spacing; see ``foodKey(_:)``.
+public struct MealFood: Equatable, Hashable, Sendable {
+    public var name: String
+    public var portion: FoodPortion
+    public var reception: FoodReception?
+
+    public init(name: String, portion: FoodPortion = .TASTE, reception: FoodReception? = nil) {
+        self.name = name
+        self.portion = portion
+        self.reception = reception
+    }
+}
+
 // MARK: - Records
 
 /// A baby's profile. Several are supported — twins, or siblings over time.
@@ -170,6 +195,10 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
     public var rightDurationMs: Int64?
     /// Encoded as Room stores it — see ``NursingSegmentCoding``.
     public var segments: String = ""
+    /// What a solid meal was made of (BDR-20), encoded as Room stores it — see
+    /// ``MealFoodCoding``. Empty on every other kind of feed, and on every meal
+    /// logged before foods could be listed.
+    public var foods: String = ""
     public var notes: String?
     public var uid: String = newUid()
     public var updatedAt: Int64 = 0
@@ -187,6 +216,7 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
         leftDurationMs: Int64? = nil,
         rightDurationMs: Int64? = nil,
         segments: [NursingSegment] = [],
+        foods: [MealFood] = [],
         notes: String? = nil,
         uid: String = newUid(),
         updatedAt: Int64 = 0,
@@ -203,6 +233,7 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
         self.leftDurationMs = leftDurationMs
         self.rightDurationMs = rightDurationMs
         self.segments = NursingSegmentCoding.encode(segments)
+        self.foods = MealFoodCoding.encode(foods)
         self.notes = notes
         self.uid = uid
         self.updatedAt = updatedAt
@@ -210,6 +241,12 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
     }
 
     public var nursingSegments: [NursingSegment] { NursingSegmentCoding.decode(segments) }
+
+    /// The meal's foods, in the order the parent listed them.
+    public var mealFoods: [MealFood] {
+        get { MealFoodCoding.decode(foods) }
+        set { foods = MealFoodCoding.encode(newValue) }
+    }
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }

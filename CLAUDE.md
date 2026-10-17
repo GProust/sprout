@@ -325,6 +325,37 @@ A running wait also reaches the two places a parent already is
   from the lock screen is delivered to nobody. Answering a notification is not
   deciding one, so ADR-0019 is untouched.
 
+## First foods
+
+A solid meal lists the foods that were in it, and the *First foods* page reads
+those lists back one food at a time
+([BDR-20](docs/decisions/0020-a-solid-meal-says-what-was-in-it.md)). One column,
+`foods` on `feeding` (Room 18 → 19, iOS `v19-meal-foods`), and on the wire the
+one array of objects inside a row. Four things a change can quietly undo:
+
+- **There is no food log.** A food is part of a meal, and every figure on the
+  page is derived from the meals each time — `data/FoodExposures.kt` and
+  `SproutData/FoodExposures.swift`, pure functions with the same cases on both
+  sides. Logging from the page writes an ordinary solid meal through the same
+  form the feeding screen uses, so a taste moves "last feed" like any meal does.
+- **A food is its name**, keyed by `foodKey`: trimmed, Unicode whitespace
+  collapsed, lower-cased without locale. Not a row with a uid — two phones naming
+  carrot on the same day must be one carrot the moment they meet. Never make the
+  key cleverer (plurals, accents) on one side only.
+- **Sprout ships no list of foods**, no allergen list, no ages and no order. The
+  suggestions are the household's own meals (`householdMealsWithFoods`). A
+  starter list is the addition this feature must not grow, for the same reason
+  BDR-15 refuses a list of medicines.
+- **Nothing is a target or a grade, and nothing is a reaction.** No number of
+  offers counts as enough, *Refused* has an icon and no warning colour, the list
+  is ordered by recency or by name and never by how well a food is going, and
+  there is no allergy field — the meal's note is where a parent writes what they
+  saw. A taste counts as an offer; tastes and servings are shown apart.
+
+The meal's weight stays `amountGrams`: what gets weighed is the bowl. And the
+feeding form now carries the edited row's `uid` through — it used to mint a new
+one, which reached the other phone as a second feed beside the first.
+
 ## The record you hand to a doctor
 
 Shipped, on top of those same per-day figures: a **PDF report** and an **`.xlsx`

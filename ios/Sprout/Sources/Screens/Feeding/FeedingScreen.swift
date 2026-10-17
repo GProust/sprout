@@ -6,6 +6,9 @@ import SwiftUI
 @MainActor
 final class FeedingViewModel {
     var feedings: [Feeding] = []
+    /// Every meal in the household that named a food, for the solid meal form's
+    /// suggestions (BDR-20).
+    var household: [Feeding] = []
 
     private let repository: SproutRepository
     private let store = NursingSessionStore.shared
@@ -20,8 +23,19 @@ final class FeedingViewModel {
     var nursing: NursingSession? { store.session }
 
     func observeFeedings() async {
-        await observe(repository.feedings) { [weak self] in self?.feedings = $0 }
+        let repository = self.repository
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                await observe(repository.feedings) { [weak self] in self?.feedings = $0 }
+            }
+            group.addTask {
+                await observe(repository.householdMealsWithFoods) { [weak self] in self?.household = $0 }
+            }
+        }
     }
+
+    /// The household's foods, most recently offered first.
+    var knownFoods: [FoodHistory] { foodHistories(household) }
 
     func add(_ feeding: Feeding) { try? repository.addFeeding(feeding) }
     func delete(_ feeding: Feeding) { try? repository.deleteFeeding(feeding) }
@@ -166,7 +180,7 @@ struct FeedingScreen: View {
         }
         .sproutStyle()
         .sheet(isPresented: $adding) {
-            FeedingForm { model.add($0); adding = false }
+            FeedingForm(known: model.knownFoods) { model.add($0); adding = false }
         }
         .fullScreenCover(isPresented: $showingTimer) {
             NursingTimerScreen(model: model)
@@ -404,6 +418,11 @@ extension Feeding {
             }
         } else if let end = endTime {
             parts.append(SproutFormat.duration(millis: end - startTime).text)
+        }
+        // What a solid meal was made of, in the parent's own words (BDR-20).
+        let foods = mealFoods
+        if type == .SOLID, !foods.isEmpty {
+            parts.append(foods.map(\.name).joined(separator: ", "))
         }
         if let notes = notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
             parts.append(notes)
@@ -650,6 +669,8 @@ private struct NursingTimerScreen: View {
 // MARK: - The manual form
 
 private struct FeedingForm: View {
+    /// The household's foods, which a solid meal's list offers back (BDR-20).
+    let known: [FoodHistory]
     let onAdd: (Feeding) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -659,6 +680,9 @@ private struct FeedingForm: View {
     @State private var minutes = ""
     @State private var start = Clock.millis
     @State private var notes = ""
+    /// Kept while the type is switched about, and only dropped on saving
+    /// something that is not a solid meal.
+    @State private var foods: [MealFood] = []
 
     var body: some View {
         NavigationStack {
@@ -686,6 +710,9 @@ private struct FeedingForm: View {
                     case .BOTTLE:
                         NumberField(label: Str.t("field_amount"), text: $amount, suffix: "ml")
                     case .SOLID:
+                        // What was in it first, then how much: the weight is
+                        // the meal's, because what gets weighed is the bowl.
+                        MealFoodsEditor(foods: $foods, known: known)
                         NumberField(label: Str.t("field_amount_solid"), text: $amount, suffix: "g")
                     }
                 }
@@ -717,6 +744,7 @@ private struct FeedingForm: View {
             amountGrams: type == .SOLID ? Int(amount) : nil,
             startTime: start,
             endTime: type == .BREAST ? length.map { start + $0 } : nil,
+            foods: type == .SOLID ? foods : [],
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         )
     }

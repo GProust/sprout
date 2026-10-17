@@ -245,6 +245,18 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
 - **Two fields are packed strings, not arrays**, because that is how Room stores
   them: a treatment's `timesOfDay` is minutes joined by `,`, and a feeding's
   `segments` is `SIDE,start,end` triples joined by `;`. Empty is `""`.
+- **A solid meal's `foods` is an array of objects**, because a food is the
+  parent's own words and no separator is safe inside them
+  ([BDR-20](../docs/decisions/0020-a-solid-meal-says-what-was-in-it.md)).
+  Each is `{"name": "…", "portion": "TASTE" | "SERVING", "reception": "LIKED" |
+  "MIXED" | "REFUSED"}`, in the order the parent listed them; `reception` is
+  absent when nothing was noted, which is "not noted" and not a fourth answer.
+  The key itself is absent on a feeding that named no foods — every feed that is
+  not a solid meal, and every meal written before foods existed — and a reader
+  treats that as an empty list. Two foods are the same food when their names
+  match after trimming, collapsing runs of whitespace (Unicode's own) to one
+  space and lower-casing without regard to locale; nothing is stored for that,
+  it is how a reader counts.
 - **A row points at another row by that row's `uid`.** A baby-scoped row carries
   `babyUid`, as above; a `medicineDoses` entry also carries `medicineUid`, the
   `uid` of the `medicines` row it was a dose of. Unlike `babyUid` this one is

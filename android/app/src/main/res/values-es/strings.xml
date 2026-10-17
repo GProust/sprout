@@ -712,4 +712,40 @@
     <string name="report_make_protected">Compartir el zip protegido</string>
     <string name="cd_show_password">Mostrar la contraseña</string>
     <string name="cd_hide_password">Ocultar la contraseña</string>
+
+    <!-- Primeros alimentos (BDR-20) -->
+    <string name="screen_foods">Alimentos</string>
+    <string name="foods_empty">Aún no hay alimentos. Registra una comida sólida con el botón + y anota qué llevaba — cada alimento tiene aquí su propio recuento.</string>
+    <string name="foods_log_meal">Registrar una comida</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d alimento ofrecido hasta ahora</item>
+        <item quantity="other">%1$d alimentos ofrecidos hasta ahora</item>
+    </plurals>
+    <string name="foods_sort_recent">Más recientes</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">Ofrecido %1$d vez</item>
+        <item quantity="other">Ofrecido %1$d veces</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">Probado %1$d vez</item>
+        <item quantity="other">Probado %1$d veces</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d ración</item>
+        <item quantity="other">%1$d raciones</item>
+    </plurals>
+    <string name="food_first">Primera vez: %1$s</string>
+    <string name="food_last">Última: %1$s</string>
+    <string name="food_portion_taste">Solo probado</string>
+    <string name="food_portion_serving">Una ración</string>
+    <string name="food_reception_liked">Le gustó</string>
+    <string name="food_reception_mixed">No está claro</string>
+    <string name="food_reception_refused">Lo rechazó</string>
+    <string name="food_reception_count">%1$s: %2$d</string>
+    <string name="meal_foods">Qué llevaba</string>
+    <string name="meal_food_add">Añadir un alimento</string>
+    <string name="meal_food_remove">Quitar %1$s</string>
+    <string name="meal_foods_hint">Cada alimento que anotes aquí tiene su propio recuento en Alimentos.</string>
+    <string name="meal_edit_title">Editar comida</string>
 </resources>

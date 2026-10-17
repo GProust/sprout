@@ -132,7 +132,7 @@ final class SchemaTests: XCTestCase {
     }
 }
 
-/// The two columns that hold a list inside a TEXT value, in Android's encoding.
+/// The three columns that hold a list inside a TEXT value, in Android's encoding.
 final class CodingTests: XCTestCase {
 
     func testReminderTimesRoundTrip() {
@@ -202,5 +202,71 @@ final class CodingTests: XCTestCase {
         let stored = try XCTUnwrap(row)
         XCTAssertEqual(stored.nursingSegments.count, 2)
         XCTAssertEqual(stored.nursingSegments.first?.durationMs, 1_000)
+    }
+
+    /// A meal's foods (BDR-20) are the parent's own words, so the names here are
+    /// the ones a packed encoding would choke on: its separators, a quote, a
+    /// character outside the BMP.
+    func testMealFoodsRoundTrip() {
+        let foods = [
+            MealFood(name: "Purée carotte; panais, \"maison\"", portion: .SERVING, reception: .LIKED),
+            MealFood(name: "Œuf 🥚", portion: .TASTE),
+            MealFood(name: "Brocoli", portion: .TASTE, reception: .REFUSED),
+        ]
+
+        XCTAssertEqual(MealFoodCoding.decode(MealFoodCoding.encode(foods)), foods)
+    }
+
+    /// Every row from before the column existed holds the default, and reads as
+    /// a meal that named nothing.
+    func testAnEmptyFoodsColumnIsAnEmptyList() {
+        XCTAssertEqual(MealFoodCoding.encode([]), "")
+        XCTAssertEqual(MealFoodCoding.decode(""), [])
+        XCTAssertEqual(MealFoodCoding.decode(nil), [])
+    }
+
+    /// The column Room writes, read as it is: Android's converter puts the keys
+    /// in this order and leaves "how it went" out when nothing was noted.
+    func testTheFoodsColumnReadsWhatAndroidWrites() {
+        let android = #"[{"name":"Carrot","portion":"SERVING","reception":"MIXED"},{"name":"Pea","portion":"TASTE"}]"#
+
+        XCTAssertEqual(
+            MealFoodCoding.decode(android),
+            [
+                MealFood(name: "Carrot", portion: .SERVING, reception: .MIXED),
+                MealFood(name: "Pea", portion: .TASTE),
+            ]
+        )
+    }
+
+    /// A column that does not parse loses its list, not the meal; a food that
+    /// does not parse loses itself, not the others.
+    func testMalformedFoodsAreSkippedNotFatal() {
+        XCTAssertEqual(MealFoodCoding.decode("not json"), [])
+        XCTAssertEqual(
+            MealFoodCoding.decode(#"[{"name":"Carrot","portion":"HALF"},{"name":"Pea","portion":"TASTE"}]"#),
+            [MealFood(name: "Pea", portion: .TASTE)]
+        )
+    }
+
+    func testFoodsSurviveTheDatabase() throws {
+        let queue = try SproutDatabase.inMemory()
+        let repository = SproutRepository(database: queue, now: { 1_000 })
+        try repository.saveParentProfile(ParentProfile(name: "Alex", gaveBirth: true, breastfeeding: true))
+        _ = try repository.addBaby(name: "Robin", birthDate: 0)
+
+        try repository.addFeeding(
+            Feeding(
+                type: .SOLID,
+                amountGrams: 60,
+                startTime: 1_000,
+                foods: [MealFood(name: "Carrot", portion: .SERVING, reception: .LIKED)]
+            )
+        )
+
+        let row = try queue.read { db in try Feeding.fetchOne(db) }
+        let stored = try XCTUnwrap(row)
+        XCTAssertEqual(stored.mealFoods, [MealFood(name: "Carrot", portion: .SERVING, reception: .LIKED)])
+        XCTAssertEqual(stored.amountGrams, 60)
     }
 }

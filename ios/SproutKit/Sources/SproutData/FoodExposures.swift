@@ -1,0 +1,115 @@
+import Foundation
+
+// The *First foods* page's arithmetic (BDR-20): which foods a baby has been
+// offered, how many times, and how it went. From `data/FoodExposures.kt`.
+//
+// Nothing here is stored. A solid meal lists its foods and these figures are
+// read back from the meals every time they are asked for, so correcting or
+// deleting a meal moves them — the same reason the medicine traffic light is
+// derived from its doses rather than kept.
+//
+// Pure functions, tested with the same cases as `FoodExposuresTest.kt`: a
+// household with one phone of each has to see the same count.
+
+/// The name two spellings of one food share: trimmed, inner runs of spacing
+/// collapsed to one space, and lower-cased without regard to the phone's
+/// language — so "Carrot", "carrot" and " carrot " are one food on every phone.
+///
+/// Whitespace is Unicode's own, a no-break space included, which is the same
+/// property Kotlin's `(?U)\s` reads.
+///
+/// Nothing cleverer. "Carrots" stays apart from "carrot": Sprout does not know
+/// the language well enough to say they are one, and guessing would merge foods
+/// a parent meant apart.
+public func foodKey(_ name: String) -> String {
+    name.split(whereSeparator: \.isWhitespace).joined(separator: " ").lowercased()
+}
+
+/// One meal a food was part of.
+public struct FoodOffer: Equatable, Sendable {
+    /// The meal's uid, so the page can open it to correct.
+    public let feedUid: String
+    public let time: Int64
+    public let portion: FoodPortion
+    public let reception: FoodReception?
+}
+
+/// Everything one food has been through: the meals it was in, newest first.
+///
+/// `name` is how it was written most recently — a parent who corrects "carot"
+/// to "Carrot" sees the correction, not the first spelling.
+public struct FoodHistory: Equatable, Sendable, Identifiable {
+    public let key: String
+    public let name: String
+    public let offers: [FoodOffer]
+
+    public var id: String { key }
+
+    /// How many meals included it — a taste is an offer too.
+    public var timesOffered: Int { offers.count }
+    public var tastes: Int { offers.filter { $0.portion == .TASTE }.count }
+    public var servings: Int { offers.filter { $0.portion == .SERVING }.count }
+    public var firstOffered: Int64 { offers[offers.count - 1].time }
+    public var lastOffered: Int64 { offers[0].time }
+
+    /// The portion it was given last time — what the form starts it on.
+    public var lastPortion: FoodPortion { offers[0].portion }
+
+    /// How many meals it went `reception` at; meals that noted nothing count for
+    /// none.
+    public func timesReceived(_ reception: FoodReception) -> Int {
+        offers.filter { $0.reception == reception }.count
+    }
+}
+
+/// Every food in `feeds`, most recently offered first.
+///
+/// Only solid meals that still exist count; the caller decides whose meals they
+/// are (one baby for the page, the whole household for the form's suggestions).
+/// A food named twice in one meal is one offer of it: a serving if either was,
+/// and the first "how it went" that was noted. Two meals at the same moment are
+/// taken in `uid` order, so both phones agree on which spelling is the latest.
+public func foodHistories(_ feeds: [Feeding]) -> [FoodHistory] {
+    let meals = feeds
+        .filter { $0.type == .SOLID && $0.deletedAt == nil && !$0.foods.isEmpty }
+        .sorted { a, b in
+            a.startTime != b.startTime ? a.startTime > b.startTime : a.uid < b.uid
+        }
+
+    var order: [String] = []
+    var names: [String: String] = [:]
+    var offers: [String: [FoodOffer]] = [:]
+    for meal in meals {
+        // One offer per food per meal, in the order the meal listed them.
+        var inMealOrder: [String] = []
+        var inMeal: [String: FoodOffer] = [:]
+        for food in meal.mealFoods {
+            let key = foodKey(food.name)
+            if key.isEmpty { continue }
+            if names[key] == nil {
+                names[key] = food.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                order.append(key)
+            }
+            if let seen = inMeal[key] {
+                inMeal[key] = FoodOffer(
+                    feedUid: seen.feedUid,
+                    time: seen.time,
+                    portion: food.portion == .SERVING ? .SERVING : seen.portion,
+                    reception: seen.reception ?? food.reception
+                )
+            } else {
+                inMeal[key] = FoodOffer(
+                    feedUid: meal.uid, time: meal.startTime,
+                    portion: food.portion, reception: food.reception
+                )
+                inMealOrder.append(key)
+            }
+        }
+        for key in inMealOrder {
+            offers[key, default: []].append(inMeal[key]!)
+        }
+    }
+    // `order` was filled newest meal first, so it is already "most recently
+    // offered first".
+    return order.map { key in FoodHistory(key: key, name: names[key]!, offers: offers[key]!) }
+}

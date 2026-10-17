@@ -1,6 +1,8 @@
 package com.gproust.sprout.data.local
 
 import androidx.room.TypeConverter
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** Room type converters that store enums as their name strings. */
 class Converters {
@@ -86,4 +88,45 @@ class Converters {
             val (side, start, end) = triple.split(",")
             NursingSegment(BreastSide.valueOf(side), start.toLong(), end.toLong())
         } ?: emptyList()
+
+    /**
+     * Stores a meal's foods as a JSON array — `[{"name":"Carrot","portion":
+     * "TASTE"}]` — and an empty list as an empty string, so every row from
+     * before the column existed already reads as a meal that named nothing.
+     *
+     * JSON rather than a packed string like the segments: a food is the
+     * parent's own words, and any separator a packing chose is a character
+     * somebody will type. The same shape is what travels (spec §7).
+     */
+    @TypeConverter
+    fun mealFoodsToString(value: List<MealFood>?): String =
+        if (value.isNullOrEmpty()) "" else mealFoodsToJson(value).toString()
+
+    @TypeConverter
+    fun stringToMealFoods(value: String?): List<MealFood> =
+        if (value.isNullOrBlank()) emptyList() else mealFoodsFromJson(JSONArray(value))
+
+    companion object {
+        fun mealFoodsToJson(foods: List<MealFood>): JSONArray = JSONArray().apply {
+            foods.forEach { food ->
+                put(
+                    JSONObject().apply {
+                        put("name", food.name)
+                        put("portion", food.portion.name)
+                        // Absent rather than null: "not noted" is no key at all.
+                        food.reception?.let { put("reception", it.name) }
+                    },
+                )
+            }
+        }
+
+        fun mealFoodsFromJson(array: JSONArray): List<MealFood> = (0 until array.length()).map { i ->
+            val o = array.getJSONObject(i)
+            MealFood(
+                name = o.getString("name"),
+                portion = FoodPortion.valueOf(o.getString("portion")),
+                reception = if (o.isNull("reception")) null else FoodReception.valueOf(o.getString("reception")),
+            )
+        }
+    }
 }

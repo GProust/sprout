@@ -172,6 +172,36 @@ extension SleepPlace {
     }
 }
 
+extension FoodPortion {
+    var label: String {
+        switch self {
+        case .TASTE: return Str.t("food_portion_taste")
+        case .SERVING: return Str.t("food_portion_serving")
+        }
+    }
+}
+
+extension FoodReception {
+    var label: String {
+        switch self {
+        case .LIKED: return Str.t("food_reception_liked")
+        case .MIXED: return Str.t("food_reception_mixed")
+        case .REFUSED: return Str.t("food_reception_refused")
+        }
+    }
+
+    /// Each answer's own symbol, so the word is never the only thing that tells
+    /// them apart at a glance — and never a colour either: *refused* is a fact
+    /// about one meal, not a warning (BDR-20).
+    var systemImage: String {
+        switch self {
+        case .LIKED: return "hand.thumbsup"
+        case .MIXED: return "circle.lefthalf.filled"
+        case .REFUSED: return "hand.thumbsdown"
+        }
+    }
+}
+
 extension MilkStorage {
     var label: String {
         switch self {

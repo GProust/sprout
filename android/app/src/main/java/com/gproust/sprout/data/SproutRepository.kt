@@ -95,6 +95,13 @@ class SproutRepository(
     fun householdDiapers(since: Long): Flow<List<DiaperEntity>> =
         db.diaperDao().observeAllSince(since)
 
+    /**
+     * Every solid meal in the household that named its foods (BDR-20). The meal
+     * form's suggestions come from here rather than from the active baby, so
+     * twins starting solids together are offered the same carrot.
+     */
+    val householdMealsWithFoods: Flow<List<FeedingEntity>> = db.feedingDao().observeMealsWithFoods()
+
     /** Every tracked baby's as-needed medicines (BDR-15). */
     val householdMedicines: Flow<List<MedicineEntity>> = db.medicineDao().observeAllActive()
 

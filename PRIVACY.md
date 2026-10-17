@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-09-16 — see [Change history](#change-history) at the end._
+_Last updated: 2026-10-17 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -11,10 +11,10 @@ what the app does — and does not do — with your information.
 
 ## What data Sprout stores
 
-Everything you log — feeding, sleep, diapers, growth measurements, the
-medicines you set up and the doses you give, the mother's postpartum
-check-ins, and your profile details — is saved in a private database
-(Room/SQLite) **on your device only**.
+Everything you log — feeding (including the foods a solid meal was made of),
+sleep, diapers, growth measurements, the medicines you set up and the doses you
+give, the mother's postpartum check-ins, and your profile details — is saved in
+a private database (Room/SQLite) **on your device only**.
 
 - There are **no user accounts** and no sign-in.
 - There is **no cloud sync** and **no server** operated by us.
@@ -109,6 +109,23 @@ app can tell you how long is left.
   dose you dismissed it against — so it comes back when you next give it — and
   that note stays on this phone and is not shared with your household's others.
 
+## First foods
+
+When you log a solid meal you can list the foods that were in it, and whether
+each was a taste or a serving and how it went. The **First foods** page counts
+them back to you.
+
+- **Sprout ships no list of foods.** The names are the words you type; nothing
+  is looked up, suggested from anywhere else, or compared against any guidance.
+  The suggestions the form offers are the foods your own household has already
+  logged.
+- **Nothing here is advice or an assessment.** The page counts the meals you
+  logged. It has no target number of tries, does not tell you what to offer next
+  or when, and records no reactions or allergies — if you want to note what you
+  saw, the meal's own note is where it goes, and it stays with that meal.
+- **The foods are part of the meal**, so they are stored, shared with your
+  household's other phones and deleted exactly as the meal is.
+
 ## Children's data
 
 Sprout is a tool used by parents/caregivers to record information about an
@@ -190,6 +207,14 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-10-17
+
+- Added the section on **first foods**. A solid meal can now list the foods that
+  were in it — a taste or a serving, and how it went — and a page counts them.
+  The foods are words you type, stored, shared and deleted with the meal they
+  belong to. Sprout ships no list of foods and records no reactions. Nothing
+  about what Sprout collects or sends has changed.
 
 ### 2026-09-16
 

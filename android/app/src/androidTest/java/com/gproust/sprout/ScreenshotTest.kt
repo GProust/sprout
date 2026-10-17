@@ -40,8 +40,11 @@ import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
@@ -62,6 +65,7 @@ import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.NursingScreen
+import com.gproust.sprout.ui.foods.FoodsScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.medicines.MedicinesScreen
 import com.gproust.sprout.ui.health.HealthScreen
@@ -83,6 +87,7 @@ import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
 import com.gproust.sprout.widget.LAST_BREAST_WINDOW_MS
 import com.gproust.sprout.widget.SproutWidgetUi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -326,6 +331,57 @@ class ScreenshotTest {
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
+
+    /**
+     * A fortnight of first foods (BDR-20): some tasted once, some come back to,
+     * one refused before it was liked — what a real list looks like, rather
+     * than a row of foods that all went well.
+     *
+     * Seeded just for its own captures and deleted straight after, because the
+     * meals are feeds: left in place they would move the history, the
+     * statistics and the record every other capture was taken from.
+     */
+    private fun seedMeals() = runBlocking {
+        val repo = app.repository
+        val day = 24L * 3_600_000L
+        val noon = System.currentTimeMillis() - 2 * 3_600_000L
+        fun meal(daysAgo: Int, grams: Int?, vararg foods: MealFood) = FeedingEntity(
+            type = FeedType.SOLID,
+            amountGrams = grams,
+            startTime = noon - daysAgo * day,
+            foods = foods.toList(),
+        )
+        repo.addFeeding(meal(12, null, MealFood("Carrot", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(meal(10, 40, MealFood("Carrot", FoodPortion.SERVING, FoodReception.LIKED)))
+        repo.addFeeding(meal(8, null, MealFood("Courgette", FoodPortion.TASTE, FoodReception.REFUSED)))
+        repo.addFeeding(
+            meal(
+                6, 60,
+                MealFood("Carrot", FoodPortion.SERVING),
+                MealFood("Courgette", FoodPortion.TASTE, FoodReception.MIXED),
+            ),
+        )
+        repo.addFeeding(meal(4, null, MealFood("Sweet potato", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(
+            meal(
+                2, 80,
+                MealFood("Courgette", FoodPortion.SERVING, FoodReception.LIKED),
+                MealFood("Sweet potato", FoodPortion.SERVING),
+            ),
+        )
+        repo.addFeeding(
+            meal(
+                1, null,
+                MealFood("Banana", FoodPortion.TASTE, FoodReception.LIKED),
+                MealFood("Pear", FoodPortion.TASTE, FoodReception.MIXED),
+            ),
+        )
+    }
+
+    private fun clearMeals() = runBlocking {
+        val repo = app.repository
+        repo.feedings.first().filter { it.type == FeedType.SOLID }.forEach { repo.deleteFeeding(it) }
+    }
 
     private fun settle() {
         rule.waitForIdle()
@@ -689,6 +745,17 @@ class ScreenshotTest {
         // sentence as well as the fields.
         tapDesc("Add a medicine")
         save("12-medicines-2-new")
+
+        // First foods (BDR-20): each food with its own count, tastes and
+        // servings apart, and how it went where that was noted. Then the meal
+        // form, offering the household's own foods back — there is no list of
+        // foods behind it, which is the point of the capture.
+        seedMeals()
+        show { FoodsScreen {} }
+        save("12-foods")
+        tapDesc("Log a meal")
+        saveScreen("12-foods-2-log")
+        clearMeals()
 
         // Partner sync: before pairing, after, and with the stash held back.
         // The ViewModel is built by hand rather than through viewModel(),

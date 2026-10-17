@@ -3,6 +3,26 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🥕 **A page for first foods.** Logging a solid meal now lets you list what was
+  in it, and the new **First foods** tile gathers every food your baby has met:
+  how many times it's been offered, the first time and the last, and how many of
+  those were just a taste and how many a real serving. Open a food to see each
+  meal it was part of, and tap one to correct it.
+- 👍 **How it went, if you noticed.** Each food on a meal can say *Liked it*,
+  *Not sure* or *Refused* — or nothing at all, which is fine. A food refused
+  three times and liked on the fourth is exactly what the count is there to
+  show, so it's shown plainly: no colours, no warnings, no target number of
+  tries.
+- ✍️ **Your foods, in your words.** Sprout doesn't come with a list of foods or
+  tell you which to try next or when — that's yours and your doctor's to decide.
+  Type a food once and it's one tap away from then on, for every baby in the
+  household. The meal's weight stays where it was, and optional.
+- 🔁 **Correcting a feed no longer shows up twice on the other phone.** Editing a
+  feed used to reach your partner's phone as a new feed beside the old one; it
+  now arrives as the correction it is.
+
 ## [1.13.0] — 2026-09-25
 
 - 🔗 **Two feeds that were really one can be joined.** If you stopped and saved

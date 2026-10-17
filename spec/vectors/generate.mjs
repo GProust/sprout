@@ -221,8 +221,8 @@ write('invitation.json', {
 // agrees with that phone.
 //
 // Every row carries one of each awkwardness the format has: a null that must be
-// written as an absent key, an enum that travels as its name, and the two fields
-// Room packs into strings.
+// written as an absent key, an enum that travels as its name, the two fields
+// Room packs into strings, and the one array of objects inside a row.
 const replica = {
   formatVersion: 1,
   schemaVersion: 17,
@@ -254,6 +254,23 @@ const replica = {
       rightDurationMs: 240_000,
       // Room packs the segments: SIDE,start,end triples joined by ';'.
       segments: 'LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000',
+    },
+    // A solid meal that says what was in it (BDR-20). `foods` is an array of
+    // objects, not a packed string: a food is the parent's own words, so the
+    // first name carries the two separators the packed fields use and a quote.
+    // The second noted nothing about how it went, which is an absent key.
+    {
+      babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
+      uid: 'a87ff679-a2f3-4e71-9181-a67b7542122c',
+      updatedAt: 1_757_401_500_000,
+      type: 'SOLID',
+      amountGrams: 60,
+      startTime: 1_757_401_200_000,
+      segments: '',
+      foods: [
+        { name: 'Carrot; parsnip, "homemade"', portion: 'SERVING', reception: 'LIKED' },
+        { name: 'Œuf', portion: 'TASTE' },
+      ],
     },
   ],
   sleeps: [

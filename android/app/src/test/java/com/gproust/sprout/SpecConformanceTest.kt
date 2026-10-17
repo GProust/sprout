@@ -8,6 +8,10 @@ import com.gproust.sprout.data.sync.SyncInvitationCodec
 import com.gproust.sprout.data.sync.SyncInvitationException
 import com.gproust.sprout.data.sync.SyncLimits
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.local.FeedType
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.sync.SyncPayloadCodec
 import com.gproust.sprout.data.sync.SyncPayloadException
 import com.gproust.sprout.data.sync.SyncSecret
@@ -251,6 +255,20 @@ class SpecConformanceTest {
         assertEquals(BreastSide.LEFT, segments.first().side)
         assertEquals(1_757_400_000_000L, segments.first().startTime)
         assertEquals(listOf(540, 1260), payload.treatments.first().row.timesOfDay)
+
+        // A solid meal's foods (BDR-20): the one array of objects inside a row,
+        // names in the parent's own words — separators and quotes included —
+        // and "how it went" absent rather than null when nothing was noted.
+        val meal = payload.feedings.single { it.row.type == FeedType.SOLID }.row
+        assertEquals(60, meal.amountGrams)
+        assertEquals(
+            listOf(
+                MealFood("Carrot; parsnip, \"homemade\"", FoodPortion.SERVING, FoodReception.LIKED),
+                MealFood("Œuf", FoodPortion.TASTE, null),
+            ),
+            meal.foods,
+        )
+        assertTrue("a breastfeed names no foods", payload.feedings.first().row.foods.isEmpty())
 
         // As-needed medicine (BDR-15). The dose names its medicine by that
         // medicine's uid — the one field in the document that points at another

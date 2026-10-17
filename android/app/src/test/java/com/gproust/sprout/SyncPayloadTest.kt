@@ -5,6 +5,9 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
@@ -106,6 +109,24 @@ class SyncPayloadTest {
                     startTime = 1_700_001_500_000,
                     uid = "feed-3",
                     updatedAt = 23,
+                ),
+            ),
+            // A meal that says what was in it (BDR-20), in names nobody chose
+            // for their convenience: a separator the segments use, a quote, an
+            // accent and a character outside the BMP.
+            BabyScoped(
+                babyUid,
+                FeedingEntity(
+                    type = FeedType.SOLID,
+                    amountGrams = 60,
+                    startTime = 1_700_001_600_000,
+                    foods = listOf(
+                        MealFood("Purée carotte; panais, \"maison\"", FoodPortion.SERVING, FoodReception.LIKED),
+                        MealFood("Œuf 🥚", FoodPortion.TASTE),
+                        MealFood("Brocoli", FoodPortion.TASTE, FoodReception.REFUSED),
+                    ),
+                    uid = "feed-4",
+                    updatedAt = 24,
                 ),
             ),
         ),
@@ -277,6 +298,47 @@ class SyncPayloadTest {
         assertNull(sleep.position)
         assertNull(sleep.place)
         assertNull(sleep.placeNote)
+    }
+
+    @Test
+    fun `a meal that named nothing carries no foods key, and one from before foods reads as naming nothing`() {
+        val json = String(SyncPayloadCodec.encode(fullPayload()))
+        // Only the one meal that listed foods writes the key: absent is empty.
+        assertEquals(1, Regex("\"foods\"").findAll(json).count())
+
+        // What a replica written by 1.13.0 looks like: a solid meal, and no
+        // mention of foods at all. It merges as a meal that listed nothing.
+        val old = """
+            {"formatVersion":1,"schemaVersion":18,"householdId":"household-1","deviceId":"device-a",
+             "createdAt":1700000000000,"babies":[],
+             "feedings":[{"babyUid":"baby-uid-1","uid":"meal-old","updatedAt":9,"type":"SOLID",
+                          "amountGrams":40,"startTime":1700000000000,"segments":""}],
+             "sleeps":[],"diapers":[],"growth":[],"treatments":[],"pumpings":[],"tombstones":[]}
+        """.trimIndent()
+        val meal = SyncPayloadCodec.decode(old.toByteArray(), currentSchemaVersion = 19).feedings.single().row
+        assertEquals(40, meal.amountGrams)
+        assertTrue(meal.foods.isEmpty())
+    }
+
+    @Test
+    fun `a food that noted nothing about how it went comes back noting nothing`() {
+        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 15)
+
+        val egg = decoded.feedings.single { it.row.uid == "feed-4" }.row.foods[1]
+        assertEquals("Œuf 🥚", egg.name)
+        assertEquals(FoodPortion.TASTE, egg.portion)
+        assertNull("not noted is not a fourth answer", egg.reception)
+    }
+
+    @Test
+    fun `the database stores a meal's foods as it reads them back`() {
+        val converters = com.gproust.sprout.data.local.Converters()
+        val foods = fullPayload().feedings.single { it.row.uid == "feed-4" }.row.foods
+
+        assertEquals(foods, converters.stringToMealFoods(converters.mealFoodsToString(foods)))
+        // Every row from before the column existed holds the default.
+        assertEquals("", converters.mealFoodsToString(emptyList()))
+        assertTrue(converters.stringToMealFoods("").isEmpty())
     }
 
     @Test

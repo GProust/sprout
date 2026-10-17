@@ -323,6 +323,22 @@ public final class SproutRepository: @unchecked Sendable {
         }
     }
 
+    /// Every solid meal in the household that named its foods (BDR-20). The meal
+    /// form's suggestions come from here rather than from the active baby, so
+    /// twins starting solids together are offered the same carrot.
+    ///
+    /// Unbounded, unlike the summaries above: a food first logged in March is
+    /// still one tap away in June. It stays small because it is only the meals
+    /// that named something.
+    public var householdMealsWithFoods: AsyncValueObservation<[Feeding]> {
+        observe { db in
+            try Feeding
+                .filter(Column("type") == FeedType.SOLID.rawValue && Column("foods") != "" && Column("deletedAt") == nil)
+                .order(Column("startTime").desc)
+                .fetchAll(db)
+        }
+    }
+
     /// Every tracked baby's as-needed medicines (BDR-15).
     public var householdMedicines: AsyncValueObservation<[Medicine]> {
         observe { db in

@@ -712,4 +712,40 @@
     <string name="report_make_protected">Condividi lo zip protetto</string>
     <string name="cd_show_password">Mostra la password</string>
     <string name="cd_hide_password">Nascondi la password</string>
+
+    <!-- Svezzamento (BDR-20) -->
+    <string name="screen_foods">Svezzamento</string>
+    <string name="foods_empty">Ancora nessun alimento. Registra un pasto solido con il pulsante + e indica cosa conteneva — qui ogni alimento ha il suo conteggio.</string>
+    <string name="foods_log_meal">Registra un pasto</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d alimento proposto finora</item>
+        <item quantity="other">%1$d alimenti proposti finora</item>
+    </plurals>
+    <string name="foods_sort_recent">Più recenti</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">Proposto %1$d volta</item>
+        <item quantity="other">Proposto %1$d volte</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">Assaggiato %1$d volta</item>
+        <item quantity="other">Assaggiato %1$d volte</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d porzione</item>
+        <item quantity="other">%1$d porzioni</item>
+    </plurals>
+    <string name="food_first">Prima volta: %1$s</string>
+    <string name="food_last">Ultima: %1$s</string>
+    <string name="food_portion_taste">Solo un assaggio</string>
+    <string name="food_portion_serving">Una porzione</string>
+    <string name="food_reception_liked">Gradito</string>
+    <string name="food_reception_mixed">Incerto</string>
+    <string name="food_reception_refused">Rifiutato</string>
+    <string name="food_reception_count">%1$s: %2$d</string>
+    <string name="meal_foods">Cosa conteneva</string>
+    <string name="meal_food_add">Aggiungi un alimento</string>
+    <string name="meal_food_remove">Rimuovi %1$s</string>
+    <string name="meal_foods_hint">Ogni alimento indicato qui ha il suo conteggio in Svezzamento.</string>
+    <string name="meal_edit_title">Modifica pasto</string>
 </resources>

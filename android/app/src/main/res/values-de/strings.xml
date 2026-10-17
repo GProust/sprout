@@ -712,4 +712,40 @@
     <string name="report_make_protected">Geschütztes Zip teilen</string>
     <string name="cd_show_password">Passwort anzeigen</string>
     <string name="cd_hide_password">Passwort verbergen</string>
+
+    <!-- Beikost (BDR-20) -->
+    <string name="screen_foods">Beikost</string>
+    <string name="foods_empty">Noch keine Lebensmittel. Trag mit + eine Beikost-Mahlzeit ein und was darin war — jedes Lebensmittel wird hier einzeln gezählt.</string>
+    <string name="foods_log_meal">Mahlzeit eintragen</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d Lebensmittel bisher angeboten</item>
+        <item quantity="other">%1$d Lebensmittel bisher angeboten</item>
+    </plurals>
+    <string name="foods_sort_recent">Neueste zuerst</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">%1$d-mal angeboten</item>
+        <item quantity="other">%1$d-mal angeboten</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">%1$d-mal probiert</item>
+        <item quantity="other">%1$d-mal probiert</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d Portion</item>
+        <item quantity="other">%1$d Portionen</item>
+    </plurals>
+    <string name="food_first">Zuerst: %1$s</string>
+    <string name="food_last">Zuletzt: %1$s</string>
+    <string name="food_portion_taste">Nur probiert</string>
+    <string name="food_portion_serving">Eine Portion</string>
+    <string name="food_reception_liked">Mochte es</string>
+    <string name="food_reception_mixed">Unsicher</string>
+    <string name="food_reception_refused">Abgelehnt</string>
+    <string name="food_reception_count">%1$s: %2$d</string>
+    <string name="meal_foods">Was drin war</string>
+    <string name="meal_food_add">Lebensmittel hinzufügen</string>
+    <string name="meal_food_remove">%1$s entfernen</string>
+    <string name="meal_foods_hint">Jedes Lebensmittel hier wird unter Beikost einzeln gezählt.</string>
+    <string name="meal_edit_title">Mahlzeit bearbeiten</string>
 </resources>

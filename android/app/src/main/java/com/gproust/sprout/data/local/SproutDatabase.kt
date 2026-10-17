@@ -24,7 +24,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ParentProfileEntity::class,
         TombstoneEntity::class,
     ],
-    version = 18,
+    version = 19,
     // Exported to app/schemas/. Committing them makes every schema change show
     // up as a reviewable diff, and is what lets a migration be tested against
     // the exact schema a released version shipped.
@@ -335,6 +335,21 @@ abstract class SproutDatabase : RoomDatabase() {
         }
 
         /**
+         * v18 -> v19: a solid meal lists the foods that were in it (BDR-20).
+         *
+         * One column on `feeding` rather than a table of foods: the meal is
+         * already the row, and a food is its name. Not null and empty by
+         * default, so every meal logged before reads back as one that named
+         * nothing — the converter's empty list — rather than needing a NULL
+         * case of its own.
+         */
+        private val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `feeding` ADD COLUMN `foods` TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        /**
          * The tables partner sync merges, and so the ones that gain the sync
          * columns in [MIGRATION_13_14]. `wellbeing` and `parent_profile` are
          * absent on purpose — they never leave the device (ADR-0007).
@@ -452,7 +467,7 @@ abstract class SproutDatabase : RoomDatabase() {
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
             MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
-            MIGRATION_16_17, MIGRATION_17_18,
+            MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
         )
 
         fun getInstance(context: Context): SproutDatabase =

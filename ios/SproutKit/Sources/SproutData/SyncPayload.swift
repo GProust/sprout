@@ -280,6 +280,11 @@ private extension SyncPayloadCodec {
         // Packed as Room stores it, not as an array: `SIDE,start,end` joined by
         // `;`. The two platforms have to agree on the string, not on a shape.
         json["segments"] = row.segments
+        // An array of objects rather than a packed string, because a food is the
+        // parent's own words (BDR-20). Absent when the meal named nothing, which
+        // is every feed that isn't a solid one.
+        let foods = row.mealFoods
+        if !foods.isEmpty { json["foods"] = MealFoodCoding.jsonArray(foods) }
         json.put("notes", row.notes)
         return json
     }
@@ -300,6 +305,11 @@ private extension SyncPayloadCodec {
             deletedAt: json.int64("deletedAt")
         )
         row.segments = json.string("segments") ?? ""
+        // Absent on replicas written before meals listed their foods, which merge
+        // exactly as they did — as meals that named nothing.
+        if let foods = json["foods"] as? [Any] {
+            row.mealFoods = try foods.map(MealFoodCoding.food(from:))
+        }
         return row
     }
 

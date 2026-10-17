@@ -712,4 +712,40 @@
     <string name="report_make_protected">Partilhar o zip protegido</string>
     <string name="cd_show_password">Mostrar a palavra-passe</string>
     <string name="cd_hide_password">Ocultar a palavra-passe</string>
+
+    <!-- Diversificação alimentar (BDR-20) -->
+    <string name="screen_foods">Diversificação</string>
+    <string name="foods_empty">Ainda não há alimentos. Registe uma refeição sólida com o botão + e indique o que levava — aqui cada alimento tem a sua própria contagem.</string>
+    <string name="foods_log_meal">Registar uma refeição</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d alimento oferecido até agora</item>
+        <item quantity="other">%1$d alimentos oferecidos até agora</item>
+    </plurals>
+    <string name="foods_sort_recent">Mais recentes</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">Oferecido %1$d vez</item>
+        <item quantity="other">Oferecido %1$d vezes</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">Provado %1$d vez</item>
+        <item quantity="other">Provado %1$d vezes</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d porção</item>
+        <item quantity="other">%1$d porções</item>
+    </plurals>
+    <string name="food_first">Primeira vez: %1$s</string>
+    <string name="food_last">Última: %1$s</string>
+    <string name="food_portion_taste">Só provou</string>
+    <string name="food_portion_serving">Uma porção</string>
+    <string name="food_reception_liked">Gostou</string>
+    <string name="food_reception_mixed">Não se sabe</string>
+    <string name="food_reception_refused">Recusou</string>
+    <string name="food_reception_count">%1$s: %2$d</string>
+    <string name="meal_foods">O que levava</string>
+    <string name="meal_food_add">Adicionar um alimento</string>
+    <string name="meal_food_remove">Remover %1$s</string>
+    <string name="meal_foods_hint">Cada alimento indicado aqui tem a sua própria contagem em Diversificação.</string>
+    <string name="meal_edit_title">Editar refeição</string>
 </resources>

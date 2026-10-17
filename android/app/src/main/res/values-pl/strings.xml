@@ -731,4 +731,48 @@
     <string name="report_make_protected">Udostępnij zabezpieczony zip</string>
     <string name="cd_show_password">Pokaż hasło</string>
     <string name="cd_hide_password">Ukryj hasło</string>
+
+    <!-- Nowe pokarmy (BDR-20) -->
+    <string name="screen_foods">Nowe pokarmy</string>
+    <string name="foods_empty">Nie ma jeszcze pokarmów. Zapisz posiłek stały przyciskiem + i wpisz, co w nim było — każdy pokarm ma tu własny licznik.</string>
+    <string name="foods_log_meal">Zapisz posiłek</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d pokarm podany do tej pory</item>
+        <item quantity="few">%1$d pokarmy podane do tej pory</item>
+        <item quantity="many">%1$d pokarmów podanych do tej pory</item>
+        <item quantity="other">%1$d pokarmu podanego do tej pory</item>
+    </plurals>
+    <string name="foods_sort_recent">Najnowsze</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">Podano %1$d raz</item>
+        <item quantity="few">Podano %1$d razy</item>
+        <item quantity="many">Podano %1$d razy</item>
+        <item quantity="other">Podano %1$d razy</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">%1$d spróbowanie</item>
+        <item quantity="few">%1$d spróbowania</item>
+        <item quantity="many">%1$d spróbowań</item>
+        <item quantity="other">%1$d spróbowania</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d porcja</item>
+        <item quantity="few">%1$d porcje</item>
+        <item quantity="many">%1$d porcji</item>
+        <item quantity="other">%1$d porcji</item>
+    </plurals>
+    <string name="food_first">Pierwszy raz: %1$s</string>
+    <string name="food_last">Ostatnio: %1$s</string>
+    <string name="food_portion_taste">Na spróbowanie</string>
+    <string name="food_portion_serving">Cała porcja</string>
+    <string name="food_reception_liked">Smakowało</string>
+    <string name="food_reception_mixed">Nie wiadomo</string>
+    <string name="food_reception_refused">Odrzucone</string>
+    <string name="food_reception_count">%1$s: %2$d</string>
+    <string name="meal_foods">Co było w posiłku</string>
+    <string name="meal_food_add">Dodaj pokarm</string>
+    <string name="meal_food_remove">Usuń %1$s</string>
+    <string name="meal_foods_hint">Każdy wpisany tu pokarm ma własny licznik w sekcji Nowe pokarmy.</string>
+    <string name="meal_edit_title">Edytuj posiłek</string>
 </resources>

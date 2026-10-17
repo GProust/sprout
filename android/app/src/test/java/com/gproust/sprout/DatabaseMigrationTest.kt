@@ -120,6 +120,22 @@ class DatabaseMigrationTest {
     }
 
     @Test
+    fun `a meal logged before v19 named no foods, rather than failing to read`() {
+        createV10Database()
+        val database = openWithMigrations()
+
+        // The v18 -> v19 column is NOT NULL and defaults to empty, which the
+        // converter reads as a meal that listed nothing (BDR-20). A NULL here
+        // would be a row the entity cannot be built from.
+        database.query("SELECT foods FROM `feeding`", null).use { c ->
+            assertEquals("feeding rows", 2, c.count)
+            while (c.moveToNext()) {
+                assertEquals("", c.getString(0))
+            }
+        }
+    }
+
+    @Test
     fun `upgrading from v10 preserves the actual values, not just the row count`() {
         createV10Database()
         val database = openWithMigrations()
@@ -221,7 +237,7 @@ class DatabaseMigrationTest {
         val database = openWithMigrations()
 
         assertEquals(0, database.countOf("baby"))
-        assertEquals(18, database.openHelper.writableDatabase.version)
+        assertEquals(19, database.openHelper.writableDatabase.version)
     }
 
     /**

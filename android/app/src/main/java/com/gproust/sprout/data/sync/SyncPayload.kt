@@ -129,7 +129,7 @@ object SyncPayloadCodec {
         val text = String(bytes, Charsets.UTF_8)
         // Before parsing, not around it: nesting deep enough to exhaust the
         // stack raises an Error, which the catch below would not hold (see
-        // SyncLimits.MAX_JSON_DEPTH). A replica is four levels deep.
+        // SyncLimits.MAX_JSON_DEPTH). A replica is six levels deep.
         if (SyncLimits.exceedsMaxJsonDepth(text)) {
             throw SyncPayloadException.Unreadable("not a Sprout replica: implausibly nested")
         }
@@ -204,6 +204,10 @@ object SyncPayloadCodec {
         putOrNull("leftDurationMs", entity.leftDurationMs)
         putOrNull("rightDurationMs", entity.rightDurationMs)
         put("segments", converters.nursingSegmentsToString(entity.segments))
+        // An array of objects rather than a packed string, because a food is
+        // the parent's own words (BDR-20). Absent when the meal named nothing,
+        // which is every feed that isn't a solid one.
+        if (entity.foods.isNotEmpty()) put("foods", Converters.mealFoodsToJson(entity.foods))
         putOrNull("notes", entity.notes)
     }
 
@@ -217,6 +221,9 @@ object SyncPayloadCodec {
         leftDurationMs = o.longOrNull("leftDurationMs"),
         rightDurationMs = o.longOrNull("rightDurationMs"),
         segments = converters.stringToNursingSegments(o.optString("segments")),
+        // Absent on replicas written before meals listed their foods, which
+        // merge exactly as they did — as meals that named nothing.
+        foods = o.optJSONArray("foods")?.let(Converters::mealFoodsFromJson).orEmpty(),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),

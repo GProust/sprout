@@ -68,6 +68,32 @@ enum class SleepPosition { BACK, SIDE, BELLY }
  */
 enum class SleepPlace { OWN_BED, BEDSIDE_COT, PARENTS_BED, ON_A_PARENT, AT_BREAST, OTHER }
 
+/**
+ * How much of a food a solid meal held: [TASTE] is a lick of the spoon or a
+ * piece to explore, [SERVING] a real helping. Both are an offer of the food,
+ * and both count (BDR-20).
+ */
+enum class FoodPortion { TASTE, SERVING }
+
+/**
+ * How a food went at one meal, when the parent noticed — their reading, not
+ * Sprout's. Null is "not noted", never a fourth answer, and [REFUSED] is a fact
+ * about one meal rather than a reaction: there is deliberately no allergy field
+ * (BDR-20).
+ */
+enum class FoodReception { LIKED, MIXED, REFUSED }
+
+/**
+ * One food in a solid meal, in the parent's own words — Sprout ships no list of
+ * foods (BDR-20). Two meals offered the same food when their names match
+ * ignoring case and spacing; see `foodKey`.
+ */
+data class MealFood(
+    val name: String,
+    val portion: FoodPortion = FoodPortion.TASTE,
+    val reception: FoodReception? = null,
+)
+
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
@@ -147,6 +173,14 @@ data class FeedingEntity(
      * back to [leftDurationMs] / [rightDurationMs]).
      */
     @ColumnInfo(defaultValue = "''") val segments: List<NursingSegment> = emptyList(),
+    /**
+     * What a [FeedType.SOLID] meal was made of, in the order the parent listed
+     * it (BDR-20). Empty on every other kind of feed, and on every solid meal
+     * logged before foods could be listed — which reads as a meal that named
+     * nothing, not as a meal of nothing. The meal's weight stays [amountGrams]:
+     * what gets weighed is the bowl, not each food in it.
+     */
+    @ColumnInfo(defaultValue = "''") val foods: List<MealFood> = emptyList(),
     val notes: String? = null,
     @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
     @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,

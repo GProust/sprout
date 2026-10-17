@@ -150,6 +150,20 @@ interface FeedingDao {
     @Query("SELECT * FROM feeding WHERE startTime >= :since AND deletedAt IS NULL ORDER BY startTime DESC")
     fun observeAllSince(since: Long): Flow<List<FeedingEntity>>
 
+    /**
+     * Every baby's solid meals that listed a food, newest first — the
+     * household's own list of foods, which the meal form offers back (BDR-20).
+     *
+     * Unbounded, unlike [observeAllSince]: a food first logged in March is
+     * still one tap away in June. It stays small because it is only the meals
+     * that named something.
+     */
+    @Query(
+        "SELECT * FROM feeding WHERE type = 'SOLID' AND foods != '' AND deletedAt IS NULL " +
+            "ORDER BY startTime DESC",
+    )
+    fun observeMealsWithFoods(): Flow<List<FeedingEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 

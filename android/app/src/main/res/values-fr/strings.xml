@@ -771,4 +771,40 @@
     <string name="report_make_protected">Partager le zip protégé</string>
     <string name="cd_show_password">Afficher le mot de passe</string>
     <string name="cd_hide_password">Masquer le mot de passe</string>
+
+    <!-- Diversification (BDR-20) -->
+    <string name="screen_foods">Diversification</string>
+    <string name="foods_empty">Aucun aliment pour l\'instant. Notez un repas solide avec le bouton + et indiquez ce qu\'il contenait — chaque aliment a ici son propre compteur.</string>
+    <string name="foods_log_meal">Noter un repas</string>
+    <plurals name="foods_count">
+        <item quantity="one">%1$d aliment proposé jusqu\'ici</item>
+        <item quantity="other">%1$d aliments proposés jusqu\'ici</item>
+    </plurals>
+    <string name="foods_sort_recent">Plus récents</string>
+    <string name="foods_sort_name">A–Z</string>
+    <plurals name="food_times_offered">
+        <item quantity="one">Proposé %1$d fois</item>
+        <item quantity="other">Proposé %1$d fois</item>
+    </plurals>
+    <plurals name="food_tastes">
+        <item quantity="one">Goûté %1$d fois</item>
+        <item quantity="other">Goûté %1$d fois</item>
+    </plurals>
+    <plurals name="food_servings">
+        <item quantity="one">%1$d portion</item>
+        <item quantity="other">%1$d portions</item>
+    </plurals>
+    <string name="food_first">Première fois : %1$s</string>
+    <string name="food_last">Dernière : %1$s</string>
+    <string name="food_portion_taste">Juste goûté</string>
+    <string name="food_portion_serving">Une portion</string>
+    <string name="food_reception_liked">A aimé</string>
+    <string name="food_reception_mixed">Mitigé</string>
+    <string name="food_reception_refused">A refusé</string>
+    <string name="food_reception_count">%1$s : %2$d</string>
+    <string name="meal_foods">Aliments du repas</string>
+    <string name="meal_food_add">Ajouter un aliment</string>
+    <string name="meal_food_remove">Retirer %1$s</string>
+    <string name="meal_foods_hint">Chaque aliment indiqué ici a son propre compteur dans Diversification.</string>
+    <string name="meal_edit_title">Modifier le repas</string>
 </resources>
