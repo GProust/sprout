@@ -4,8 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.foodHistories
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
@@ -74,6 +78,9 @@ class SyncMergeTest {
         suspend fun liveMedicines() = db.medicineDao().allForSync().filter { it.deletedAt == null }
 
         suspend fun liveDoses() = db.medicineDoseDao().allForSync().filter { it.deletedAt == null }
+
+        /** What the First foods form offers back here: the household's own foods (BDR-20). */
+        suspend fun knownFoods() = foodHistories(db.feedingDao().observeMealsWithFoods().first())
     }
 
     private val phones = mutableListOf<Phone>()
@@ -362,5 +369,79 @@ class SyncMergeTest {
 
         assertTrue("the medicine is gone here too", sam.liveMedicines().isEmpty())
         assertTrue("and so is the dose that was of it", sam.liveDoses().isEmpty())
+    }
+
+    // --- First foods (BDR-20) ---------------------------------------------
+
+    private val carrotInFrench = MealFood("Carotte", FoodPortion.SERVING, FoodReception.LIKED, ref = "carrot")
+    private val ratatouille = MealFood("Ratatouille", FoodPortion.TASTE)
+
+    private suspend fun Phone.logMeal(at: Long, vararg foods: MealFood) {
+        repository.addFeeding(FeedingEntity(type = FeedType.SOLID, startTime = at, foods = foods.toList()))
+    }
+
+    /**
+     * A meal's foods travel with the meal, the household's own included — and a
+     * food the other phone added by hand is one this phone's form now offers
+     * too, because the suggestions are read from the meals and not kept apart.
+     */
+    @Test
+    fun `a meal's foods reach the other phone whole, the household's own ones included`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.logMeal(1_700_000_100_000, carrotInFrench, ratatouille)
+
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+
+        assertEquals(listOf(carrotInFrench, ratatouille), sam.feedings().single().foods)
+        assertEquals(setOf("ref:carrot", "ratatouille"), sam.knownFoods().map { it.key }.toSet())
+    }
+
+    /** A correction to a meal's list is a correction on both phones, not an addition. */
+    @Test
+    fun `a food taken off a meal is taken off on the other phone too`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.logMeal(1_700_000_100_000, carrotInFrench, ratatouille)
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+
+        alex.clock += 5_000
+        alex.repository.addFeeding(alex.feedings().single().copy(foods = listOf(carrotInFrench)))
+        sam.engine.merge(alex.replica())
+
+        assertEquals(listOf(carrotInFrench), sam.feedings().single().foods)
+        assertEquals("nothing names the ratatouille any more", listOf("ref:carrot"), sam.knownFoods().map { it.key })
+    }
+
+    /**
+     * Two parents, two languages, one carrot: a food from the list is counted by
+     * its id on both phones, whatever each was called where it was logged.
+     */
+    @Test
+    fun `a carrot logged in two languages is one food on both phones`() = runBlocking {
+        val alex = phone("alex")
+        alex.seedParent()
+        alex.repository.addBaby("Léa", birthDate = 1_699_000_000_000)
+        alex.logMeal(1_700_000_100_000, carrotInFrench)
+
+        val sam = phone("sam")
+        sam.seedParent()
+        sam.engine.merge(alex.replica())
+        sam.repository.setActiveBaby(sam.babyId())
+        sam.clock += 1_000
+        sam.logMeal(1_700_000_200_000, MealFood("Carrot", FoodPortion.TASTE, ref = "carrot"))
+        alex.engine.merge(sam.replica())
+
+        for (phone in listOf(alex, sam)) {
+            val carrot = foodHistories(phone.feedings()).single()
+            assertEquals(phone.name, "ref:carrot", carrot.key)
+            assertEquals(phone.name, 2, carrot.timesOffered)
+        }
     }
 }

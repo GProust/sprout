@@ -85,6 +85,16 @@ final class SyncMergeTests: XCTestCase {
             try queue.read { db in try T.fetchAll(db) }
         }
 
+        /// What the First foods form offers back here: the household's own foods
+        /// (BDR-20).
+        func knownFoods() throws -> [FoodHistory] {
+            foodHistories(try queue.read { db in try Feeding.fetchAll(db) })
+        }
+
+        func logMeal(at time: Int64, _ foods: MealFood...) throws {
+            try repository.addFeeding(Feeding(type: .SOLID, startTime: time, foods: foods))
+        }
+
         func babyId() throws -> Int64 {
             let baby = try queue.read { db in
                 try Baby.filter(Column("deletedAt") == nil).fetchOne(db)
@@ -442,5 +452,71 @@ final class SyncMergeTests: XCTestCase {
         XCTAssertEqual(summary.added, 0)
         XCTAssertEqual(summary.skipped, 1)
         XCTAssertTrue(try sam.allRows(Feeding.self).isEmpty)
+    }
+
+    // MARK: - First foods (BDR-20)
+
+    private let carrotInFrench = MealFood(name: "Carotte", portion: .SERVING, reception: .LIKED, ref: "carrot")
+    private let ratatouille = MealFood(name: "Ratatouille", portion: .TASTE)
+
+    /// A meal's foods travel with the meal, the household's own included — and a
+    /// food the other phone added by hand is one this phone's form now offers too,
+    /// because the suggestions are read from the meals and not kept apart.
+    func testAMealsFoodsReachTheOtherPhoneWholeTheHouseholdsOwnOnesIncluded() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.logMeal(at: 1_700_000_100_000, carrotInFrench, ratatouille)
+
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+
+        XCTAssertEqual(try sam.feedings().first?.mealFoods, [carrotInFrench, ratatouille])
+        XCTAssertEqual(Set(try sam.knownFoods().map(\.key)), ["ref:carrot", "ratatouille"])
+    }
+
+    /// A correction to a meal's list is a correction on both phones, not an
+    /// addition.
+    func testAFoodTakenOffAMealIsTakenOffOnTheOtherPhoneToo() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.logMeal(at: 1_700_000_100_000, carrotInFrench, ratatouille)
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+
+        alex.clock.now += 5_000
+        var corrected = try XCTUnwrap(try alex.feedings().first)
+        corrected.mealFoods = [carrotInFrench]
+        try alex.repository.addFeeding(corrected)
+        _ = try sam.engine.merge(try alex.replica())
+
+        XCTAssertEqual(try sam.feedings().first?.mealFoods, [carrotInFrench])
+        XCTAssertEqual(try sam.knownFoods().map(\.key), ["ref:carrot"], "nothing names the ratatouille any more")
+    }
+
+    /// Two parents, two languages, one carrot: a food from the list is counted by
+    /// its id on both phones, whatever each was called where it was logged.
+    func testACarrotLoggedInTwoLanguagesIsOneFoodOnBothPhones() throws {
+        let alex = try Phone("alex")
+        try alex.seedParent()
+        try alex.addBaby()
+        try alex.logMeal(at: 1_700_000_100_000, carrotInFrench)
+
+        let sam = try Phone("sam")
+        try sam.seedParent()
+        _ = try sam.engine.merge(try alex.replica())
+        try sam.repository.setActiveBaby(id: try sam.babyId())
+        sam.clock.now += 1_000
+        try sam.logMeal(at: 1_700_000_200_000, MealFood(name: "Carrot", portion: .TASTE, ref: "carrot"))
+        _ = try alex.engine.merge(try sam.replica())
+
+        for phone in [alex, sam] {
+            let foods = foodHistories(try phone.feedings())
+            XCTAssertEqual(foods.map(\.key), ["ref:carrot"], phone.name)
+            XCTAssertEqual(foods.first?.timesOffered, 2, phone.name)
+        }
     }
 }

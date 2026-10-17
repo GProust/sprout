@@ -23,6 +23,11 @@ All notable changes to Sprout are documented here. This project follows
 - ✍️ **And anything else, in your words.** A ratatouille, a cheese, grandma's
   soup: type it once and it's one tap away from then on, for every baby in the
   household. The meal's weight stays where it was, and optional.
+- 🤝 **Shared like every other feed.** If your household's phones share, the
+  foods go with each meal — the ones you added yourself included, which then
+  turn up in the other phone's suggestions too. Correct a meal on one phone and
+  the other follows. Both phones need this version: an older one will ask to be
+  updated rather than read the meals half-way.
 - 🔁 **Correcting a feed no longer shows up twice on the other phone.** Editing a
   feed used to reach your partner's phone as a new feed beside the old one; it
   now arrives as the correction it is.
