@@ -232,7 +232,9 @@ fun FoodsScreen(
 @Composable
 private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit) {
     val context = LocalContext.current
-    val sep = stringResource(R.string.feeding_detail_separator)
+    // Android trims the spaces off the resource's " · ", so they go back on
+    // here; the dot itself stays the translators' to change.
+    val sep = " ${stringResource(R.string.feeding_detail_separator).trim()} "
     var expanded by rememberSaveable(food.key) { mutableStateOf(false) }
 
     Card(Modifier.fillMaxWidth()) {
