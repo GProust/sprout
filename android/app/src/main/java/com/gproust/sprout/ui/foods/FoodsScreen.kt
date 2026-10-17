@@ -186,7 +186,8 @@ fun FoodsScreen(
                 item { EmptyHint(stringResource(R.string.foods_empty)) }
             } else {
                 item(key = "header") {
-                    val context = LocalContext.current
+                    val recent = stringResource(R.string.foods_sort_recent)
+                    val byName = stringResource(R.string.foods_sort_name)
                     Column {
                         Text(
                             pluralStringResource(R.plurals.foods_count, foods.size, foods.size),
@@ -197,12 +198,10 @@ fun FoodsScreen(
                             selected = order,
                             onSelect = { order = it },
                             labelOf = {
-                                context.getString(
-                                    when (it) {
-                                        FoodOrder.RECENT -> R.string.foods_sort_recent
-                                        FoodOrder.NAME -> R.string.foods_sort_name
-                                    },
-                                )
+                                when (it) {
+                                    FoodOrder.RECENT -> recent
+                                    FoodOrder.NAME -> byName
+                                }
                             },
                         )
                     }
