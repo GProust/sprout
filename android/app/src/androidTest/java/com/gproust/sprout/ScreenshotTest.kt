@@ -751,7 +751,7 @@ class ScreenshotTest {
         // form, offering the household's own foods back — there is no list of
         // foods behind it, which is the point of the capture.
         seedMeals()
-        show { FoodsScreen {} }
+        show { FoodsScreen(onBack = {}) }
         save("12-foods")
         tapDesc("Log a meal")
         saveScreen("12-foods-2-log")
