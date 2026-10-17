@@ -37,6 +37,26 @@ private val itemNames: Map<String, Int> = mapOf(
     "sweetcorn" to R.string.food_item_sweetcorn,
     "tomato" to R.string.food_item_tomato,
     "turnip" to R.string.food_item_turnip,
+    "apple" to R.string.food_item_apple,
+    "apricot" to R.string.food_item_apricot,
+    "banana" to R.string.food_item_banana,
+    "blueberries" to R.string.food_item_blueberries,
+    "cherries" to R.string.food_item_cherries,
+    "clementine" to R.string.food_item_clementine,
+    "fig" to R.string.food_item_fig,
+    "grapes" to R.string.food_item_grapes,
+    "kiwi" to R.string.food_item_kiwi,
+    "mango" to R.string.food_item_mango,
+    "melon" to R.string.food_item_melon,
+    "nectarine" to R.string.food_item_nectarine,
+    "orange" to R.string.food_item_orange,
+    "peach" to R.string.food_item_peach,
+    "pear" to R.string.food_item_pear,
+    "pineapple" to R.string.food_item_pineapple,
+    "plum" to R.string.food_item_plum,
+    "raspberries" to R.string.food_item_raspberries,
+    "strawberries" to R.string.food_item_strawberries,
+    "watermelon" to R.string.food_item_watermelon,
     "beef" to R.string.food_item_beef,
     "chicken" to R.string.food_item_chicken,
     "duck" to R.string.food_item_duck,
@@ -68,6 +88,7 @@ fun catalogName(context: Context, id: String?): String? =
 fun FoodCategory.label(context: Context): String = context.getString(
     when (this) {
         FoodCategory.VEGETABLE -> R.string.food_category_vegetable
+        FoodCategory.FRUIT -> R.string.food_category_fruit
         FoodCategory.MEAT -> R.string.food_category_meat
         FoodCategory.FISH -> R.string.food_category_fish
     },

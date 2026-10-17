@@ -15,12 +15,12 @@ All notable changes to Sprout are documented here. This project follows
   three times and liked on the fourth is exactly what the count is there to
   show, so it's shown plainly: no colours, no warnings, no target number of
   tries.
-- 🔎 **A list to search, in your language.** Vegetables, meat and fish come
-  ready to pick — search as you type (accents optional) or browse a shelf. A
+- 🔎 **A list to search, in your language.** Vegetables, fruit, meat and fish
+  come ready to pick — search as you type (accents optional) or browse a shelf. A
   carrot logged on a phone in French shows as a carrot on a phone in English,
   and counts as the same food. The list is just names: no ages, no order, no
   "try this next" — when and what is yours and your doctor's to decide.
-- ✍️ **And anything else, in your words.** A ratatouille, a fruit, grandma's
+- ✍️ **And anything else, in your words.** A ratatouille, a cheese, grandma's
   soup: type it once and it's one tap away from then on, for every baby in the
   household. The meal's weight stays where it was, and optional.
 - 🔁 **Correcting a feed no longer shows up twice on the other phone.** Editing a

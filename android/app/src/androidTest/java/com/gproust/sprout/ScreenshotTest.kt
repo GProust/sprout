@@ -753,7 +753,7 @@ class ScreenshotTest {
         save("12-foods")
         tapDesc("Log a meal")
         saveScreen("12-foods-2-log")
-        // One of the three shelves open: Sprout's list of plain names, to browse
+        // One of the shelves open: Sprout's list of plain names, to browse
         // without knowing what to type.
         tap("Vegetables")
         saveScreen("12-foods-3-vegetables")

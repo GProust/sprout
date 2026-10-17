@@ -94,9 +94,9 @@ private val COMBINING_MARKS = Regex("\\p{Mn}+")
  * The foods of one solid meal (BDR-20): each one a taste or a serving, and how
  * it went if the parent noticed.
  *
- * One field does both jobs. Typing searches Sprout's list — vegetables, meat
- * and fish, in the phone's language — and every food the household has logged
- * before; the three shelves can be browsed without typing at all. Anything
+ * One field does both jobs. Typing searches Sprout's list — vegetables, fruit,
+ * meat and fish, in the phone's language — and every food the household has
+ * logged before; the shelves can be browsed without typing at all. Anything
  * that is not found is added as typed (a ratatouille, a grandmother's soup) and
  * is one tap away from then on. A new food starts as a taste; one logged before
  * starts as whatever it was last time.
@@ -186,7 +186,7 @@ fun MealFoodsEditor(
         },
         modifier = Modifier.fillMaxWidth(),
     )
-    // The three shelves, to browse without knowing what to type. Tapping the
+    // The shelves, to browse without knowing what to type. Tapping the
     // chosen one again puts it away.
     ChoiceChips(
         options = FoodCategory.entries,

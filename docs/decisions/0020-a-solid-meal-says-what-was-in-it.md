@@ -78,8 +78,8 @@ itself to correct.
 **A taste counts.** It is an offer: the baby met the food. The page shows the
 tastes and the servings apart, so nothing is hidden by counting them together.
 
-**Sprout ships a list of plain names, and nothing about them.** Vegetables, meat
-and fish — the foods every family names — translated into the app's seven
+**Sprout ships a list of plain names, and nothing about them.** Vegetables, fruit,
+meat and fish — the foods every family names — translated into the app's seven
 languages, searchable from the one field in the form (accents optional, so
 *epinards* finds *épinards*) and browsable shelf by shelf. Each is a name and
 nothing else: no age at which it becomes "allowed", no order of introduction, no
@@ -87,7 +87,7 @@ allergen mark, no badge, and nothing suggested next. The shelves are sorted
 alphabetically in the phone's language, which is an order that says nothing.
 
 **Anything else is the household's own.** A ratatouille, a grandmother's soup, a
-fruit: typed once, it is added as written and offered back one tap away from then
+cheese: typed once, it is added as written and offered back one tap away from then
 on, for every baby in the household, alongside the list. The list is a
 convenience for the common names, not the edge of what can be logged.
 
@@ -151,7 +151,7 @@ setting.
   deciding that two things the parent logged differently were the same.
 - **A list is something to keep honest.** Every name on it is a translation that
   can be wrong in one language, and it will be asked to grow. It grows by names
-  only: a shelf of fruit or of cereals is the same decision, a field that says
+  only: a shelf of cereals or of dairy is the same decision, a field that says
   anything *about* a food is not.
 - **Editing a meal keeps its identity.** The feeding form used to rebuild the
   row it edited, with a new `uid`; the other phone then saw a new meal beside the

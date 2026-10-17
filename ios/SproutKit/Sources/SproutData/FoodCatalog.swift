@@ -1,9 +1,9 @@
 import Foundation
 
-/// The shelf a food on the list sits on. Vegetables, meat and fish only: the list
+/// The shelf a food on the list sits on. Vegetables, fruit, meat and fish: the list
 /// is a convenience for the foods every family names, not a map of what a baby
 /// should eat (BDR-20).
-public enum FoodCategory: String, CaseIterable, Sendable { case VEGETABLE, MEAT, FISH }
+public enum FoodCategory: String, CaseIterable, Sendable { case VEGETABLE, FRUIT, MEAT, FISH }
 
 /// One food on Sprout's list. `id` is what travels with the meal
 /// (``MealFood/ref``), so a carrot logged on a phone in French and one logged on
@@ -53,6 +53,26 @@ public enum FoodCatalog {
         CatalogFood(id: "sweetcorn", category: .VEGETABLE),
         CatalogFood(id: "tomato", category: .VEGETABLE),
         CatalogFood(id: "turnip", category: .VEGETABLE),
+        CatalogFood(id: "apple", category: .FRUIT),
+        CatalogFood(id: "apricot", category: .FRUIT),
+        CatalogFood(id: "banana", category: .FRUIT),
+        CatalogFood(id: "blueberries", category: .FRUIT),
+        CatalogFood(id: "cherries", category: .FRUIT),
+        CatalogFood(id: "clementine", category: .FRUIT),
+        CatalogFood(id: "fig", category: .FRUIT),
+        CatalogFood(id: "grapes", category: .FRUIT),
+        CatalogFood(id: "kiwi", category: .FRUIT),
+        CatalogFood(id: "mango", category: .FRUIT),
+        CatalogFood(id: "melon", category: .FRUIT),
+        CatalogFood(id: "nectarine", category: .FRUIT),
+        CatalogFood(id: "orange", category: .FRUIT),
+        CatalogFood(id: "peach", category: .FRUIT),
+        CatalogFood(id: "pear", category: .FRUIT),
+        CatalogFood(id: "pineapple", category: .FRUIT),
+        CatalogFood(id: "plum", category: .FRUIT),
+        CatalogFood(id: "raspberries", category: .FRUIT),
+        CatalogFood(id: "strawberries", category: .FRUIT),
+        CatalogFood(id: "watermelon", category: .FRUIT),
         CatalogFood(id: "beef", category: .MEAT),
         CatalogFood(id: "chicken", category: .MEAT),
         CatalogFood(id: "duck", category: .MEAT),

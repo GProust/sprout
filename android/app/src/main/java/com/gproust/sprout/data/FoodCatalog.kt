@@ -1,11 +1,11 @@
 package com.gproust.sprout.data
 
 /**
- * The shelf a food on the list sits on. Vegetables, meat and fish only: the
+ * The shelf a food on the list sits on. Vegetables, fruit, meat and fish: the
  * list is a convenience for the foods every family names, not a map of what a
  * baby should eat (BDR-20).
  */
-enum class FoodCategory { VEGETABLE, MEAT, FISH }
+enum class FoodCategory { VEGETABLE, FRUIT, MEAT, FISH }
 
 /**
  * One food on Sprout's list. [id] is what travels with the meal
@@ -58,6 +58,26 @@ object FoodCatalog {
         CatalogFood("sweetcorn", FoodCategory.VEGETABLE),
         CatalogFood("tomato", FoodCategory.VEGETABLE),
         CatalogFood("turnip", FoodCategory.VEGETABLE),
+        CatalogFood("apple", FoodCategory.FRUIT),
+        CatalogFood("apricot", FoodCategory.FRUIT),
+        CatalogFood("banana", FoodCategory.FRUIT),
+        CatalogFood("blueberries", FoodCategory.FRUIT),
+        CatalogFood("cherries", FoodCategory.FRUIT),
+        CatalogFood("clementine", FoodCategory.FRUIT),
+        CatalogFood("fig", FoodCategory.FRUIT),
+        CatalogFood("grapes", FoodCategory.FRUIT),
+        CatalogFood("kiwi", FoodCategory.FRUIT),
+        CatalogFood("mango", FoodCategory.FRUIT),
+        CatalogFood("melon", FoodCategory.FRUIT),
+        CatalogFood("nectarine", FoodCategory.FRUIT),
+        CatalogFood("orange", FoodCategory.FRUIT),
+        CatalogFood("peach", FoodCategory.FRUIT),
+        CatalogFood("pear", FoodCategory.FRUIT),
+        CatalogFood("pineapple", FoodCategory.FRUIT),
+        CatalogFood("plum", FoodCategory.FRUIT),
+        CatalogFood("raspberries", FoodCategory.FRUIT),
+        CatalogFood("strawberries", FoodCategory.FRUIT),
+        CatalogFood("watermelon", FoodCategory.FRUIT),
         CatalogFood("beef", FoodCategory.MEAT),
         CatalogFood("chicken", FoodCategory.MEAT),
         CatalogFood("duck", FoodCategory.MEAT),

@@ -344,7 +344,7 @@ one array of objects inside a row. Four things a change can quietly undo:
   `foodKey` of its name: trimmed, Unicode whitespace collapsed, lower-cased
   without locale. Never key by the phone's language, and never make the key
   cleverer (plurals, accents) on one side only — accent folding is for searching.
-- **The list is names and nothing else** — vegetables, meat, fish, in seven
+- **The list is names and nothing else** — vegetables, fruit, meat, fish, in seven
   languages (`food_item_<id>` in Android's strings, generated into iOS's). No
   ages, no order, no allergen marks, nothing suggested. Its ids are pinned by
   `spec/vectors/food-catalog.json` on both sides: append to a shelf, never rename

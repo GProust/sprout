@@ -115,8 +115,8 @@ When you log a solid meal you can list the foods that were in it, and whether
 each was a taste or a serving and how it went. The **First foods** page counts
 them back to you.
 
-- **The list of foods is part of the app.** Vegetables, meat and fish are
-  built in, in the app's languages, and searching it happens on your phone —
+- **The list of foods is part of the app.** Vegetables, fruit, meat and
+  fish are built in, in the app's languages, and searching it happens on your phone —
   nothing is looked up anywhere. Anything else is the words you type, and the
   suggestions the form offers are the foods your own household has already
   logged. Nothing is compared against any guidance.
