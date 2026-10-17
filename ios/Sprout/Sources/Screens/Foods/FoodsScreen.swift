@@ -122,7 +122,7 @@ struct FoodsScreen: View {
 
     private func ordered(_ foods: [FoodHistory]) -> [FoodHistory] {
         guard byName else { return foods }
-        return foods.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        return foods.sorted { $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending }
     }
 }
 
@@ -144,7 +144,7 @@ private struct FoodCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.hairline) {
             HStack(alignment: .firstTextBaseline) {
-                Text(food.name)
+                Text(food.displayName)
                     .font(.body.weight(.medium))
                     .foregroundStyle(SproutColor.onSurface)
                     .frame(maxWidth: .infinity, alignment: .leading)

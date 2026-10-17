@@ -117,18 +117,30 @@ public struct NursingSegment: Equatable, Sendable {
     public var durationMs: Int64 { max(0, endTime - startTime) }
 }
 
-/// One food in a solid meal, in the parent's own words — Sprout ships no list of
-/// foods (BDR-20). Two meals offered the same food when their names match
-/// ignoring case and spacing; see ``foodKey(_:)``.
+/// One food in a solid meal (BDR-20): one from Sprout's list, or one the
+/// household typed in.
+///
+/// `ref` is the ``FoodCatalog`` id of a food from the list, and what makes it the
+/// same food on every phone whatever language each is in; `name` is still saved
+/// with it, as it read when it was logged, so a phone that does not know the id
+/// has something to show. A food the household added has no `ref` and is its
+/// `name`, matched ignoring case and spacing — see ``foodKey(_:)``.
 public struct MealFood: Equatable, Hashable, Sendable {
     public var name: String
     public var portion: FoodPortion
     public var reception: FoodReception?
+    public var ref: String?
 
-    public init(name: String, portion: FoodPortion = .TASTE, reception: FoodReception? = nil) {
+    public init(
+        name: String,
+        portion: FoodPortion = .TASTE,
+        reception: FoodReception? = nil,
+        ref: String? = nil
+    ) {
         self.name = name
         self.portion = portion
         self.reception = reception
+        self.ref = ref
     }
 }
 

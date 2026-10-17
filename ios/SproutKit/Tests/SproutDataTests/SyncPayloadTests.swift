@@ -160,7 +160,7 @@ final class SyncPayloadTests: XCTestCase {
             meal.mealFoods,
             [
                 MealFood(name: #"Carrot; parsnip, "homemade""#, portion: .SERVING, reception: .LIKED),
-                MealFood(name: "Œuf", portion: .TASTE),
+                MealFood(name: "Panais", portion: .TASTE, ref: "parsnip"),
             ]
         )
         XCTAssertEqual(try XCTUnwrap(payload.feedings.first).row.mealFoods, [], "a breastfeed names no foods")
@@ -174,6 +174,8 @@ final class SyncPayloadTests: XCTestCase {
         let foods = try XCTUnwrap(written["foods"] as? [[String: Any]])
         XCTAssertEqual(foods.count, 2)
         XCTAssertNil(foods[1]["reception"], "not noted is no key at all")
+        XCTAssertEqual(foods[1]["ref"] as? String, "parsnip")
+        XCTAssertNil(foods[0]["ref"], "a food the household typed in has no list id")
         XCTAssertNil(try XCTUnwrap(feedings.first { $0["type"] as? String == "BREAST" })["foods"])
     }
 

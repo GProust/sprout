@@ -18,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.ThumbsUpDown
@@ -37,35 +39,67 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
+import com.gproust.sprout.data.FoodCatalog
+import com.gproust.sprout.data.FoodCategory
 import com.gproust.sprout.data.FoodHistory
+import com.gproust.sprout.data.foodIdentity
 import com.gproust.sprout.data.foodKey
 import com.gproust.sprout.data.local.FoodPortion
 import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.FieldLabel
+import java.text.Collator
+import java.text.Normalizer
 
 /**
- * How many of the household's foods the form offers at once. Enough for the
- * week's usual suspects; typing narrows the rest.
+ * How many of the household's foods the form offers before anything is typed.
+ * Enough for the week's usual suspects; typing reaches the rest.
  */
-private const val MAX_SUGGESTIONS = 12
+private const val MAX_RECENT = 12
+
+/** How many matches a search shows at once — a word narrows it further. */
+private const val MAX_MATCHES = 24
+
+/**
+ * Something the parent can tap to put on the meal: a food from Sprout's list, or
+ * one the household has logged before. [food] is what it adds; [key] is its
+ * [foodIdentity], so the same carrot is never offered twice.
+ */
+private data class FoodChoice(
+    val label: String,
+    val food: MealFood,
+    val key: String,
+    val category: FoodCategory? = null,
+)
+
+/**
+ * What a search compares: [foodKey] with the accents taken off, so "pates"
+ * finds "pâtes" and "epinards" finds "épinards". For searching only — two foods
+ * are never merged by it.
+ */
+private fun searchKey(text: String): String =
+    Normalizer.normalize(foodKey(text), Normalizer.Form.NFD).replace(COMBINING_MARKS, "")
+
+private val COMBINING_MARKS = Regex("\\p{Mn}+")
 
 /**
  * The foods of one solid meal (BDR-20): each one a taste or a serving, and how
  * it went if the parent noticed.
  *
- * There is no list of foods behind this. [known] is the household's own — every
- * food it has logged before, most recent first — offered back as one-tap chips
- * and narrowed as the parent types, so the second time nobody types at all.
- * A new food starts as a taste; one logged before starts as whatever it was
- * last time.
+ * One field does both jobs. Typing searches Sprout's list — vegetables, meat
+ * and fish, in the phone's language — and every food the household has logged
+ * before; the three shelves can be browsed without typing at all. Anything
+ * that is not found is added as typed (a ratatouille, a grandmother's soup) and
+ * is one tap away from then on. A new food starts as a taste; one logged before
+ * starts as whatever it was last time.
  */
 @Composable
 fun MealFoodsEditor(
@@ -73,17 +107,48 @@ fun MealFoodsEditor(
     onChange: (List<MealFood>) -> Unit,
     known: List<FoodHistory>,
 ) {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     var typed by remember { mutableStateOf("") }
+    var shelf by remember { mutableStateOf<FoodCategory?>(null) }
 
-    fun add(name: String) {
-        val clean = name.trim()
-        val key = foodKey(clean)
-        // A food already on this meal is not a second offer of it.
-        if (key.isNotEmpty() && foods.none { foodKey(it.name) == key }) {
-            val portion = known.firstOrNull { it.key == key }?.lastPortion ?: FoodPortion.TASTE
-            onChange(foods + MealFood(clean, portion))
+    // The list in this phone's language, rebuilt when the language changes.
+    val catalog = remember(configuration) {
+        FoodCatalog.foods.map { item ->
+            val label = catalogName(context, item.id) ?: item.id
+            FoodChoice(label, MealFood(label, ref = item.id), "ref:${item.id}", item.category)
+        }
+    }
+    val household = known.map { history ->
+        FoodChoice(
+            label = history.displayName(context),
+            food = MealFood(history.displayName(context), history.lastPortion, ref = history.ref),
+            key = history.key,
+        )
+    }
+    val lastPortion = known.associate { it.key to it.lastPortion }
+    val onMeal = foods.map(::foodIdentity).toSet()
+    val query = searchKey(typed)
+    val everything = (household + catalog).distinctBy { it.key }
+    val exact = everything.firstOrNull { searchKey(it.label) == query }
+
+    fun add(choice: FoodChoice) {
+        if (choice.key !in onMeal) {
+            onChange(foods + choice.food.copy(portion = lastPortion[choice.key] ?: choice.food.portion))
         }
         typed = ""
+    }
+
+    // What was typed, as a food: the one it names on the list or in the
+    // household if there is one, so "carotte" typed out in full is still the
+    // carrot from the list, and otherwise a food of the household's own.
+    fun addTyped() {
+        val clean = typed.trim()
+        when {
+            query.isEmpty() -> typed = ""
+            exact != null -> add(exact)
+            else -> add(FoodChoice(clean, MealFood(clean), foodKey(clean)))
+        }
     }
 
     FieldLabel(stringResource(R.string.meal_foods))
@@ -106,37 +171,71 @@ fun MealFoodsEditor(
     OutlinedTextField(
         value = typed,
         onValueChange = { typed = it },
-        label = { Text(stringResource(R.string.meal_food_add)) },
+        label = { Text(stringResource(R.string.meal_food_search)) },
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Sentences,
             imeAction = ImeAction.Done,
         ),
-        keyboardActions = KeyboardActions(onDone = { add(typed) }),
+        keyboardActions = KeyboardActions(onDone = { addTyped() }),
         trailingIcon = {
-            IconButton(onClick = { add(typed) }, enabled = typed.isNotBlank()) {
+            IconButton(onClick = { addTyped() }, enabled = query.isNotEmpty()) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.meal_food_add))
             }
         },
         modifier = Modifier.fillMaxWidth(),
     )
+    // The three shelves, to browse without knowing what to type. Tapping the
+    // chosen one again puts it away.
+    ChoiceChips(
+        options = FoodCategory.entries,
+        selected = shelf,
+        onSelect = { shelf = if (it == shelf) null else it },
+        labelOf = { it.label(context) },
+    )
 
-    val onMeal = foods.map { foodKey(it.name) }.toSet()
-    val query = foodKey(typed)
-    val suggestions = known
-        .filter { it.key !in onMeal && (query.isEmpty() || it.key.contains(query)) }
-        .take(MAX_SUGGESTIONS)
-    if (suggestions.isNotEmpty()) {
+    val collator = remember(configuration) { Collator.getInstance() }
+    val shown = when {
+        shelf != null -> catalog
+            .filter { it.category == shelf && (query.isEmpty() || searchKey(it.label).contains(query)) }
+            .sortedWith { a, b -> collator.compare(a.label, b.label) }
+        query.isEmpty() -> household.take(MAX_RECENT)
+        else -> everything.filter { searchKey(it.label).contains(query) }.take(MAX_MATCHES)
+    }.filter { it.key !in onMeal }
+
+    if (shelf == null && query.isEmpty() && shown.isNotEmpty()) {
+        Text(
+            stringResource(R.string.meal_foods_recent),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+    }
+    // Something typed that matches nothing exactly is offered as a food of its
+    // own, by name, so adding the ratatouille is a tap and not a hunt for the
+    // keyboard's Done key.
+    val offerTyped = query.isNotEmpty() && exact == null
+    if (shown.isNotEmpty() || offerTyped) {
         FlowRow(
             modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            suggestions.forEach { history ->
+            shown.forEach { choice ->
                 AssistChip(
-                    onClick = { add(history.name) },
-                    label = { Text(history.name) },
+                    onClick = { add(choice) },
+                    label = { Text(choice.label) },
                     leadingIcon = {
                         Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    },
+                )
+            }
+            if (offerTyped) {
+                AssistChip(
+                    onClick = { addTyped() },
+                    label = { Text(stringResource(R.string.meal_food_add_named, typed.trim())) },
+                    leadingIcon = {
+                        Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                     },
                 )
             }
@@ -156,14 +255,14 @@ private fun MealFoodRow(
         Column(Modifier.padding(start = 12.dp, end = 4.dp, bottom = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    food.name,
+                    food.displayName(context),
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = onRemove) {
                     Icon(
                         Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.meal_food_remove, food.name),
+                        contentDescription = stringResource(R.string.meal_food_remove, food.displayName(context)),
                         tint = MaterialTheme.colorScheme.outline,
                     )
                 }

@@ -162,11 +162,14 @@ fun FoodsScreen(
         )
     }
 
+    val context = LocalContext.current
     val collator = remember { Collator.getInstance() }
-    val foods = remember(state.foods, order) {
+    val foods = remember(state.foods, order, context) {
         when (order) {
             FoodOrder.RECENT -> state.foods
-            FoodOrder.NAME -> state.foods.sortedWith { a, b -> collator.compare(a.name, b.name) }
+            FoodOrder.NAME -> state.foods.sortedWith { a, b ->
+                collator.compare(a.displayName(context), b.displayName(context))
+            }
         }
     }
     val now = System.currentTimeMillis()
@@ -235,7 +238,11 @@ private fun FoodCard(food: FoodHistory, now: Long, onOpenMeal: (String) -> Unit)
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(food.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(
+                    food.displayName(context),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
                 Text(
                     pluralStringResource(R.plurals.food_times_offered, food.timesOffered, food.timesOffered),
                     style = MaterialTheme.typography.labelLarge,

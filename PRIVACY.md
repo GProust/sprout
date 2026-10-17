@@ -115,10 +115,11 @@ When you log a solid meal you can list the foods that were in it, and whether
 each was a taste or a serving and how it went. The **First foods** page counts
 them back to you.
 
-- **Sprout ships no list of foods.** The names are the words you type; nothing
-  is looked up, suggested from anywhere else, or compared against any guidance.
-  The suggestions the form offers are the foods your own household has already
-  logged.
+- **The list of foods is part of the app.** Vegetables, meat and fish are
+  built in, in the app's languages, and searching it happens on your phone —
+  nothing is looked up anywhere. Anything else is the words you type, and the
+  suggestions the form offers are the foods your own household has already
+  logged. Nothing is compared against any guidance.
 - **Nothing here is advice or an assessment.** The page counts the meals you
   logged. It has no target number of tries, does not tell you what to offer next
   or when, and records no reactions or allergies — if you want to note what you
@@ -212,9 +213,9 @@ one you can check.
 
 - Added the section on **first foods**. A solid meal can now list the foods that
   were in it — a taste or a serving, and how it went — and a page counts them.
-  The foods are words you type, stored, shared and deleted with the meal they
-  belong to. Sprout ships no list of foods and records no reactions. Nothing
-  about what Sprout collects or sends has changed.
+  The foods are picked from a list built into the app or typed in, and are
+  stored, shared and deleted with the meal they belong to. Sprout records no
+  reactions. Nothing about what Sprout collects or sends has changed.
 
 ### 2026-09-16
 

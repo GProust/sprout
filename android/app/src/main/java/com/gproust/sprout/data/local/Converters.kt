@@ -113,8 +113,10 @@ class Converters {
                     JSONObject().apply {
                         put("name", food.name)
                         put("portion", food.portion.name)
-                        // Absent rather than null: "not noted" is no key at all.
+                        // Absent rather than null: "not noted" is no key at all,
+                        // and a food the household typed in has no list id.
                         food.reception?.let { put("reception", it.name) }
+                        food.ref?.let { put("ref", it) }
                     },
                 )
             }
@@ -126,6 +128,7 @@ class Converters {
                 name = o.getString("name"),
                 portion = FoodPortion.valueOf(o.getString("portion")),
                 reception = if (o.isNull("reception")) null else FoodReception.valueOf(o.getString("reception")),
+                ref = if (o.isNull("ref")) null else o.getString("ref"),
             )
         }
     }

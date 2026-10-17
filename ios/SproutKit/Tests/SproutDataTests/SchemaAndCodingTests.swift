@@ -212,6 +212,7 @@ final class CodingTests: XCTestCase {
             MealFood(name: "Purée carotte; panais, \"maison\"", portion: .SERVING, reception: .LIKED),
             MealFood(name: "Œuf 🥚", portion: .TASTE),
             MealFood(name: "Brocoli", portion: .TASTE, reception: .REFUSED),
+            MealFood(name: "Carotte", portion: .SERVING, ref: "carrot"),
         ]
 
         XCTAssertEqual(MealFoodCoding.decode(MealFoodCoding.encode(foods)), foods)

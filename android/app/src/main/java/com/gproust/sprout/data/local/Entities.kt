@@ -84,14 +84,20 @@ enum class FoodPortion { TASTE, SERVING }
 enum class FoodReception { LIKED, MIXED, REFUSED }
 
 /**
- * One food in a solid meal, in the parent's own words — Sprout ships no list of
- * foods (BDR-20). Two meals offered the same food when their names match
- * ignoring case and spacing; see `foodKey`.
+ * One food in a solid meal (BDR-20): one from Sprout's list, or one the
+ * household typed in.
+ *
+ * [ref] is the [com.gproust.sprout.data.FoodCatalog] id of a food from the list,
+ * and what makes it the same food on every phone whatever language each is in;
+ * [name] is still saved with it, as it read when it was logged, so a phone that
+ * does not know the id has something to show. A food the household added has no
+ * [ref] and is its [name], matched ignoring case and spacing — see `foodKey`.
  */
 data class MealFood(
     val name: String,
     val portion: FoodPortion = FoodPortion.TASTE,
     val reception: FoodReception? = null,
+    val ref: String? = null,
 )
 
 /** Postpartum bleeding (lochia) intensity. */

@@ -422,7 +422,7 @@ extension Feeding {
         // What a solid meal was made of, in the parent's own words (BDR-20).
         let foods = mealFoods
         if type == .SOLID, !foods.isEmpty {
-            parts.append(foods.map(\.name).joined(separator: ", "))
+            parts.append(foods.map(\.displayName).joined(separator: ", "))
         }
         if let notes = notes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
             parts.append(notes)

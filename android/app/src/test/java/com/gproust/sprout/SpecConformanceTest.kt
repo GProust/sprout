@@ -7,6 +7,8 @@ import com.gproust.sprout.data.sync.SyncInvitation
 import com.gproust.sprout.data.sync.SyncInvitationCodec
 import com.gproust.sprout.data.sync.SyncInvitationException
 import com.gproust.sprout.data.sync.SyncLimits
+import com.gproust.sprout.data.FoodCatalog
+import com.gproust.sprout.data.FoodCategory
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FoodPortion
@@ -264,7 +266,7 @@ class SpecConformanceTest {
         assertEquals(
             listOf(
                 MealFood("Carrot; parsnip, \"homemade\"", FoodPortion.SERVING, FoodReception.LIKED),
-                MealFood("Œuf", FoodPortion.TASTE, null),
+                MealFood("Panais", FoodPortion.TASTE, null, ref = "parsnip"),
             ),
             meal.foods,
         )
@@ -315,6 +317,26 @@ class SpecConformanceTest {
         assertEquals(
             1_757_406_000_000L,
             payload.diapers.first { it.row.deletedAt != null }.row.deletedAt,
+        )
+    }
+
+    /**
+     * Sprout's food list against the ids Node wrote down (BDR-20). A `ref` this
+     * phone knows and the other does not is a carrot one of them can name and the
+     * other shows by whatever it was called where it was logged.
+     */
+    @Test
+    fun `the food list matches the spec`() {
+        val v = vector("food-catalog.json")
+        val categories = v.getJSONArray("categories")
+        assertEquals(
+            (0 until categories.length()).map { categories.getString(it) },
+            FoodCategory.entries.map { it.name },
+        )
+        val foods = v.getJSONArray("foods")
+        assertEquals(
+            (0 until foods.length()).map { foods.getJSONObject(it).let { o -> o.getString("id") to o.getString("category") } },
+            FoodCatalog.foods.map { it.id to it.category.name },
         )
     }
 

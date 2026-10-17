@@ -256,9 +256,12 @@ const replica = {
       segments: 'LEFT,1757400000000,1757400360000;RIGHT,1757400360000,1757400600000',
     },
     // A solid meal that says what was in it (BDR-20). `foods` is an array of
-    // objects, not a packed string: a food is the parent's own words, so the
-    // first name carries the two separators the packed fields use and a quote.
-    // The second noted nothing about how it went, which is an absent key.
+    // objects, not a packed string. The first food is one the household typed
+    // in, so its name carries the two separators the packed fields use and a
+    // quote, and it has no `ref`. The second is from Sprout's list: `ref` is
+    // its id there, and its name is how it read on the phone that logged it —
+    // in French here, which a phone in any other language shows in its own.
+    // It noted nothing about how it went, which is an absent key.
     {
       babyUid: '8f14e45f-ea9b-4b3d-9f1a-2c0d3e4f5a6b',
       uid: 'a87ff679-a2f3-4e71-9181-a67b7542122c',
@@ -269,7 +272,7 @@ const replica = {
       segments: '',
       foods: [
         { name: 'Carrot; parsnip, "homemade"', portion: 'SERVING', reception: 'LIKED' },
-        { name: 'Œuf', portion: 'TASTE' },
+        { name: 'Panais', portion: 'TASTE', ref: 'parsnip' },
       ],
     },
   ],
@@ -435,6 +438,80 @@ write('replica.json', {
     { name: 'no versions at all', json: JSON.stringify({ householdId: 'x' }), reason: 'unreadable' },
     { name: 'not JSON', json: 'not a replica at all', reason: 'unreadable' },
   ],
+})
+
+// ---------------------------------------------------------- the food list
+
+// Sprout's list of foods (BDR-20), by the ids a meal's `ref` carries. Both apps
+// hold the same list in the same order and are checked against this file: an
+// id one phone knows and the other does not is a carrot one phone names and the
+// other shows by whatever it was called where it was logged. Ids are added to
+// the end of a shelf and never renamed or removed — they are in every meal that
+// used them. The names, in seven languages, are Android's string resources
+// (`food_item_<id>`), which the iOS catalog is generated from.
+const foodCatalog = {
+  VEGETABLE: [
+    'artichoke',
+    'asparagus',
+    'aubergine',
+    'avocado',
+    'beetroot',
+    'broccoli',
+    'butternut',
+    'cabbage',
+    'carrot',
+    'cauliflower',
+    'celeriac',
+    'chickpeas',
+    'courgette',
+    'cucumber',
+    'fennel',
+    'green_beans',
+    'leek',
+    'lentils',
+    'mushrooms',
+    'parsnip',
+    'peas',
+    'potato',
+    'pumpkin',
+    'spinach',
+    'sweet_pepper',
+    'sweet_potato',
+    'sweetcorn',
+    'tomato',
+    'turnip',
+  ],
+  MEAT: [
+    'beef',
+    'chicken',
+    'duck',
+    'ham',
+    'lamb',
+    'pork',
+    'rabbit',
+    'turkey',
+    'veal',
+  ],
+  FISH: [
+    'cod',
+    'hake',
+    'mackerel',
+    'salmon',
+    'sardines',
+    'sea_bass',
+    'sea_bream',
+    'sole',
+    'trout',
+    'tuna',
+  ],
+}
+
+write('food-catalog.json', {
+  note:
+    "Every id on Sprout's food list, shelf by shelf, in the order both apps hold them. " +
+    'A meal food\'s `ref` is one of these, or absent for a food the household typed in.',
+  categories: Object.keys(foodCatalog),
+  foods: Object.entries(foodCatalog).flatMap(([category, ids]) => ids.map((id) => ({ id, category }))),
 })
 
 // ------------------------------------------------------------- nesting depth

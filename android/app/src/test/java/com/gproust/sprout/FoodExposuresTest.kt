@@ -1,6 +1,7 @@
 package com.gproust.sprout
 
 import com.gproust.sprout.data.foodHistories
+import com.gproust.sprout.data.foodIdentity
 import com.gproust.sprout.data.foodKey
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
@@ -142,6 +143,28 @@ class FoodExposuresTest {
         assertEquals("carrot", carrot.name)
         assertEquals(listOf("a", "b"), carrot.offers.map { it.feedUid })
         assertEquals(SERVING, carrot.lastPortion)
+    }
+
+    @Test
+    fun `a food from the list is one food in every language`() {
+        val foods = foodHistories(
+            listOf(
+                meal("m1", t0, MealFood("Carotte", TASTE, ref = "carrot")),
+                meal("m2", t0 + day, MealFood("Carrot", SERVING, ref = "carrot")),
+                // Typed in, not picked from the list: the household's own food,
+                // which a carrot from the list never silently becomes.
+                meal("m3", t0 + 2 * day, food("Carrot")),
+            ),
+        )
+
+        assertEquals(listOf("carrot", "ref:carrot"), foods.map { it.key })
+        val listed = foods[1]
+        assertEquals(2, listed.timesOffered)
+        assertEquals("carrot", listed.ref)
+        assertEquals("the latest name it was saved with", "Carrot", listed.name)
+        assertNull(foods[0].ref)
+        assertEquals("ref:carrot", foodIdentity(MealFood("Zanahoria", ref = "carrot")))
+        assertEquals("carrot", foodIdentity(MealFood(" Carrot ")))
     }
 
     @Test

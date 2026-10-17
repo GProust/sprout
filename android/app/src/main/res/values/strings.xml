@@ -797,9 +797,8 @@
     <string name="cd_show_password">Show password</string>
     <string name="cd_hide_password">Hide password</string>
 
-    <!-- First foods (BDR-20). Sprout ships no list of foods and grades none of
-         them: the foods are the parent's own words, and the counts are facts —
-         never progress toward a number. -->
+    <!-- First foods (BDR-20). The counts are facts, never progress toward a
+         number, and nothing here grades a food. -->
     <string name="screen_foods">First foods</string>
     <string name="foods_empty">No foods yet. Log a solid meal with the + button and list what was in it — each food gets its own count here.</string>
     <string name="foods_log_meal">Log a meal</string>
@@ -834,4 +833,61 @@
     <string name="meal_food_remove">Remove %1$s</string>
     <string name="meal_foods_hint">Each food you list gets its own count under First foods.</string>
     <string name="meal_edit_title">Edit meal</string>
+
+    <!-- The food list (BDR-20): plain names in seven languages, keyed by an id that
+         travels with the meal. Names only — no ages, no order, nothing marked. -->
+    <string name="meal_food_search">Search or add a food</string>
+    <string name="meal_food_add_named">Add “%1$s”</string>
+    <string name="meal_foods_recent">Already logged</string>
+    <string name="food_category_vegetable">Vegetables</string>
+    <string name="food_category_meat">Meat</string>
+    <string name="food_category_fish">Fish</string>
+    <string name="food_item_artichoke">Artichoke</string>
+    <string name="food_item_asparagus">Asparagus</string>
+    <string name="food_item_aubergine">Aubergine</string>
+    <string name="food_item_avocado">Avocado</string>
+    <string name="food_item_beetroot">Beetroot</string>
+    <string name="food_item_broccoli">Broccoli</string>
+    <string name="food_item_butternut">Butternut squash</string>
+    <string name="food_item_cabbage">Cabbage</string>
+    <string name="food_item_carrot">Carrot</string>
+    <string name="food_item_cauliflower">Cauliflower</string>
+    <string name="food_item_celeriac">Celeriac</string>
+    <string name="food_item_chickpeas">Chickpeas</string>
+    <string name="food_item_courgette">Courgette</string>
+    <string name="food_item_cucumber">Cucumber</string>
+    <string name="food_item_fennel">Fennel</string>
+    <string name="food_item_green_beans">Green beans</string>
+    <string name="food_item_leek">Leek</string>
+    <string name="food_item_lentils">Lentils</string>
+    <string name="food_item_mushrooms">Mushrooms</string>
+    <string name="food_item_parsnip">Parsnip</string>
+    <string name="food_item_peas">Peas</string>
+    <string name="food_item_potato">Potato</string>
+    <string name="food_item_pumpkin">Pumpkin</string>
+    <string name="food_item_spinach">Spinach</string>
+    <string name="food_item_sweet_pepper">Sweet pepper</string>
+    <string name="food_item_sweet_potato">Sweet potato</string>
+    <string name="food_item_sweetcorn">Sweetcorn</string>
+    <string name="food_item_tomato">Tomato</string>
+    <string name="food_item_turnip">Turnip</string>
+    <string name="food_item_beef">Beef</string>
+    <string name="food_item_chicken">Chicken</string>
+    <string name="food_item_duck">Duck</string>
+    <string name="food_item_ham">Ham</string>
+    <string name="food_item_lamb">Lamb</string>
+    <string name="food_item_pork">Pork</string>
+    <string name="food_item_rabbit">Rabbit</string>
+    <string name="food_item_turkey">Turkey</string>
+    <string name="food_item_veal">Veal</string>
+    <string name="food_item_cod">Cod</string>
+    <string name="food_item_hake">Hake</string>
+    <string name="food_item_mackerel">Mackerel</string>
+    <string name="food_item_salmon">Salmon</string>
+    <string name="food_item_sardines">Sardines</string>
+    <string name="food_item_sea_bass">Sea bass</string>
+    <string name="food_item_sea_bream">Sea bream</string>
+    <string name="food_item_sole">Sole</string>
+    <string name="food_item_trout">Trout</string>
+    <string name="food_item_tuna">Tuna</string>
 </resources>

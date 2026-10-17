@@ -25,6 +25,15 @@ public func foodKey(_ name: String) -> String {
     name.split(whereSeparator: \.isWhitespace).joined(separator: " ").lowercased()
 }
 
+/// What makes two foods on two meals the same food: the list's id for a food from
+/// Sprout's list — "Carotte" logged in French and "Carrot" logged in English are
+/// one carrot — and ``foodKey(_:)`` of the name for a food the household typed
+/// in. Never the phone's language, so both phones count alike.
+public func foodIdentity(_ food: MealFood) -> String {
+    if let ref = food.ref { return "ref:\(ref)" }
+    return foodKey(food.name)
+}
+
 /// One meal a food was part of.
 public struct FoodOffer: Equatable, Sendable {
     /// The meal's uid, so the page can open it to correct.
@@ -36,12 +45,15 @@ public struct FoodOffer: Equatable, Sendable {
 
 /// Everything one food has been through: the meals it was in, newest first.
 ///
-/// `name` is how it was written most recently — a parent who corrects "carot"
-/// to "Carrot" sees the correction, not the first spelling.
+/// `key` is its ``foodIdentity(_:)``. `name` is how it was written most
+/// recently — a parent who corrects "carot" to "Carrot" sees the correction, not
+/// the first spelling — and `ref` is its id on Sprout's list, when it is from
+/// there, which is what the page names it by.
 public struct FoodHistory: Equatable, Sendable, Identifiable {
     public let key: String
     public let name: String
     public let offers: [FoodOffer]
+    public var ref: String?
 
     public var id: String { key }
 
@@ -77,17 +89,17 @@ public func foodHistories(_ feeds: [Feeding]) -> [FoodHistory] {
         }
 
     var order: [String] = []
-    var names: [String: String] = [:]
+    var latest: [String: MealFood] = [:]
     var offers: [String: [FoodOffer]] = [:]
     for meal in meals {
         // One offer per food per meal, in the order the meal listed them.
         var inMealOrder: [String] = []
         var inMeal: [String: FoodOffer] = [:]
         for food in meal.mealFoods {
-            let key = foodKey(food.name)
-            if key.isEmpty { continue }
-            if names[key] == nil {
-                names[key] = food.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            if foodKey(food.name).isEmpty && food.ref == nil { continue }
+            let key = foodIdentity(food)
+            if latest[key] == nil {
+                latest[key] = food
                 order.append(key)
             }
             if let seen = inMeal[key] {
@@ -111,5 +123,13 @@ public func foodHistories(_ feeds: [Feeding]) -> [FoodHistory] {
     }
     // `order` was filled newest meal first, so it is already "most recently
     // offered first".
-    return order.map { key in FoodHistory(key: key, name: names[key]!, offers: offers[key]!) }
+    return order.map { key in
+        let food = latest[key]!
+        return FoodHistory(
+            key: key,
+            name: food.name.trimmingCharacters(in: .whitespacesAndNewlines),
+            offers: offers[key]!,
+            ref: food.ref
+        )
+    }
 }

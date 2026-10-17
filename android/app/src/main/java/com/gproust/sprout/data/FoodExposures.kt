@@ -4,6 +4,7 @@ import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.FoodPortion
 import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import java.util.Locale
 
 /**
@@ -38,6 +39,14 @@ fun foodKey(name: String): String =
  */
 private val WHITESPACE = Regex("(?U)\\s+")
 
+/**
+ * What makes two foods on two meals the same food: the list's id for a food
+ * from Sprout's list — "Carotte" logged in French and "Carrot" logged in
+ * English are one carrot — and [foodKey] of the name for a food the household
+ * typed in. Never the phone's language, so both phones count alike.
+ */
+fun foodIdentity(food: MealFood): String = food.ref?.let { "ref:$it" } ?: foodKey(food.name)
+
 /** One meal a food was part of. */
 data class FoodOffer(
     /** The meal's [FeedingEntity.uid], so the page can open it to correct. */
@@ -50,13 +59,16 @@ data class FoodOffer(
 /**
  * Everything one food has been through: the meals it was in, newest first.
  *
- * [name] is how it was written most recently — a parent who corrects
- * "carot" to "Carrot" sees the correction, not the first spelling.
+ * [key] is its [foodIdentity]. [name] is how it was written most recently — a
+ * parent who corrects "carot" to "Carrot" sees the correction, not the first
+ * spelling — and [ref] is its id on Sprout's list, when it is from there, which
+ * is what the page names it by.
  */
 data class FoodHistory(
     val key: String,
     val name: String,
     val offers: List<FoodOffer>,
+    val ref: String? = null,
 ) {
     /** How many meals included it — a taste is an offer too. */
     val timesOffered: Int get() = offers.size
@@ -86,15 +98,15 @@ fun foodHistories(feeds: List<FeedingEntity>): List<FoodHistory> {
         .filter { it.type == FeedType.SOLID && it.deletedAt == null && it.foods.isNotEmpty() }
         .sortedWith(compareByDescending<FeedingEntity> { it.startTime }.thenBy { it.uid })
 
-    val names = LinkedHashMap<String, String>()
+    val names = LinkedHashMap<String, MealFood>()
     val offers = HashMap<String, MutableList<FoodOffer>>()
     for (meal in meals) {
         // One offer per food per meal, in the order the meal listed them.
         val inMeal = LinkedHashMap<String, FoodOffer>()
         for (food in meal.foods) {
-            val key = foodKey(food.name)
-            if (key.isEmpty()) continue
-            if (key !in names) names[key] = food.name.trim()
+            if (foodKey(food.name).isEmpty() && food.ref == null) continue
+            val key = foodIdentity(food)
+            if (key !in names) names[key] = food
             val seen = inMeal[key]
             inMeal[key] = if (seen == null) {
                 FoodOffer(meal.uid, meal.startTime, food.portion, food.reception)
@@ -109,5 +121,7 @@ fun foodHistories(feeds: List<FeedingEntity>): List<FoodHistory> {
     }
     // `names` was filled newest meal first, so its order is already "most
     // recently offered first".
-    return names.map { (key, name) -> FoodHistory(key, name, offers.getValue(key)) }
+    return names.map { (key, latest) ->
+        FoodHistory(key, latest.name.trim(), offers.getValue(key), latest.ref)
+    }
 }

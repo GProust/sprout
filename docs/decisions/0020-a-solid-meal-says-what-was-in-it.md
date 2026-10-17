@@ -35,12 +35,14 @@ Three things make this easy to get wrong.
 times that can disagree — and the statistics, the reminder and the doctor's
 record would only ever see one of them.
 
-**Every list of foods is advice.** Which foods first, at what age, in what order,
-and when the common allergens should come in are questions national guidance
-answers differently, and has reversed within a decade — peanut and egg went from
-"wait" to "don't wait" in most countries. A list in the app, however neutral it
-means to be, reads as a curriculum: the foods it shows are the ones to do, and
-the ones it leaves out are the ones to wait for.
+**A list of foods can turn into advice.** Which foods first, at what age, in what
+order, and when the common allergens should come in are questions national
+guidance answers differently, and has reversed within a decade — peanut and egg
+went from "wait" to "don't wait" in most countries. A list that carried any of
+that would read as a curriculum. And yet typing "carotte" at every meal, on a
+phone held in one hand, is the friction that makes a log stop being kept; and a
+household with one phone in French and one in English needs *carotte* and
+*carrot* to be one food.
 
 **A count invites a target.** "Offered 6 times" is one step from "6 of 10", a
 progress bar, a nudge to try again tomorrow — the app deciding what the right
@@ -76,17 +78,28 @@ itself to correct.
 **A taste counts.** It is an offer: the baby met the food. The page shows the
 tastes and the servings apart, so nothing is hidden by counting them together.
 
-**Sprout ships no list of foods.** No starter list, no allergen checklist, no
-age at which a food becomes "allowed", no order of introduction, and no
-suggestion of what to try next. The foods are the parent's own words. After the
-first time, a food is one tap away: the form offers every food the household has
-logged before, most recent first, and filters them as the parent types — so the
-list a family builds is the only list there is.
+**Sprout ships a list of plain names, and nothing about them.** Vegetables, meat
+and fish — the foods every family names — translated into the app's seven
+languages, searchable from the one field in the form (accents optional, so
+*epinards* finds *épinards*) and browsable shelf by shelf. Each is a name and
+nothing else: no age at which it becomes "allowed", no order of introduction, no
+allergen mark, no badge, and nothing suggested next. The shelves are sorted
+alphabetically in the phone's language, which is an order that says nothing.
 
-**A food is its name, without regard to case or spacing.** "Carrot", "carrot"
-and " carrot " are one food; the page shows it as it was most recently written.
-"Carrot" and "carrots" are two, because Sprout does not know the language well
-enough to say otherwise and guessing would merge foods a parent meant apart.
+**Anything else is the household's own.** A ratatouille, a grandmother's soup, a
+fruit: typed once, it is added as written and offered back one tap away from then
+on, for every baby in the household, alongside the list. The list is a
+convenience for the common names, not the edge of what can be logged.
+
+**A food from the list is its id; any other food is its name.** A food picked from
+the list carries its id on the list (`ref`) as well as the name it was shown
+under, so *Carotte* logged in French and *Carrot* logged in English are one
+carrot on both phones, each showing it in its own language. Typing a list food's
+name out in full picks the list food. A food the household added is its name,
+without regard to case or spacing: "Ratatouille" and " ratatouille " are one
+food, shown as it was most recently written; "carrot" and "carrots" are two,
+because Sprout does not know the language well enough to say otherwise. A food
+the household typed is never silently turned into a list food after the fact.
 
 **Nothing on the page is a target, and nothing is graded.** There is no number of
 offers the app considers enough, no progress toward one, no reminder to offer a
@@ -120,14 +133,26 @@ setting.
   replica that is an array of objects rather than a packed string, because a
   parent's own words can contain any character a packing could choose. Its
   vectors land in the same commit ([spec](../../spec/README.md)).
+- **The list's ids are part of the format.** Both apps hold the same ids in the
+  same order, pinned by `spec/vectors/food-catalog.json`; the names are Android's
+  string resources, which the iOS catalog is generated from. An id is added to
+  the end of a shelf and never renamed or removed, because it is in every meal
+  that used it. A phone that meets an id it does not know shows the name the
+  meal was saved with.
 - **A taste is a feed.** Logging a taste of banana writes a solid meal, and a
   solid meal has always moved the dashboard's "last feed" and the feeding
   reminder. That is unchanged here and deliberate: from the dashboard's point of
   view the baby did eat. A household that finds it wrong for a taste is telling
   us something worth a decision of its own.
-- **Spelling is the parent's to keep consistent.** Two spellings of one food are
-  two lines on the page until the parent corrects a meal. The form's
-  suggestions are what keep that rare: the second time, nobody types.
+- **Spelling is the parent's to keep consistent, for the foods they add.** Two
+  spellings of one added food are two lines on the page until the parent corrects
+  a meal; the form's suggestions keep that rare. A carrot typed in by hand before
+  it was picked from the list stays its own line — merging it would be the app
+  deciding that two things the parent logged differently were the same.
+- **A list is something to keep honest.** Every name on it is a translation that
+  can be wrong in one language, and it will be asked to grow. It grows by names
+  only: a shelf of fruit or of cereals is the same decision, a field that says
+  anything *about* a food is not.
 - **Editing a meal keeps its identity.** The feeding form used to rebuild the
   row it edited, with a new `uid`; the other phone then saw a new meal beside the
   old one instead of a correction. The form now carries the `uid` through, which
@@ -146,11 +171,16 @@ setting.
   once as foods; and two phones naming carrot on the same day would create two
   carrots with two uids, which the merge cannot know are one. Keyed by name, they
   are one food the moment they meet.
-- **Shipping a list of common first foods**, translated, to tap from on day one.
-  It saves a few minutes of typing in the first week and costs the decision
-  above: every list is an order and an omission, it would be wrong in some
-  country on the day it shipped, and an allergen list in particular is advice
-  with a date on it. The household's own list fills in by the second week.
+- **No list at all**, the household's own foods only. It was this record's first
+  draft, and the parent who asked for the feature asked for the list: typing every
+  food the first time is real friction, and without shared ids a household on two
+  languages counts one carrot twice. What made the list risky was never the names
+  — it was ages, order and allergen marks, which it does not carry.
+- **A list with recommended ages, or allergens flagged.** That is the version that
+  is advice with a date on it, wrong in some country on the day it shipped.
+- **Keying list foods by their name** rather than an id. It would split every
+  bilingual household's carrots in two, and break every count the day a
+  translation is corrected.
 - **A weight per food.** Nobody weighs the carrot and the parsnip in one purée
   separately; a per-food field would mostly stay empty, and when one was filled
   in it would sit beside a meal total it does not add up to. The meal's one

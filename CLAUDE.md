@@ -338,14 +338,18 @@ one array of objects inside a row. Four things a change can quietly undo:
   `SproutData/FoodExposures.swift`, pure functions with the same cases on both
   sides. Logging from the page writes an ordinary solid meal through the same
   form the feeding screen uses, so a taste moves "last feed" like any meal does.
-- **A food is its name**, keyed by `foodKey`: trimmed, Unicode whitespace
-  collapsed, lower-cased without locale. Not a row with a uid — two phones naming
-  carrot on the same day must be one carrot the moment they meet. Never make the
-  key cleverer (plurals, accents) on one side only.
-- **Sprout ships no list of foods**, no allergen list, no ages and no order. The
-  suggestions are the household's own meals (`householdMealsWithFoods`). A
-  starter list is the addition this feature must not grow, for the same reason
-  BDR-15 refuses a list of medicines.
+- **A food is its list id, or else its name** (`foodIdentity`). A food picked
+  from Sprout's list carries `ref`, its id in `FoodCatalog` — so *Carotte* and
+  *Carrot* are one carrot across languages; a food the household typed in is
+  `foodKey` of its name: trimmed, Unicode whitespace collapsed, lower-cased
+  without locale. Never key by the phone's language, and never make the key
+  cleverer (plurals, accents) on one side only — accent folding is for searching.
+- **The list is names and nothing else** — vegetables, meat, fish, in seven
+  languages (`food_item_<id>` in Android's strings, generated into iOS's). No
+  ages, no order, no allergen marks, nothing suggested. Its ids are pinned by
+  `spec/vectors/food-catalog.json` on both sides: append to a shelf, never rename
+  or remove one. Anything not on it is the household's own, offered back from
+  `householdMealsWithFoods`.
 - **Nothing is a target or a grade, and nothing is a reaction.** No number of
   offers counts as enough, *Refused* has an icon and no warning colour, the list
   is ordered by recency or by name and never by how well a food is going, and

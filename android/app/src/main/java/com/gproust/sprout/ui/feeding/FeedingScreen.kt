@@ -89,6 +89,7 @@ import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.foods.MealFoodsEditor
+import com.gproust.sprout.ui.foods.displayName
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
@@ -1189,7 +1190,7 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
     }
     // What a solid meal was made of, in the parent's own words (BDR-20).
     if (entry.type == FeedType.SOLID && entry.foods.isNotEmpty()) {
-        parts += entry.foods.joinToString(", ") { it.name }
+        parts += entry.foods.joinToString(", ") { it.displayName(context) }
     }
     entry.notes?.takeIf { it.isNotBlank() }?.let { parts += it }
     return parts.joinToString(sep)

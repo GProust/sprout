@@ -249,14 +249,21 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   parent's own words and no separator is safe inside them
   ([BDR-20](../docs/decisions/0020-a-solid-meal-says-what-was-in-it.md)).
   Each is `{"name": "…", "portion": "TASTE" | "SERVING", "reception": "LIKED" |
-  "MIXED" | "REFUSED"}`, in the order the parent listed them; `reception` is
-  absent when nothing was noted, which is "not noted" and not a fourth answer.
-  The key itself is absent on a feeding that named no foods — every feed that is
-  not a solid meal, and every meal written before foods existed — and a reader
-  treats that as an empty list. Two foods are the same food when their names
-  match after trimming, collapsing runs of whitespace (Unicode's own) to one
-  space and lower-casing without regard to locale; nothing is stored for that,
-  it is how a reader counts.
+  "MIXED" | "REFUSED", "ref": "carrot"}`, in the order the parent listed them;
+  `reception` is absent when nothing was noted, which is "not noted" and not a
+  fourth answer. `ref` is the food's id on Sprout's list
+  ([`vectors/food-catalog.json`](vectors/food-catalog.json)) and absent for a
+  food the household typed in; `name` is always present, as the food read on the
+  phone that logged it, so a reader that does not know a `ref` still has
+  something to show. The key itself is absent on a feeding that named no foods —
+  every feed that is not a solid meal, and every meal written before foods
+  existed — and a reader treats that as an empty list.
+- **Two foods are the same food** when they carry the same `ref`, whatever their
+  names — "Carotte" and "Carrot" are one carrot — and, for foods without one,
+  when their names match after trimming, collapsing runs of whitespace (Unicode's
+  own) to one space and lower-casing without regard to locale. A food with a
+  `ref` and one without are never the same food. Nothing is stored for any of
+  this; it is how a reader counts, and both readers must count alike.
 - **A row points at another row by that row's `uid`.** A baby-scoped row carries
   `babyUid`, as above; a `medicineDoses` entry also carries `medicineUid`, the
   `uid` of the `medicines` row it was a dose of. Unlike `babyUid` this one is

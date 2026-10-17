@@ -123,6 +123,8 @@ class SyncPayloadTest {
                     foods = listOf(
                         MealFood("Purée carotte; panais, \"maison\"", FoodPortion.SERVING, FoodReception.LIKED),
                         MealFood("Œuf 🥚", FoodPortion.TASTE),
+                        // From Sprout's list, logged on a phone in French.
+                        MealFood("Carotte", FoodPortion.SERVING, ref = "carrot"),
                         MealFood("Brocoli", FoodPortion.TASTE, FoodReception.REFUSED),
                     ),
                     uid = "feed-4",
@@ -328,6 +330,8 @@ class SyncPayloadTest {
         assertEquals("Œuf 🥚", egg.name)
         assertEquals(FoodPortion.TASTE, egg.portion)
         assertNull("not noted is not a fourth answer", egg.reception)
+        assertNull("a food the household typed in has no list id", egg.ref)
+        assertEquals("carrot", decoded.feedings.single { it.row.uid == "feed-4" }.row.foods[2].ref)
     }
 
     @Test

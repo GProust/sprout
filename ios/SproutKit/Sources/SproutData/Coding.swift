@@ -85,11 +85,13 @@ public enum MealFoodCoding {
     }
 
     /// The objects a replica carries. `reception` is left out rather than
-    /// written as null: "not noted" is no key at all.
+    /// written as null: "not noted" is no key at all, and a food the household
+    /// typed in has no list id.
     static func jsonArray(_ foods: [MealFood]) -> [[String: Any]] {
         foods.map { food in
             var json: [String: Any] = ["name": food.name, "portion": food.portion.rawValue]
             if let reception = food.reception { json["reception"] = reception.rawValue }
+            if let ref = food.ref { json["ref"] = ref }
             return json
         }
     }
@@ -108,6 +110,6 @@ public enum MealFoodCoding {
             else { throw SyncPayloadError.unreadable("damaged replica: unknown reception") }
             reception = value
         }
-        return MealFood(name: name, portion: portion, reception: reception)
+        return MealFood(name: name, portion: portion, reception: reception, ref: json["ref"] as? String)
     }
 }

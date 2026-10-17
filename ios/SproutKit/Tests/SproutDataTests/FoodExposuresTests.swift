@@ -116,6 +116,36 @@ final class FoodExposuresTests: XCTestCase {
         XCTAssertEqual(carrot.lastPortion, .SERVING)
     }
 
+    func testAFoodFromTheListIsOneFoodInEveryLanguage() {
+        let foods = foodHistories([
+            meal("m1", t0, MealFood(name: "Carotte", portion: .TASTE, ref: "carrot")),
+            meal("m2", t0 + day, MealFood(name: "Carrot", portion: .SERVING, ref: "carrot")),
+            // Typed in, not picked from the list: the household's own food, which
+            // a carrot from the list never silently becomes.
+            meal("m3", t0 + 2 * day, food("Carrot")),
+        ])
+
+        XCTAssertEqual(foods.map(\.key), ["carrot", "ref:carrot"])
+        let listed = foods[1]
+        XCTAssertEqual(listed.timesOffered, 2)
+        XCTAssertEqual(listed.ref, "carrot")
+        XCTAssertEqual(listed.name, "Carrot", "the latest name it was saved with")
+        XCTAssertNil(foods[0].ref)
+        XCTAssertEqual(foodIdentity(MealFood(name: "Zanahoria", ref: "carrot")), "ref:carrot")
+        XCTAssertEqual(foodIdentity(MealFood(name: " Carrot ")), "carrot")
+    }
+
+    /// Sprout's food list against the ids Node wrote down (BDR-20). A `ref` one
+    /// phone knows and the other does not is a carrot one of them can name and
+    /// the other shows by whatever it was called where it was logged.
+    func testTheFoodListMatchesTheSpec() throws {
+        let vector = try Vectors.load("food-catalog.json")
+        XCTAssertEqual(vector["categories"] as? [String], FoodCategory.allCases.map(\.rawValue))
+        let foods = try XCTUnwrap(vector["foods"] as? [[String: String]])
+        XCTAssertEqual(foods.map { $0["id"] ?? "" }, FoodCatalog.foods.map(\.id))
+        XCTAssertEqual(foods.map { $0["category"] ?? "" }, FoodCatalog.foods.map(\.category.rawValue))
+    }
+
     func testNothingNotedIsNotAnAnswer() throws {
         let carrot = try XCTUnwrap(foodHistories([meal("m1", t0, food("Carrot"))]).first)
 

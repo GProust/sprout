@@ -351,31 +351,29 @@ class ScreenshotTest {
             startTime = noon - daysAgo * day,
             foods = foods.toList(),
         )
-        repo.addFeeding(meal(12, null, MealFood("Carrot", FoodPortion.TASTE, FoodReception.LIKED)))
-        repo.addFeeding(meal(10, 40, MealFood("Carrot", FoodPortion.SERVING, FoodReception.LIKED)))
-        repo.addFeeding(meal(8, null, MealFood("Courgette", FoodPortion.TASTE, FoodReception.REFUSED)))
+        // From Sprout's list, by id — the names are this phone's language.
+        fun listed(id: String, name: String, portion: FoodPortion, reception: FoodReception? = null) =
+            MealFood(name, portion, reception, ref = id)
+        repo.addFeeding(meal(12, null, listed("carrot", "Carrot", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(meal(10, 40, listed("carrot", "Carrot", FoodPortion.SERVING, FoodReception.LIKED)))
+        repo.addFeeding(meal(8, null, listed("courgette", "Courgette", FoodPortion.TASTE, FoodReception.REFUSED)))
         repo.addFeeding(
             meal(
                 6, 60,
-                MealFood("Carrot", FoodPortion.SERVING),
-                MealFood("Courgette", FoodPortion.TASTE, FoodReception.MIXED),
+                listed("carrot", "Carrot", FoodPortion.SERVING),
+                listed("courgette", "Courgette", FoodPortion.TASTE, FoodReception.MIXED),
             ),
         )
-        repo.addFeeding(meal(4, null, MealFood("Sweet potato", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(meal(4, null, listed("sweet_potato", "Sweet potato", FoodPortion.TASTE, FoodReception.LIKED)))
         repo.addFeeding(
             meal(
                 2, 80,
-                MealFood("Courgette", FoodPortion.SERVING, FoodReception.LIKED),
-                MealFood("Sweet potato", FoodPortion.SERVING),
+                listed("courgette", "Courgette", FoodPortion.SERVING, FoodReception.LIKED),
+                listed("salmon", "Salmon", FoodPortion.TASTE),
             ),
         )
-        repo.addFeeding(
-            meal(
-                1, null,
-                MealFood("Banana", FoodPortion.TASTE, FoodReception.LIKED),
-                MealFood("Pear", FoodPortion.TASTE, FoodReception.MIXED),
-            ),
-        )
+        // And one the household added itself, which is not on any list.
+        repo.addFeeding(meal(1, null, MealFood("Ratatouille", FoodPortion.TASTE, FoodReception.MIXED)))
     }
 
     private fun clearMeals() = runBlocking {
@@ -748,13 +746,17 @@ class ScreenshotTest {
 
         // First foods (BDR-20): each food with its own count, tastes and
         // servings apart, and how it went where that was noted. Then the meal
-        // form, offering the household's own foods back — there is no list of
-        // foods behind it, which is the point of the capture.
+        // form, offering the household's own foods back — the ratatouille
+        // among them, which is on no list — and one shelf of Sprout's.
         seedMeals()
         show { FoodsScreen(onBack = {}) }
         save("12-foods")
         tapDesc("Log a meal")
         saveScreen("12-foods-2-log")
+        // One of the three shelves open: Sprout's list of plain names, to browse
+        // without knowing what to type.
+        tap("Vegetables")
+        saveScreen("12-foods-3-vegetables")
         clearMeals()
 
         // Partner sync: before pairing, after, and with the stash held back.
