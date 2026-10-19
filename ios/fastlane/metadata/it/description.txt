@@ -1,0 +1,25 @@
+Sprout è un diario tranquillo e privato per le prime settimane e i primi mesi del tuo neonato, e per chi si sta riprendendo dal parto.
+
+Tutto resta sul tuo iPhone. Nessun account da creare, nessun cloud, nessuna pubblicità, nessun tracciamento. Sprout non stabilisce alcuna connessione di rete: niente lascia il tuo telefono, a meno che tu non scelga di inviarlo.
+
+COSA PUOI ANNOTARE
+
+• Pasti: seno, biberon e solidi. Un timer di allattamento in diretta cambia lato con un tocco e si può mettere in pausa per il ruttino, senza contare la pausa come tempo al seno.
+• Tiralatte: quanto latte, da quale lato e dove è andato, con una scorta che somma ciò che c'è in frigorifero e in congelatore.
+• Sonno: pisolini e notti, e dove ha dormito il bebè se vuoi annotarlo.
+• Pannolini: bagnati, sporchi o entrambi, con una scala dei colori delle feci.
+• Crescita: peso, altezza e circonferenza cranica, confrontati con gli standard di crescita dell'OMS.
+• Medicinali: trattamenti programmati con promemoria, e medicinali dati al bisogno, con l'attesa tra le dosi che ti è stata indicata.
+• Il tuo recupero: un breve check-in quotidiano sull'umore e, quando ti riguardano, sulla guarigione e sul comfort del seno. Puoi disattivarlo in qualsiasi momento.
+
+PER TUTTE LE FAMIGLIE
+
+• Più bebè, gemelli compresi, uno accanto all'altro.
+• Condividi il diario di un bebè con gli altri telefoni di casa inviando un file. Senza account né server; il diario condiviso è cifrato.
+• Statistiche giornaliere e settimanali, e un report PDF o un foglio di calcolo da portare alla visita, che puoi proteggere con una password.
+• Promemoria facoltativi per pasti e trattamenti, programmati sul telefono stesso.
+• In italiano, inglese, francese, tedesco, spagnolo, polacco e portoghese.
+
+Sprout registra ciò che inserisci. Non fornisce consigli medici e non sostituisce un professionista sanitario.
+
+Sprout è software libero e open source (GNU GPLv3), senza pubblicità né acquisti in-app.

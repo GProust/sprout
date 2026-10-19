@@ -1,0 +1,25 @@
+Sprout est un carnet calme et privé pour les premières semaines et les premiers mois de votre nouveau-né, et pour le parent qui se remet de l'accouchement.
+
+Tout reste sur votre iPhone. Pas de compte à créer, pas de cloud, pas de publicité, pas de pistage. Sprout n'établit aucune connexion réseau : rien ne quitte votre téléphone, sauf si vous choisissez de l'envoyer.
+
+CE QUE VOUS POUVEZ NOTER
+
+• Repas : sein, biberon et solides. Un minuteur de tétée en direct change de côté d'un geste et peut se mettre en pause pour le rot, sans compter la pause comme du temps au sein.
+• Tirage : quelle quantité, quel côté et où va le lait, avec un stock qui additionne ce qu'il y a au réfrigérateur et au congélateur.
+• Sommeil : siestes et nuits, et l'endroit où bébé a dormi si vous voulez le noter.
+• Couches : mouillées, souillées ou les deux, avec une échelle de couleur des selles.
+• Croissance : poids, taille et périmètre crânien, lus sur les courbes de croissance de l'OMS.
+• Médicaments : traitements réguliers avec rappels, et médicaments donnés au besoin, avec le délai entre deux prises qu'on vous a indiqué.
+• Votre récupération : un court point quotidien sur l'humeur, et sur la cicatrisation et le confort des seins quand ils vous concernent. Vous pouvez le désactiver à tout moment.
+
+POUR TOUTES LES FAMILLES
+
+• Plusieurs bébés, jumeaux compris, côte à côte.
+• Partagez le suivi d'un bébé avec les autres téléphones de votre foyer en envoyant un fichier. Sans compte ni serveur ; le suivi partagé est chiffré.
+• Statistiques par jour et par semaine, et un rapport PDF ou un classeur à apporter en consultation, que vous pouvez protéger par un mot de passe.
+• Rappels facultatifs pour les repas et les traitements, programmés sur le téléphone lui-même.
+• En français, anglais, allemand, espagnol, italien, polonais et portugais.
+
+Sprout garde une trace de ce que vous saisissez. Il ne donne aucun conseil médical et ne remplace pas un professionnel de santé.
+
+Sprout est un logiciel libre et open source (GNU GPLv3), sans publicité ni achat intégré.

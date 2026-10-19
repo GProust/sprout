@@ -83,6 +83,12 @@ targets:
             LSHandlerRank: Owner
             CFBundleTypeRole: Viewer
             LSItemContentTypes: [com.gproust.sprout.sync]
+        # The export-compliance answer, given once here instead of on every
+        # upload. Every cipher Sprout uses is the operating system's own —
+        # CryptoKit for the household exchange, CommonCrypto for the AES block
+        # of a locked export (BDR-13) — which Apple treats as exempt. A cipher
+        # of our own, or a crypto library, would make this answer wrong.
+        ITSAppUsesNonExemptEncryption: false
         # Deliberately absent, and the absence is the point (ADR-0014): no
         # NSAppTransportSecurity, no URL scheme, no networking usage string,
         # because there is no networking. That is the iOS equivalent of Android's
@@ -95,9 +101,19 @@ targets:
         # ios/tools/make_app_icon.py — one product, one icon, and CI checks the
         # committed PNG is still what that vector produces.
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        MARKETING_VERSION: '0.1.0'
+        # What App Store Connect shows as the version, and what the listing's
+        # Version field has to match. The iOS app keeps its own numbering: it is
+        # a first release, not Android's 1.13.
+        MARKETING_VERSION: '1.0'
         CURRENT_PROJECT_VERSION: '1'
-        TARGETED_DEVICE_FAMILY: '1,2'
+        # iPhone only. Nothing here has been laid out or looked at on an iPad,
+        # and declaring one brings two obligations with it: a set of iPad
+        # screenshots for the listing, and — because the app is portrait-only —
+        # an upload that App Store Connect refuses, since an iPad app that can
+        # multitask must support every orientation. An iPhone app still runs on
+        # an iPad, in the iPhone-sized window. Widening this is a decision to
+        # make with an iPad in hand.
+        TARGETED_DEVICE_FAMILY: '1'
 
   SproutUITests:
     type: bundle.ui-testing

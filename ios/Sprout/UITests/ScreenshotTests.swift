@@ -88,6 +88,38 @@ final class ScreenshotTests: XCTestCase {
         try file(app, named: "13-sync", language: language)
     }
 
+    /// One screen in Dark Mode, which Sprout follows from the system.
+    ///
+    /// The App Store asks for at least one dark screenshot from an app that
+    /// supports it, and a log kept through the night is used in the dark more
+    /// than in daylight. The sleep log, because that is the screen a parent
+    /// opens at night.
+    ///
+    /// Its own launch rather than a step in `testCaptureEveryScreen`, so it
+    /// starts from the same seeded database as every other capture. Dark is
+    /// asked of the app (`-sprout-screenshots-dark`, see `ScreenshotSeed`), not
+    /// of the simulator: setting `XCUIDevice.appearance` captured light on the
+    /// runner, and it would have outlived the test besides.
+    func testCaptureInTheDark() throws {
+        let language = ProcessInfo.processInfo.environment["SPROUT_LANGUAGE"] ?? "en"
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-sprout-screenshots",
+            "-sprout-screenshots-dark",
+            "-AppleLanguages", "(\(language))",
+            "-AppleLocale", language,
+        ]
+        app.launch()
+
+        // The tab bar first, for the cold launch's sake — `captureLog` only
+        // waits briefly for its tile.
+        XCTAssertTrue(
+            app.tabBars.buttons.element(boundBy: 0).waitForExistence(timeout: 60),
+            "04-sleep-dark: the tab bar never appeared — the app failed to launch"
+        )
+        try captureLog(app, tile: "sleep", named: "04-sleep-dark", language: language)
+    }
+
     /// The first run, which no seeded capture can reach.
     ///
     /// Seeding a profile is exactly what makes onboarding not appear, so this is

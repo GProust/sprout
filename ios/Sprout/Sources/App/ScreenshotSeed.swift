@@ -1,6 +1,7 @@
 #if DEBUG
 import Foundation
 import SproutData
+import SwiftUI
 
 /// A fixed database for the screenshot run, and nothing else.
 ///
@@ -32,6 +33,19 @@ enum ScreenshotSeed {
     /// 2026-06-15 14:30 UTC — an afternoon, so the dashboard's greeting is the
     /// one most screenshots should show.
     static let now: Int64 = 1_781_534_400_000
+
+    /// The seeded app in Dark Mode, for the one dark capture the App Store
+    /// listing shows.
+    ///
+    /// Asked of the app rather than of the simulator: the UI test set the
+    /// simulator's appearance to dark and the runner captured it light anyway.
+    /// The app's own preference is what it then draws with, whatever the device
+    /// is set to — the same switch a parent's Settings → Display makes.
+    static let darkLaunchArgument = "-sprout-screenshots-dark"
+
+    static var isDarkRequested: Bool {
+        ProcessInfo.processInfo.arguments.contains(darkLaunchArgument)
+    }
 
     static var isRequested: Bool {
         let arguments = ProcessInfo.processInfo.arguments
@@ -246,5 +260,13 @@ enum ScreenshotSeed {
     private static let minute: Int64 = 60_000
     private static let hour: Int64 = 60 * minute
     private static let day: Int64 = 24 * hour
+}
+
+extension View {
+    /// Dark when the screenshot run asks for it, and otherwise no preference
+    /// at all — the system's appearance, as in every other build.
+    func screenshotAppearance() -> some View {
+        preferredColorScheme(ScreenshotSeed.isDarkRequested ? .dark : nil)
+    }
 }
 #endif

@@ -1,0 +1,25 @@
+O Sprout é um registo calmo e privado para as primeiras semanas e meses do seu recém-nascido, e para quem está a recuperar do parto.
+
+Tudo fica no seu iPhone. Sem conta para criar, sem nuvem, sem anúncios e sem rastreio. O Sprout não estabelece qualquer ligação de rede: nada sai do seu telemóvel, a não ser que decida enviá-lo.
+
+O QUE PODE REGISTAR
+
+• Refeições: peito, biberão e sólidos. Um temporizador de amamentação em direto muda de lado com um toque e pode ser colocado em pausa para o arroto, sem contar a pausa como tempo ao peito.
+• Extração: quanto leite, de que lado e para onde foi, com uma reserva que soma o que está no frigorífico e no congelador.
+• Sono: sestas e noites, e onde o bebé dormiu, se o quiser anotar.
+• Fraldas: molhadas, sujas ou ambas, com uma escala de cor das fezes.
+• Crescimento: peso, altura e perímetro cefálico, lidos nas curvas de crescimento da OMS.
+• Medicamentos: tratamentos programados com lembretes, e medicamentos dados quando são precisos, com o intervalo entre doses que lhe indicaram.
+• A sua recuperação: um breve registo diário do humor e, quando se aplicam, da cicatrização e do conforto dos seios. Pode desativá-lo a qualquer momento.
+
+PARA TODAS AS FAMÍLIAS
+
+• Vários bebés, incluindo gémeos, lado a lado.
+• Partilhe o registo de um bebé com os outros telemóveis da sua casa enviando um ficheiro. Sem conta nem servidor; o registo partilhado é cifrado.
+• Estatísticas por dia e por semana, e um relatório PDF ou folha de cálculo para levar à consulta, que pode proteger com palavra-passe.
+• Lembretes opcionais para refeições e tratamentos, agendados no próprio telemóvel.
+• Em português, inglês, francês, alemão, espanhol, italiano e polaco.
+
+O Sprout guarda o que regista. Não dá conselhos médicos nem substitui um profissional de saúde.
+
+O Sprout é software livre e de código aberto (GNU GPLv3), sem anúncios nem compras na app.

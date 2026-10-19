@@ -3,6 +3,12 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🧹 **Room around the dots.** Details that ran together — *Breast·Left*,
+  *Left 9m·Right 4m·Total 13m* — now have a space on each side of the dot, in
+  the histories, on the widget and in the doctor's report.
+
 ## [1.13.0] — 2026-09-25
 
 - 🔗 **Two feeds that were really one can be joined.** If you stopped and saved
