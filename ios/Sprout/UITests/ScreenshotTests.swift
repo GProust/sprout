@@ -96,17 +96,16 @@ final class ScreenshotTests: XCTestCase {
     /// opens at night.
     ///
     /// Its own launch rather than a step in `testCaptureEveryScreen`, so it
-    /// starts from the same seeded database as every other capture. The
-    /// appearance belongs to the simulator, not the app, and outlives the test:
-    /// the teardown puts it back, or every test after this one would run dark.
+    /// starts from the same seeded database as every other capture. Dark is
+    /// asked of the app (`-sprout-screenshots-dark`, see `ScreenshotSeed`), not
+    /// of the simulator: setting `XCUIDevice.appearance` captured light on the
+    /// runner, and it would have outlived the test besides.
     func testCaptureInTheDark() throws {
         let language = ProcessInfo.processInfo.environment["SPROUT_LANGUAGE"] ?? "en"
-        addTeardownBlock { XCUIDevice.shared.appearance = .light }
-        XCUIDevice.shared.appearance = .dark
-
         let app = XCUIApplication()
         app.launchArguments = [
             "-sprout-screenshots",
+            "-sprout-screenshots-dark",
             "-AppleLanguages", "(\(language))",
             "-AppleLocale", language,
         ]
