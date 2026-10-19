@@ -33,8 +33,9 @@ object SyncLimits {
     /**
      * How deeply a Sprout document may nest.
      *
-     * A replica is four levels deep at its worst — the document, a list, a row,
-     * a value — so thirty-two is far more headroom than the format can use, and
+     * A replica is six levels deep at its worst — the document, a list, a row,
+     * a meal's foods, one food, a value — so thirty-two is far more headroom
+     * than the format can use, and
      * still nowhere near enough to matter to a parser that recurses. Which
      * Android's `org.json` does: `JSONTokener` calls itself once per nested
      * value. Measured against the real runtime with an 8 MB stack, about twenty

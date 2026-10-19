@@ -443,4 +443,73 @@ final class SproutRepositoryTests: XCTestCase {
 
         XCTAssertEqual(try repository.treatmentsWithReminders().map(\.name), ["Vitamin D"])
     }
+
+    // MARK: - Correcting a food (BDR-20)
+
+    private func meal(_ at: Int64, _ foods: MealFood...) -> Feeding {
+        Feeding(type: .SOLID, startTime: at, foods: foods)
+    }
+
+    /// Every meal that named the food is corrected and stamped, so the
+    /// correction travels; a meal that never named it is not rewritten.
+    func testEveryMealThatNamedTheFoodIsCorrectedAndStamped() throws {
+        let sam = try makeBaby("Sam")
+        let hour: Int64 = 60 * 60_000
+        try repository.addFeeding(meal(clock, MealFood(name: "carottes", portion: .SERVING, reception: .LIKED)), for: sam)
+        try repository.addFeeding(meal(clock + hour, MealFood(name: "Pea"), MealFood(name: "carottes")), for: sam)
+        try repository.addFeeding(meal(clock + 2 * hour, MealFood(name: "Pea")), for: sam)
+        let before = try read { db in try Feeding.fetchAll(db) }
+        let later = clock + 24 * hour
+        repository = SproutRepository(database: queue, now: { later })
+
+        XCTAssertEqual(
+            try repository.relabelFood(babyId: sam, from: "carottes", to: MealFood(name: "Carotte", ref: "carrot")),
+            2
+        )
+
+        let after = try read { db in try Feeding.fetchAll(db) }
+        XCTAssertEqual(after.filter { $0.updatedAt == later }.count, 2)
+        let first = try XCTUnwrap(after.first { $0.startTime == clock })
+        XCTAssertEqual(first.mealFoods, [MealFood(name: "Carotte", portion: .SERVING, reception: .LIKED, ref: "carrot")])
+        let untouched = try XCTUnwrap(after.first { $0.mealFoods == [MealFood(name: "Pea")] })
+        XCTAssertEqual(untouched.updatedAt, before.first { $0.uid == untouched.uid }?.updatedAt)
+
+        XCTAssertEqual(foodHistories(after).map(\.key).sorted(), ["pea", "ref:carrot"])
+        XCTAssertEqual(Set(after.map(\.uid)), Set(before.map(\.uid)), "the same meals, corrected")
+    }
+
+    func testATwinsMealsAndDeletedMealsAreLeftAlone() throws {
+        let sam = try makeBaby("Sam")
+        let robin = try makeBaby("Robin")
+        try repository.addFeeding(meal(clock, MealFood(name: "carottes")), for: robin)
+        try repository.addFeeding(meal(clock, MealFood(name: "carottes")), for: sam)
+        let gone = try XCTUnwrap(try read { db in try Feeding.filter(Column("babyId") == sam).fetchOne(db) })
+        try repository.deleteFeeding(gone)
+
+        XCTAssertEqual(
+            try repository.relabelFood(babyId: sam, from: "carottes", to: MealFood(name: "Carotte", ref: "carrot")),
+            0
+        )
+
+        let names = try read { db in try Feeding.fetchAll(db) }.map { $0.mealFoods.first?.name }
+        XCTAssertEqual(names, ["carottes", "carottes"])
+    }
+
+    /// An allergy noted against the food follows it, so the mark stays on the
+    /// line the parent sees (BDR-21).
+    func testAnAllergyNotedAgainstTheFoodFollowsTheCorrection() throws {
+        let sam = try makeBaby("Sam")
+        try repository.addFeeding(meal(clock, MealFood(name: "carottes")), for: sam)
+        try repository.saveAllergy(Allergy(name: "carottes", confirmed: true))
+        let later = clock + 60 * 60_000
+        repository = SproutRepository(database: queue, now: { later })
+
+        try repository.relabelFood(babyId: sam, from: "carottes", to: MealFood(name: "Carotte", ref: "carrot"))
+
+        let allergy = try XCTUnwrap(try read { db in try Allergy.fetchOne(db) })
+        XCTAssertEqual(allergy.name, "Carotte")
+        XCTAssertEqual(allergy.ref, "carrot")
+        XCTAssertTrue(allergy.confirmed, "still the parent's own statement")
+        XCTAssertEqual(allergy.updatedAt, later, "stamped, so it travels")
+    }
 }

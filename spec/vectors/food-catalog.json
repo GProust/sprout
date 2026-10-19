@@ -1,0 +1,283 @@
+{
+  "note": "Every id on Sprout's food list, shelf by shelf, in the order both apps hold them. A meal food's `ref` is one of these, or absent for a food the household typed in.",
+  "categories": [
+    "VEGETABLE",
+    "FRUIT",
+    "MEAT",
+    "FISH"
+  ],
+  "foods": [
+    {
+      "id": "artichoke",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "asparagus",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "aubergine",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "avocado",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "beetroot",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "broccoli",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "butternut",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "cabbage",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "carrot",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "cauliflower",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "celeriac",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "chickpeas",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "courgette",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "cucumber",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "fennel",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "green_beans",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "leek",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "lentils",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "mushrooms",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "parsnip",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "peas",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "potato",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "pumpkin",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "spinach",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "sweet_pepper",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "sweet_potato",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "sweetcorn",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "tomato",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "turnip",
+      "category": "VEGETABLE"
+    },
+    {
+      "id": "apple",
+      "category": "FRUIT"
+    },
+    {
+      "id": "apricot",
+      "category": "FRUIT"
+    },
+    {
+      "id": "banana",
+      "category": "FRUIT"
+    },
+    {
+      "id": "blueberries",
+      "category": "FRUIT"
+    },
+    {
+      "id": "cherries",
+      "category": "FRUIT"
+    },
+    {
+      "id": "clementine",
+      "category": "FRUIT"
+    },
+    {
+      "id": "fig",
+      "category": "FRUIT"
+    },
+    {
+      "id": "grapes",
+      "category": "FRUIT"
+    },
+    {
+      "id": "kiwi",
+      "category": "FRUIT"
+    },
+    {
+      "id": "mango",
+      "category": "FRUIT"
+    },
+    {
+      "id": "melon",
+      "category": "FRUIT"
+    },
+    {
+      "id": "nectarine",
+      "category": "FRUIT"
+    },
+    {
+      "id": "orange",
+      "category": "FRUIT"
+    },
+    {
+      "id": "peach",
+      "category": "FRUIT"
+    },
+    {
+      "id": "pear",
+      "category": "FRUIT"
+    },
+    {
+      "id": "pineapple",
+      "category": "FRUIT"
+    },
+    {
+      "id": "plum",
+      "category": "FRUIT"
+    },
+    {
+      "id": "raspberries",
+      "category": "FRUIT"
+    },
+    {
+      "id": "strawberries",
+      "category": "FRUIT"
+    },
+    {
+      "id": "watermelon",
+      "category": "FRUIT"
+    },
+    {
+      "id": "beef",
+      "category": "MEAT"
+    },
+    {
+      "id": "chicken",
+      "category": "MEAT"
+    },
+    {
+      "id": "duck",
+      "category": "MEAT"
+    },
+    {
+      "id": "ham",
+      "category": "MEAT"
+    },
+    {
+      "id": "lamb",
+      "category": "MEAT"
+    },
+    {
+      "id": "pork",
+      "category": "MEAT"
+    },
+    {
+      "id": "rabbit",
+      "category": "MEAT"
+    },
+    {
+      "id": "turkey",
+      "category": "MEAT"
+    },
+    {
+      "id": "veal",
+      "category": "MEAT"
+    },
+    {
+      "id": "cod",
+      "category": "FISH"
+    },
+    {
+      "id": "hake",
+      "category": "FISH"
+    },
+    {
+      "id": "mackerel",
+      "category": "FISH"
+    },
+    {
+      "id": "salmon",
+      "category": "FISH"
+    },
+    {
+      "id": "sardines",
+      "category": "FISH"
+    },
+    {
+      "id": "sea_bass",
+      "category": "FISH"
+    },
+    {
+      "id": "sea_bream",
+      "category": "FISH"
+    },
+    {
+      "id": "sole",
+      "category": "FISH"
+    },
+    {
+      "id": "trout",
+      "category": "FISH"
+    },
+    {
+      "id": "tuna",
+      "category": "FISH"
+    }
+  ]
+}

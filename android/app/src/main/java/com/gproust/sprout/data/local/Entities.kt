@@ -68,6 +68,38 @@ enum class SleepPosition { BACK, SIDE, BELLY }
  */
 enum class SleepPlace { OWN_BED, BEDSIDE_COT, PARENTS_BED, ON_A_PARENT, AT_BREAST, OTHER }
 
+/**
+ * How much of a food a solid meal held: [TASTE] is a lick of the spoon or a
+ * piece to explore, [SERVING] a real helping. Both are an offer of the food,
+ * and both count (BDR-20).
+ */
+enum class FoodPortion { TASTE, SERVING }
+
+/**
+ * How a food went at one meal, when the parent noticed — their reading, not
+ * Sprout's. Null is "not noted", never a fourth answer, and [REFUSED] is a fact
+ * about one meal rather than a reaction: there is deliberately no allergy field
+ * (BDR-20).
+ */
+enum class FoodReception { LIKED, MIXED, REFUSED }
+
+/**
+ * One food in a solid meal (BDR-20): one from Sprout's list, or one the
+ * household typed in.
+ *
+ * [ref] is the [com.gproust.sprout.data.FoodCatalog] id of a food from the list,
+ * and what makes it the same food on every phone whatever language each is in;
+ * [name] is still saved with it, as it read when it was logged, so a phone that
+ * does not know the id has something to show. A food the household added has no
+ * [ref] and is its [name], matched ignoring case and spacing — see `foodKey`.
+ */
+data class MealFood(
+    val name: String,
+    val portion: FoodPortion = FoodPortion.TASTE,
+    val reception: FoodReception? = null,
+    val ref: String? = null,
+)
+
 /** Postpartum bleeding (lochia) intensity. */
 enum class Bleeding { NONE, LIGHT, MODERATE, HEAVY }
 
@@ -147,6 +179,14 @@ data class FeedingEntity(
      * back to [leftDurationMs] / [rightDurationMs]).
      */
     @ColumnInfo(defaultValue = "''") val segments: List<NursingSegment> = emptyList(),
+    /**
+     * What a [FeedType.SOLID] meal was made of, in the order the parent listed
+     * it (BDR-20). Empty on every other kind of feed, and on every solid meal
+     * logged before foods could be listed — which reads as a meal that named
+     * nothing, not as a meal of nothing. The meal's weight stays [amountGrams]:
+     * what gets weighed is the bowl, not each food in it.
+     */
+    @ColumnInfo(defaultValue = "''") val foods: List<MealFood> = emptyList(),
     val notes: String? = null,
     @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
     @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
@@ -336,6 +376,47 @@ data class MedicineEntity(
     val remindAtComfort: Boolean = false,
     /** False once the parent stops using it; kept out of the active list. */
     val active: Boolean = true,
+    val notes: String? = null,
+    @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
+    @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,
+    override val deletedAt: Long? = null,
+) : Syncable
+
+/**
+ * Something a baby is allergic to, as the household came to know it (BDR-21).
+ *
+ * The parent's record and nothing more: what it is, when it was noticed, and
+ * whether a health professional confirmed it. Sprout does not diagnose,
+ * suggest or infer one — a food refused three times is not an allergy, and a
+ * rash is a note on a meal until a parent decides otherwise — and nothing
+ * here is checked against a list of allergens, because Sprout ships none.
+ *
+ * What it names is a food in the First foods sense (BDR-20): [ref] is its id
+ * on Sprout's list when it was picked from there, so the label follows the
+ * carrot in every language; otherwise [name] is the parent's own words, which
+ * can be anything — cow's milk protein, egg, a medicine.
+ */
+@Entity(
+    tableName = "allergy",
+    indices = [Index("babyId"), Index(value = ["uid"], unique = true)],
+)
+data class AllergyEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** Whose allergy it is; stamped by the repository on insert. */
+    val babyId: Long = 0L,
+    /** What it is, as it was written when noted — the list's name, or the parent's. */
+    val name: String,
+    /** Its id on Sprout's food list ([com.gproust.sprout.data.FoodCatalog]), or null. */
+    val ref: String? = null,
+    /** The day it was first noticed (epoch millis), when the parent gave one. */
+    val noticedAt: Long? = null,
+    /**
+     * Whether a health professional confirmed it. False is "noted by us", not
+     * "doubtful": it is the parent's statement either way, and the document
+     * that leaves says which.
+     */
+    val confirmed: Boolean = false,
+    /** What was seen, what the doctor said — the parent's words, as typed. */
     val notes: String? = null,
     @ColumnInfo(defaultValue = "''") override val uid: String = newUid(),
     @ColumnInfo(defaultValue = "0") override val updatedAt: Long = 0L,

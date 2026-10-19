@@ -61,12 +61,15 @@ object ExportFiles {
      * clients and file managers of every vintage, and a name with a slash in it
      * is a file that fails to save rather than a file with an odd name.
      */
-    fun fileName(babyName: String, from: LocalDate, to: LocalDate, extension: String): String {
-        val safe = babyName.map { if (it.isLetterOrDigit()) it else '-' }
-            .joinToString("")
-            .trim('-')
-            .take(24)
-            .ifBlank { "baby" }
-        return "Sprout-$safe-${from}_$to.$extension"
-    }
+    fun fileName(babyName: String, from: LocalDate, to: LocalDate, extension: String): String =
+        "Sprout-${safeName(babyName)}-${from}_$to.$extension"
+
+    /** The allergy list's file (BDR-21): whose it is, and what it is. */
+    fun allergyFileName(babyName: String): String = "Sprout-${safeName(babyName)}-allergies.pdf"
+
+    private fun safeName(babyName: String): String = babyName.map { if (it.isLetterOrDigit()) it else '-' }
+        .joinToString("")
+        .trim('-')
+        .take(24)
+        .ifBlank { "baby" }
 }

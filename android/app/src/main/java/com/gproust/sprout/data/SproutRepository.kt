@@ -1,10 +1,12 @@
 package com.gproust.sprout.data
 
 import androidx.room.withTransaction
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.GrowthEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.ParentProfileEntity
@@ -95,6 +97,13 @@ class SproutRepository(
     fun householdDiapers(since: Long): Flow<List<DiaperEntity>> =
         db.diaperDao().observeAllSince(since)
 
+    /**
+     * Every solid meal in the household that named its foods (BDR-20). The meal
+     * form's suggestions come from here rather than from the active baby, so
+     * twins starting solids together are offered the same carrot.
+     */
+    val householdMealsWithFoods: Flow<List<FeedingEntity>> = db.feedingDao().observeMealsWithFoods()
+
     /** Every tracked baby's as-needed medicines (BDR-15). */
     val householdMedicines: Flow<List<MedicineEntity>> = db.medicineDao().observeAllActive()
 
@@ -120,6 +129,7 @@ class SproutRepository(
     private fun TreatmentEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun MedicineEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun MedicineDoseEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
+    private fun AllergyEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
     private fun PumpingEntity.stamped() = copy(uid = uid.ifEmpty { newUid() }, updatedAt = now())
 
     /** Adds a baby and returns its new id, selecting it if none is active yet. */
@@ -179,6 +189,7 @@ class SproutRepository(
                 addAll(db.treatmentDao().uidsForBaby(babyId).toTombstones("treatment", deletedAt))
                 addAll(db.medicineDao().uidsForBaby(babyId).toTombstones("medicine", deletedAt))
                 addAll(db.medicineDoseDao().uidsForBaby(babyId).toTombstones("medicine_dose", deletedAt))
+                addAll(db.allergyDao().uidsForBaby(babyId).toTombstones("allergy", deletedAt))
                 addAll(listOfNotNull(db.babyDao().uidById(babyId)).toTombstones("baby", deletedAt))
             }
             db.tombstoneDao().insertAll(tombstones)
@@ -190,6 +201,7 @@ class SproutRepository(
             db.treatmentDao().purgeForBaby(babyId)
             db.medicineDao().purgeForBaby(babyId)
             db.medicineDoseDao().purgeForBaby(babyId)
+            db.allergyDao().purgeForBaby(babyId)
             db.babyDao().purgeById(babyId)
         }
         reassignActiveIfNeeded(babyId)
@@ -213,6 +225,7 @@ class SproutRepository(
             db.treatmentDao().compact(cutoff)
             db.medicineDao().compact(cutoff)
             db.medicineDoseDao().compact(cutoff)
+            db.allergyDao().compact(cutoff)
             db.pumpingDao().compact(cutoff)
             db.tombstoneDao().compact(cutoff)
         }
@@ -287,6 +300,39 @@ class SproutRepository(
         }
         if (joined) onWidgetDataChanged()
         return joined
+    }
+
+    /**
+     * Corrects one food on every meal of [babyId]'s that names it (BDR-20): the
+     * food whose [foodIdentity] is [from] becomes [to] — "carottes" typed by
+     * hand made into the carrot from the list, or merged into a food the
+     * household already has. How each meal gave it and how it went are kept.
+     * Returns how many meals were rewritten.
+     *
+     * The meals are read inside the transaction rather than taken from the
+     * screen, for the reason [joinBreastfeeds] gives: a meal that arrived from
+     * the other phone while the dialog was open is corrected too, and an edit
+     * that arrived is not undone. Each rewritten meal is stamped, so the
+     * correction reaches the other phone as the meals it changed.
+     *
+     * An allergy noted against the food follows it (BDR-21): an allergy to
+     * "carottes" is an allergy to the carrot once "carottes" turns out to be
+     * the carrot, and leaving it on a name no meal uses any more would take
+     * the mark off every line the parent can see.
+     */
+    suspend fun relabelFood(babyId: Long, from: String, to: MealFood): Int = db.withTransaction {
+        val at = now()
+        var changed = 0
+        for (meal in db.feedingDao().mealsWithFoods(babyId)) {
+            val foods = relabelledFoods(meal.foods, from, to) ?: continue
+            db.feedingDao().insert(meal.copy(foods = foods, updatedAt = at))
+            changed++
+        }
+        for (allergy in db.allergyDao().allForBabyOnce(babyId)) {
+            if (allergyIdentity(allergy) != from) continue
+            db.allergyDao().update(allergy.copy(name = to.name, ref = to.ref, updatedAt = at))
+        }
+        changed
     }
 
     /** Epoch millis of a baby's most recent feed, or null if none yet. */
@@ -492,6 +538,25 @@ class SproutRepository(
 
     suspend fun medicineDosesForBabyOnce(babyId: Long): List<MedicineDoseEntity> =
         db.medicineDoseDao().allForBabyOnce(babyId)
+
+    // Allergies (BDR-21) — the active baby's, as the household came to know them.
+
+    val allergies: Flow<List<AllergyEntity>> = activeBabyId.flatMapLatest { id ->
+        if (id == null) flowOf(emptyList()) else db.allergyDao().observeForBaby(id)
+    }
+
+    /** Notes an allergy on the active baby. Returns the new row id, or null with no active baby. */
+    suspend fun addAllergy(entity: AllergyEntity): Long? {
+        val id = activeBabyId.first() ?: return null
+        return db.allergyDao().insert(entity.copy(babyId = id).stamped())
+    }
+
+    suspend fun updateAllergy(entity: AllergyEntity) = db.allergyDao().update(entity.stamped())
+
+    suspend fun deleteAllergy(entity: AllergyEntity) = db.allergyDao().softDelete(entity.id, now())
+
+    suspend fun allergiesForBabyOnce(babyId: Long): List<AllergyEntity> =
+        db.allergyDao().allForBabyOnce(babyId)
 
     // Pumping (expressed milk — the parent's stash, not a baby's log)
     val pumpings: Flow<List<PumpingEntity>> = db.pumpingDao().observeAll()

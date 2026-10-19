@@ -5,6 +5,54 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 🥕 **A page for first foods.** Logging a solid meal now lets you list what was
+  in it, and the new **First foods** tile gathers every food your baby has met:
+  how many times it's been offered, the first time and the last, and how many of
+  those were just a taste and how many a real serving. Open a food to see each
+  meal it was part of, and tap one to correct it.
+- 👍 **How it went, if you noticed.** Each food on a meal can say *Liked it*,
+  *Not sure* or *Refused* — or nothing at all, which is fine. A food refused
+  three times and liked on the fourth is exactly what the count is there to
+  show, so it's shown plainly: no colours, no warnings, no target number of
+  tries.
+- 🔎 **A list to search, in your language.** Vegetables, fruit, meat and fish
+  come ready to pick — search as you type (accents optional) or browse a shelf. A
+  carrot logged on a phone in French shows as a carrot on a phone in English,
+  and counts as the same food. The list is just names: no ages, no order, no
+  "try this next" — when and what is yours and your doctor's to decide.
+- ✍️ **And anything else, in your words.** A ratatouille, a cheese, grandma's
+  soup: type it once and it's one tap away from then on, for every baby in the
+  household. The meal's weight stays where it was, and optional.
+- 🧹 **Put a food right after the fact.** Typed "carottes" by hand before you
+  found the carrot in the list? Tap **Correct** on that food and pick what it
+  was: every meal that named it follows, and the two lines become one — tastes,
+  servings and how it went kept as they were. Searching for "carottes" now also
+  offers the carrot from the list first.
+- 🛡️ **Allergies, as you come to know them.** Note what your baby is allergic
+  to — a food from the list, or anything in your own words (cow's milk protein,
+  egg, a medicine) — with the day you noticed it, whether a doctor confirmed it,
+  and what you saw. It's marked on that food on the First foods page and when you
+  add it to a meal, without ever getting in the way of logging. Both phones keep
+  it, even if you only started sharing later.
+- 📄 **Share the allergy list on its own.** One tap gives a one-page PDF — your
+  baby's name, each allergy and what you noted — for a nursery, a childminder or
+  a grandparent, without the rest of the record. The record for your doctor now
+  starts with the allergies too. Sprout doesn't diagnose anything: if you think
+  your baby reacted to something, ask a doctor.
+- 🩺 **First foods in the record for your doctor.** The PDF now lists each food
+  offered in the period — when it was first offered, how many times since,
+  tastes and servings, and how it went where you noted it — and the spreadsheet
+  has a **Foods** sheet with one row per food per meal. Just the counts, no
+  comment on them; switch it off on the export screen if you'd rather leave it
+  out.
+- 🤝 **Shared like every other feed.** If your household's phones share, the
+  foods go with each meal — the ones you added yourself included, which then
+  turn up in the other phone's suggestions too. Correct a meal on one phone and
+  the other follows. Both phones need this version: an older one will ask to be
+  updated rather than read the meals half-way.
+- 🔁 **Correcting a feed no longer shows up twice on the other phone.** Editing a
+  feed used to reach your partner's phone as a new feed beside the old one; it
+  now arrives as the correction it is.
 - 🧹 **Room around the dots.** Details that ran together — *Breast·Left*,
   *Left 9m·Right 4m·Total 13m* — now have a space on each side of the dot, in
   the histories, on the widget and in the doctor's report.

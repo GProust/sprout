@@ -38,10 +38,14 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.DiaperEntity
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
 import com.gproust.sprout.data.local.NursingSegment
@@ -62,6 +66,7 @@ import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.NursingScreen
+import com.gproust.sprout.ui.foods.FoodsScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.medicines.MedicinesScreen
 import com.gproust.sprout.ui.health.HealthScreen
@@ -83,6 +88,7 @@ import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
 import com.gproust.sprout.widget.LAST_BREAST_WINDOW_MS
 import com.gproust.sprout.widget.SproutWidgetUi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -326,6 +332,59 @@ class ScreenshotTest {
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
+
+    /**
+     * A fortnight of first foods (BDR-20): some tasted once, some come back to,
+     * one refused before it was liked — what a real list looks like, rather
+     * than a row of foods that all went well.
+     *
+     * Seeded just for its own captures and deleted straight after, because the
+     * meals are feeds: left in place they would move the history, the
+     * statistics and the record every other capture was taken from.
+     */
+    private fun seedMeals() = runBlocking {
+        val repo = app.repository
+        val day = 24L * 3_600_000L
+        val noon = System.currentTimeMillis() - 2 * 3_600_000L
+        fun meal(daysAgo: Int, grams: Int?, vararg foods: MealFood) = FeedingEntity(
+            type = FeedType.SOLID,
+            amountGrams = grams,
+            startTime = noon - daysAgo * day,
+            foods = foods.toList(),
+        )
+        // From Sprout's list, by id — the names are this phone's language.
+        fun listed(id: String, name: String, portion: FoodPortion, reception: FoodReception? = null) =
+            MealFood(name, portion, reception, ref = id)
+        repo.addFeeding(meal(12, null, listed("carrot", "Carrot", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(meal(10, 40, listed("carrot", "Carrot", FoodPortion.SERVING, FoodReception.LIKED)))
+        repo.addFeeding(meal(8, null, listed("courgette", "Courgette", FoodPortion.TASTE, FoodReception.REFUSED)))
+        repo.addFeeding(
+            meal(
+                6, 60,
+                listed("carrot", "Carrot", FoodPortion.SERVING),
+                listed("courgette", "Courgette", FoodPortion.TASTE, FoodReception.MIXED),
+            ),
+        )
+        repo.addFeeding(meal(4, null, listed("sweet_potato", "Sweet potato", FoodPortion.TASTE, FoodReception.LIKED)))
+        repo.addFeeding(
+            meal(
+                2, 80,
+                listed("courgette", "Courgette", FoodPortion.SERVING, FoodReception.LIKED),
+                listed("salmon", "Salmon", FoodPortion.TASTE),
+            ),
+        )
+        // One allergy, noted by the family, so the page's allergy card and the
+        // marker on its food are in the capture (BDR-21).
+        repo.addAllergy(AllergyEntity(name = "Salmon", ref = "salmon", noticedAt = noon - 2 * day))
+        // And one the household added itself, which is not on any list.
+        repo.addFeeding(meal(1, null, MealFood("Ratatouille", FoodPortion.TASTE, FoodReception.MIXED)))
+    }
+
+    private fun clearMeals() = runBlocking {
+        val repo = app.repository
+        repo.feedings.first().filter { it.type == FeedType.SOLID }.forEach { repo.deleteFeeding(it) }
+        repo.allergies.first().forEach { repo.deleteAllergy(it) }
+    }
 
     private fun settle() {
         rule.waitForIdle()
@@ -689,6 +748,21 @@ class ScreenshotTest {
         // sentence as well as the fields.
         tapDesc("Add a medicine")
         save("12-medicines-2-new")
+
+        // First foods (BDR-20): each food with its own count, tastes and
+        // servings apart, and how it went where that was noted. Then the meal
+        // form, offering the household's own foods back — the ratatouille
+        // among them, which is on no list — and one shelf of Sprout's.
+        seedMeals()
+        show { FoodsScreen(onBack = {}) }
+        save("12-foods")
+        tapDesc("Log a meal")
+        saveScreen("12-foods-2-log")
+        // One of the shelves open: Sprout's list of plain names, to browse
+        // without knowing what to type.
+        tap("Vegetables")
+        saveScreen("12-foods-3-vegetables")
+        clearMeals()
 
         // Partner sync: before pairing, after, and with the stash held back.
         // The ViewModel is built by hand rather than through viewModel(),

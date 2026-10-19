@@ -24,6 +24,8 @@ public enum ReportWorkbook {
         ]
         if report.options.includeTreatments { sheets.append(treatments(report)) }
         if !report.medicines.isEmpty { sheets.append(medicineDoses(report)) }
+        if !report.foods.isEmpty { sheets.append(foods(report)) }
+        if !report.allergies.isEmpty { sheets.append(allergies(report)) }
         return sheets
     }
 
@@ -335,6 +337,65 @@ public enum ReportWorkbook {
         report.medicines
             .flatMap { record in record.doses.map { (medicine: record.medicine, dose: $0) } }
             .sorted { $0.dose.time < $1.dose.time }
+    }
+
+    /// Every food offered inside the range, one row per food per meal (BDR-20).
+    ///
+    /// Raw rows, as for the medicines: a pivot by `food` gives the PDF's counts,
+    /// and nothing here has been summed or judged first. `list_id` is the food's
+    /// id on Sprout's list — the same on every phone and in every language, so
+    /// it is what to group by — and blank for a food the household added, whose
+    /// `food` is the parent's own words. `portion` and `reception` are keys, in
+    /// English, like `stool_colour`; a reception nobody noted is blank, not a
+    /// fourth answer. `first_offered` is the food's first meal ever, which may be
+    /// before the range.
+    private static func foods(_ report: ReportContent) -> Xlsx.Sheet {
+        let offered = report.foods
+            .flatMap { food in food.offers.map { (food: food, offer: $0) } }
+            .sorted { a, b in
+                a.offer.time != b.offer.time ? a.offer.time < b.offer.time : a.offer.feedUid < b.offer.feedUid
+            }
+        return Xlsx.Sheet(
+            name: "Foods",
+            headers: ["date", "time", "food", "list_id", "portion", "reception", "first_offered"],
+            rows: offered.map { given -> [Xlsx.Cell] in
+                [
+                    .day(day(given.offer.time)),
+                    .clock(clock(given.offer.time)),
+                    .text(given.food.name),
+                    given.food.ref.map { Xlsx.Cell.text($0) } ?? .blank,
+                    .text(given.offer.portion.rawValue.lowercased()),
+                    given.offer.reception.map { Xlsx.Cell.text($0.rawValue.lowercased()) } ?? .blank,
+                    .day(day(given.food.firstOffered)),
+                ]
+            },
+            widths: [12, 10, 22, 14, 10, 11, 14]
+        )
+    }
+
+    /// The baby's allergies as the household noted them (BDR-21), one row each.
+    /// `list_id` is the food list's id where there is one, `confirmed` the
+    /// parents' own statement that a health professional confirmed it, and
+    /// `notes` follows the same switch as every other sheet's.
+    private static func allergies(_ report: ReportContent) -> Xlsx.Sheet {
+        var headers = ["allergy", "list_id", "confirmed", "noticed_on"]
+        if report.options.includeNotes { headers.append("notes") }
+
+        return Xlsx.Sheet(
+            name: "Allergies",
+            headers: headers,
+            rows: report.allergies.map { allergy -> [Xlsx.Cell] in
+                var row: [Xlsx.Cell] = [
+                    .text(allergy.name),
+                    allergy.ref.map { Xlsx.Cell.text($0) } ?? .blank,
+                    .flag(allergy.confirmed),
+                    allergy.noticedAt.map { Xlsx.Cell.day(day($0)) } ?? .blank,
+                ]
+                if report.options.includeNotes { row.append(.text(allergy.notes ?? "")) }
+                return row
+            },
+            widths: [24, 14, 11, 13, 40]
+        )
     }
 
     private static let widthsForDaily: [Int] = {

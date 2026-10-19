@@ -26,6 +26,54 @@ public enum SproutDatabase {
     static let migrationsAfterAndroidSchema: [(name: String, migrate: @Sendable (Database) throws -> Void)] = [
         (name: "v17-as-needed-medicine", migrate: migrateToV17),
         (name: "v18-medicine-amounts", migrate: migrateToV18),
+        (name: "v19-meal-foods", migrate: migrateToV19),
+        (name: "v20-allergies", migrate: migrateToV20),
+    ]
+
+    /// v19 -> v20: a baby's allergies, as the household came to know them
+    /// (BDR-21).
+    ///
+    /// Android's `MIGRATION_19_20`, verbatim. A table of its own rather than a
+    /// mark on a food or a column on the baby: each allergy is a row with its
+    /// own uid, so two phones that each note one on the same day keep both.
+    private static func migrateToV20(_ db: Database) throws {
+        for statement in schemaV20 {
+            try db.execute(sql: statement)
+        }
+    }
+
+    static let schemaV20: [String] = [
+        """
+        CREATE TABLE IF NOT EXISTS `allergy` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `babyId` INTEGER NOT NULL,
+            `name` TEXT NOT NULL,
+            `ref` TEXT,
+            `noticedAt` INTEGER,
+            `confirmed` INTEGER NOT NULL,
+            `notes` TEXT,
+            `uid` TEXT NOT NULL DEFAULT '',
+            `updatedAt` INTEGER NOT NULL DEFAULT 0,
+            `deletedAt` INTEGER)
+        """,
+        "CREATE INDEX IF NOT EXISTS `index_allergy_babyId` ON `allergy` (`babyId`)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS `index_allergy_uid` ON `allergy` (`uid`)",
+    ]
+
+    /// v18 -> v19: a solid meal lists the foods that were in it (BDR-20).
+    ///
+    /// Android's `MIGRATION_18_19`, verbatim. One column on `feeding` rather
+    /// than a table of foods: the meal is already the row, and a food is its
+    /// name. Not null and empty by default, so every meal logged before reads
+    /// back as one that named nothing.
+    private static func migrateToV19(_ db: Database) throws {
+        for statement in schemaV19 {
+            try db.execute(sql: statement)
+        }
+    }
+
+    static let schemaV19: [String] = [
+        "ALTER TABLE `feeding` ADD COLUMN `foods` TEXT NOT NULL DEFAULT ''",
     ]
 
     /// v17 -> v18: amounts on an as-needed medicine, and on the dose that used

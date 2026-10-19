@@ -189,7 +189,9 @@ private func assembleReport(
         medicines: try repository.allMedicinesForBabyOnce(babyId),
         medicineDoses: try repository.medicineDosesForBabyOnce(babyId),
         options: options,
-        now: Clock.millis
+        now: Clock.millis,
+        foodName: { catalogName($0) },
+        allergies: try repository.allergiesForBabyOnce(babyId)
     )
 }
 
@@ -393,6 +395,22 @@ struct ReportScreen: View {
             isOn: Binding(
                 get: { model.options.includeMedicines },
                 set: { model.options.includeMedicines = $0 }
+            )
+        )
+        ToggleRow(
+            title: Str.t("allergies_title"),
+            subtitle: Str.t("report_include_allergies_hint"),
+            isOn: Binding(
+                get: { model.options.includeAllergies },
+                set: { model.options.includeAllergies = $0 }
+            )
+        )
+        ToggleRow(
+            title: Str.t("screen_foods"),
+            subtitle: Str.t("report_include_foods_hint"),
+            isOn: Binding(
+                get: { model.options.includeFoods },
+                set: { model.options.includeFoods = $0 }
             )
         )
         ToggleRow(

@@ -1,6 +1,6 @@
 import Foundation
 
-// Two columns hold a list inside a TEXT value, because Room's converters put
+// Three columns hold a list inside a TEXT value, because Room's converters put
 // them there. The encodings are Android's, reproduced exactly: the database is
 // local, but a phone restored from a backup and a replica read by the sync
 // engine both expect these bytes, and "nearly the same" is a column that parses
@@ -52,5 +52,64 @@ public enum NursingSegmentCoding {
             else { return nil }
             return NursingSegment(side: side, startTime: start, endTime: end)
         }
+    }
+}
+
+/// A solid meal's foods (BDR-20), as Room stores them: a JSON array of
+/// `{"name", "portion", "reception"}` objects, and an empty list as an empty
+/// string — so every row from before the column existed already reads as a meal
+/// that named nothing.
+///
+/// JSON rather than a packed string like the segments, because a food is the
+/// parent's own words and any separator a packing chose is a character somebody
+/// will type. The same objects are what travel in a replica (spec §7).
+public enum MealFoodCoding {
+
+    public static func encode(_ foods: [MealFood]) -> String {
+        guard !foods.isEmpty,
+              let data = try? JSONSerialization.data(withJSONObject: jsonArray(foods), options: [.sortedKeys]),
+              let text = String(data: data, encoding: .utf8)
+        else { return "" }
+        return text
+    }
+
+    /// A column that does not parse reads as a meal that named nothing, and a
+    /// food that does not is skipped: a list from a merge is not a reason to
+    /// lose the meal it belongs to.
+    public static func decode(_ text: String?) -> [MealFood] {
+        guard let text, !text.isEmpty,
+              let data = text.data(using: .utf8),
+              let array = (try? JSONSerialization.jsonObject(with: data)) as? [Any]
+        else { return [] }
+        return array.compactMap { try? food(from: $0) }
+    }
+
+    /// The objects a replica carries. `reception` is left out rather than
+    /// written as null: "not noted" is no key at all, and a food the household
+    /// typed in has no list id.
+    static func jsonArray(_ foods: [MealFood]) -> [[String: Any]] {
+        foods.map { food in
+            var json: [String: Any] = ["name": food.name, "portion": food.portion.rawValue]
+            if let reception = food.reception { json["reception"] = reception.rawValue }
+            if let ref = food.ref { json["ref"] = ref }
+            return json
+        }
+    }
+
+    /// One food from a replica, read as strictly as Android reads it: a missing
+    /// name or a portion this app does not know is a damaged document.
+    static func food(from value: Any) throws -> MealFood {
+        guard let json = value as? [String: Any],
+              let name = json["name"] as? String,
+              let portionName = json["portion"] as? String,
+              let portion = FoodPortion(rawValue: portionName)
+        else { throw SyncPayloadError.unreadable("damaged replica: a meal's food is malformed") }
+        var reception: FoodReception?
+        if let raw = json["reception"], !(raw is NSNull) {
+            guard let text = raw as? String, let value = FoodReception(rawValue: text)
+            else { throw SyncPayloadError.unreadable("damaged replica: unknown reception") }
+            reception = value
+        }
+        return MealFood(name: name, portion: portion, reception: reception, ref: json["ref"] as? String)
     }
 }

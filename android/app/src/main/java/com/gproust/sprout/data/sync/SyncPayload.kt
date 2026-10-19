@@ -1,5 +1,6 @@
 package com.gproust.sprout.data.sync
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.Converters
@@ -62,6 +63,7 @@ data class SyncPayload(
     val treatments: List<BabyScoped<TreatmentEntity>> = emptyList(),
     val medicines: List<BabyScoped<MedicineEntity>> = emptyList(),
     val medicineDoses: List<BabyScoped<MedicineDoseEntity>> = emptyList(),
+    val allergies: List<BabyScoped<AllergyEntity>> = emptyList(),
     val pumpings: List<PumpingEntity> = emptyList(),
     val tombstones: List<TombstoneEntity> = emptyList(),
 ) {
@@ -69,7 +71,7 @@ data class SyncPayload(
     val rowCount: Int
         get() = babies.size + feedings.size + sleeps.size + diapers.size +
             growth.size + treatments.size + medicines.size + medicineDoses.size +
-            pumpings.size + tombstones.size
+            allergies.size + pumpings.size + tombstones.size
 }
 
 /** A log with the uid — never the local id — of the baby it belongs to. */
@@ -115,6 +117,7 @@ object SyncPayloadCodec {
         put("treatments", payload.treatments.map { it.toJson(::treatmentToJson) }.toJsonArray())
         put("medicines", payload.medicines.map { it.toJson(::medicineToJson) }.toJsonArray())
         put("medicineDoses", payload.medicineDoses.map { it.toJson(::medicineDoseToJson) }.toJsonArray())
+        put("allergies", payload.allergies.map { it.toJson(::allergyToJson) }.toJsonArray())
         put("pumpings", payload.pumpings.map(::pumpingToJson).toJsonArray())
         put("tombstones", payload.tombstones.map(::tombstoneToJson).toJsonArray())
     }.toString().toByteArray(Charsets.UTF_8)
@@ -129,7 +132,7 @@ object SyncPayloadCodec {
         val text = String(bytes, Charsets.UTF_8)
         // Before parsing, not around it: nesting deep enough to exhaust the
         // stack raises an Error, which the catch below would not hold (see
-        // SyncLimits.MAX_JSON_DEPTH). A replica is four levels deep.
+        // SyncLimits.MAX_JSON_DEPTH). A replica is six levels deep.
         if (SyncLimits.exceedsMaxJsonDepth(text)) {
             throw SyncPayloadException.Unreadable("not a Sprout replica: implausibly nested")
         }
@@ -161,6 +164,9 @@ object SyncPayloadCodec {
                 treatments = root.list("treatments") { it.babyScoped(::treatmentFromJson) },
                 medicines = root.list("medicines") { it.babyScoped(::medicineFromJson) },
                 medicineDoses = root.list("medicineDoses") { it.babyScoped(::medicineDoseFromJson) },
+                // Absent on a replica from before allergies existed (BDR-21),
+                // which is a household that had noted none.
+                allergies = root.list("allergies") { it.babyScoped(::allergyFromJson) },
                 pumpings = root.list("pumpings", ::pumpingFromJson),
                 tombstones = root.list("tombstones", ::tombstoneFromJson),
             )
@@ -204,6 +210,10 @@ object SyncPayloadCodec {
         putOrNull("leftDurationMs", entity.leftDurationMs)
         putOrNull("rightDurationMs", entity.rightDurationMs)
         put("segments", converters.nursingSegmentsToString(entity.segments))
+        // An array of objects rather than a packed string, because a food is
+        // the parent's own words (BDR-20). Absent when the meal named nothing,
+        // which is every feed that isn't a solid one.
+        if (entity.foods.isNotEmpty()) put("foods", Converters.mealFoodsToJson(entity.foods))
         putOrNull("notes", entity.notes)
     }
 
@@ -217,6 +227,9 @@ object SyncPayloadCodec {
         leftDurationMs = o.longOrNull("leftDurationMs"),
         rightDurationMs = o.longOrNull("rightDurationMs"),
         segments = converters.stringToNursingSegments(o.optString("segments")),
+        // Absent on replicas written before meals listed their foods, which
+        // merge exactly as they did — as meals that named nothing.
+        foods = o.optJSONArray("foods")?.let(Converters::mealFoodsFromJson).orEmpty(),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),
@@ -368,6 +381,26 @@ object SyncPayloadCodec {
         medicineUid = o.getString("medicineUid"),
         time = o.getLong("time"),
         amount = o.doubleOrNull("amount"),
+        notes = o.stringOrNull("notes"),
+        uid = o.getString("uid"),
+        updatedAt = o.getLong("updatedAt"),
+        deletedAt = o.longOrNull("deletedAt"),
+    )
+
+    private fun allergyToJson(entity: AllergyEntity) = JSONObject().apply {
+        putSync(entity.uid, entity.updatedAt, entity.deletedAt)
+        put("name", entity.name)
+        putOrNull("ref", entity.ref)
+        putOrNull("noticedAt", entity.noticedAt)
+        put("confirmed", entity.confirmed)
+        putOrNull("notes", entity.notes)
+    }
+
+    private fun allergyFromJson(o: JSONObject) = AllergyEntity(
+        name = o.getString("name"),
+        ref = o.stringOrNull("ref"),
+        noticedAt = o.longOrNull("noticedAt"),
+        confirmed = o.optBoolean("confirmed", false),
         notes = o.stringOrNull("notes"),
         uid = o.getString("uid"),
         updatedAt = o.getLong("updatedAt"),

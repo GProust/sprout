@@ -116,6 +116,21 @@ final class SyncPayloadTests: XCTestCase {
         XCTAssertEqual(dose.row.time, 1_757_402_800_000)
         XCTAssertEqual(dose.row.amount ?? 0, 2.5, accuracy: 1e-9)
 
+        // An allergy is its own baby-scoped row (BDR-21); everything but its name
+        // and `confirmed` is absent when not given.
+        XCTAssertEqual(payload.allergies.count, 2)
+        let kiwi = try XCTUnwrap(payload.allergies.first).row
+        XCTAssertEqual(kiwi.ref, "kiwi")
+        XCTAssertEqual(kiwi.noticedAt, 1_757_403_000_000)
+        XCTAssertTrue(kiwi.confirmed)
+        XCTAssertEqual(kiwi.notes, "lips swelled; seen by the GP")
+        let milk = try XCTUnwrap(payload.allergies.last).row
+        XCTAssertEqual(milk.name, "Cow's milk protein")
+        XCTAssertNil(milk.ref)
+        XCTAssertNil(milk.noticedAt)
+        XCTAssertFalse(milk.confirmed)
+        XCTAssertNil(milk.notes)
+
         let pumping = try XCTUnwrap(payload.pumpings.first)
         XCTAssertEqual(pumping.storage, .FRIDGE)
         XCTAssertEqual(pumping.amountMl, 120)
@@ -144,6 +159,72 @@ final class SyncPayloadTests: XCTestCase {
         let treatment = try XCTUnwrap(payload.treatments.first).row
         XCTAssertEqual(treatment.timesOfDay, "540,1260")
         XCTAssertEqual(treatment.reminderTimes, [540, 1260])
+    }
+
+    /// A solid meal's foods (BDR-20): the one array of objects inside a row,
+    /// names in the parent's own words — separators and quotes included — and
+    /// "how it went" absent rather than null when nothing was noted.
+    func testAMealsFoodsTravelAsObjects() throws {
+        let payload = try SyncPayloadCodec.decode(
+            try document(), currentSchemaVersion: try vectorSchemaVersion()
+        )
+
+        let meal = try XCTUnwrap(payload.feedings.first { $0.row.type == .SOLID }).row
+        XCTAssertEqual(meal.amountGrams, 60)
+        XCTAssertEqual(
+            meal.mealFoods,
+            [
+                MealFood(name: #"Carrot; parsnip, "homemade""#, portion: .SERVING, reception: .LIKED),
+                MealFood(name: "Panais", portion: .TASTE, ref: "parsnip"),
+            ]
+        )
+        XCTAssertEqual(try XCTUnwrap(payload.feedings.first).row.mealFoods, [], "a breastfeed names no foods")
+
+        // And written back the same way: an array on the meal, and no key at all
+        // on a feed that named nothing.
+        let encoded = try SyncPayloadCodec.encode(payload)
+        let root = try XCTUnwrap(try JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        let feedings = try XCTUnwrap(root["feedings"] as? [[String: Any]])
+        let written = try XCTUnwrap(feedings.first { $0["type"] as? String == "SOLID" })
+        let foods = try XCTUnwrap(written["foods"] as? [[String: Any]])
+        XCTAssertEqual(foods.count, 2)
+        XCTAssertNil(foods[1]["reception"], "not noted is no key at all")
+        XCTAssertEqual(foods[1]["ref"] as? String, "parsnip")
+        XCTAssertNil(foods[0]["ref"], "a food the household typed in has no list id")
+        XCTAssertNil(try XCTUnwrap(feedings.first { $0["type"] as? String == "BREAST" })["foods"])
+    }
+
+    /// What a replica written before meals listed their foods looks like: a solid
+    /// meal, and no mention of foods. It merges as a meal that named nothing.
+    func testAMealFromBeforeFoodsNamesNothing() throws {
+        let json = """
+        {"formatVersion":1,"schemaVersion":18,"householdId":"h","deviceId":"d","createdAt":1,
+         "babies":[],"feedings":[{"babyUid":"b","uid":"meal-old","updatedAt":9,"type":"SOLID",
+         "amountGrams":40,"startTime":1700000000000,"segments":""}]}
+        """
+
+        let payload = try SyncPayloadCodec.decode(Data(json.utf8), currentSchemaVersion: 19)
+        let meal = try XCTUnwrap(payload.feedings.first).row
+        XCTAssertEqual(meal.amountGrams, 40)
+        XCTAssertEqual(meal.mealFoods, [])
+        XCTAssertEqual(meal.foods, "")
+    }
+
+    /// A food Android could not read is a food this app must not read either: a
+    /// replica one phone accepts and the other refuses is two phones that stop
+    /// syncing with nothing to say why.
+    func testAMalformedFoodIsADamagedReplica() {
+        let json = """
+        {"formatVersion":1,"schemaVersion":19,"householdId":"h","deviceId":"d","createdAt":1,
+         "babies":[],"feedings":[{"babyUid":"b","uid":"m","updatedAt":9,"type":"SOLID",
+         "startTime":1,"segments":"","foods":[{"portion":"TASTE"}]}]}
+        """
+
+        XCTAssertThrowsError(try SyncPayloadCodec.decode(Data(json.utf8), currentSchemaVersion: 19)) { error in
+            guard case .unreadable = error as? SyncPayloadError else {
+                return XCTFail("expected unreadable, got \(error)")
+            }
+        }
     }
 
     /// A measure nobody took is an absent key, not a zero, and a row nobody

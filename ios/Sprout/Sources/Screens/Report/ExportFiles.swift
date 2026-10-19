@@ -56,15 +56,22 @@ enum ExportFiles {
         to: CalendarDay,
         extension fileExtension: String
     ) -> String {
+        "Sprout-\(safeName(babyName))-\(iso(from))_\(iso(to)).\(fileExtension)"
+    }
+
+    /// The allergy list's file (BDR-21): whose it is, and what it is.
+    static func allergyFileName(babyName: String) -> String {
+        "Sprout-\(safeName(babyName))-allergies.pdf"
+    }
+
+    private static func safeName(_ babyName: String) -> String {
         let safe = String(
             babyName
                 .map { $0.isLetter || $0.isNumber ? $0 : "-" }
                 .prefix(24)
         )
         .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-
-        let name = safe.isEmpty ? "baby" : safe
-        return "Sprout-\(name)-\(iso(from))_\(iso(to)).\(fileExtension)"
+        return safe.isEmpty ? "baby" : safe
     }
 
     /// `2026-09-08`, and deliberately not the reader's date format: this is part

@@ -150,6 +150,27 @@ interface FeedingDao {
     @Query("SELECT * FROM feeding WHERE startTime >= :since AND deletedAt IS NULL ORDER BY startTime DESC")
     fun observeAllSince(since: Long): Flow<List<FeedingEntity>>
 
+    /**
+     * Every baby's solid meals that listed a food, newest first — the
+     * household's own list of foods, which the meal form offers back (BDR-20).
+     *
+     * Unbounded, unlike [observeAllSince]: a food first logged in March is
+     * still one tap away in June. It stays small because it is only the meals
+     * that named something.
+     */
+    @Query(
+        "SELECT * FROM feeding WHERE type = 'SOLID' AND foods != '' AND deletedAt IS NULL " +
+            "ORDER BY startTime DESC",
+    )
+    fun observeMealsWithFoods(): Flow<List<FeedingEntity>>
+
+    /** One baby's meals that named any food, for correcting one of them everywhere (BDR-20). */
+    @Query(
+        "SELECT * FROM feeding WHERE babyId = :babyId AND type = 'SOLID' AND foods != '' " +
+            "AND deletedAt IS NULL",
+    )
+    suspend fun mealsWithFoods(babyId: Long): List<FeedingEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FeedingEntity)
 
@@ -496,6 +517,46 @@ interface MedicineDoseDao {
     @Query("DELETE FROM medicine_dose WHERE uid = :uid")
     suspend fun purgeByUid(uid: String)
 
+}
+
+@Dao
+interface AllergyDao {
+    /** A baby's allergies, by name (BDR-21). */
+    @Query("SELECT * FROM allergy WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY name COLLATE NOCASE ASC")
+    fun observeForBaby(babyId: Long): Flow<List<AllergyEntity>>
+
+    /** The same, once — what the documents that leave read. */
+    @Query("SELECT * FROM allergy WHERE babyId = :babyId AND deletedAt IS NULL ORDER BY name COLLATE NOCASE ASC")
+    suspend fun allForBabyOnce(babyId: Long): List<AllergyEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: AllergyEntity): Long
+
+    @Update
+    suspend fun update(entity: AllergyEntity)
+
+    @Query("UPDATE allergy SET deletedAt = :now, updatedAt = :now WHERE id = :id")
+    suspend fun softDelete(id: Long, now: Long)
+
+    @Query("SELECT uid FROM allergy WHERE babyId = :babyId")
+    suspend fun uidsForBaby(babyId: Long): List<String>
+
+    @Query("DELETE FROM allergy WHERE babyId = :babyId")
+    suspend fun purgeForBaby(babyId: Long)
+
+    @Query("DELETE FROM allergy WHERE deletedAt IS NOT NULL AND deletedAt < :cutoff")
+    suspend fun compact(cutoff: Long)
+
+    // --- Partner sync (ADR-0007).
+
+    @Query("SELECT * FROM allergy")
+    suspend fun allForSync(): List<AllergyEntity>
+
+    @Query("SELECT * FROM allergy WHERE uid = :uid LIMIT 1")
+    suspend fun findByUid(uid: String): AllergyEntity?
+
+    @Query("DELETE FROM allergy WHERE uid = :uid")
+    suspend fun purgeByUid(uid: String)
 }
 
 @Dao

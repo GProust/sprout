@@ -47,7 +47,9 @@ final class ReportDataTests: XCTestCase {
         treatments: [Treatment] = [],
         medicines: [Medicine] = [],
         medicineDoses: [MedicineDose] = [],
-        options: ReportOptions = ReportOptions(period: .week)
+        options: ReportOptions = ReportOptions(period: .week),
+        foodName: (String) -> String? = { _ in nil },
+        allergies: [Allergy] = []
     ) -> ReportContent {
         buildReport(
             baby: baby,
@@ -59,7 +61,9 @@ final class ReportDataTests: XCTestCase {
             medicines: medicines,
             medicineDoses: medicineDoses,
             options: options,
-            now: now
+            now: now,
+            foodName: foodName,
+            allergies: allergies
         )
     }
 
@@ -408,5 +412,163 @@ final class ReportDataTests: XCTestCase {
         )
 
         XCTAssertTrue(content.medicines.isEmpty)
+    }
+
+    // MARK: - First foods in the doctor's record (BDR-20)
+
+    private func meal(_ date: CalendarDay, _ hour: Int, _ foods: MealFood...) -> Feeding {
+        Feeding(babyId: 1, type: .SOLID, startTime: at(date, hour), foods: foods, uid: "meal-\(at(date, hour))")
+    }
+
+    func testAFoodReachesTheRecordWithTheMealsInsideTheRangeAndItsFirstEver() throws {
+        let content = report(
+            feedings: [
+                meal(today.adding(days: -30), 12, MealFood(name: "Carotte", ref: "carrot")),
+                meal(today.adding(days: -2), 12, MealFood(name: "Carrot", portion: .SERVING, reception: .LIKED, ref: "carrot")),
+                meal(today, 12, MealFood(name: "Carotte", ref: "carrot"), MealFood(name: "Ratatouille")),
+            ],
+            foodName: { $0 == "carrot" ? "Carrot" : nil }
+        )
+
+        XCTAssertEqual(content.foods.count, 2)
+        let carrot = content.foods[0]
+        XCTAssertEqual(carrot.name, "Carrot")
+        XCTAssertEqual(carrot.ref, "carrot")
+        XCTAssertEqual(carrot.offers.count, 2)
+        XCTAssertEqual(carrot.tastes, 1)
+        XCTAssertEqual(carrot.servings, 1)
+        XCTAssertEqual(carrot.timesReceived(.LIKED), 1)
+        XCTAssertEqual(carrot.firstOffered, at(today.adding(days: -30), 12), "the first ever, not the first in the range")
+        XCTAssertLessThan(try XCTUnwrap(carrot.offers.first).time, try XCTUnwrap(carrot.offers.last).time, "oldest first")
+
+        XCTAssertEqual(content.foods[1].name, "Ratatouille")
+        XCTAssertNil(content.foods[1].ref)
+    }
+
+    /// In the order they were first offered — never by how well each is going.
+    func testFoodsAreListedInTheOrderTheyWereIntroduced() {
+        let content = report(feedings: [
+            meal(today, 12, MealFood(name: "Pea"), MealFood(name: "Apple")),
+            meal(today.adding(days: -3), 12, MealFood(name: "Leek", reception: .REFUSED)),
+        ])
+
+        XCTAssertEqual(content.foods.map(\.name), ["Leek", "Apple", "Pea"])
+    }
+
+    func testAFoodOfferedOnlyBeforeTheRangeIsLeftOut() {
+        XCTAssertTrue(report(feedings: [meal(born, 12, MealFood(name: "Leek"))]).foods.isEmpty)
+    }
+
+    func testTurningTheFoodsOffLeavesThemOutOfTheDocument() {
+        let content = report(
+            feedings: [meal(today, 12, MealFood(name: "Leek"))],
+            options: ReportOptions(period: .week, includeFoods: false)
+        )
+
+        XCTAssertTrue(content.foods.isEmpty)
+    }
+
+    /// One row per food per meal inside the range: the list's id to group by,
+    /// keys rather than translated words, and a reception nobody noted left blank
+    /// rather than made into an answer. From `ReportWorkbookTest.kt`.
+    func testTheFoodsSheetHasARowPerFoodPerMeal() throws {
+        let content = report(
+            feedings: [
+                meal(today.adding(days: -20), 12, MealFood(name: "Carotte", ref: "carrot")),
+                meal(
+                    today, 12,
+                    MealFood(name: "Carotte", portion: .SERVING, reception: .LIKED, ref: "carrot"),
+                    MealFood(name: "Ratatouille")
+                ),
+            ],
+            foodName: { $0 == "carrot" ? "Carrot" : nil }
+        )
+        let sheet = try XCTUnwrap(ReportWorkbook.build(content).first { $0.name == "Foods" })
+
+        XCTAssertEqual(sheet.headers, ["date", "time", "food", "list_id", "portion", "reception", "first_offered"])
+        XCTAssertEqual(sheet.rows.count, 2)
+        let carrot = sheet.rows[0]
+        XCTAssertEqual(carrot[2], .text("Carrot"), "named in the export's language, whatever it was saved under")
+        XCTAssertEqual(carrot[3], .text("carrot"))
+        XCTAssertEqual(carrot[4], .text("serving"))
+        XCTAssertEqual(carrot[5], .text("liked"))
+        XCTAssertEqual(carrot[6], .day(today.adding(days: -20)))
+
+        let ratatouille = sheet.rows[1]
+        XCTAssertEqual(ratatouille[2], .text("Ratatouille"))
+        XCTAssertEqual(ratatouille[3], .blank)
+        XCTAssertEqual(ratatouille[4], .text("taste"))
+        XCTAssertEqual(ratatouille[5], .blank)
+        XCTAssertEqual(ratatouille[6], .day(today))
+    }
+
+    func testTheFoodsSheetGoesWhenFoodsDo() {
+        let content = report(
+            feedings: [meal(today, 12, MealFood(name: "Leek"))],
+            options: ReportOptions(period: .week, includeFoods: false)
+        )
+
+        XCTAssertFalse(ReportWorkbook.build(content).map(\.name).contains("Foods"))
+    }
+
+    // MARK: - Allergies in the doctor's record (BDR-21)
+
+    /// About who the baby is, not about the period: one noted in March is in
+    /// June's report. From `ReportDataTest.kt`.
+    func testAllergiesReachTheRecordWhateverThePeriodNamedAndInAlphabeticalOrder() throws {
+        let content = report(
+            foodName: { $0 == "kiwi" ? "Kiwi fruit" : nil },
+            allergies: [
+                Allergy(babyId: 1, name: "Œuf", noticedAt: at(born, 9)),
+                Allergy(babyId: 1, name: "Kiwi", ref: "kiwi", confirmed: true, notes: " lips "),
+                Allergy(babyId: 1, name: "Gone", deletedAt: 1),
+            ]
+        )
+
+        XCTAssertEqual(content.allergies.map(\.name), ["Kiwi fruit", "Œuf"])
+        let kiwi = try XCTUnwrap(content.allergies.first)
+        XCTAssertTrue(kiwi.confirmed)
+        XCTAssertEqual(kiwi.notes, "lips")
+        XCTAssertEqual(content.allergies.last?.noticedAt, at(born, 9))
+        XCTAssertEqual(content.allergies.last?.confirmed, false)
+    }
+
+    func testTurningTheAllergiesOffLeavesThemOutOfTheDocument() {
+        let content = report(
+            options: ReportOptions(period: .week, includeAllergies: false),
+            allergies: [Allergy(babyId: 1, name: "Kiwi")]
+        )
+
+        XCTAssertTrue(content.allergies.isEmpty)
+    }
+
+    /// The list shared on its own is assembled the same way, so the two documents
+    /// agree.
+    func testTheAllergyListSaysWhoseItIsAndCarriesTheSameRecords() {
+        let allergies = [Allergy(babyId: 1, name: "Kiwi", ref: "kiwi")]
+        let list = allergyList(baby: baby, allergies: allergies, now: now) { _ in "Kiwi fruit" }
+
+        XCTAssertEqual(list.babyName, "Louise")
+        XCTAssertEqual(list.birthDate, baby.birthDate)
+        XCTAssertEqual(list.generatedAt, now)
+        XCTAssertEqual(list.allergies, report(foodName: { _ in "Kiwi fruit" }, allergies: allergies).allergies)
+    }
+
+    /// One row per allergy; notes only when notes are switched on, as on every
+    /// sheet. From `ReportWorkbookTest.kt`.
+    func testTheAllergiesSheetCarriesWhatTheFamilyNoted() throws {
+        let allergies = [
+            Allergy(babyId: 1, name: "Kiwi", ref: "kiwi", noticedAt: at(born, 9), confirmed: true, notes: "lips"),
+        ]
+        let sheet = try XCTUnwrap(ReportWorkbook.build(report(allergies: allergies)).first { $0.name == "Allergies" })
+        XCTAssertEqual(sheet.headers, ["allergy", "list_id", "confirmed", "noticed_on"])
+        XCTAssertEqual(sheet.rows.first, [.text("Kiwi"), .text("kiwi"), .flag(true), .day(born)])
+
+        let withNotes = try XCTUnwrap(
+            ReportWorkbook.build(
+                report(options: ReportOptions(period: .week, includeNotes: true), allergies: allergies)
+            ).first { $0.name == "Allergies" }
+        )
+        XCTAssertEqual(withNotes.rows.first?.last, .text("lips"))
     }
 }

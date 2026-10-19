@@ -30,7 +30,7 @@ public enum Xlsx {
 
     /// One cell. Numbers stay numbers and dates stay dates; nothing is a string
     /// with a unit glued on.
-    public enum Cell {
+    public enum Cell: Equatable {
         case text(String)
         case whole(Int64)
         case decimal(Double)

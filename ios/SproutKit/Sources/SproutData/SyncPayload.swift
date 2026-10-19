@@ -40,6 +40,7 @@ public struct SyncPayload: Equatable, Sendable {
     public var treatments: [BabyScopedRow<Treatment>] = []
     public var medicines: [BabyScopedRow<Medicine>] = []
     public var medicineDoses: [BabyScopedRow<MedicineDose>] = []
+    public var allergies: [BabyScopedRow<Allergy>] = []
     public var pumpings: [Pumping] = []
     public var tombstones: [Tombstone] = []
 
@@ -66,7 +67,7 @@ public struct SyncPayload: Equatable, Sendable {
         let logs: Int = feedings.count + sleeps.count + diapers.count
         let more: Int = growth.count + treatments.count + pumpings.count
         let asNeeded: Int = medicines.count + medicineDoses.count
-        return babies.count + logs + more + asNeeded + tombstones.count
+        return babies.count + logs + more + asNeeded + allergies.count + tombstones.count
     }
 }
 
@@ -118,6 +119,7 @@ public enum SyncPayloadCodec {
             "treatments": payload.treatments.map { scoped($0, treatment) },
             "medicines": payload.medicines.map { scoped($0, medicine) },
             "medicineDoses": payload.medicineDoses.map { scoped($0, medicineDose) },
+            "allergies": payload.allergies.map { scoped($0, allergy) },
             "pumpings": payload.pumpings.map(pumping),
             "tombstones": payload.tombstones.map(tombstone),
         ]
@@ -194,6 +196,9 @@ public enum SyncPayloadCodec {
             payload.treatments = try root.rows("treatments") { try scopedFrom($0, treatmentFrom) }
             payload.medicines = try root.rows("medicines") { try scopedFrom($0, medicineFrom) }
             payload.medicineDoses = try root.rows("medicineDoses") { try scopedFrom($0, medicineDoseFrom) }
+            // Absent on a replica from before allergies existed (BDR-21), which
+            // is a household that had noted none.
+            payload.allergies = try root.rows("allergies") { try scopedFrom($0, allergyFrom) }
             payload.pumpings = try root.rows("pumpings", pumpingFrom)
             payload.tombstones = try root.rows("tombstones", tombstoneFrom)
         } catch let error as SyncPayloadError {
@@ -280,6 +285,11 @@ private extension SyncPayloadCodec {
         // Packed as Room stores it, not as an array: `SIDE,start,end` joined by
         // `;`. The two platforms have to agree on the string, not on a shape.
         json["segments"] = row.segments
+        // An array of objects rather than a packed string, because a food is the
+        // parent's own words (BDR-20). Absent when the meal named nothing, which
+        // is every feed that isn't a solid one.
+        let foods = row.mealFoods
+        if !foods.isEmpty { json["foods"] = MealFoodCoding.jsonArray(foods) }
         json.put("notes", row.notes)
         return json
     }
@@ -300,6 +310,11 @@ private extension SyncPayloadCodec {
             deletedAt: json.int64("deletedAt")
         )
         row.segments = json.string("segments") ?? ""
+        // Absent on replicas written before meals listed their foods, which merge
+        // exactly as they did — as meals that named nothing.
+        if let foods = json["foods"] as? [Any] {
+            row.mealFoods = try foods.map(MealFoodCoding.food(from:))
+        }
         return row
     }
 
@@ -477,6 +492,31 @@ private extension SyncPayloadCodec {
             medicineUid: try json.required("medicineUid"),
             time: try json.requiredInt64("time"),
             amount: json.double("amount"),
+            notes: json.string("notes"),
+            uid: try json.required("uid"),
+            updatedAt: try json.requiredInt64("updatedAt"),
+            deletedAt: json.int64("deletedAt")
+        )
+    }
+
+    // MARK: Allergy
+
+    static func allergy(_ row: Allergy) -> [String: Any] {
+        var json = sync(row)
+        json["name"] = row.name
+        json.put("ref", row.ref)
+        json.put("noticedAt", row.noticedAt)
+        json["confirmed"] = row.confirmed
+        json.put("notes", row.notes)
+        return json
+    }
+
+    static func allergyFrom(_ json: [String: Any]) throws -> Allergy {
+        Allergy(
+            name: try json.required("name"),
+            ref: json.string("ref"),
+            noticedAt: json.int64("noticedAt"),
+            confirmed: json.bool("confirmed") ?? false,
             notes: json.string("notes"),
             uid: try json.required("uid"),
             updatedAt: try json.requiredInt64("updatedAt"),

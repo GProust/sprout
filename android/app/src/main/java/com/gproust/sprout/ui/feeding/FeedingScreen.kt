@@ -58,14 +58,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
+import com.gproust.sprout.data.FoodHistory
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.breastfeedJoinGap
 import com.gproust.sprout.data.breastfeedJoinOffers
+import com.gproust.sprout.data.allergyIdentities
+import com.gproust.sprout.data.foodHistories
 import com.gproust.sprout.data.joinedBreastfeed
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.NursingSegment
+import com.gproust.sprout.data.sync.newUid
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.ui.common.AddEntryFab
 import com.gproust.sprout.ui.common.AddEntrySheet
@@ -84,11 +89,14 @@ import com.gproust.sprout.ui.common.formatClock
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.startOfDay
+import com.gproust.sprout.ui.foods.MealFoodsEditor
+import com.gproust.sprout.ui.foods.displayName
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -98,6 +106,16 @@ class FeedingViewModel(
 ) : ViewModel() {
     val feedings = repository.feedings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** The household's foods, offered back by the solid meal form (BDR-20). */
+    val knownFoods = repository.householdMealsWithFoods
+        .map(::foodHistories)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** The active baby's allergies, marked on the meal form's foods (BDR-21). */
+    val allergies = repository.allergies
+        .map(::allergyIdentities)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
 
     /**
      * The live session, straight from the store rather than a copy of it. There
@@ -225,6 +243,8 @@ fun FeedingScreen(
     vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
 ) {
     val feedings by vm.feedings.collectAsState()
+    val knownFoods by vm.knownFoods.collectAsState()
+    val allergies by vm.allergies.collectAsState()
     val nursing by vm.nursing.collectAsState()
     val context = LocalContext.current
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
@@ -238,6 +258,8 @@ fun FeedingScreen(
     editing?.let { entry ->
         EditFeedingDialog(
             entry = entry,
+            knownFoods = knownFoods,
+            allergies = allergies,
             onDismiss = { editing = null },
             onSave = { vm.add(it); editing = null },
             onDelete = { deleting = entry },
@@ -271,6 +293,8 @@ fun FeedingScreen(
                 initial = null,
                 submitLabel = stringResource(R.string.feeding_add),
                 onSubmit = { vm.add(it); adding = false },
+                knownFoods = knownFoods,
+                allergies = allergies,
             )
         }
     }
@@ -761,13 +785,21 @@ private fun ConfirmJoinDialog(
     )
 }
 
-/** Edit (or delete) an existing feed in a dialog, reusing [FeedingForm]. */
+/**
+ * Edit (or delete) an existing feed in a dialog, reusing [FeedingForm]. The
+ * First foods page opens the same dialog on a meal, held to solids, so a meal
+ * corrected from either screen is corrected the same way (BDR-20).
+ */
 @Composable
-private fun EditFeedingDialog(
+internal fun EditFeedingDialog(
     entry: FeedingEntity,
+    knownFoods: List<FoodHistory>,
     onDismiss: () -> Unit,
     onSave: (FeedingEntity) -> Unit,
     onDelete: () -> Unit,
+    title: String = stringResource(R.string.feeding_edit_title),
+    fixedType: FeedType? = null,
+    allergies: Set<String> = emptySet(),
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
@@ -776,15 +808,15 @@ private fun EditFeedingDialog(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             ) {
-                Text(
-                    stringResource(R.string.feeding_edit_title),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                Text(title, style = MaterialTheme.typography.titleMedium)
                 FeedingForm(
                     initial = entry,
                     submitLabel = stringResource(R.string.action_save),
                     onSubmit = onSave,
                     onDelete = onDelete,
+                    knownFoods = knownFoods,
+                    fixedType = fixedType,
+                    allergies = allergies,
                 )
             }
         }
@@ -795,23 +827,34 @@ private fun EditFeedingDialog(
  * The shared feed editor used both for manual logging (no [initial]) and for
  * editing an existing entry. Holds its own field state, re-initialised whenever
  * [initial] changes. When adding, the fields reset after submitting.
+ *
+ * [fixedType] holds the form to one kind of feed and hides the choice — the
+ * First foods page logs solid meals and nothing else. [knownFoods] is what a
+ * solid meal's food list offers back (BDR-20), and [allergies] the foods it
+ * marks as ones the baby is noted as allergic to (BDR-21).
  */
 @Composable
-private fun FeedingForm(
+internal fun FeedingForm(
     initial: FeedingEntity?,
     submitLabel: String,
     onSubmit: (FeedingEntity) -> Unit,
     onDelete: (() -> Unit)? = null,
+    knownFoods: List<FoodHistory> = emptyList(),
+    fixedType: FeedType? = null,
+    allergies: Set<String> = emptySet(),
 ) {
     val context = LocalContext.current
     val now = System.currentTimeMillis()
 
-    var type by remember(initial) { mutableStateOf(initial?.type ?: FeedType.BREAST) }
+    var type by remember(initial) { mutableStateOf(initial?.type ?: fixedType ?: FeedType.BREAST) }
     var amount by remember(initial) { mutableStateOf(initial?.amountMl?.toString() ?: "") }
     // Solids are weighed rather than measured, so they get their own field —
     // sharing one with the bottle's millilitres would carry a number across
     // when the type is switched and silently change what it means.
     var grams by remember(initial) { mutableStateOf(initial?.amountGrams?.toString() ?: "") }
+    // What a solid meal was made of. Kept while the type is switched about, and
+    // only dropped on saving something that is not a solid meal.
+    var foods by remember(initial) { mutableStateOf<List<MealFood>>(initial?.foods.orEmpty()) }
     var start by remember(initial) { mutableLongStateOf(initial?.startTime ?: now) }
     // Whether each breast's length is entered as an end time or a duration.
     var byEnd by remember(initial) { mutableStateOf(initial?.endTime != null) }
@@ -821,9 +864,10 @@ private fun FeedingForm(
     var notes by remember(initial) { mutableStateOf(initial?.notes ?: "") }
 
     fun reset() {
-        type = FeedType.BREAST
+        type = fixedType ?: FeedType.BREAST
         amount = ""
         grams = ""
+        foods = emptyList()
         start = System.currentTimeMillis()
         byEnd = false
         segs = listOf(SegInput(BreastSide.LEFT, "", System.currentTimeMillis()))
@@ -859,6 +903,10 @@ private fun FeedingForm(
         }
         return FeedingEntity(
             id = initial?.id ?: 0L,
+            // The row being edited keeps its name. A new uid on every edit made
+            // the other phone see a second feed beside the first rather than a
+            // correction of it.
+            uid = initial?.uid ?: newUid(),
             type = type,
             side = if (breast) breastSide else null,
             amountMl = if (type == FeedType.BOTTLE) amount.toIntOrNull() else null,
@@ -868,17 +916,20 @@ private fun FeedingForm(
             leftDurationMs = left.takeIf { breast && it > 0 },
             rightDurationMs = right.takeIf { breast && it > 0 },
             segments = built,
+            foods = if (type == FeedType.SOLID) foods else emptyList(),
             notes = notes.ifBlank { null },
         )
     }
 
-    FieldLabel(stringResource(R.string.field_type))
-    ChoiceChips(
-        options = FeedType.entries,
-        selected = type,
-        onSelect = { type = it },
-        labelOf = { it.label(context) },
-    )
+    if (fixedType == null) {
+        FieldLabel(stringResource(R.string.field_type))
+        ChoiceChips(
+            options = FeedType.entries,
+            selected = type,
+            onSelect = { type = it },
+            labelOf = { it.label(context) },
+        )
+    }
 
     if (type == FeedType.BOTTLE) {
         FieldLabel(stringResource(R.string.field_amount))
@@ -890,9 +941,12 @@ private fun FeedingForm(
         )
     }
 
-    // Optional, and stays optional: a purée is often given without a scale in
-    // sight, and a solid feed with no number is still worth logging.
+    // What was in it first, then how much. The weight is optional, and stays
+    // optional: a purée is often given without a scale in sight, and a solid
+    // feed with no number is still worth logging. It is the meal's — what gets
+    // weighed is the bowl, not each food in it (BDR-20).
     if (type == FeedType.SOLID) {
+        MealFoodsEditor(foods = foods, onChange = { foods = it }, known = knownFoods, allergies = allergies)
         FieldLabel(stringResource(R.string.field_amount_solid))
         NumberField(
             label = stringResource(R.string.field_amount_solid),
@@ -1146,6 +1200,10 @@ private fun feedingSubtitle(context: Context, entry: FeedingEntity): String {
                 parts += formatDuration(context, it - entry.startTime)
             }
         }
+    }
+    // What a solid meal was made of, in the parent's own words (BDR-20).
+    if (entry.type == FeedType.SOLID && entry.foods.isNotEmpty()) {
+        parts += entry.foods.joinToString(", ") { it.displayName(context) }
     }
     entry.notes?.takeIf { it.isNotBlank() }?.let { parts += it }
     return parts.joinToString(sep)

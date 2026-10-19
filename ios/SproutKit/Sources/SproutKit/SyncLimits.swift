@@ -17,8 +17,8 @@ public enum SyncLimits {
     /// tracking is a few hundred kilobytes.
     public static let maxFileBytes = 8 * 1024 * 1024
 
-    /// How deeply a Sprout document may nest. A replica is four levels deep at
-    /// its worst — the document, a list, a row, a value.
+    /// How deeply a Sprout document may nest. A replica is six levels deep at
+    /// its worst — the document, a list, a row, a meal's foods, one food, a value.
     public static let maxJsonDepth = 32
 
     /// Whether `text` nests deeper than ``maxJsonDepth``.

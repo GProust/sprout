@@ -78,6 +78,7 @@ class SyncEngine(
             treatments = scoped(db.treatmentDao().allForSync()) { it.babyId },
             medicines = scoped(db.medicineDao().allForSync()) { it.babyId },
             medicineDoses = scoped(db.medicineDoseDao().allForSync()) { it.babyId },
+            allergies = scoped(db.allergyDao().allForSync()) { it.babyId },
             pumpings = if (includePumping) db.pumpingDao().allForSync() else emptyList(),
             tombstones = db.tombstoneDao().all(),
         )
@@ -174,6 +175,17 @@ class SyncEngine(
                 insert = { db.medicineDoseDao().insert(it.copy(id = 0L)) },
                 update = { incoming, local -> db.medicineDoseDao().update(incoming.copy(id = local.id)) },
             )
+            // Allergies ignore `since`, as the babies do (BDR-21). "Share from
+            // the pairing forward" is about the entries each parent logged
+            // before; an allergy is about who the baby is, and the parent
+            // who joins later is the one who most needs to know it.
+            summary += mergeScoped(
+                payload.allergies, since = null, babyIdOf,
+                withBaby = { row, babyId -> row.copy(babyId = babyId) },
+                find = { db.allergyDao().findByUid(it) },
+                insert = { db.allergyDao().insert(it.copy(id = 0L)) },
+                update = { incoming, local -> db.allergyDao().update(incoming.copy(id = local.id)) },
+            )
             summary += mergeRows(
                 rows = payload.pumpings,
                 since = since,
@@ -201,6 +213,7 @@ class SyncEngine(
                 "treatment" -> db.treatmentDao().findByUid(tombstone.uid)?.also { db.treatmentDao().purgeByUid(tombstone.uid) }
                 "medicine" -> db.medicineDao().findByUid(tombstone.uid)?.also { db.medicineDao().purgeByUid(tombstone.uid) }
                 "medicine_dose" -> db.medicineDoseDao().findByUid(tombstone.uid)?.also { db.medicineDoseDao().purgeByUid(tombstone.uid) }
+                "allergy" -> db.allergyDao().findByUid(tombstone.uid)?.also { db.allergyDao().purgeByUid(tombstone.uid) }
                 "pumping" -> db.pumpingDao().findByUid(tombstone.uid)?.also { db.pumpingDao().purgeByUid(tombstone.uid) }
                 // A table we don't know: keep the tombstone, touch nothing.
                 else -> null

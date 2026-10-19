@@ -1,11 +1,15 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
 import com.gproust.sprout.data.local.GrowthEntity
 import com.gproust.sprout.data.local.MedicineDoseEntity
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.SleepEntity
 import com.gproust.sprout.data.local.SleepPlace
@@ -58,6 +62,24 @@ class ReportWorkbookTest {
                     startTime = at(today, 9),
                     notes = "took it well",
                 ),
+                // The carrot's first meal, before the range: the sheet says so.
+                FeedingEntity(
+                    babyId = 1,
+                    type = FeedType.SOLID,
+                    startTime = at(today.minusDays(20), 12),
+                    foods = listOf(MealFood("Carotte", ref = "carrot")),
+                    uid = "meal-1",
+                ),
+                FeedingEntity(
+                    babyId = 1,
+                    type = FeedType.SOLID,
+                    startTime = at(today, 12),
+                    foods = listOf(
+                        MealFood("Carotte", FoodPortion.SERVING, FoodReception.LIKED, ref = "carrot"),
+                        MealFood("Ratatouille"),
+                    ),
+                    uid = "meal-2",
+                ),
             ),
             sleeps = listOf(
                 SleepEntity(
@@ -91,6 +113,10 @@ class ReportWorkbookTest {
             options = options,
             now = now,
             zone = zone,
+            foodName = { ref -> if (ref == "carrot") "Carrot" else null },
+            allergies = listOf(
+                AllergyEntity(babyId = 1, name = "Kiwi", ref = "kiwi", confirmed = true, noticedAt = at(born, 9), notes = "lips"),
+            ),
         )
         return ReportWorkbook.build(report, zone)
     }
@@ -100,7 +126,7 @@ class ReportWorkbookTest {
         assertEquals(
             listOf(
                 "Summary", "Day by day", "Feeding", "Sleep", "Nappies", "Growth",
-                "Treatments", "Medicines",
+                "Treatments", "Medicines", "Foods", "Allergies",
             ),
             sheets().map { it.name },
         )
@@ -174,6 +200,54 @@ class ReportWorkbookTest {
         assertEquals(Xlsx.Cell.Decimal(1.5), row[sheet.headers.indexOf("max_amount_per_day")])
         // Zero and not absent: the medicine's leaflet gave no gap at all.
         assertEquals(Xlsx.Cell.Whole(0L), row[sheet.headers.indexOf("min_interval_minutes")])
+    }
+
+    /**
+     * One row per food per meal inside the range (BDR-20): the list's id to
+     * group by, keys rather than translated words, and a reception nobody noted
+     * left blank rather than made into an answer.
+     */
+    @Test
+    fun theFoodsSheetHasARowPerFoodPerMeal() {
+        val sheet = sheets().first { it.name == "Foods" }
+        assertEquals(
+            listOf("date", "time", "food", "list_id", "portion", "reception", "first_offered"),
+            sheet.headers,
+        )
+        val (carrot, ratatouille) = sheet.rows
+
+        // Named in the export's language, whatever it was saved under.
+        assertEquals(Xlsx.Cell.Text("Carrot"), carrot[2])
+        assertEquals(Xlsx.Cell.Text("carrot"), carrot[3])
+        assertEquals(Xlsx.Cell.Text("serving"), carrot[4])
+        assertEquals(Xlsx.Cell.Text("liked"), carrot[5])
+        assertEquals(Xlsx.Cell.Day(today.minusDays(20)), carrot[6])
+
+        assertEquals(Xlsx.Cell.Text("Ratatouille"), ratatouille[2])
+        assertEquals(Xlsx.Cell.Blank, ratatouille[3])
+        assertEquals(Xlsx.Cell.Text("taste"), ratatouille[4])
+        assertEquals(Xlsx.Cell.Blank, ratatouille[5])
+        assertEquals(Xlsx.Cell.Day(today), ratatouille[6])
+    }
+
+    /** One row per allergy; notes only when notes are switched on, as on every sheet (BDR-21). */
+    @Test
+    fun theAllergiesSheetCarriesWhatTheFamilyNoted() {
+        val sheet = sheets().first { it.name == "Allergies" }
+        assertEquals(listOf("allergy", "list_id", "confirmed", "noticed_on"), sheet.headers)
+        assertEquals(
+            listOf(Xlsx.Cell.Text("Kiwi"), Xlsx.Cell.Text("kiwi"), Xlsx.Cell.Flag(true), Xlsx.Cell.Day(born)),
+            sheet.rows.single(),
+        )
+
+        val withNotes = sheets(ReportOptions(period = ReportPeriod.WEEK, includeNotes = true)).first { it.name == "Allergies" }
+        assertEquals(Xlsx.Cell.Text("lips"), withNotes.rows.single()[withNotes.headers.indexOf("notes")])
+    }
+
+    @Test
+    fun theFoodsSheetGoesWhenFoodsDo() {
+        val names = sheets(ReportOptions(period = ReportPeriod.WEEK, includeFoods = false)).map { it.name }
+        assertFalse(names.contains("Foods"))
     }
 
     /** No doses in the period, no sheet — the book reports what happened. */

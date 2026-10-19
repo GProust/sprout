@@ -1,10 +1,14 @@
 package com.gproust.sprout
 
+import com.gproust.sprout.data.local.AllergyEntity
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedType
 import com.gproust.sprout.data.local.FeedingEntity
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.local.MedicineDoseEntity
 import com.gproust.sprout.data.local.MedicineEntity
 import com.gproust.sprout.data.local.MilkStorage
@@ -108,6 +112,26 @@ class SyncPayloadTest {
                     updatedAt = 23,
                 ),
             ),
+            // A meal that says what was in it (BDR-20), in names nobody chose
+            // for their convenience: a separator the segments use, a quote, an
+            // accent and a character outside the BMP.
+            BabyScoped(
+                babyUid,
+                FeedingEntity(
+                    type = FeedType.SOLID,
+                    amountGrams = 60,
+                    startTime = 1_700_001_600_000,
+                    foods = listOf(
+                        MealFood("Purée carotte; panais, \"maison\"", FoodPortion.SERVING, FoodReception.LIKED),
+                        MealFood("Œuf 🥚", FoodPortion.TASTE),
+                        // From Sprout's list, logged on a phone in French.
+                        MealFood("Carotte", FoodPortion.SERVING, ref = "carrot"),
+                        MealFood("Brocoli", FoodPortion.TASTE, FoodReception.REFUSED),
+                    ),
+                    uid = "feed-4",
+                    updatedAt = 24,
+                ),
+            ),
         ),
         sleeps = listOf(
             // Everything a sleep can say about itself, the parent's own name
@@ -202,6 +226,23 @@ class SyncPayloadTest {
                 ),
             ),
         ),
+        allergies = listOf(
+            // From the list, confirmed, with a date and the parent's words (BDR-21)...
+            BabyScoped(
+                babyUid,
+                AllergyEntity(
+                    name = "Kiwi",
+                    ref = "kiwi",
+                    noticedAt = 1_700_002_800_000,
+                    confirmed = true,
+                    notes = "lèvres gonflées, vu par le Dr Martin",
+                    uid = "allergy-1",
+                    updatedAt = 44,
+                ),
+            ),
+            // ...and the household's own, noted with nothing else.
+            BabyScoped(babyUid, AllergyEntity(name = "Protéines de lait de vache", uid = "allergy-2", updatedAt = 45)),
+        ),
         pumpings = listOf(
             PumpingEntity(
                 time = 1_700_003_000_000,
@@ -231,6 +272,7 @@ class SyncPayloadTest {
         assertEquals(original.treatments, decoded.treatments)
         assertEquals(original.medicines, decoded.medicines)
         assertEquals(original.medicineDoses, decoded.medicineDoses)
+        assertEquals(original.allergies, decoded.allergies)
         assertEquals(original.pumpings, decoded.pumpings)
         assertEquals(original.tombstones, decoded.tombstones)
     }
@@ -277,6 +319,49 @@ class SyncPayloadTest {
         assertNull(sleep.position)
         assertNull(sleep.place)
         assertNull(sleep.placeNote)
+    }
+
+    @Test
+    fun `a meal that named nothing carries no foods key, and one from before foods reads as naming nothing`() {
+        val json = String(SyncPayloadCodec.encode(fullPayload()))
+        // Only the one meal that listed foods writes the key: absent is empty.
+        assertEquals(1, Regex("\"foods\"").findAll(json).count())
+
+        // What a replica written by 1.13.0 looks like: a solid meal, and no
+        // mention of foods at all. It merges as a meal that listed nothing.
+        val old = """
+            {"formatVersion":1,"schemaVersion":18,"householdId":"household-1","deviceId":"device-a",
+             "createdAt":1700000000000,"babies":[],
+             "feedings":[{"babyUid":"baby-uid-1","uid":"meal-old","updatedAt":9,"type":"SOLID",
+                          "amountGrams":40,"startTime":1700000000000,"segments":""}],
+             "sleeps":[],"diapers":[],"growth":[],"treatments":[],"pumpings":[],"tombstones":[]}
+        """.trimIndent()
+        val meal = SyncPayloadCodec.decode(old.toByteArray(), currentSchemaVersion = 19).feedings.single().row
+        assertEquals(40, meal.amountGrams)
+        assertTrue(meal.foods.isEmpty())
+    }
+
+    @Test
+    fun `a food that noted nothing about how it went comes back noting nothing`() {
+        val decoded = SyncPayloadCodec.decode(SyncPayloadCodec.encode(fullPayload()), 15)
+
+        val egg = decoded.feedings.single { it.row.uid == "feed-4" }.row.foods[1]
+        assertEquals("Œuf 🥚", egg.name)
+        assertEquals(FoodPortion.TASTE, egg.portion)
+        assertNull("not noted is not a fourth answer", egg.reception)
+        assertNull("a food the household typed in has no list id", egg.ref)
+        assertEquals("carrot", decoded.feedings.single { it.row.uid == "feed-4" }.row.foods[2].ref)
+    }
+
+    @Test
+    fun `the database stores a meal's foods as it reads them back`() {
+        val converters = com.gproust.sprout.data.local.Converters()
+        val foods = fullPayload().feedings.single { it.row.uid == "feed-4" }.row.foods
+
+        assertEquals(foods, converters.stringToMealFoods(converters.mealFoodsToString(foods)))
+        // Every row from before the column existed holds the default.
+        assertEquals("", converters.mealFoodsToString(emptyList()))
+        assertTrue(converters.stringToMealFoods("").isEmpty())
     }
 
     @Test
@@ -360,5 +445,16 @@ class SyncPayloadTest {
         assertEquals(6, code.length)
         assertTrue("no characters that get misheard aloud", code.none { it in "01OI" })
         assertNotEquals(code, SyncSecret.random().verificationCode())
+    }
+
+    /** A replica from before allergies existed carries no key for them, and is a household that noted none. */
+    @Test
+    fun `a replica without allergies reads as one with none`() {
+        val bytes = SyncPayloadCodec.encode(fullPayload())
+        val json = org.json.JSONObject(String(bytes, Charsets.UTF_8)).apply { remove("allergies") }
+
+        val decoded = SyncPayloadCodec.decode(json.toString().toByteArray(Charsets.UTF_8), currentSchemaVersion = 15)
+
+        assertEquals(emptyList<Any>(), decoded.allergies)
     }
 }

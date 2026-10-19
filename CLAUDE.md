@@ -325,6 +325,67 @@ A running wait also reaches the two places a parent already is
   from the lock screen is delivered to nobody. Answering a notification is not
   deciding one, so ADR-0019 is untouched.
 
+## First foods
+
+A solid meal lists the foods that were in it, and the *First foods* page reads
+those lists back one food at a time
+([BDR-20](docs/decisions/0020-a-solid-meal-says-what-was-in-it.md)). One column,
+`foods` on `feeding` (Room 18 → 19, iOS `v19-meal-foods`), and on the wire the
+one array of objects inside a row. Four things a change can quietly undo:
+
+- **There is no food log.** A food is part of a meal, and every figure on the
+  page is derived from the meals each time — `data/FoodExposures.kt` and
+  `SproutData/FoodExposures.swift`, pure functions with the same cases on both
+  sides. Logging from the page writes an ordinary solid meal through the same
+  form the feeding screen uses, so a taste moves "last feed" like any meal does.
+- **A food is its list id, or else its name** (`foodIdentity`). A food picked
+  from Sprout's list carries `ref`, its id in `FoodCatalog` — so *Carotte* and
+  *Carrot* are one carrot across languages; a food the household typed in is
+  `foodKey` of its name: trimmed, Unicode whitespace collapsed, lower-cased
+  without locale. Never key by the phone's language, and never make the key
+  cleverer (plurals, accents) on one side only — accent folding is for searching.
+  Correcting a food (`relabelledFoods`, `relabelFood`) is the parent's act, from
+  the page: it rewrites that baby's meals in one transaction, re-read inside it,
+  and is never suggested or done on its own.
+- **The list is names and nothing else** — vegetables, fruit, meat, fish, in seven
+  languages (`food_item_<id>` in Android's strings, generated into iOS's). No
+  ages, no order, no allergen marks, nothing suggested. Its ids are pinned by
+  `spec/vectors/food-catalog.json` on both sides: append to a shelf, never rename
+  or remove one. Anything not on it is the household's own, offered back from
+  `householdMealsWithFoods`.
+- **Nothing is a target or a grade, and nothing is a reaction.** No number of
+  offers counts as enough, *Refused* has an icon and no warning colour, the list
+  is ordered by recency or by name and never by how well a food is going, and
+  there is no reaction field on a meal — the meal's note is where a parent writes what they
+  saw. A taste counts as an offer; tastes and servings are shown apart.
+
+A baby's known allergies are a record of their own
+([BDR-21](docs/decisions/0021-a-babys-allergies-as-the-household-knows-them.md)):
+the synced `allergy` table (Room 19 → 20, iOS `v20-allergies`), one row each so
+two phones noting one each keep both. Four things a change can quietly undo:
+
+- **Sprout never proposes, infers or grades one.** No allergy from a refusal or a
+  note, no allergen marks on the food list, no severity scale. "Confirmed by a
+  health professional" is the parent's statement, shown in words wherever the
+  allergy is.
+- **The marker never stops anything.** "Allergy noted" — icon and words, ordinary
+  ink — on the food's line and on the meal form; no alert, no confirmation, no
+  disabled button.
+- **It is about who the baby is.** The merge applies no pairing cut-off to it
+  (as for babies), a report carries it whatever the period, and `relabelFood`
+  moves an allergy with the food it names (`allergyIdentity`).
+- **The list leaves alone, too.** `AllergyListPdf` on both sides, from the same
+  `allergyRecords` the report uses, carrying the notes and the sentence that it
+  is the family's record and not a medical document.
+
+The meal's weight stays `amountGrams`: what gets weighed is the bowl. The
+doctor's record carries the foods as `ReportContent.foods` — named through the
+`foodName` passed to `buildReport`, because the data layer has no strings and the
+two renderers must not each look a name up — and the workbook's `Foods` sheet
+keys them by `list_id`. And the
+feeding form now carries the edited row's `uid` through — it used to mint a new
+one, which reached the other phone as a second feed beside the first.
+
 ## The record you hand to a doctor
 
 Shipped, on top of those same per-day figures: a **PDF report** and an **`.xlsx`

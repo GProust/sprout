@@ -7,7 +7,13 @@ import com.gproust.sprout.data.sync.SyncInvitation
 import com.gproust.sprout.data.sync.SyncInvitationCodec
 import com.gproust.sprout.data.sync.SyncInvitationException
 import com.gproust.sprout.data.sync.SyncLimits
+import com.gproust.sprout.data.FoodCatalog
+import com.gproust.sprout.data.FoodCategory
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.local.FeedType
+import com.gproust.sprout.data.local.FoodPortion
+import com.gproust.sprout.data.local.FoodReception
+import com.gproust.sprout.data.local.MealFood
 import com.gproust.sprout.data.sync.SyncPayloadCodec
 import com.gproust.sprout.data.sync.SyncPayloadException
 import com.gproust.sprout.data.sync.SyncSecret
@@ -17,6 +23,7 @@ import com.gproust.sprout.data.sync.nearby.SyncSession
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -252,6 +259,20 @@ class SpecConformanceTest {
         assertEquals(1_757_400_000_000L, segments.first().startTime)
         assertEquals(listOf(540, 1260), payload.treatments.first().row.timesOfDay)
 
+        // A solid meal's foods (BDR-20): the one array of objects inside a row,
+        // names in the parent's own words — separators and quotes included —
+        // and "how it went" absent rather than null when nothing was noted.
+        val meal = payload.feedings.single { it.row.type == FeedType.SOLID }.row
+        assertEquals(60, meal.amountGrams)
+        assertEquals(
+            listOf(
+                MealFood("Carrot; parsnip, \"homemade\"", FoodPortion.SERVING, FoodReception.LIKED),
+                MealFood("Panais", FoodPortion.TASTE, null, ref = "parsnip"),
+            ),
+            meal.foods,
+        )
+        assertTrue("a breastfeed names no foods", payload.feedings.first().row.foods.isEmpty())
+
         // As-needed medicine (BDR-15). The dose names its medicine by that
         // medicine's uid — the one field in the document that points at another
         // row rather than at a baby, and the one a hand-written port could
@@ -288,6 +309,19 @@ class SpecConformanceTest {
         assertEquals(1_757_402_800_000L, dose.time)
         assertEquals(2.5, dose.amount!!, 1e-9)
 
+        // An allergy is its own baby-scoped row (BDR-21); everything but its
+        // name and `confirmed` is absent when not given.
+        val (kiwi, milk) = payload.allergies.map { it.row }
+        assertEquals("kiwi", kiwi.ref)
+        assertEquals(1_757_403_000_000L, kiwi.noticedAt)
+        assertTrue(kiwi.confirmed)
+        assertEquals("lips swelled; seen by the GP", kiwi.notes)
+        assertEquals("Cow's milk protein", milk.name)
+        assertNull(milk.ref)
+        assertNull(milk.noticedAt)
+        assertFalse(milk.confirmed)
+        assertNull(milk.notes)
+
         // A measure nobody took is an absent key, not a zero.
         assertNull(payload.growth.first().row.heightMm)
         assertNull(payload.babies.first().feedingReminderEnabled)
@@ -297,6 +331,26 @@ class SpecConformanceTest {
         assertEquals(
             1_757_406_000_000L,
             payload.diapers.first { it.row.deletedAt != null }.row.deletedAt,
+        )
+    }
+
+    /**
+     * Sprout's food list against the ids Node wrote down (BDR-20). A `ref` this
+     * phone knows and the other does not is a carrot one of them can name and the
+     * other shows by whatever it was called where it was logged.
+     */
+    @Test
+    fun `the food list matches the spec`() {
+        val v = vector("food-catalog.json")
+        val categories = v.getJSONArray("categories")
+        assertEquals(
+            (0 until categories.length()).map { categories.getString(it) },
+            FoodCategory.entries.map { it.name },
+        )
+        val foods = v.getJSONArray("foods")
+        assertEquals(
+            (0 until foods.length()).map { foods.getJSONObject(it).let { o -> o.getString("id") to o.getString("category") } },
+            FoodCatalog.foods.map { it.id to it.category.name },
         )
     }
 

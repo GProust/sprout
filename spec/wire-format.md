@@ -216,7 +216,7 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   "createdAt": 1757400000000,
   "babies": [], "feedings": [], "sleeps": [], "diapers": [],
   "growth": [], "treatments": [], "medicines": [], "medicineDoses": [],
-  "pumpings": [], "tombstones": []
+  "allergies": [], "pumpings": [], "tombstones": []
 }
 ```
 
@@ -245,6 +245,25 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
 - **Two fields are packed strings, not arrays**, because that is how Room stores
   them: a treatment's `timesOfDay` is minutes joined by `,`, and a feeding's
   `segments` is `SIDE,start,end` triples joined by `;`. Empty is `""`.
+- **A solid meal's `foods` is an array of objects**, because a food is the
+  parent's own words and no separator is safe inside them
+  ([BDR-20](../docs/decisions/0020-a-solid-meal-says-what-was-in-it.md)).
+  Each is `{"name": "…", "portion": "TASTE" | "SERVING", "reception": "LIKED" |
+  "MIXED" | "REFUSED", "ref": "carrot"}`, in the order the parent listed them;
+  `reception` is absent when nothing was noted, which is "not noted" and not a
+  fourth answer. `ref` is the food's id on Sprout's list
+  ([`vectors/food-catalog.json`](vectors/food-catalog.json)) and absent for a
+  food the household typed in; `name` is always present, as the food read on the
+  phone that logged it, so a reader that does not know a `ref` still has
+  something to show. The key itself is absent on a feeding that named no foods —
+  every feed that is not a solid meal, and every meal written before foods
+  existed — and a reader treats that as an empty list.
+- **Two foods are the same food** when they carry the same `ref`, whatever their
+  names — "Carotte" and "Carrot" are one carrot — and, for foods without one,
+  when their names match after trimming, collapsing runs of whitespace (Unicode's
+  own) to one space and lower-casing without regard to locale. A food with a
+  `ref` and one without are never the same food. Nothing is stored for any of
+  this; it is how a reader counts, and both readers must count alike.
 - **A row points at another row by that row's `uid`.** A baby-scoped row carries
   `babyUid`, as above; a `medicineDoses` entry also carries `medicineUid`, the
   `uid` of the `medicines` row it was a dose of. Unlike `babyUid` this one is
@@ -265,9 +284,17 @@ The plaintext inside §3 — what one phone actually sends the other. UTF-8 JSON
   ([BDR-18](../docs/decisions/0018-a-medicine-measured-by-amount.md)); a reader
   that treats zero as "give it now" is already right, which is why this needed
   no new key.
-- **A tombstone's `entity` is the table name**, so the two new ones are
-  `medicine` and `medicine_dose` — underscored, because that is what the table
-  is called. Both readers hold a closed list of names and ignore any other, so a
+- **An allergy is a row of its own**, baby-scoped like a medicine
+  ([BDR-21](../docs/decisions/0021-a-babys-allergies-as-the-household-knows-them.md)):
+  `name` always, `confirmed` always (`false` is "noted by the parents", not
+  "doubtful"), and `ref` (an id from the food list, read as foods are),
+  `noticedAt` (epoch milliseconds) and `notes` when given. A replica written
+  before allergies existed has no `allergies` key, which is a household that
+  noted none. A reader applying a pairing cut-off ("share from the pairing
+  forward") does not apply it to allergies, as it does not to babies.
+- **A tombstone's `entity` is the table name**, so the newer ones are
+  `medicine`, `medicine_dose` and `allergy` — underscored, because that is what
+  the table is called. Both readers hold a closed list of names and ignore any other, so a
   table from a newer Sprout leaves the tombstone in place and touches nothing.
 
 **Vector:** `replica.json` — a document with one of every row type, and the

@@ -36,6 +36,16 @@ public enum SleepPlace: String, Codable, CaseIterable, Sendable {
     case OWN_BED, BEDSIDE_COT, PARENTS_BED, ON_A_PARENT, AT_BREAST, OTHER
 }
 
+/// How much of a food a solid meal held: a lick of the spoon, or a real helping.
+/// Both are an offer of the food, and both count (BDR-20).
+public enum FoodPortion: String, Codable, CaseIterable, Sendable { case TASTE, SERVING }
+
+/// How a food went at one meal, when the parent noticed — their reading, not
+/// Sprout's. `nil` is "not noted", never a fourth answer, and `REFUSED` is a fact
+/// about one meal rather than a reaction: there is deliberately no allergy field
+/// (BDR-20).
+public enum FoodReception: String, Codable, CaseIterable, Sendable { case LIKED, MIXED, REFUSED }
+
 /// Postpartum bleeding (lochia) intensity.
 public enum Bleeding: String, Codable, CaseIterable, Sendable { case NONE, LIGHT, MODERATE, HEAVY }
 
@@ -107,6 +117,33 @@ public struct NursingSegment: Equatable, Sendable {
     public var durationMs: Int64 { max(0, endTime - startTime) }
 }
 
+/// One food in a solid meal (BDR-20): one from Sprout's list, or one the
+/// household typed in.
+///
+/// `ref` is the ``FoodCatalog`` id of a food from the list, and what makes it the
+/// same food on every phone whatever language each is in; `name` is still saved
+/// with it, as it read when it was logged, so a phone that does not know the id
+/// has something to show. A food the household added has no `ref` and is its
+/// `name`, matched ignoring case and spacing — see ``foodKey(_:)``.
+public struct MealFood: Equatable, Hashable, Sendable {
+    public var name: String
+    public var portion: FoodPortion
+    public var reception: FoodReception?
+    public var ref: String?
+
+    public init(
+        name: String,
+        portion: FoodPortion = .TASTE,
+        reception: FoodReception? = nil,
+        ref: String? = nil
+    ) {
+        self.name = name
+        self.portion = portion
+        self.reception = reception
+        self.ref = ref
+    }
+}
+
 // MARK: - Records
 
 /// A baby's profile. Several are supported — twins, or siblings over time.
@@ -170,6 +207,10 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
     public var rightDurationMs: Int64?
     /// Encoded as Room stores it — see ``NursingSegmentCoding``.
     public var segments: String = ""
+    /// What a solid meal was made of (BDR-20), encoded as Room stores it — see
+    /// ``MealFoodCoding``. Empty on every other kind of feed, and on every meal
+    /// logged before foods could be listed.
+    public var foods: String = ""
     public var notes: String?
     public var uid: String = newUid()
     public var updatedAt: Int64 = 0
@@ -187,6 +228,7 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
         leftDurationMs: Int64? = nil,
         rightDurationMs: Int64? = nil,
         segments: [NursingSegment] = [],
+        foods: [MealFood] = [],
         notes: String? = nil,
         uid: String = newUid(),
         updatedAt: Int64 = 0,
@@ -203,6 +245,7 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
         self.leftDurationMs = leftDurationMs
         self.rightDurationMs = rightDurationMs
         self.segments = NursingSegmentCoding.encode(segments)
+        self.foods = MealFoodCoding.encode(foods)
         self.notes = notes
         self.uid = uid
         self.updatedAt = updatedAt
@@ -210,6 +253,12 @@ public struct Feeding: Codable, FetchableRecord, Identifiable, Equatable, Syncab
     }
 
     public var nursingSegments: [NursingSegment] { NursingSegmentCoding.decode(segments) }
+
+    /// The meal's foods, in the order the parent listed them.
+    public var mealFoods: [MealFood] {
+        get { MealFoodCoding.decode(foods) }
+        set { foods = MealFoodCoding.encode(newValue) }
+    }
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 }
@@ -549,6 +598,64 @@ public struct MedicineDose: Codable, FetchableRecord, Identifiable, Equatable, S
         self.medicineUid = medicineUid
         self.time = time
         self.amount = amount
+        self.notes = notes
+        self.uid = uid
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+    }
+
+    public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
+}
+
+/// Something a baby is allergic to, as the household came to know it (BDR-21).
+/// From `AllergyEntity` in `Entities.kt`.
+///
+/// The parent's record and nothing more: what it is, when it was noticed, and
+/// whether a health professional confirmed it. Sprout does not diagnose,
+/// suggest or infer one, and checks nothing against a list of allergens — it
+/// ships none.
+///
+/// What it names is a food in the First foods sense (BDR-20): `ref` is its id on
+/// Sprout's list when it was picked from there, so the label follows the carrot
+/// in every language; otherwise `name` is the parent's own words.
+public struct Allergy: Codable, FetchableRecord, Identifiable, Equatable, SyncableRecord, BabyScoped {
+    public static let databaseTableName = "allergy"
+
+    public var id: Int64?
+    public var babyId: Int64 = 0
+    /// What it is, as it was written when noted.
+    public var name: String
+    /// Its id on Sprout's food list (``FoodCatalog``), or `nil`.
+    public var ref: String?
+    /// The day it was first noticed, when the parent gave one.
+    public var noticedAt: Int64?
+    /// Whether a health professional confirmed it. `false` is "noted by us", not
+    /// "doubtful".
+    public var confirmed: Bool = false
+    /// What was seen, what the doctor said — the parent's words, as typed.
+    public var notes: String?
+    public var uid: String = newUid()
+    public var updatedAt: Int64 = 0
+    public var deletedAt: Int64?
+
+    public init(
+        id: Int64? = nil,
+        babyId: Int64 = 0,
+        name: String,
+        ref: String? = nil,
+        noticedAt: Int64? = nil,
+        confirmed: Bool = false,
+        notes: String? = nil,
+        uid: String = newUid(),
+        updatedAt: Int64 = 0,
+        deletedAt: Int64? = nil
+    ) {
+        self.id = id
+        self.babyId = babyId
+        self.name = name
+        self.ref = ref
+        self.noticedAt = noticedAt
+        self.confirmed = confirmed
         self.notes = notes
         self.uid = uid
         self.updatedAt = updatedAt

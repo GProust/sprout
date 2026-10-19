@@ -197,7 +197,7 @@ struct QuickFeed: View {
 /// export is reached from one baby's page, and a menu left on another name must
 /// not be able to send the wrong child's record.
 enum LogDestination: Hashable {
-    case feeding, pumping, sleep, diaper, growth, treatments, medicines, wellbeing
+    case feeding, pumping, sleep, diaper, growth, treatments, medicines, foods, wellbeing
     case stats, checkIn
     case report(Int64)
     /// Not logs — the two the dashboard's toolbar opens, and the sync screen
@@ -219,6 +219,7 @@ enum LogDestination: Hashable {
         case .growth: return "growth"
         case .treatments: return "treatments"
         case .medicines: return "medicines"
+        case .foods: return "foods"
         case .wellbeing: return "wellbeing"
         case .stats: return "stats"
         case .checkIn: return "checkIn"
@@ -230,7 +231,7 @@ enum LogDestination: Hashable {
     }
 }
 
-/// The six baby logs plus the parent's two, as equals.
+/// The seven baby logs plus the parent's two, as equals.
 ///
 /// All of them sit here rather than in the tab bar (BDR-0010): a Material
 /// navigation bar holds five, Home takes one of those seats, and the arithmetic
@@ -260,6 +261,10 @@ struct LogGrid: View {
             Tile(label: Str.t("nav_growth"), symbol: "ruler", destination: .growth),
             Tile(label: Str.t("screen_treatments"), symbol: "pills.fill", destination: .treatments),
             Tile(label: Str.t("screen_medicines"), symbol: "cross.vial.fill", destination: .medicines),
+            // After the others rather than beside Feed, so no tile a parent
+            // reaches for by position has moved; and for every baby, because
+            // when diversification starts is not the app's to decide (BDR-20).
+            Tile(label: Str.t("screen_foods"), symbol: "fork.knife", destination: .foods),
         ]
         // Dropped for a parent who has turned their own tracking off; the
         // history stays, untouched.
