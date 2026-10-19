@@ -28,8 +28,9 @@ name: App Store screenshots
 # app-store-screenshots-<size>in holds every screen the test reaches.
 #
 # Run it from Actions → App Store screenshots → Run workflow. It also runs on a
-# pull request that changes this file or what it stages by (the screenshot list
-# and check_listing.py), so a change to it is seen working before it lands —
+# pull request that changes this file or what it draws from the capture (the
+# screenshot list, the header's headlines and the two tools), so a change to it
+# is seen working before it lands —
 # workflow_dispatch only offers workflows that are already on main. And
 # `ios-listing.yml` calls it, to capture the set it then uploads.
 
@@ -51,7 +52,9 @@ on:
     paths:
       - '.github/workflows/ios-listing-screenshots.yml'
       - 'ios/fastlane/listing-screenshots.txt'
+      - 'ios/fastlane/creative/**'
       - 'ios/tools/check_listing.py'
+      - 'ios/tools/creative_asset.mjs'
 
 permissions:
   contents: read
@@ -206,6 +209,48 @@ jobs:
         with:
           name: app-store-listing-${{ env.DISPLAY_SIZE }}in
           path: app-store-listing/
+          if-no-files-found: error
+
+      # The product page header and search-result artwork App Store Connect
+      # added for iOS 27 ("creative assets"): one universal 5244 × 2950 image a
+      # language, drawn from this capture by ios/tools/creative_asset.mjs in the
+      # runner's Chrome, so the type is the system's own. Optional in App Store
+      # Connect and uploaded by hand — deliver does not carry it — so a failure
+      # here is reported without holding back the screenshots.
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Draw the header artwork
+        id: creative
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+          CREATIVE_BROWSER_CHANNEL: chrome
+        run: |
+          set -euo pipefail
+          npm install --silent --no-audit --no-fund --prefix "$RUNNER_TEMP/playwright" playwright@1.56.1
+          export PLAYWRIGHT_MODULE="$RUNNER_TEMP/playwright/node_modules/playwright/index.mjs"
+          node ios/tools/creative_asset.mjs "$OUT" app-store-header
+          bad=0
+          for f in app-store-header/*.png; do
+            w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/ {print $2}')
+            h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/ {print $2}')
+            alpha=$(sips -g hasAlpha "$f" | awk '/hasAlpha/ {print $2}')
+            if [ "${w}x${h}" != "5244x2950" ] || [ "$alpha" = "yes" ]; then
+              echo "::error file=$f::${w}x${h}, alpha $alpha — App Store Connect takes 5244x2950 with no alpha"
+              bad=1
+            fi
+          done
+          exit $bad
+
+      - name: Upload the header artwork
+        if: steps.creative.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-store-header
+          path: app-store-header/
           if-no-files-found: error
 
       # On a failure the result bundles hold the hierarchy dumps and the screen

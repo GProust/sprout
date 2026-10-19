@@ -14,7 +14,11 @@ with the rules that keep the seven languages one listing:
 - keywords stay within 100 *bytes*, not characters, so an "ä" cannot tip one
   over;
 - no other platform is named (App Review Guideline 2.3.10);
-- the three URLs are the same in every language.
+- the three URLs are the same in every language;
+- the header artwork's one line (ios/fastlane/creative/<locale>/headline.txt,
+  drawn by creative_asset.mjs) exists in every language, is short enough to
+  stay on one line, and avoids what Apple's creative-asset guidance rules out:
+  prices, web addresses, the copyright sign, other platforms.
 
     python3 ios/tools/check_listing.py
     python3 ios/tools/check_listing.py stage <captured-dir> <out-dir>
@@ -34,6 +38,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 METADATA = REPO / "ios/fastlane/metadata"
+CREATIVE = REPO / "ios/fastlane/creative"
 SCREENSHOT_LIST = REPO / "ios/fastlane/listing-screenshots.txt"
 REVIEW_SCREENSHOTS = REPO / "ios/screenshots"
 
@@ -51,6 +56,9 @@ URLS = ("support_url", "marketing_url", "privacy_url")
 FIELDS = (*LIMITS, *URLS)
 
 OTHER_PLATFORMS = re.compile(r"\b(android|google play|play store)\b", re.IGNORECASE)
+# What Apple's creative-asset guidance asks the artwork to leave out.
+NOT_ON_ARTWORK = re.compile(r"[$€£¥©®]|https?://|www\.|\d+\s?%|\b(free|gratuit|kostenlos|gratis|darmowa)\b", re.IGNORECASE)
+HEADLINE_LIMIT = 55
 MAX_SCREENSHOTS = 10
 
 
@@ -131,6 +139,23 @@ def check() -> list[str]:
     for field, seen in urls.items():
         if len(seen) > 1:
             errors.append(f"{field} differs between languages: {sorted(seen)}")
+
+    present = sorted(p.name for p in CREATIVE.iterdir() if p.is_dir()) if CREATIVE.is_dir() else []
+    if present != sorted(LOCALES):
+        errors.append(f"header artwork languages are {present}, expected {sorted(LOCALES)}")
+    for locale in LOCALES:
+        path = CREATIVE / locale / "headline.txt"
+        if not path.is_file():
+            errors.append(f"{locale}: creative/{locale}/headline.txt is missing")
+            continue
+        raw = path.read_text(encoding="utf-8")
+        headline = raw.strip()
+        if not headline or "\n" in headline:
+            errors.append(f"{locale}: the header headline must be one non-empty line")
+        if len(headline) > HEADLINE_LIMIT:
+            errors.append(f"{locale}: the header headline is {len(headline)} characters, keep it to {HEADLINE_LIMIT}")
+        if OTHER_PLATFORMS.search(headline) or NOT_ON_ARTWORK.search(headline):
+            errors.append(f"{locale}: the header headline has something App Store artwork must not carry: {headline!r}")
 
     copyright_file = METADATA / "copyright.txt"
     if not copyright_file.is_file() or not read(copyright_file):

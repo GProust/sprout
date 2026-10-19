@@ -321,6 +321,23 @@ now and, by that page, required from April 2027 for apps built with the iOS
 27.1 SDK or later. Nothing is committed: the images belong to the listing, not
 to the repository.
 
+**The header artwork** — what App Store Connect calls a *creative asset*, new
+with iOS 27: the image across the top of the product page and behind the app in
+search results. Optional, and not something `deliver` uploads, so the same
+workflow draws it and leaves it in the `app-store-header` artifact, one PNG a
+language, to drag into the version page's *En-tête* slot by hand. One universal
+5244 × 2950 image serves both places: App Store Connect crops it to 21:9 for
+the header and to 3:2 for search, so the headline and the tops of the phones sit
+where the two crops overlap. The phones are the capture itself;
+[`creative_asset.mjs`](../ios/tools/creative_asset.mjs) draws the rest, and the
+headline is one line a language in
+[`ios/fastlane/creative/<locale>/headline.txt`](../ios/fastlane/creative), held
+by `check_listing.py` to a length that stays on one line and away from what
+Apple's guidance rules out of the artwork — prices, web addresses, ©, other
+platforms. Check it in App Store Connect's *Aperçu* before submitting: where
+the App Store puts its own name and *Get* button over it is drawn there and
+nowhere else.
+
 **The app is iPhone-only** (`TARGETED_DEVICE_FAMILY: '1'` in `project.yml`), so
 there is no iPad slot to fill. Declaring an iPad would mean a second set of
 screenshots and — the app being portrait-only — an upload App Store Connect
