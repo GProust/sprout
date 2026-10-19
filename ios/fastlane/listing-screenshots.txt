@@ -3,7 +3,7 @@
 # App Store Connect takes up to ten per language, and search results show only
 # the first three, so the order is the pitch: the dashboard, the feed, the
 # medicine waits. Each name is one of the captures in ios/screenshots/ — the
-# listing set is the same screens, captured again at 1284 × 2778 in every
+# listing set is the same screens, captured again at 1206 × 2622 in every
 # language.
 #
 # Statistics, growth, pumping and treatments are left out on purpose: the

@@ -3,7 +3,8 @@ name: App Store listing
 # Puts the App Store listing in App Store Connect: the name, subtitle,
 # description, keywords, promotional text and links in all seven languages,
 # from ios/fastlane/metadata/, and the screenshots named in
-# ios/fastlane/listing-screenshots.txt, captured fresh at 1284 × 2778.
+# ios/fastlane/listing-screenshots.txt, captured fresh at 1206 × 2622 — the
+# "iPhone with Dynamic Island (medium)" size, the one App Store Connect requires.
 #
 # The repository is the listing's source, the way android/fastlane/ is Play's:
 # whatever this uploads replaces what App Store Connect held, field by field
@@ -61,7 +62,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.screenshots
     uses: ./.github/workflows/ios-listing-screenshots.yml
     with:
-      display: '6.5'
+      display: '6.3'
 
   upload:
     name: Upload to App Store Connect
@@ -93,18 +94,14 @@ jobs:
           bundler-cache: true
           working-directory: ios
 
+      # Already the listing's set: the capture keeps the screens
+      # listing-screenshots.txt names, numbered into its order.
       - name: Download the screenshots
         if: env.WITH_SCREENSHOTS == 'true'
         uses: actions/download-artifact@v7
         with:
-          name: app-store-screenshots-6.5in
-          path: ${{ runner.temp }}/captured
-
-      # The capture holds every screen in every language; the listing shows the
-      # ones listing-screenshots.txt names, numbered into its order.
-      - name: Choose the listing's screenshots
-        if: env.WITH_SCREENSHOTS == 'true'
-        run: python3 ios/tools/check_listing.py stage "$RUNNER_TEMP/captured" "$RUNNER_TEMP/screenshots"
+          name: app-store-listing-6.3in
+          path: ${{ runner.temp }}/screenshots
 
       # The key goes to a file only this job can read and is never printed.
       # fastlane takes it as JSON; the three values are the secrets RELEASING.md

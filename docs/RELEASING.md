@@ -295,17 +295,31 @@ ship, and none of its sizes are ones App Store Connect takes. The listing set
 has its own workflow, [`ios-listing-screenshots.yml`](../.github/workflows/ios-listing-screenshots.yml)
 — the counterpart of `screenshots.yml`'s `tablet-7` / `tablet-10` runs:
 **Actions → App Store screenshots → Run workflow**, pick the slot, and download
-the `app-store-screenshots-<size>in` artifact. It holds one folder per App Store
-locale (`en-US`, `fr-FR`, `de-DE`, `es-ES`, `it`, `pl`, `pt-PT`), every image
-checked for size and transparency before upload.
+the artifacts. Each holds one folder per App Store locale (`en-US`, `fr-FR`,
+`de-DE`, `es-ES`, `it`, `pl`, `pt-PT`), every image checked for size and
+transparency before upload:
 
-| Slot | Simulator | Pixels |
-|------|-----------|--------|
-| 6.5" | iPhone 14 Plus | 1284 × 2778 |
-| 6.9" | iPhone 16 Pro Max | 1320 × 2868 |
+- `app-store-listing-<size>in` — the listing's own set, the screens
+  [`listing-screenshots.txt`](../ios/fastlane/listing-screenshots.txt) names,
+  numbered into its order. This is the folder to drag in by hand; App Store
+  Connect takes ten a language.
+- `app-store-screenshots-<size>in` — every screen the test reaches, more than
+  twenty, for choosing a different set.
 
-Apple needs one of the two, not both. Nothing is committed: the images belong
-to the listing, not to the repository.
+| Slot | Simulator | Pixels | |
+|------|-----------|--------|---|
+| 6.3" — iPhone with Dynamic Island (medium) | iPhone 16 Pro | 1206 × 2622 | **required**, and the default |
+| 6.5" | iPhone 14 Plus | 1284 × 2778 | optional |
+| 6.9" | iPhone 16 Pro Max | 1320 × 2868 | optional |
+
+The required slot takes its own two sizes (1206 × 2622 or 1179 × 2556) and
+refuses everything else image by image — which is how the first set, captured
+at 6.5" when that was the slot App Store Connect showed first, was found out.
+Apple moves these slots; its *Screenshot specifications* page in the App Store
+Connect help is the list to check. *iPhone Duo* screenshots are optional for
+now and, by that page, required from April 2027 for apps built with the iOS
+27.1 SDK or later. Nothing is committed: the images belong to the listing, not
+to the repository.
 
 **The app is iPhone-only** (`TARGETED_DEVICE_FAMILY: '1'` in `project.yml`), so
 there is no iPad slot to fill. Declaring an iPad would mean a second set of
@@ -396,7 +410,7 @@ the icon on the phone still reads "Sprout".
   API key (§9). Untick *screenshots* for a text-only run of a minute or two.
 
 **The repository wins.** An upload replaces what App Store Connect held for every
-field it carries, in every language it carries, and replaces the 6.5"
+field it carries, in every language it carries, and replaces the 6.3"
 screenshots. Edit the listing here and run the workflow; an edit made in App
 Store Connect lasts until the next run.
 

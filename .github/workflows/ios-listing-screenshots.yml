@@ -9,14 +9,23 @@ name: App Store screenshots
 # Connect wants a phone's native pixels, and a simulator produces its own
 # model's native size and no other, so this names the model:
 #
-#   6.5"  iPhone 14 Plus      1284 × 2778   the slot App Store Connect shows first
-#   6.9"  iPhone 16 Pro Max   1320 × 2868   the larger slot, if it is ever asked for
+#   6.3"  iPhone 16 Pro       1206 × 2622   "iPhone with Dynamic Island (medium)":
+#                                           the one size App Store Connect requires
+#   6.5"  iPhone 14 Plus      1284 × 2778   optional
+#   6.9"  iPhone 16 Pro Max   1320 × 2868   optional
+#
+# The required slot refuses every other size outright — the first set, captured
+# at 6.5", was turned away image by image for its dimensions. Apple's
+# "Screenshot specifications" page is the list to check if that happens again.
 #
 # The same UI test, the same seeded database and the same frozen clock as the
 # review set, once per language — so the seven sets show the same numbers in
 # the same places. Nothing is committed: the images are the listing's, not the
-# repository's, and they arrive as one artifact with a folder per App Store
-# locale (en-US, fr-FR, de-DE, es-ES, it, pl, pt-PT), ready to drag in.
+# repository's. They arrive as two artifacts with a folder per App Store locale
+# (en-US, fr-FR, de-DE, es-ES, it, pl, pt-PT): app-store-listing-<size>in holds
+# the screens ios/fastlane/listing-screenshots.txt names, numbered into its
+# order — the set to drag in, at most ten a language — and
+# app-store-screenshots-<size>in holds every screen the test reaches.
 #
 # Run it from Actions → App Store screenshots → Run workflow. It also runs on a
 # pull request that changes this file, so a change to it is seen working before
@@ -27,15 +36,15 @@ on:
   workflow_dispatch:
     inputs:
       display:
-        description: 'The App Store Connect slot to fill: 6.5 (iPhone 14 Plus, 1284 × 2778) or 6.9 (iPhone 16 Pro Max, 1320 × 2868).'
+        description: 'The App Store Connect slot to fill: 6.3 (iPhone 16 Pro, 1206 × 2622, the required one), 6.5 (iPhone 14 Plus, 1284 × 2778) or 6.9 (iPhone 16 Pro Max, 1320 × 2868).'
         type: choice
-        options: [ '6.5', '6.9' ]
-        default: '6.5'
+        options: [ '6.3', '6.5', '6.9' ]
+        default: '6.3'
   workflow_call:
     inputs:
       display:
         type: string
-        default: '6.5'
+        default: '6.3'
   pull_request:
     branches: [ main ]
     paths:
@@ -45,15 +54,15 @@ permissions:
   contents: read
 
 concurrency:
-  group: ios-listing-${{ github.head_ref || github.ref }}-${{ inputs.display || '6.5' }}
+  group: ios-listing-${{ github.head_ref || github.ref }}-${{ inputs.display || '6.3' }}
   cancel-in-progress: true
 
 jobs:
   capture:
-    name: Capture (${{ inputs.display || '6.5' }}")
+    name: Capture (${{ inputs.display || '6.3' }}")
     runs-on: macos-15
     env:
-      DISPLAY_SIZE: ${{ inputs.display || '6.5' }}
+      DISPLAY_SIZE: ${{ inputs.display || '6.3' }}
       OUT: app-store-screenshots
     steps:
       - name: Checkout
@@ -67,6 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           case "$DISPLAY_SIZE" in
+            6.3) model=iPhone-16-Pro;     size=1206x2622 ;;
             6.5) model=iPhone-14-Plus;    size=1284x2778 ;;
             6.9) model=iPhone-16-Pro-Max; size=1320x2868 ;;
             *) echo "::error::no model for a $DISPLAY_SIZE\" display"; exit 1 ;;
@@ -181,6 +191,19 @@ jobs:
           name: app-store-screenshots-${{ env.DISPLAY_SIZE }}in
           path: ${{ env.OUT }}/
           if-no-files-found: warn
+
+      # The listing's own set, out of the full capture: what ios-listing.yml
+      # uploads, and what to drag in by hand — App Store Connect takes ten a
+      # language, and the capture has more than twenty.
+      - name: Choose the listing's screenshots
+        run: python3 ios/tools/check_listing.py stage "$OUT" app-store-listing
+
+      - name: Upload the listing's screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-store-listing-${{ env.DISPLAY_SIZE }}in
+          path: app-store-listing/
+          if-no-files-found: error
 
       # On a failure the result bundles hold the hierarchy dumps and the screen
       # recording — the evidence for why a screen was never reached.

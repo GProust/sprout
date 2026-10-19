@@ -14,7 +14,7 @@ runtimes but no devices, make one rather than failing.
 
 The one exception is the App Store listing, where the model is the point: App
 Store Connect accepts screenshots at a handful of exact pixel sizes, and a
-simulator produces its model's native size and no other. `--model iPhone-14-Plus`
+simulator produces its model's native size and no other. `--model iPhone-16-Pro`
 asks for that model by its device type, and creates it if the image has none.
 
 Python rather than shell because the first version of this was a `python3 -c`
