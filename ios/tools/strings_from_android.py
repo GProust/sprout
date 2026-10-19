@@ -69,19 +69,55 @@ def convert_format_specifiers(text: str) -> str:
 
 
 def unescape_android(text: str) -> str:
-    """Undoes the escaping Android requires inside a resource value."""
-    out = []
+    """Reads a resource value the way Android's resource compiler does.
+
+    Three rules, and the app sees the result of all of them:
+
+    - a backslash escapes the next character (`\\n` and `\\t` are a newline and
+      a tab);
+    - an unescaped double quote is not text: it opens or closes a stretch in
+      which whitespace is kept exactly — `" · "` is how a string keeps the
+      spaces around its dot, and the quotes themselves never reach the screen;
+    - outside quotes, a run of whitespace is one space, and the value's own
+      leading and trailing whitespace is dropped.
+
+    Copying the quotes through put `In the pram" · "On their side` on the iOS
+    sleep screen while Android showed `In the pram · On their side`.
+    """
+    out: list[str] = []
+    # Characters that must survive the final trim: escaped ones and anything
+    # inside quotes. Tracked by position so only unprotected whitespace goes.
+    kept: list[bool] = []
+    quoted = False
     index = 0
     while index < len(text):
         char = text[index]
         if char == "\\" and index + 1 < len(text):
             following = text[index + 1]
             out.append({"n": "\n", "t": "\t"}.get(following, following))
+            kept.append(True)
             index += 2
             continue
+        if char == '"':
+            quoted = not quoted
+            index += 1
+            continue
+        if not quoted and char.isspace():
+            if not (out and not kept[-1] and out[-1] == " "):
+                out.append(" ")
+                kept.append(False)
+            index += 1
+            continue
         out.append(char)
+        kept.append(quoted or not char.isspace())
         index += 1
-    return "".join(out)
+
+    start, end = 0, len(out)
+    while start < end and not kept[start] and out[start] == " ":
+        start += 1
+    while end > start and not kept[end - 1] and out[end - 1] == " ":
+        end -= 1
+    return "".join(out[start:end])
 
 
 def value_of(element: ET.Element) -> str:
@@ -93,6 +129,22 @@ def value_of(element: ET.Element) -> str:
     means.
     """
     return unescape_android("".join(element.itertext()))
+
+
+def lost_whitespace(element: ET.Element) -> bool:
+    """True when Android will silently drop a space the author typed.
+
+    `<string> · </string>` reads as a dot with a space on each side and is shown
+    as a bare dot: Android trims whitespace outside quotes, which is how the
+    feeding history came to say `Breast·Left`. The spaces have to be written
+    `" · "`. Caught here, on the one path both apps' strings go through, rather
+    than on a screen.
+    """
+    raw = "".join(element.itertext())
+    if not raw or raw.strip() == raw:
+        return False
+    # Whitespace inside quotes survives; an escaped space (`\\ `) does too.
+    return not (raw.lstrip()[:1] == '"' and raw.rstrip()[-1:] == '"') and not raw.rstrip().endswith("\\")
 
 
 def read_locale(directory: Path) -> tuple[dict[str, str], dict[str, dict[str, str]], set[str]]:
@@ -110,6 +162,12 @@ def read_locale(directory: Path) -> tuple[dict[str, str], dict[str, dict[str, st
         name = element.get("name")
         if not name:
             continue
+        for value in [element, *element.findall("item")]:
+            if value.tag in ("string", "item") and lost_whitespace(value):
+                raise SystemExit(
+                    f"{path}: '{name}' starts or ends with a space Android will drop; "
+                    'write it inside quotes, e.g. " · "'
+                )
         if element.tag == "string":
             if element.get("translatable") == "false":
                 untranslatable.add(name)

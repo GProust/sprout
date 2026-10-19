@@ -53,6 +53,9 @@ All notable changes to Sprout are documented here. This project follows
 - 🔁 **Correcting a feed no longer shows up twice on the other phone.** Editing a
   feed used to reach your partner's phone as a new feed beside the old one; it
   now arrives as the correction it is.
+- 🧹 **Room around the dots.** Details that ran together — *Breast·Left*,
+  *Left 9m·Right 4m·Total 13m* — now have a space on each side of the dot, in
+  the histories, on the widget and in the doctor's report.
 
 ## [1.13.0] — 2026-09-25
 

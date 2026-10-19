@@ -1,0 +1,9 @@
+# fastlane, for the App Store listing (`.github/workflows/ios-listing.yml`).
+#
+# Pinned here, with the lock file beside it, so the upload that runs next month
+# is the one that was checked this month: `deliver` talks to an API Apple
+# changes, and a floating version is how a listing upload breaks with nothing
+# in this repository having moved.
+source "https://rubygems.org"
+
+gem "fastlane", "2.240.1"

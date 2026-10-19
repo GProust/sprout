@@ -57,6 +57,10 @@ struct SproutApp: App {
                     failure = String(describing: error)
                 }
             }
+            // Dark for the one capture that asks for it (ScreenshotSeed).
+            #if DEBUG
+            .screenshotAppearance()
+            #endif
             // A `.sprout` file another app handed us — from Mail, Messages, or
             // wherever the parents already talk to each other (ADR-0008). It is
             // the same door the manifest declares on Android, and it opens onto

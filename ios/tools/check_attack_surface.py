@@ -45,6 +45,9 @@ INFO_PLIST_KEYS = {
     "CFBundleLocalizations",
     "CFBundleShortVersionString",
     "CFBundleVersion",
+    # The export-compliance answer (only the OS's own ciphers). Not a door;
+    # pinned so that changing it is as visible as adding one.
+    "ITSAppUsesNonExemptEncryption",
     "NSBluetoothAlwaysUsageDescription",
     "UILaunchScreen",
     "UISupportedInterfaceOrientations",
