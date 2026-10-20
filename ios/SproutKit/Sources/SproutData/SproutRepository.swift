@@ -386,6 +386,34 @@ public final class SproutRepository: @unchecked Sendable {
         Task { await onWidgetDataChanged() }
     }
 
+    /// The uid of the selected baby, read once: the baby a timed feed is started for.
+    public func activeBabyUidNow() throws -> String? {
+        try database.read { db in try Self.activeBaby(db)?.uid }
+    }
+
+    /// Save a breastfeed timed on the nursing screen to the baby it was started
+    /// for (`babyUid`), not to whichever one is selected by the time it is saved.
+    /// From Android's `addTimedFeeding`.
+    ///
+    /// With twins the selection is a mode: a feed started from one baby's card,
+    /// then the other's card tapped, used to be saved to the second baby. A
+    /// session from before the baby was recorded has no `babyUid`, and a baby
+    /// that is no longer here leaves nothing to resolve it to. Both go to the
+    /// selected baby, as every timed feed used to, because keeping the feed is
+    /// the lesser surprise. Returns the baby the feed went to, or nil if there
+    /// was none.
+    @discardableResult
+    public func addTimedFeeding(_ feeding: Feeding, startedFor babyUid: String?) throws -> Int64? {
+        let startedForId = try babyUid.flatMap { uid in
+            try database.read { db in
+                try Baby.filter(Column("uid") == uid && Column("deletedAt") == nil).fetchOne(db)?.id
+            }
+        }
+        guard let babyId = try startedForId ?? activeBabyIdNow() else { return nil }
+        try addFeeding(feeding, for: babyId)
+        return babyId
+    }
+
     public func deleteFeeding(_ feeding: Feeding) throws {
         try softDelete(feeding)
         Task { await onWidgetDataChanged() }

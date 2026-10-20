@@ -266,6 +266,69 @@ final class SproutRepositoryTests: XCTestCase {
         XCTAssertEqual(try repository.activeBabies().map(\.name), ["Robin"])
     }
 
+    // MARK: - A timed feed stays with its baby (#115)
+
+    /// A breastfeed from the timer, as `stopNursing` saves it.
+    private func timedFeed() -> Feeding {
+        let minute: Int64 = 60_000
+        return Feeding(
+            type: .BREAST,
+            side: .LEFT,
+            startTime: clock,
+            endTime: clock + 9 * minute,
+            segments: [NursingSegment(side: .LEFT, startTime: clock, endTime: clock + 9 * minute)]
+        )
+    }
+
+    private func savedTo() throws -> Int64? {
+        try read { db in try Feeding.fetchAll(db) }.first?.babyId
+    }
+
+    /// Léa's feed started from her card, Noah's card tapped a minute later: the
+    /// selection is Noah's by the time the feed is saved, and the feed is still
+    /// Léa's. The same cases as `TimedFeedRepositoryTest.kt`.
+    func testTheFeedGoesToTheBabyItWasStartedFor() throws {
+        let lea = try makeBaby("Léa")
+        let noah = try makeBaby("Noah")
+        let startedFor = try repository.activeBabyUidNow()
+        try repository.setActiveBaby(id: noah)
+
+        XCTAssertEqual(try repository.addTimedFeeding(timedFeed(), startedFor: startedFor), lea)
+        XCTAssertEqual(try savedTo(), lea)
+    }
+
+    func testTheSelectedBabyIsTheOneAFeedStartsFor() throws {
+        _ = try makeBaby("Léa")
+        let noah = try makeBaby("Noah")
+        try repository.setActiveBaby(id: noah)
+
+        let uid = try read { db in try Baby.fetchOne(db, key: noah)?.uid }
+        XCTAssertEqual(try repository.activeBabyUidNow(), uid)
+    }
+
+    /// A session left running by the version before, which named no baby.
+    func testASessionThatNamesNoBabyGoesToTheSelectedOne() throws {
+        _ = try makeBaby("Léa")
+        let noah = try makeBaby("Noah")
+        try repository.setActiveBaby(id: noah)
+
+        XCTAssertEqual(try repository.addTimedFeeding(timedFeed(), startedFor: nil), noah)
+        XCTAssertEqual(try savedTo(), noah)
+    }
+
+    /// A baby that is no longer here: the feed is kept, on the selected baby.
+    func testABabyNoLongerHereLeavesTheFeedToTheSelectedOne() throws {
+        _ = try makeBaby("Léa")
+        let noah = try makeBaby("Noah")
+        try repository.setActiveBaby(id: noah)
+
+        XCTAssertEqual(
+            try repository.addTimedFeeding(timedFeed(), startedFor: "not-a-baby-any-more"),
+            noah
+        )
+        XCTAssertEqual(try savedTo(), noah)
+    }
+
     // MARK: - Pumping belongs to the parent
 
     func testPumpingIsNotScopedToABaby() async throws {

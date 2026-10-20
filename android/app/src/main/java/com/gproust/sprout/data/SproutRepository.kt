@@ -264,6 +264,31 @@ class SproutRepository(
         onWidgetDataChanged()
     }
 
+    /** The uid of the selected baby, read once: the baby a timed feed is started for. */
+    suspend fun activeBabyUidNow(): String? = activeBabyIdNow()?.let { db.babyDao().uidById(it) }
+
+    /**
+     * Save a breastfeed timed on the nursing screen to the baby it was started
+     * for ([babyUid]), not to whichever one is selected by the time it is saved.
+     *
+     * With twins the selection is a mode: a feed started from one baby's card,
+     * then the other's card tapped, used to be saved to the second baby. A
+     * session from before the baby was recorded has no [babyUid], and a baby that
+     * is no longer here leaves nothing to resolve it to. Both go to the selected
+     * baby, as every timed feed used to, because keeping the feed is the lesser
+     * surprise. Returns the baby the feed went to, or null if there was none.
+     */
+    suspend fun addTimedFeeding(babyUid: String?, entity: FeedingEntity): Long? {
+        val babyId = babyUid
+            ?.let { db.babyDao().findByUid(it) }
+            ?.takeIf { it.deletedAt == null }
+            ?.id
+            ?: activeBabyIdNow()
+            ?: return null
+        addFeedingFor(babyId, entity)
+        return babyId
+    }
+
     /** A named baby's most recent breastfeed started at or after [since], or null. */
     suspend fun lastBreastFeedFor(babyId: Long, since: Long): FeedingEntity? =
         db.feedingDao().lastBreastFeedSince(babyId, since)

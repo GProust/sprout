@@ -15,6 +15,9 @@ import Foundation
 /// burping as time at the breast, which is the one number the timer exists to
 /// get right (BDR-17).
 ///
+/// The session also names the baby it is timing (`babyUid`), because the feed
+/// is saved minutes later, and by then the selection may have moved to a twin.
+///
 /// It lives in `SproutData` rather than beside its screen so that the
 /// arithmetic can be tested the way Android tests it. The store that holds the
 /// running session is the app's, and device-local.
@@ -25,19 +28,25 @@ public struct NursingSession: Equatable, Sendable {
     public var segments: [NursingSegment]
     /// When the current break began; nil while a breast is actually nursing.
     public var pausedAt: Int64?
+    /// The baby this feed was started for, by uid. Saving it goes to this baby,
+    /// whoever is selected by then. Nil only for a session left running by a
+    /// version that did not record it.
+    public var babyUid: String?
 
     public init(
         sessionStart: Int64,
         currentSide: BreastSide,
         segmentStart: Int64,
         segments: [NursingSegment] = [],
-        pausedAt: Int64? = nil
+        pausedAt: Int64? = nil,
+        babyUid: String? = nil
     ) {
         self.sessionStart = sessionStart
         self.currentSide = currentSide
         self.segmentStart = segmentStart
         self.segments = segments
         self.pausedAt = pausedAt
+        self.babyUid = babyUid
     }
 
     public var isPaused: Bool { pausedAt != nil }

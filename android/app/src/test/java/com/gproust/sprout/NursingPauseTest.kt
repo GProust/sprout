@@ -96,6 +96,18 @@ class NursingPauseTest {
         assertEquals(min(14), switched.nursedMs(start + min(14)))
     }
 
+    /** A break or a switch never loses track of which baby is feeding. */
+    @Test
+    fun pausingResumingAndSwitchingKeepTheBaby() {
+        val lea = session.copy(babyUid = "baby-lea")
+
+        val after = lea.paused(start + min(8))
+            .resumed(BreastSide.RIGHT, start + min(13))
+            .switched(start + min(19))
+
+        assertEquals("baby-lea", after.babyUid)
+    }
+
     @Test
     fun aFeedThatRanStraightThroughHasNoBreaks() {
         val segments = listOf(

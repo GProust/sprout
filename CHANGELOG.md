@@ -56,6 +56,11 @@ All notable changes to Sprout are documented here. This project follows
 - 🧹 **Room around the dots.** Details that ran together — *Breast·Left*,
   *Left 9m·Right 4m·Total 13m* — now have a space on each side of the dot, in
   the histories, on the widget and in the doctor's report.
+- 👶 **A twin's feed stays theirs.** With two babies, starting a breastfeed from
+  one baby's card and then tapping the other's could save the first baby's feed
+  under the second, without a word. A timed feed now remembers who it was
+  started for, and is saved to them whichever baby is selected when you tap
+  *Save*.
 
 ## [1.13.0] — 2026-09-25
 

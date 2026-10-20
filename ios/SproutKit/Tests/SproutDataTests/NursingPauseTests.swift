@@ -76,6 +76,18 @@ final class NursingPauseTests: XCTestCase {
         XCTAssertEqual(switched.nursedMs(at: start + min(14)), min(14))
     }
 
+    /// A break or a switch never loses track of which baby is feeding.
+    func testPausingResumingAndSwitchingKeepTheBaby() {
+        var lea = session
+        lea.babyUid = "baby-lea"
+
+        let after = lea.paused(at: start + min(8))
+            .resumed(on: .RIGHT, at: start + min(13))
+            .switched(at: start + min(19))
+
+        XCTAssertEqual(after.babyUid, "baby-lea")
+    }
+
     func testAFeedThatRanStraightThroughHasNoBreaks() {
         let segments = [
             NursingSegment(side: .LEFT, startTime: start, endTime: start + min(8)),
