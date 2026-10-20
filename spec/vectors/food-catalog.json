@@ -204,6 +204,78 @@
       "category": "FRUIT"
     },
     {
+      "id": "blackberries",
+      "category": "FRUIT"
+    },
+    {
+      "id": "blackcurrants",
+      "category": "FRUIT"
+    },
+    {
+      "id": "coconut",
+      "category": "FRUIT"
+    },
+    {
+      "id": "dates",
+      "category": "FRUIT"
+    },
+    {
+      "id": "grapefruit",
+      "category": "FRUIT"
+    },
+    {
+      "id": "guava",
+      "category": "FRUIT"
+    },
+    {
+      "id": "lemon",
+      "category": "FRUIT"
+    },
+    {
+      "id": "lychee",
+      "category": "FRUIT"
+    },
+    {
+      "id": "mandarin",
+      "category": "FRUIT"
+    },
+    {
+      "id": "papaya",
+      "category": "FRUIT"
+    },
+    {
+      "id": "passion_fruit",
+      "category": "FRUIT"
+    },
+    {
+      "id": "persimmon",
+      "category": "FRUIT"
+    },
+    {
+      "id": "pomegranate",
+      "category": "FRUIT"
+    },
+    {
+      "id": "prunes",
+      "category": "FRUIT"
+    },
+    {
+      "id": "quince",
+      "category": "FRUIT"
+    },
+    {
+      "id": "raisins",
+      "category": "FRUIT"
+    },
+    {
+      "id": "redcurrants",
+      "category": "FRUIT"
+    },
+    {
+      "id": "rhubarb",
+      "category": "FRUIT"
+    },
+    {
       "id": "beef",
       "category": "MEAT"
     },
