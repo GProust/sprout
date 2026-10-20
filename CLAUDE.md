@@ -424,6 +424,25 @@ undo:
   implementation; if you touch that file, those are what stop a silent change
   from producing an archive nobody can open.
 
+## What's new after an update
+
+An update that brings something new says so once, on the dashboard
+([BDR-22](docs/decisions/0022-whats-new-is-a-card-the-parent-puts-away.md)). The
+logic is `data/WhatsNew.kt` and `SproutData/WhatsNew.swift`, with the same cases
+tested on both sides. Four things a change can quietly undo:
+
+- **It is a card, never a gate.** Launch goes straight to the dashboard (BDR-6),
+  and the card sits below what is running. A screen at launch is the thing
+  BDR-6 took out.
+- **Ids are one sequence for both apps, appended and never reused**
+  (`ANNOUNCEMENT_IDS` / `announcementIds`). A phone remembers the newest id it
+  has shown, not a version: Android and iOS number their versions apart.
+- **A fresh install sees nothing.** Onboarding marks every announcement seen,
+  before the profile is written. On iOS the home model exists before onboarding
+  ends, which is why it re-reads the store on every recompute.
+- **The screenshot seeds mark everything seen**, or every dashboard capture
+  carries the card.
+
 ## Asking for support
 
 Settings ends with two donation links (GitHub Sponsors, Buy Me a Coffee). The

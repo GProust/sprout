@@ -61,7 +61,13 @@ enum ScreenshotSeed {
     static func environment() throws -> AppEnvironment {
         Clock.now = { now }
         let environment = try AppEnvironment.inMemory()
-        if !isEmptyRequested { try seed(environment.repository) }
+        if !isEmptyRequested {
+            try seed(environment.repository)
+            // The "what's new" card is for a phone that has just updated; the
+            // captures show the dashboard as it is every other day (BDR-22).
+            // The first-run capture needs nothing: onboarding marks it.
+            WhatsNewSettings(store: environment.settingsStore).markAllSeen()
+        }
         return environment
     }
 

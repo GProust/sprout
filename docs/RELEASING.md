@@ -250,6 +250,11 @@ the notes without bumping again.
 - [ ] New version picked (the Release workflow bumps `versionCode`/`versionName` itself)
 - [ ] `CHANGELOG.md` has the entries under `[Unreleased]` (the workflow dates them)
 - [ ] "What's new" written for the 7 languages, ready to paste into the run form
+- [ ] In-app announcement ([BDR-22](decisions/0022-whats-new-is-a-card-the-parent-puts-away.md)):
+      if this release brings something a parent would want to know is there, a
+      new id appended to `ANNOUNCEMENT_IDS` and `announcementIds`, with
+      `whats_new_<id>_title` / `_body` in the 7 languages — merged before the
+      release. A release of fixes has none.
 - [ ] `./gradlew lintRelease testReleaseUnitTest` pass
 - [ ] Store listing text + screenshots current
 - [ ] Privacy policy URL reachable; Data safety form matches it

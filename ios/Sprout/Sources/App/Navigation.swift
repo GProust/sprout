@@ -89,6 +89,12 @@ struct RootView: View {
                     // way these two writes fail is a database that is already
                     // broken, and `SproutApp` says so at launch when it is.
                     // Tapping again is a retry.
+                    //
+                    // Everything is new to someone who has just arrived, and
+                    // nothing has changed: a fresh install starts with no
+                    // "what's new" to catch up on (BDR-22). Before the profile
+                    // is written, because writing it is what opens the dashboard.
+                    WhatsNewSettings(store: sprout.settingsStore).markAllSeen()
                     try? completeOnboarding(answers, into: sprout.repository)
                 }
             case .main:

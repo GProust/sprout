@@ -590,6 +590,12 @@
     <string name="home_live_nursing">Stillen · %1$s</string>
     <string name="home_live_asleep">%1$s schläft</string>
     <string name="home_live_open">Öffnen</string>
+    <string name="whats_new_label">Neu in Sprout</string>
+    <string name="whats_new_title">Neuigkeiten</string>
+    <string name="whats_new_show_me">Zeig es mir</string>
+    <string name="cd_whats_new_dismiss">Neuigkeiten ausblenden</string>
+    <string name="whats_new_1_title">Beikost</string>
+    <string name="whats_new_1_body">Eine Breimahlzeit kann jetzt festhalten, was darin war, und die Seite Beikost zeigt jedes Lebensmittel, das dein Baby kennengelernt hat: wie oft, das erste und das letzte Mal. Bekannte Allergien haben auch einen eigenen Platz.</string>
     <string name="sleep_woke_up">Aufgewacht</string>
     <string name="cd_open_baby">%1$s öffnen</string>
     <string name="you_intro">Abpumpen, dein Wohlbefinden und der tägliche Check-in.</string>

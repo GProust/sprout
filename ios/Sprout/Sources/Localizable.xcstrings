@@ -3565,6 +3565,52 @@
         }
       }
     },
+    "cd_whats_new_dismiss": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuigkeiten ausblenden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss what's new"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar novedades"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer les nouveautés"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascondi le novità"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ukryj nowości"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar novidades"
+          }
+        }
+      }
+    },
     "checkin_begin": {
       "localizations": {
         "de": {
@@ -37715,6 +37761,236 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recuperação: %1$@"
+          }
+        }
+      }
+    },
+    "whats_new_1_body": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Breimahlzeit kann jetzt festhalten, was darin war, und die Seite Beikost zeigt jedes Lebensmittel, das dein Baby kennengelernt hat: wie oft, das erste und das letzte Mal. Bekannte Allergien haben auch einen eigenen Platz."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A solid meal can now say what was in it, and the First foods page gathers every food your baby has met: how many times, the first time and the last. Known allergies have a place of their own too."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una comida sólida ya puede decir qué llevaba, y la página Alimentos reúne cada alimento que tu bebé ha probado: cuántas veces, la primera y la última. Las alergias conocidas también tienen su propio lugar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un repas solide peut maintenant dire ce qu'il contenait, et la page Diversification rassemble chaque aliment que votre bébé a découvert : combien de fois, la première et la dernière. Les allergies connues ont aussi leur place."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un pasto solido ora può dire cosa conteneva, e la pagina Svezzamento raccoglie ogni alimento che il tuo bambino ha conosciuto: quante volte, la prima e l'ultima. Anche le allergie note hanno un posto tutto loro."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posiłek stały może teraz mówić, co w nim było, a strona Nowe pokarmy zbiera każdy pokarm, który poznało Twoje dziecko: ile razy, pierwszy i ostatni raz. Znane alergie też mają swoje miejsce."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma refeição sólida já pode dizer o que levava, e a página Diversificação reúne cada alimento que o seu bebé já conheceu: quantas vezes, a primeira e a última. As alergias conhecidas também têm um lugar próprio."
+          }
+        }
+      }
+    },
+    "whats_new_1_title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beikost"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First foods"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alimentos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diversification"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Svezzamento"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nowe pokarmy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diversificação"
+          }
+        }
+      }
+    },
+    "whats_new_label": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu in Sprout"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New in Sprout"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades en Sprout"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau dans Sprout"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novità in Sprout"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nowość w Sprout"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novidades no Sprout"
+          }
+        }
+      }
+    },
+    "whats_new_show_me": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeig es mir"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show me"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muéstramelo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me montrer"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrami"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokaż"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar"
+          }
+        }
+      }
+    },
+    "whats_new_title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuigkeiten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novità"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Co nowego"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novidades"
           }
         }
       }

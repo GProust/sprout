@@ -590,6 +590,12 @@
     <string name="home_live_nursing">Amamentação · %1$s</string>
     <string name="home_live_asleep">%1$s está a dormir</string>
     <string name="home_live_open">Abrir</string>
+    <string name="whats_new_label">Novidades no Sprout</string>
+    <string name="whats_new_title">Novidades</string>
+    <string name="whats_new_show_me">Mostrar</string>
+    <string name="cd_whats_new_dismiss">Ocultar novidades</string>
+    <string name="whats_new_1_title">Diversificação</string>
+    <string name="whats_new_1_body">Uma refeição sólida já pode dizer o que levava, e a página Diversificação reúne cada alimento que o seu bebé já conheceu: quantas vezes, a primeira e a última. As alergias conhecidas também têm um lugar próprio.</string>
     <string name="sleep_woke_up">Acordou</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">A extração, o seu bem-estar e a verificação diária.</string>

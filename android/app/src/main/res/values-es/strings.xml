@@ -590,6 +590,12 @@
     <string name="home_live_nursing">Lactancia · %1$s</string>
     <string name="home_live_asleep">%1$s está durmiendo</string>
     <string name="home_live_open">Abrir</string>
+    <string name="whats_new_label">Novedades en Sprout</string>
+    <string name="whats_new_title">Novedades</string>
+    <string name="whats_new_show_me">Muéstramelo</string>
+    <string name="cd_whats_new_dismiss">Ocultar novedades</string>
+    <string name="whats_new_1_title">Alimentos</string>
+    <string name="whats_new_1_body">Una comida sólida ya puede decir qué llevaba, y la página Alimentos reúne cada alimento que tu bebé ha probado: cuántas veces, la primera y la última. Las alergias conocidas también tienen su propio lugar.</string>
     <string name="sleep_woke_up">Se despertó</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">La extracción, tu bienestar y el chequeo diario.</string>

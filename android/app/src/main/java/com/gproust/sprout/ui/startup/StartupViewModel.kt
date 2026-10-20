@@ -1,10 +1,12 @@
 package com.gproust.sprout.ui.startup
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.ParentProfileEntity
+import com.gproust.sprout.ui.whatsnew.WhatsNewSettings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -21,7 +23,10 @@ sealed interface Startup {
     data object Main : Startup
 }
 
-class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
+class StartupViewModel(
+    private val repository: SproutRepository,
+    private val context: Context,
+) : ViewModel() {
 
     val startup = repository.parentProfile.map { profile ->
         if (profile == null) Startup.Onboarding else Startup.Main
@@ -36,6 +41,11 @@ class StartupViewModel(private val repository: SproutRepository) : ViewModel() {
         birthDate: Long,
         trackWellbeing: Boolean,
     ) {
+        // Everything is new to someone who has just arrived, and nothing has
+        // changed: a fresh install starts with no "what's new" to catch up on
+        // (BDR-22). Before the profile is saved, because saving it is what
+        // opens the dashboard.
+        WhatsNewSettings.markAllSeen(context)
         viewModelScope.launch {
             val babyId = if (babyName.isNotBlank()) {
                 repository.addBaby(babyName, birthDate)

@@ -590,6 +590,12 @@
     <string name="home_live_nursing">Allattamento · %1$s</string>
     <string name="home_live_asleep">%1$s dorme</string>
     <string name="home_live_open">Apri</string>
+    <string name="whats_new_label">Novità in Sprout</string>
+    <string name="whats_new_title">Novità</string>
+    <string name="whats_new_show_me">Mostrami</string>
+    <string name="cd_whats_new_dismiss">Nascondi le novità</string>
+    <string name="whats_new_1_title">Svezzamento</string>
+    <string name="whats_new_1_body">Un pasto solido ora può dire cosa conteneva, e la pagina Svezzamento raccoglie ogni alimento che il tuo bambino ha conosciuto: quante volte, la prima e l\'ultima. Anche le allergie note hanno un posto tutto loro.</string>
     <string name="sleep_woke_up">Risveglio</string>
     <string name="cd_open_baby">Apri %1$s</string>
     <string name="you_intro">Il tiralatte, il tuo benessere e il check-in quotidiano.</string>
