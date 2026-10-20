@@ -52,6 +52,13 @@ public struct BabySummary: Equatable, Identifiable, Sendable {
 /// How far back the app still cares which breast the last breastfeed began on.
 public let lastBreastWindowMs: Int64 = 24 * 60 * 60 * 1000
 
+/// How far back the dashboard reads, from `HOUSEHOLD_WINDOW_MS`. It shows *how
+/// long ago* and *how many today*, not a history, so a week is generous: past it
+/// a baby simply has no "last feed" to show, which is the honest answer at that
+/// point anyway (BDR-0009). Both apps read the same week, or the two phones in
+/// one household disagree about a baby who has not been fed in four days.
+public let householdWindowMs: Int64 = 7 * 24 * 60 * 60 * 1000
+
 /// Summarises every tracked baby, from `ui/home/HouseholdSummary.kt`.
 public func summariseHousehold(
     babies: [Baby],

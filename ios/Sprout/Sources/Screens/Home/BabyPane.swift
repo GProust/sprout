@@ -334,3 +334,56 @@ private struct TodayRow: View {
         }
     }
 }
+
+/// The gentle growth-spurt note (BDR-5), from `GrowthSpurtNote` in
+/// `ui/home/BabyPane.kt`: shown while a baby is in — or a few days from — one of
+/// the typical periods, and gone again on its own. Informational only; every
+/// baby is different, so there is nothing to configure, log or dismiss.
+struct GrowthSpurtNote: View {
+    let window: GrowthSpurtWindow
+    let startsSoon: Bool
+
+    /// The note for a baby born at `birthDate`, or nil while no period is near.
+    init?(birthDate: Int64, now: Int64) {
+        let ageDays = ageInDays(birthDate: birthDate, now: now)
+        if let current = currentGrowthSpurt(ageDays: ageDays) {
+            window = current
+            startsSoon = false
+        } else if let upcoming = upcomingGrowthSpurt(ageDays: ageDays) {
+            window = upcoming
+            startsSoon = true
+        } else {
+            return nil
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: Spacing.snug) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .foregroundStyle(SproutColor.onSurfaceVariant)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(startsSoon ? Str.t("growth_spurt_soon_title") : Str.t("growth_spurt_now_title"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(SproutColor.onSurface)
+                Text(
+                    startsSoon
+                        ? Str.t("growth_spurt_soon_body", ageLabel)
+                        : Str.t("growth_spurt_now_body", ageLabel)
+                )
+                .font(.callout)
+                .foregroundStyle(SproutColor.onSurfaceVariant)
+            }
+        }
+        .padding(Spacing.regular)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SproutColor.surfaceVariant, in: RoundedRectangle(cornerRadius: Radius.card))
+        .accessibilityElement(children: .combine)
+    }
+
+    /// "around 3 weeks", declined by each language from the window's number.
+    private var ageLabel: String {
+        if let weeks = window.approxWeeks { return Str.t("growth_spurt_weeks", weeks) }
+        if let months = window.approxMonths { return Str.t("growth_spurt_months", months) }
+        return ""
+    }
+}
