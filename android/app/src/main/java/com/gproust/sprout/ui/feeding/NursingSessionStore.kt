@@ -31,6 +31,7 @@ object NursingSessionStore {
     private const val KEY_SEGMENT_START = "segmentStart"
     private const val KEY_SEGMENTS = "segments"
     private const val KEY_PAUSED_AT = "pausedAt"
+    private const val KEY_BABY_UID = "babyUid"
 
     private val state = MutableStateFlow<NursingSession?>(null)
     private var seeded = false
@@ -110,6 +111,9 @@ object NursingSessionStore {
                 .putLong(KEY_SEGMENT_START, session.segmentStart)
                 .putString(KEY_SEGMENTS, Converters().nursingSegmentsToString(session.segments))
                 .putLong(KEY_PAUSED_AT, session.pausedAt ?: 0L)
+                // A null removes the key, which is how a session from before
+                // this field existed reads.
+                .putString(KEY_BABY_UID, session.babyUid)
                 .apply()
         }
         seeded = true
@@ -130,6 +134,9 @@ object NursingSessionStore {
             // Absent (0) is "not on a break": a session stored before breaks
             // existed reads back as one that is nursing, which it was.
             pausedAt = p.getLong(KEY_PAUSED_AT, 0L).takeIf { it > 0L },
+            // Absent for a session stored before the baby was recorded: it is
+            // saved to the selected baby, as it always was.
+            babyUid = p.getString(KEY_BABY_UID, null),
         )
     }
 }

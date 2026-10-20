@@ -62,7 +62,13 @@ final class FeedingViewModel {
     func startNursing(on side: BreastSide) {
         let now = Clock.millis
         store.startIfIdle(
-            NursingSession(sessionStart: now, currentSide: side, segmentStart: now)
+            NursingSession(
+                sessionStart: now,
+                currentSide: side,
+                segmentStart: now,
+                // The feed belongs to the baby selected now, when it starts.
+                babyUid: try? repository.activeBabyUidNow()
+            )
         )
     }
 
@@ -97,21 +103,22 @@ final class FeedingViewModel {
             return .LEFT
         }()
 
-        add(
-            Feeding(
-                type: .BREAST,
-                side: side,
-                startTime: session.sessionStart,
-                // The feed ended when the last stretch did, not when Save was
-                // tapped: a session saved from a break would otherwise carry
-                // the whole break as feeding time it never was.
-                endTime: all.last?.endTime ?? now,
-                leftDurationMs: left > 0 ? left : nil,
-                rightDurationMs: right > 0 ? right : nil,
-                segments: all,
-                notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-            )
+        let feed = Feeding(
+            type: .BREAST,
+            side: side,
+            startTime: session.sessionStart,
+            // The feed ended when the last stretch did, not when Save was
+            // tapped: a session saved from a break would otherwise carry the
+            // whole break as feeding time it never was.
+            endTime: all.last?.endTime ?? now,
+            leftDurationMs: left > 0 ? left : nil,
+            rightDurationMs: right > 0 ? right : nil,
+            segments: all,
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         )
+        // To the baby the session was started for, not to whoever is selected
+        // now. With twins, those two are not always the same.
+        try? repository.addTimedFeeding(feed, startedFor: session.babyUid)
     }
 
     /// Discard the running session without saving it.

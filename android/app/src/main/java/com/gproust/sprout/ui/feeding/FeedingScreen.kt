@@ -159,11 +159,21 @@ class FeedingViewModel(
      */
     fun startNursing(side: BreastSide) {
         val now = System.currentTimeMillis()
-        NursingSessionStore.startIfIdle(
-            context,
-            NursingSession(sessionStart = now, currentSide = side, segmentStart = now),
-        )
-        refreshWidget()
+        viewModelScope.launch {
+            // The feed belongs to the baby selected now, when it starts. A
+            // dashboard card selects its baby before it opens the timer.
+            val babyUid = repository.activeBabyUidNow()
+            NursingSessionStore.startIfIdle(
+                context,
+                NursingSession(
+                    sessionStart = now,
+                    currentSide = side,
+                    segmentStart = now,
+                    babyUid = babyUid,
+                ),
+            )
+            refreshWidget()
+        }
     }
 
     /** Bank the current breast as a completed segment and switch to the other. */
@@ -210,22 +220,25 @@ class FeedingViewModel(
             rightMs > 0 -> BreastSide.RIGHT
             else -> BreastSide.LEFT
         }
-        // babyId is stamped by the repository on insert.
-        add(
-            FeedingEntity(
-                type = FeedType.BREAST,
-                side = side,
-                startTime = s.sessionStart,
-                // The feed ended when the last stretch did, not when Save was
-                // tapped: a session saved from a break would otherwise carry
-                // the whole break as feeding time it never was.
-                endTime = all.lastOrNull()?.endTime ?: now,
-                leftDurationMs = leftMs.takeIf { it > 0 },
-                rightDurationMs = rightMs.takeIf { it > 0 },
-                segments = all,
-                notes = notes.ifBlank { null },
-            ),
+        val feed = FeedingEntity(
+            type = FeedType.BREAST,
+            side = side,
+            startTime = s.sessionStart,
+            // The feed ended when the last stretch did, not when Save was
+            // tapped: a session saved from a break would otherwise carry the
+            // whole break as feeding time it never was.
+            endTime = all.lastOrNull()?.endTime ?: now,
+            leftDurationMs = leftMs.takeIf { it > 0 },
+            rightDurationMs = rightMs.takeIf { it > 0 },
+            segments = all,
+            notes = notes.ifBlank { null },
         )
+        viewModelScope.launch {
+            // To the baby the session was started for, not to whoever is
+            // selected now. With twins, those two are not always the same.
+            val babyId = repository.addTimedFeeding(s.babyUid, feed) ?: return@launch
+            FeedingReminders.rescheduleForBaby(context, repository, babyId)
+        }
         refreshWidget()
     }
 

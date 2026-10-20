@@ -191,7 +191,7 @@ that a change can quietly break:
 ## A breastfeed that stops for a burp
 
 The live timer has three states, not two: nursing, on a break, finished
-([BDR-17](docs/decisions/0017-a-breastfeed-can-stop-and-carry-on.md)). Three
+([BDR-17](docs/decisions/0017-a-breastfeed-can-stop-and-carry-on.md)). Four
 things a change can quietly undo:
 
 - **A break is not time at the breast, and every clock reads it that way.**
@@ -207,6 +207,10 @@ things a change can quietly undo:
   edit rather than collapsing them.
 - **Nothing about a break is judged.** No maximum, no nudge, no automatic stop,
   and pausing twice must not restart the break's clock.
+- **A session names the baby it was started for** (`babyUid`), and *Save* goes
+  through `addTimedFeeding`, never the active-baby `addFeeding`. With twins the
+  selection is a mode that moves while the timer runs, and resolving it at save
+  time is how one twin's feed was filed under the other (#115).
 
 Two feeds saved apart can also be joined back into the one feed they were
 ([BDR-19](docs/decisions/0019-two-breastfeeds-saved-apart-can-be-joined.md)) —

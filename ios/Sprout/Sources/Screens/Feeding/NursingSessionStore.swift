@@ -90,21 +90,22 @@ final class NursingSessionStore {
             defaults.removeObject(forKey: key)
             return
         }
-        defaults.set(
-            [
-                "sessionStart": value.sessionStart,
-                "currentSide": value.currentSide.rawValue,
-                "segmentStart": value.segmentStart,
-                // The same encoding Room's converter uses, so the widget and a
-                // future App Group read the bytes the app wrote.
-                "segments": NursingSegmentCoding.encode(value.segments),
-                // Zero is "not on a break", the way an absent key reads: a
-                // session stored before breaks existed was nursing, and comes
-                // back as one that is.
-                "pausedAt": value.pausedAt ?? 0,
-            ],
-            forKey: key
-        )
+        var stored: [String: Any] = [
+            "sessionStart": value.sessionStart,
+            "currentSide": value.currentSide.rawValue,
+            "segmentStart": value.segmentStart,
+            // The same encoding Room's converter uses, so the widget and a
+            // future App Group read the bytes the app wrote.
+            "segments": NursingSegmentCoding.encode(value.segments),
+            // Zero is "not on a break", the way an absent key reads: a session
+            // stored before breaks existed was nursing, and comes back as one
+            // that is.
+            "pausedAt": value.pausedAt ?? 0,
+        ]
+        // Left out when there is none, which is how a session from before the
+        // baby was recorded reads.
+        if let babyUid = value.babyUid { stored["babyUid"] = babyUid }
+        defaults.set(stored, forKey: key)
     }
 
     private static func read(from defaults: UserDefaults, key: String) -> NursingSession? {
@@ -123,7 +124,10 @@ final class NursingSessionStore {
             currentSide: side,
             segmentStart: segmentStart,
             segments: NursingSegmentCoding.decode(stored["segments"] as? String),
-            pausedAt: pausedAt > 0 ? pausedAt : nil
+            pausedAt: pausedAt > 0 ? pausedAt : nil,
+            // Absent for a session stored before the baby was recorded: it is
+            // saved to the selected baby, as it always was.
+            babyUid: stored["babyUid"] as? String
         )
     }
 }

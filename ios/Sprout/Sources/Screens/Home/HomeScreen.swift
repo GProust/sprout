@@ -168,7 +168,12 @@ final class HomeViewModel {
     func startFeed(for baby: Baby, on side: BreastSide) {
         select(baby)
         NursingSessionStore.shared.startIfIdle(
-            NursingSession(sessionStart: Clock.millis, currentSide: side, segmentStart: Clock.millis)
+            NursingSession(
+                sessionStart: Clock.millis,
+                currentSide: side,
+                segmentStart: Clock.millis,
+                babyUid: baby.uid
+            )
         )
     }
 
