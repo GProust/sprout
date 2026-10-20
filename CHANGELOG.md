@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.14.0] — 2026-10-20
 
 - 🥕 **A page for first foods.** Logging a solid meal now lets you list what was
   in it, and the new **First foods** tile gathers every food your baby has met:
