@@ -56,5 +56,6 @@ ADR log and are cross-linked from here.
 | [0019](0019-two-breastfeeds-saved-apart-can-be-joined.md) | Two breastfeeds saved apart can be joined into the one feed they were | Product / UX | Accepted |
 | [0020](0020-a-solid-meal-says-what-was-in-it.md) | A solid meal says what was in it, and each food keeps its own count | Product / Domain | Accepted |
 | [0021](0021-a-babys-allergies-as-the-household-knows-them.md) | A baby's allergies, as the household comes to know them | Product / Domain | Accepted |
+| [0022](0022-whats-new-is-a-card-the-parent-puts-away.md) | What's new is a card on the dashboard, and the parent puts it away | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

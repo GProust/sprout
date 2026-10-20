@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -51,9 +52,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
+import com.gproust.sprout.data.ANNOUNCEMENT_IDS
 import com.gproust.sprout.data.MEDICINE_DAY_MS
 import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.announcementsToShow
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
 import com.gproust.sprout.data.local.FeedingEntity
@@ -73,6 +76,9 @@ import com.gproust.sprout.ui.common.upcomingGrowthSpurt
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.whatsnew.WhatsNewCard
+import com.gproust.sprout.ui.whatsnew.WhatsNewSettings
+import com.gproust.sprout.ui.whatsnew.WhatsNewSheet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -140,6 +146,18 @@ class HomeViewModel(
      * awaits this before it navigates, rather than firing both and hoping.
      */
     suspend fun selectBaby(id: Long) = repository.setActiveBaby(id)
+
+    /**
+     * The announcements the "New in Sprout" card offers, newest first; empty
+     * means no card (BDR-22). Kept apart from [uiState], which is a summary of
+     * the household's rows: this is about what one parent has read.
+     */
+    val whatsNew = WhatsNewSettings.lastSeen(context)
+        .map { announcementsToShow(ANNOUNCEMENT_IDS, it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Read or put away: either way, the card has done its job. */
+    fun markWhatsNewSeen() = WhatsNewSettings.markAllSeen(context)
 
     /** "Not today" on the check-in card: put it away until tomorrow, nothing saved. */
     fun dismissCheckIn() = viewModelScope.launch {
@@ -296,6 +314,10 @@ fun HomeScreen(
 ) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val whatsNew by vm.whatsNew.collectAsState()
+    // What the open sheet lists. Held here rather than read from [whatsNew],
+    // because opening the sheet marks the announcements seen and empties that.
+    var whatsNewSheet by remember { mutableStateOf<List<Int>?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -362,6 +384,20 @@ fun HomeScreen(
                 onWakeUp = vm::wakeUp,
             )
 
+            // After what is running, before the babies: one line, put away with
+            // one tap, and never in front of anything (BDR-22).
+            whatsNew.firstOrNull()?.let { newest ->
+                WhatsNewCard(
+                    newest = newest,
+                    onOpen = {
+                        whatsNewSheet = whatsNew
+                        vm.markWhatsNewSeen()
+                    },
+                    onDismiss = vm::markWhatsNewSeen,
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
             val single = state.babies.singleOrNull()
             if (single != null) {
                 // One baby: no card to pick, so the dashboard *is* the baby view.
@@ -424,6 +460,17 @@ fun HomeScreen(
                 )
             }
         }
+    }
+
+    whatsNewSheet?.let { ids ->
+        WhatsNewSheet(
+            ids = ids,
+            onShowMe = { route ->
+                whatsNewSheet = null
+                onNavigate(route)
+            },
+            onDismiss = { whatsNewSheet = null },
+        )
     }
 }
 

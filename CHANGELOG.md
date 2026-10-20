@@ -56,6 +56,11 @@ All notable changes to Sprout are documented here. This project follows
 - 🧹 **Room around the dots.** Details that ran together — *Breast·Left*,
   *Left 9m·Right 4m·Total 13m* — now have a space on each side of the dot, in
   the histories, on the widget and in the doctor's report.
+- 📣 **What's new, said once.** After an update that brings something new, a
+  small card on the dashboard says so: tap it to read what changed, or put it
+  away with the cross. It never stands in front of anything, it doesn't come
+  back once read, and a fresh install doesn't get one. This time, it's about
+  First foods.
 - 👶 **A twin's feed stays theirs.** With two babies, starting a breastfeed from
   one baby's card and then tapping the other's could save the first baby's feed
   under the second, without a word. A timed feed now remembers who it was

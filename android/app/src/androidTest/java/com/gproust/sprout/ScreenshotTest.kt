@@ -73,6 +73,7 @@ import com.gproust.sprout.ui.health.HealthScreen
 import com.gproust.sprout.ui.baby.BabyScreen
 import com.gproust.sprout.ui.home.HomeScreen
 import com.gproust.sprout.ui.home.MedicineDismissals
+import com.gproust.sprout.ui.whatsnew.WhatsNewSettings
 import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.onboarding.OnboardingScreen
 import com.gproust.sprout.ui.profile.ProfileScreen
@@ -329,6 +330,9 @@ class ScreenshotTest {
         // seeded to show all three states of the card, and a dismissal left
         // behind by an earlier run would photograph two of them (BDR-16).
         MedicineDismissals.clear(app)
+        // The "what's new" card is for a phone that has just updated. These
+        // captures show the dashboard as it is every other day (BDR-22).
+        WhatsNewSettings.markAllSeen(app)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})

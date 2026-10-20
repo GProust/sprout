@@ -44,7 +44,7 @@ class SproutViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when {
-            modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository)
+            modelClass.isAssignableFrom(StartupViewModel::class.java) -> StartupViewModel(repository, context)
             modelClass.isAssignableFrom(CheckInViewModel::class.java) -> CheckInViewModel(repository)
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> HomeViewModel(repository, context)
             modelClass.isAssignableFrom(ShellViewModel::class.java) -> ShellViewModel(repository)

@@ -19,6 +19,9 @@ final class HomeViewModel {
     var tracksWellbeing = true
     var checkInPending = false
     private(set) var activeBabyId: Int64?
+    /// The announcements the "New in Sprout" card offers, newest first; empty
+    /// means no card (BDR-22).
+    private(set) var whatsNew: [Int] = []
 
     /// Coarse enough for "2 h ago". The screen re-reads it on a timer rather
     /// than per frame; nothing here needs a second hand.
@@ -28,6 +31,8 @@ final class HomeViewModel {
     /// What *Dismiss* on the card has put away (BDR-16). Device-local, never
     /// synced, and it expires on its own when the next dose is logged.
     private let dismissals: MedicineDismissals
+    /// What this parent has already read of what's new (BDR-22).
+    private let whatsNewSettings: WhatsNewSettings
 
     /// How far back a "last fed" can be found — the same week Android reads. It
     /// only bounds the read, so a few hours of drift over a long-lived process
@@ -37,6 +42,7 @@ final class HomeViewModel {
     init(repository: SproutRepository, settings: any DeviceLocalStore) {
         self.repository = repository
         self.dismissals = MedicineDismissals(store: settings)
+        self.whatsNewSettings = WhatsNewSettings(store: settings)
         self.latestDismissals = dismissals.all()
     }
 
@@ -120,6 +126,10 @@ final class HomeViewModel {
 
     private func recompute() {
         hasProfile = !latestBabies.isEmpty
+        // Read again each time rather than once: this model is made at launch,
+        // before onboarding has run, and finishing onboarding is what marks
+        // everything seen.
+        whatsNew = announcementsToShow(available: announcementIds, lastSeen: whatsNewSettings.lastSeen)
         babies = summariseHousehold(
             babies: latestBabies,
             feedings: latestFeedings,
@@ -154,6 +164,12 @@ final class HomeViewModel {
             lastCheckIn: profile.lastCheckIn,
             now: Clock.millis
         )
+    }
+
+    /// Read or put away: either way, the card has done its job (BDR-22).
+    func markWhatsNewSeen() {
+        whatsNewSettings.markAllSeen()
+        whatsNew = announcementsToShow(available: announcementIds, lastSeen: whatsNewSettings.lastSeen)
     }
 
     /// "Not today": put the check-in away until tomorrow, saving nothing.
@@ -231,6 +247,13 @@ struct HomeScreen: View {
     let model: HomeViewModel
     let onOpen: (LogDestination) -> Void
 
+    /// What the open sheet lists. Held here rather than read from the model,
+    /// because opening the sheet marks the announcements seen and empties that.
+    @State private var whatsNewSheet: [Int]?
+    /// Where *Show me* goes, once the sheet has finished closing: a push
+    /// started while it is still on its way down is dropped.
+    @State private var pendingDestination: LogDestination?
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.regular) {
@@ -263,6 +286,19 @@ struct HomeScreen: View {
                         LiveSleepRow(name: sleeping.baby.name, sleep: sleep, now: model.now) {
                             model.wakeUp(sleep)
                         }
+                    }
+
+                    // After what is running, before the babies: one line, put
+                    // away with one tap, and never in front of anything (BDR-22).
+                    if let newest = model.whatsNew.first {
+                        WhatsNewCard(
+                            newest: newest,
+                            onOpen: {
+                                whatsNewSheet = model.whatsNew
+                                model.markWhatsNewSeen()
+                            },
+                            onDismiss: { model.markWhatsNewSeen() }
+                        )
                     }
 
                     if let single = model.babies.count == 1 ? model.babies.first : nil {
@@ -351,6 +387,23 @@ struct HomeScreen: View {
             }
         }
         .sproutStyle()
+        .sheet(
+            isPresented: Binding(
+                get: { whatsNewSheet != nil },
+                set: { if !$0 { whatsNewSheet = nil } }
+            ),
+            onDismiss: {
+                if let destination = pendingDestination {
+                    pendingDestination = nil
+                    onOpen(destination)
+                }
+            }
+        ) {
+            WhatsNewSheet(ids: whatsNewSheet ?? []) { destination in
+                pendingDestination = destination
+                whatsNewSheet = nil
+            }
+        }
         // A minute is as fine as "2 h ago" needs; anything shorter spends
         // battery redrawing the same words.
         .task {

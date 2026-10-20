@@ -649,6 +649,12 @@
     <string name="home_live_nursing">Tétée · %1$s</string>
     <string name="home_live_asleep">%1$s dort</string>
     <string name="home_live_open">Ouvrir</string>
+    <string name="whats_new_label">Nouveau dans Sprout</string>
+    <string name="whats_new_title">Nouveautés</string>
+    <string name="whats_new_show_me">Me montrer</string>
+    <string name="cd_whats_new_dismiss">Masquer les nouveautés</string>
+    <string name="whats_new_1_title">Diversification</string>
+    <string name="whats_new_1_body">Un repas solide peut maintenant dire ce qu\'il contenait, et la page Diversification rassemble chaque aliment que votre bébé a découvert : combien de fois, la première et la dernière. Les allergies connues ont aussi leur place.</string>
     <string name="sleep_woke_up">Réveil</string>
     <string name="cd_open_baby">Ouvrir %1$s</string>
     <string name="you_intro">Le tirage, votre bien-être et le bilan du jour.</string>
