@@ -114,6 +114,22 @@ targets:
         # an iPad, in the iPhone-sized window. Widening this is a decision to
         # make with an iPad in hand.
         TARGETED_DEVICE_FAMILY: '1'
+      configs:
+        # Signing for the App Store build, and for that build only: the iOS
+        # release workflow (.github/workflows/ios-release.yml) archives Release
+        # with the distribution certificate and the App Store profile it gets
+        # from the repository's secrets. The team and the profile's UUID are
+        # read from the profile at build time and passed in as these two
+        # variables, so neither is written here. They sit on this target rather
+        # than on xcodebuild's command line, because a profile given there
+        # applies to every target, the Swift packages included, and a package
+        # refuses one. Debug is untouched: CI builds it for the simulator with
+        # signing switched off.
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          DEVELOPMENT_TEAM: $(SPROUT_TEAM_ID)
+          PROVISIONING_PROFILE_SPECIFIER: $(SPROUT_PROVISIONING_PROFILE)
 
   SproutUITests:
     type: bundle.ui-testing

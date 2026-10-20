@@ -1,0 +1,328 @@
+name: iOS release
+
+# Builds the App Store version of the iPhone app and uploads it to App Store
+# Connect, where it appears in TestFlight and becomes a build the version can be
+# submitted with. Run it from Actions → iOS release → Run workflow; it runs from
+# whatever the branch holds, so run it from main.
+#
+#   1. archives the Release configuration for a device, signed with the
+#      distribution certificate and the App Store profile from the repository
+#      secrets (docs/RELEASING.md §9), after ios/tools/check_signing.py has
+#      checked that the three of them belong together;
+#   2. exports the .ipa, and checks the app inside it with
+#      check_attack_surface.py — the Info.plist, the linked libraries and the
+#      entitlements the signature carries, which is the build that is sent;
+#   3. uploads it with fastlane's pilot and the App Store Connect API key, the
+#      same key the listing workflow uses.
+#
+# The version is MARKETING_VERSION in ios/Sprout/project.yml and the build
+# number CURRENT_PROJECT_VERSION, unless the run form gives another: App Store
+# Connect takes each build number once per version, so a second upload of the
+# same version needs a higher one — and project.yml should then be raised to
+# match, so the next run does not offer the old number again.
+#
+# What it does not do: submit for review, fill in TestFlight's "What to Test",
+# change the version, or tag anything. Submitting is App Store Connect's
+# version page: pick the build once it has processed, then Add for Review.
+#
+# On a pull request that touches it, it archives without signing — no secrets,
+# nothing sent — so a change here is proven to build before it is run for real.
+
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: 'Build number to upload as (CFBundleVersion). Empty: CURRENT_PROJECT_VERSION from ios/Sprout/project.yml. Each number is taken once per version.'
+        required: false
+        default: ''
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/ios-release.yml'
+      - 'ios/Sprout/project.yml'
+      - 'ios/tools/check_attack_surface.py'
+      - 'ios/tools/check_signing.py'
+
+permissions:
+  contents: read
+
+# Never two uploads at once, and never one cancelled halfway.
+concurrency:
+  group: ios-release-${{ github.head_ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Archive and upload
+    # macos-26 rather than ios.yml's macos-15: App Store Connect refuses a build
+    # made with an Xcode older than MIN_XCODE, and macos-15 defaults to 16.4.
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      UPLOAD: ${{ github.event_name == 'workflow_dispatch' }}
+      # Apple's minimum for an upload, raised each spring (from 28 April 2026:
+      # Xcode 26 and the iOS 26 SDK). The job stops here rather than after an
+      # upload App Store Connect would refuse.
+      MIN_XCODE: '26'
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      # As in ios-listing.yml: the release tooling of an app that sends nothing
+      # should not send things either.
+      FASTLANE_OPT_OUT_USAGE: '1'
+      FASTLANE_SKIP_UPDATE_CHECK: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show the toolchain
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          major="$(xcodebuild -version | sed -n 's/^Xcode \([0-9]*\).*/\1/p')"
+          if [ -z "$major" ] || [ "$major" -lt "$MIN_XCODE" ]; then
+            echo "::error::App Store Connect takes builds from Xcode $MIN_XCODE or later; this runner has Xcode ${major:-unknown}"
+            exit 1
+          fi
+
+      - name: Generate the project
+        run: brew install xcodegen && xcodegen generate --spec ios/Sprout/project.yml --project ios/Sprout
+
+      - name: Read the version
+        id: version
+        env:
+          BUILD_INPUT: ${{ inputs.build }}
+        run: |
+          set -euo pipefail
+          read_setting() {
+            sed -n "s/^ *$1: *'\{0,1\}\([0-9.]*\)'\{0,1\}.*/\1/p" ios/Sprout/project.yml | head -n1
+          }
+          version="$(read_setting MARKETING_VERSION)"
+          build="${BUILD_INPUT:-$(read_setting CURRENT_PROJECT_VERSION)}"
+          if [ -z "$version" ]; then
+            echo "::error::could not read MARKETING_VERSION from ios/Sprout/project.yml"
+            exit 1
+          fi
+          # What App Store Connect accepts as a CFBundleVersion: up to three
+          # period-separated integers.
+          if ! printf '%s' "$build" | grep -Eq '^[0-9]+(\.[0-9]+){0,2}$'; then
+            echo "::error::'$build' is not a build number App Store Connect accepts (e.g. 2, or 1.0.2)"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "::notice::Sprout $version ($build)"
+
+      # A keychain of its own, made for this run and deleted at the end, so the
+      # certificate never sits in the runner's login keychain. The .p12 is
+      # deleted as soon as it is imported; the profile is checked against it
+      # before it is installed.
+      - name: Install the certificate and the profile
+        id: signing
+        if: env.UPLOAD == 'true'
+        env:
+          P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
+          PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "$P12_BASE64" ] || [ -z "$P12_PASSWORD" ] || [ -z "$PROFILE_BASE64" ]; then
+            echo "::error::APPLE_DISTRIBUTION_P12_BASE64, APPLE_DISTRIBUTION_P12_PASSWORD and APPLE_PROVISIONING_PROFILE_BASE64 must all be set as repository secrets"
+            exit 1
+          fi
+          umask 077
+          signing="$RUNNER_TEMP/signing"
+          mkdir -p "$signing"
+          # Python rather than `base64 --decode`, which refuses the line breaks
+          # a copied value often carries.
+          python3 - <<'PY'
+          import base64, os
+          folder = os.path.join(os.environ["RUNNER_TEMP"], "signing")
+          for variable, name in (("P12_BASE64", "distribution.p12"), ("PROFILE_BASE64", "profile.mobileprovision")):
+              with open(os.path.join(folder, name), "wb") as f:
+                  f.write(base64.b64decode(os.environ[variable]))
+          PY
+
+          keychain="$signing/sprout.keychain-db"
+          keychain_password="$(openssl rand -hex 24)"
+          echo "::add-mask::$keychain_password"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$signing/distribution.p12" -k "$keychain" -P "$P12_PASSWORD" \
+            -f pkcs12 -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+            -k "$keychain_password" "$keychain" > /dev/null
+          # Searched first, ahead of the login keychain it is added to.
+          # shellcheck disable=SC2046
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          rm -f "$signing/distribution.p12"
+
+          security cms -D -i "$signing/profile.mobileprovision" -o "$signing/profile.plist"
+          security find-identity -v -p codesigning "$keychain" \
+            | python3 ios/tools/check_signing.py "$signing/profile.plist" > "$signing/checked"
+          profile="$(sed -n 's/^profile=//p' "$signing/checked")"
+          for folder in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                        "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$folder"
+            cp "$signing/profile.mobileprovision" "$folder/$profile.mobileprovision"
+          done
+          cat "$signing/checked" >> "$GITHUB_OUTPUT"
+          echo "keychain=$keychain" >> "$GITHUB_OUTPUT"
+
+      # The team and the profile go in as SPROUT_* variables, which only the
+      # Sprout target's Release configuration reads (project.yml says why).
+      - name: Archive
+        env:
+          BUILD: ${{ steps.version.outputs.build }}
+          TEAM_ID: ${{ steps.signing.outputs.team }}
+          PROFILE: ${{ steps.signing.outputs.profile }}
+          KEYCHAIN: ${{ steps.signing.outputs.keychain }}
+        run: |
+          set -euo pipefail
+          if [ "$UPLOAD" = "true" ]; then
+            signing=(
+              SPROUT_TEAM_ID="$TEAM_ID"
+              SPROUT_PROVISIONING_PROFILE="$PROFILE"
+              OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN"
+            )
+          else
+            signing=(CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO)
+          fi
+          xcodebuild archive \
+            -project ios/Sprout/Sprout.xcodeproj \
+            -scheme Sprout \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Sprout.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            CURRENT_PROJECT_VERSION="$BUILD" \
+            "${signing[@]}"
+
+      - name: The archived app opens no door the source did not
+        run: |
+          python3 ios/tools/check_attack_surface.py \
+            --app "$RUNNER_TEMP/Sprout.xcarchive/Products/Applications/Sprout.app"
+
+      - name: Export for App Store Connect
+        id: export
+        if: env.UPLOAD == 'true'
+        env:
+          TEAM_ID: ${{ steps.signing.outputs.team }}
+          PROFILE: ${{ steps.signing.outputs.profile }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, plistlib
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "ExportOptions.plist"), "wb") as f:
+              plistlib.dump({
+                  "method": "app-store-connect",
+                  "destination": "export",
+                  "teamID": os.environ["TEAM_ID"],
+                  "signingStyle": "manual",
+                  "signingCertificate": "Apple Distribution",
+                  "provisioningProfiles": {"com.gproust.sprout": os.environ["PROFILE"]},
+                  # The build number is the one this run was given, never one
+                  # Xcode picks on its own.
+                  "manageAppVersionAndBuildNumber": False,
+              }, f)
+          PY
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Sprout.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export"
+          ipa="$(find "$RUNNER_TEMP/export" -maxdepth 1 -name '*.ipa' | head -n1)"
+          if [ -z "$ipa" ]; then
+            echo "::error::the export produced no .ipa"
+            exit 1
+          fi
+          echo "ipa=$ipa" >> "$GITHUB_OUTPUT"
+
+      # The export signs again, with the profile's entitlements, so the app
+      # that is checked last is the one inside the file that is sent.
+      - name: The app being sent opens no door either
+        if: env.UPLOAD == 'true'
+        env:
+          IPA: ${{ steps.export.outputs.ipa }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD: ${{ steps.version.outputs.build }}
+        run: |
+          set -euo pipefail
+          unzip -q "$IPA" -d "$RUNNER_TEMP/exported"
+          app="$RUNNER_TEMP/exported/Payload/Sprout.app"
+          python3 ios/tools/check_attack_surface.py --app "$app"
+          built="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Info.plist") ($(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist"))"
+          if [ "$built" != "$VERSION ($BUILD)" ]; then
+            echo "::error::the exported app says $built, not $VERSION ($BUILD)"
+            exit 1
+          fi
+
+      # On a pull request too, so the toolchain the upload needs is proven to
+      # install on this runner before a release depends on it.
+      - name: Set up Ruby and fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Show fastlane
+        working-directory: ios
+        run: bundle exec fastlane --version
+
+      # Exactly as in ios-listing.yml: a file only this job can read, never
+      # printed, removed at the end.
+      - name: Write the App Store Connect API key
+        if: env.UPLOAD == 'true'
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEY_ID" ] || [ -z "$ISSUER_ID" ] || [ -z "$PRIVATE_KEY" ]; then
+            echo "::error::APP_STORE_CONNECT_KEY_ID, _ISSUER_ID and _PRIVATE_KEY must all be set as repository secrets"
+            exit 1
+          fi
+          umask 077
+          python3 - <<'PY'
+          import json, os
+          path = os.path.join(os.environ["RUNNER_TEMP"], "app-store-connect.json")
+          with open(path, "w") as f:
+              json.dump({
+                  "key_id": os.environ["KEY_ID"],
+                  "issuer_id": os.environ["ISSUER_ID"],
+                  "key": os.environ["PRIVATE_KEY"],
+                  "in_house": False,
+              }, f)
+          PY
+
+      # Not waiting for App Store Connect to process the build: that takes from
+      # minutes to an hour, Apple emails when it is done or what it refused, and
+      # a macOS runner idling through it proves nothing.
+      - name: Upload to App Store Connect
+        if: env.UPLOAD == 'true'
+        working-directory: ios
+        env:
+          IPA: ${{ steps.export.outputs.ipa }}
+        run: |
+          set -euo pipefail
+          bundle exec fastlane pilot upload \
+            --api_key_path "$RUNNER_TEMP/app-store-connect.json" \
+            --ipa "$IPA" \
+            --app_platform ios \
+            --skip_waiting_for_build_processing true \
+            --skip_submission true
+
+      - name: Remove the certificate, the profile and the key
+        if: always()
+        env:
+          PROFILE: ${{ steps.signing.outputs.profile }}
+        run: |
+          if [ -f "$RUNNER_TEMP/signing/sprout.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/signing/sprout.keychain-db" || true
+          fi
+          if [ -n "$PROFILE" ]; then
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE.mobileprovision" \
+                  "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$PROFILE.mobileprovision"
+          fi
+          rm -rf "$RUNNER_TEMP/signing" "$RUNNER_TEMP/app-store-connect.json"

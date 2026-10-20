@@ -261,6 +261,8 @@ the notes without bumping again.
 - [ ] Release workflow run (Actions → Release) with the version + release notes — commits the bump, changelog and notes, builds the signed `.aab`, tags, publishes the GitHub Release
 - [ ] Installed and smoke-tested the release APK on a device
 - [ ] Production rollout started in Play Console
+- [ ] iOS: listing current (Actions → App Store listing), then Actions → iOS release from main (§8, *Uploading a build*)
+- [ ] iOS: the build picked on the version page in App Store Connect once it has processed, and *Add for Review*
 
 ---
 
@@ -290,8 +292,10 @@ what the `paths:` filters in `ci.yml` and `ios.yml` exist to keep in check.
 - **Run on a real radio.** The Bluetooth exchange
   ([ADR-0016](adr/0016-a-transport-both-platforms-can-speak.md)) is testable over
   a pipe and not otherwise. Two physical phones are the only proof.
-- **Produce anything installable.** Not a TestFlight build, not an `.ipa`, not
-  something you can put on your own phone.
+- **Produce anything installable without credentials.** The one build that
+  reaches a phone is the App Store one, made by `ios-release.yml` with the
+  secrets in §9 (*Uploading a build*, below), and it installs through
+  TestFlight or the App Store — not as a file.
 
 ### The listing screenshots
 
@@ -444,6 +448,45 @@ fastlane is pinned in [`ios/Gemfile`](../ios/Gemfile) and its lock file, and
 told not to report usage — the release tooling of an app that sends nothing
 should not send things either.
 
+### Uploading a build
+
+[`ios-release.yml`](../.github/workflows/ios-release.yml) — **Actions → iOS
+release → Run workflow**, from main. It archives the Release configuration for
+a device, signs it with the distribution certificate and the App Store profile,
+exports the `.ipa` and uploads it with fastlane's `pilot` and the same API key
+the listing uses. The build shows up in TestFlight once App Store Connect has
+processed it (minutes to an hour; Apple emails either way), and from then on it
+is a build the version page can pick.
+
+- **The secrets are checked before anything is built.**
+  [`ios/tools/check_signing.py`](../ios/tools/check_signing.py) says which of the
+  three is wrong — a development profile, a profile for another App ID or
+  another certificate, an expired one, a `.cer` with no private key — in
+  seconds, instead of `xcodebuild` saying "No profiles were found" ten minutes
+  in.
+- **The app that is sent is the one checked.** The export signs again with the
+  profile's entitlements, so `check_attack_surface.py --app` runs on the app
+  inside the `.ipa`: the `Info.plist`, the libraries it links, and the
+  entitlements the signature carries — a signed build may hold only what
+  `Sprout.entitlements` allows plus the identity signing writes.
+- **The version is `MARKETING_VERSION`, the build `CURRENT_PROJECT_VERSION`**
+  (`project.yml`), unless the run form gives a build number. App Store Connect
+  takes each build number once per version: a second upload of 1.0 needs build
+  2, and `project.yml` should be raised to match in the same breath.
+- **It runs on `macos-26`, not `ios.yml`'s `macos-15`.** Apple refuses uploads
+  from an Xcode older than the one it requires — Xcode 26 and the iOS 26 SDK
+  since 28 April 2026, raised each spring — and the job stops at the first step
+  rather than after an upload that would be refused. `MIN_XCODE` in the workflow
+  is the number to raise.
+- **On a pull request that touches it,** it archives without signing — no
+  secrets, nothing sent — and sets up fastlane, so a change to the workflow or
+  to `project.yml` is proven to build on that runner before a release depends on
+  it.
+
+It does not submit anything. On the version page in App Store Connect: pick the
+build under *Build*, then *Add for Review*. Nor does it write TestFlight's
+*What to Test*, bump the version or tag a commit.
+
 ### What publishing will need, when the screens land
 
 None of this is required to keep developing, and none of it should be bought
@@ -479,10 +522,8 @@ to collect anything with.
   push. 1024×1024 with no alpha channel, because an icon with transparency is
   rejected at upload.
 
-When those exist, they become repository secrets alongside the Android ones
-already listed in [`release.yml`](../.github/workflows/release.yml) — an
-`APP_STORE_CONNECT_KEY_ID`, `_ISSUER_ID` and `_PRIVATE_KEY` — and a fourth job
-archives and uploads. Not before.
+Those exist now: the API key and the signing material are repository secrets
+(§9), and `ios-release.yml` archives and uploads (*Uploading a build*, above).
 
 ---
 
@@ -554,9 +595,37 @@ The names follow the ones already in
 prefix, one secret per value.
 
 **Signing is separate from all of this.** The API key authenticates *uploads*; it
-does not sign the build. Either let Xcode manage signing with that same key, or
-add a distribution certificate and provisioning profile as two more secrets. That
-choice is not made yet and does not need to be until there is an Apple account.
+does not sign the build. That is a distribution certificate and an App Store
+provisioning profile, three more secrets, and signing is manual: the workflow
+names exactly the certificate and the profile it was given, and Xcode is never
+allowed to create or fetch one on its own.
+
+1. **The certificate.** Keychain Access → *Certificate Assistant → Request a
+   Certificate From a Certificate Authority*, saved to disk. Then
+   <https://developer.apple.com/account/resources/certificates> → **+** →
+   *Apple Distribution*, upload that request, download the `.cer` and open it so
+   it lands in the keychain beside its private key. In Keychain Access → *My
+   Certificates*, export *Apple Distribution: …* as a `.p12` with a password —
+   the `.p12` carries the private key, which the `.cer` alone does not.
+2. **The profile.** <https://developer.apple.com/account/resources/profiles> →
+   **+** → *Distribution → App Store Connect*, App ID `com.gproust.sprout`, the
+   certificate from step 1. Download the `.mobileprovision`.
+3. **Both as text:** `base64 -i <file> | pbcopy` on a Mac, and paste.
+
+| Secret | Value |
+|---|---|
+| `APPLE_DISTRIBUTION_P12_BASE64` | the `.p12` from step 1, base64 |
+| `APPLE_DISTRIBUTION_P12_PASSWORD` | the password it was exported with |
+| `APPLE_PROVISIONING_PROFILE_BASE64` | the `.mobileprovision` from step 2, base64 |
+
+The team id is not a secret of its own: it is read from the profile. The
+certificate lasts a year and the profile expires with it; each run says when,
+and `check_signing.py` says which one has run out. Renewing means both secrets
+again, because a profile names the certificate it was made with.
+
+**What they can do:** sign a build of Sprout that only App Store Connect will
+take — which also needs the API key. If they leak, revoke the certificate at
+developer.apple.com; the profile dies with it.
 
 ### What is still not automated, and what it would take
 
@@ -564,18 +633,15 @@ Both stores' metadata already sits in fastlane's own layout —
 `android/fastlane/metadata/android/<locale>/` is exactly what `supply` reads, and
 `ios/fastlane/metadata/<locale>/` is what `deliver` reads. **The App Store
 listing is uploaded** by `ios-listing.yml` (§8), with fastlane pinned in
-`ios/Gemfile`. `release.yml` builds and signs the Android artifact but uploads
-it by hand (§5).
+`ios/Gemfile`, and **the build is uploaded** by `ios-release.yml` (§8).
+`release.yml` builds and signs the Android artifact but uploads it by hand (§5).
 
 So the work still to do is:
 
 - **Play:** add `supply` and one job. The metadata and the release notes are
   already in the right directories, which is most of what that job would
-  otherwise need.
-- **App Store:** add `pilot` (TestFlight) — it needs the distribution
-  certificate and provisioning profile as well as the API key — plus the step
-  that copies `changelogs/<build>.txt` into `release_notes.txt` for every
-  version after the first (§8).
-
-Neither is worth writing before its credentials exist, because neither can be
-tested without them.
+  otherwise need. Not worth writing before the service account exists, because
+  it cannot be tested without it.
+- **App Store:** the step that copies `changelogs/<build>.txt` into
+  `release_notes.txt` for every version after the first (§8). The first version
+  has no "What's New" — App Store Connect asks for one from the second.
