@@ -15,7 +15,9 @@ own manifest and the whole merged build:
 * **The built layer** (`--app`) reads the `Info.plist` Xcode actually produced
   and the libraries the binary actually links. That is the half that catches
   something a dependency dragged in, which is the whole point of Android's
-  merged-permission pin.
+  merged-permission pin. On a signed build — the one the iOS release workflow
+  uploads — it also reads the entitlements the signature carries, which come
+  from the provisioning profile as much as from `Sprout.entitlements`.
 
 The two are separate modes rather than one cumulative run, and deliberately: the
 built layer needs nothing but the standard library, because the macOS runners
@@ -94,6 +96,17 @@ FORBIDDEN_INFO_KEYS = {
 
 # Entitlements Sprout may hold. Empty today, and the file says why.
 ALLOWED_ENTITLEMENTS: set[str] = set()
+
+# What signing adds on its own: the app's identity, whether a debugger may
+# attach, and TestFlight's flag. Anything else in a signed build came from the
+# provisioning profile rather than from Sprout.entitlements, which is the half
+# the source layer cannot see.
+SIGNING_ADDED_ENTITLEMENTS = {
+    "application-identifier",
+    "com.apple.developer.team-identifier",
+    "get-task-allow",
+    "beta-reports-active",
+}
 
 # …and the ones that would undo the privacy claim outright.
 FORBIDDEN_ENTITLEMENTS = {
@@ -215,6 +228,34 @@ def check_linked_frameworks(app: pathlib.Path, fail: Failures) -> None:
             fail.add(f"the binary links {framework} — {why}")
 
 
+def check_signed_entitlements(app: pathlib.Path, fail: Failures) -> None:
+    # CI's simulator builds are made with CODE_SIGNING_ALLOWED=NO, so there is
+    # no signature to read; only a bundle Xcode sealed has this.
+    if not (app / "_CodeSignature" / "CodeResources").is_file():
+        return
+    try:
+        result = subprocess.run(
+            ["codesign", "-d", "--entitlements", "-", "--xml", str(app)],
+            capture_output=True, check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        fail.add(f"could not read the signature's entitlements: {error}")
+        return
+    entitlements = plistlib.loads(result.stdout) if result.stdout.strip() else {}
+
+    # Signing may also write out the default keychain group: the app's own
+    # identifier, which is the group it has anyway. That one value shares
+    # nothing (ADR-0018); any other group is shared with something else.
+    if entitlements.get("keychain-access-groups") == [entitlements.get("application-identifier")]:
+        del entitlements["keychain-access-groups"]
+
+    for key in sorted(set(entitlements) - ALLOWED_ENTITLEMENTS - SIGNING_ADDED_ENTITLEMENTS):
+        fail.add(f"the signed app holds {key}, which neither Sprout.entitlements allows nor signing adds")
+    for key, why in FORBIDDEN_ENTITLEMENTS.items():
+        if key in entitlements:
+            fail.add(f"the signed app holds {key} — {why}")
+
+
 def check_source(fail: Failures) -> None:
     # Imported here, not at the top: the built layer must not need it.
     import yaml
@@ -235,6 +276,7 @@ def check_built(app: pathlib.Path, fail: Failures) -> None:
         ours = {k: v for k, v in built.items() if k not in BUILD_ADDED_KEYS}
         check_info(ours, "the built Info.plist", fail, pin=True)
     check_linked_frameworks(app, fail)
+    check_signed_entitlements(app, fail)
 
 
 def main() -> int:

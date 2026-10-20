@@ -97,9 +97,11 @@ surface down; two tests hold it.
 - **iOS has the same pin, in two layers** (`ios/tools/check_attack_surface.py`).
   One reads `project.yml` and the entitlements — what we wrote down; the other
   reads the `Info.plist` Xcode produced and the libraries the binary links, which
-  is the half a dependency could move. Same rule as Android's: a legitimate new
-  door costs one line in the list, in the same commit; a door nobody meant to
-  open fails CI. `check_no_network.py` is the third leg — no code that *could*
+  is the half a dependency could move — and, on the signed build
+  `ios-release.yml` uploads, the entitlements the signature carries, which is
+  the half a provisioning profile could move. Same rule as Android's: a
+  legitimate new door costs one line in the list, in the same commit; a door
+  nobody meant to open fails CI. `check_no_network.py` is the third leg — no code that *could*
   open a connection, beside nothing that *declares* one.
 
 ## Sharing a baby's record between phones
