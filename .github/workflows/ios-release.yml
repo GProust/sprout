@@ -203,6 +203,20 @@ jobs:
           python3 ios/tools/check_attack_surface.py \
             --app "$RUNNER_TEMP/Sprout.xcarchive/Products/Applications/Sprout.app"
 
+      # App Store Connect refuses a build with no icon, and the asset catalog
+      # compiler only warns when it cannot place an image ("unassigned child"),
+      # as it did on this workflow's first run. CFBundleIconName is written only
+      # when an icon was actually compiled into the app.
+      - name: The archived app carries its icon
+        run: |
+          set -euo pipefail
+          plist="$RUNNER_TEMP/Sprout.xcarchive/Products/Applications/Sprout.app/Info.plist"
+          icon="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconName' "$plist" 2>/dev/null || true)"
+          if [ "$icon" != "AppIcon" ]; then
+            echo "::error::the archived app has no app icon (CFBundleIconName is '${icon}'); check Assets.xcassets/AppIcon.appiconset/Contents.json"
+            exit 1
+          fi
+
       - name: Export for App Store Connect
         id: export
         if: env.UPLOAD == 'true'
