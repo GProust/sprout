@@ -29,9 +29,10 @@ final class HomeViewModel {
     /// synced, and it expires on its own when the next dose is logged.
     private let dismissals: MedicineDismissals
 
-    /// How far back a "last fed" can be found. It only bounds the read, so a few
-    /// hours of drift over a long-lived process changes nothing anyone sees.
-    private let windowStart: Int64 = Clock.millis - 3 * 24 * 60 * 60 * 1000
+    /// How far back a "last fed" can be found — the same week Android reads. It
+    /// only bounds the read, so a few hours of drift over a long-lived process
+    /// changes nothing anyone sees.
+    private let windowStart: Int64 = Clock.millis - householdWindowMs
 
     init(repository: SproutRepository, settings: any DeviceLocalStore) {
         self.repository = repository
@@ -243,6 +244,13 @@ struct HomeScreen: View {
                         .foregroundStyle(SproutColor.primary)
                     }
 
+                    // A feed on the timer, wherever it was started from. The
+                    // shared store rather than a copy, so the row goes the
+                    // moment the feed is saved, wherever it was saved from.
+                    if let session = NursingSessionStore.shared.session {
+                        LiveNursingRow(session: session) { onOpen(.feeding) }
+                    }
+
                     // A baby asleep right now is the one thing on this screen
                     // that changes without anyone touching it.
                     if let sleeping = model.babies.first(where: { $0.ongoingSleep != nil }),
@@ -277,6 +285,9 @@ struct HomeScreen: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         )
+                        if let spurt = GrowthSpurtNote(birthDate: single.baby.birthDate, now: model.now) {
+                            spurt
+                        }
                     } else {
                         // Two or more: a card each, and the full pane moves to
                         // the baby's own tab.
@@ -297,6 +308,9 @@ struct HomeScreen: View {
                                     onOpen(.medicines)
                                 }
                             )
+                            if let spurt = GrowthSpurtNote(birthDate: summary.baby.birthDate, now: model.now) {
+                                spurt
+                            }
                         }
                     }
 
@@ -370,6 +384,54 @@ private struct CheckInCard: View {
         .padding(Spacing.regular)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(SproutColor.surface, in: RoundedRectangle(cornerRadius: Radius.card))
+    }
+}
+
+/// "Feeding · Left — 12:34", from `LiveRow` in `ui/home/HomeScreen.kt`, with the
+/// one tap back to it.
+///
+/// The clock is time at the breast, not time since the feed began: it stops
+/// while a break runs, exactly as the timer's does (BDR-17). It is the one thing
+/// on the dashboard with a second hand, so it ticks on its own rather than
+/// making the whole summary recompute every second.
+private struct LiveNursingRow: View {
+    let session: NursingSession
+    let onOpen: () -> Void
+
+    @State private var now = Clock.millis
+
+    var body: some View {
+        HStack {
+            Image(systemName: session.isPaused ? "pause.circle.fill" : "drop.fill")
+                .foregroundStyle(SproutColor.onPrimaryContainer)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(Str.t("home_live_nursing", state))
+                    .font(.callout.weight(.medium))
+                Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
+                    .font(.footnote)
+                    .monospacedDigit()
+            }
+            Spacer()
+            Button(Str.t("home_live_open"), action: onOpen)
+                .font(.footnote.weight(.medium))
+                .accessibilityIdentifier("home-live-nursing")
+        }
+        .foregroundStyle(SproutColor.onPrimaryContainer)
+        .padding(Spacing.snug)
+        .background(SproutColor.primaryContainer, in: RoundedRectangle(cornerRadius: Radius.control))
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                now = Clock.millis
+            }
+        }
+    }
+
+    /// A feed on a break says so here too, or the dashboard shows a side that
+    /// nobody is actually feeding on.
+    private var state: String {
+        if session.isPaused { return Str.t("feeding_paused") }
+        return session.currentSide == .RIGHT ? Str.t("side_right") : Str.t("side_left")
     }
 }
 
