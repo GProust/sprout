@@ -131,6 +131,28 @@ class NursingSessionStoreTest {
         assertNull(NursingSessionStore.load(context)?.pausedAt)
     }
 
+    /**
+     * The baby the feed was started for comes back with it, or a feed left
+     * running while the phone is killed is saved to whichever twin is selected.
+     */
+    @Test
+    fun theBabyItWasStartedForSurvivesProcessDeath() {
+        NursingSessionStore.save(context, session.copy(babyUid = "baby-lea"))
+        NursingSessionStore.forgetInMemory()
+
+        assertEquals("baby-lea", NursingSessionStore.load(context)?.babyUid)
+    }
+
+    /** A session stored before the baby was recorded names none, rather than a wrong one. */
+    @Test
+    fun aSessionFromBeforeTheBabyWasRecordedNamesNone() {
+        NursingSessionStore.save(context, session.copy(babyUid = "baby-lea"))
+        NursingSessionStore.save(context, session)
+        NursingSessionStore.forgetInMemory()
+
+        assertNull(NursingSessionStore.load(context)?.babyUid)
+    }
+
     @Test
     fun startingWhileIdleStartsTheSession() {
         val running = NursingSessionStore.startIfIdle(context, session)

@@ -15,6 +15,9 @@ import com.gproust.sprout.data.local.NursingSegment
  * it resumes. That is why every clock is read through [nursedMs] and never from
  * `now - segmentStart`: a reader that forgets the break counts the burping as
  * time at the breast, which is the one number this screen exists to get right.
+ *
+ * The session also names the baby it is timing ([babyUid]), because the feed is
+ * saved minutes later, and by then the selection may have moved to a twin.
  */
 data class NursingSession(
     val sessionStart: Long,
@@ -23,6 +26,12 @@ data class NursingSession(
     val segments: List<NursingSegment> = emptyList(),
     /** When the current break began; null while a breast is actually nursing. */
     val pausedAt: Long? = null,
+    /**
+     * The baby this feed was started for, by uid. Saving it goes to this baby,
+     * whoever is selected by then. Null only for a session left running by a
+     * version that did not record it.
+     */
+    val babyUid: String? = null,
 ) {
     val isPaused: Boolean get() = pausedAt != null
 
