@@ -16013,6 +16013,52 @@
         }
       }
     },
+    "home_live_nursing_named": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Stillen · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Feeding · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Lactancia · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Tétée · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Allattamento · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Karmienie · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Amamentação · %2$@"
+          }
+        }
+      }
+    },
     "home_live_open": {
       "localizations": {
         "de": {
@@ -19809,6 +19855,236 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eu"
+          }
+        }
+      }
+    },
+    "nursing_channel_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A breastfeed while it is being timed, with buttons to pause it, switch side and save it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une tétée pendant qu'elle est chronométrée, avec des boutons pour la mettre en pause, changer de sein et l'enregistrer"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie piersią w trakcie mierzenia czasu, z przyciskami do wstrzymania, zmiany piersi i zapisania"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma mamada enquanto está a ser cronometrada, com botões para a pausar, trocar de lado e guardar"
+          }
+        }
+      }
+    },
+    "nursing_channel_name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running breastfeed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma en curso"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée en cours"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata in corso"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada em curso"
+          }
+        }
+      }
+    },
+    "nursing_notif_feed_number": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stillmahlzeit %1$lld · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed %1$lld · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma %1$lld · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée %1$lld · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata %1$lld · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie %1$lld · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "nursing_notif_on_break": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausiert · %1$@ an der Brust"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On a break · %1$@ at the breast"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pausa · %1$@ al pecho"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pause · %1$@ au sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In pausa · %1$@ al seno"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przerwa · %1$@ przy piersi"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em pausa · %1$@ à mama"
+          }
+        }
+      }
+    },
+    "nursing_switch_side": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seite wechseln"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch side"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar de lado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia lato"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zmień pierś"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar de lado"
           }
         }
       }
@@ -28365,6 +28641,190 @@
           "stringUnit": {
             "state": "translated",
             "value": "Predefinição do sistema"
+          }
+        }
+      }
+    },
+    "settings_live_activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit auf dem Sperrbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed on the lock screen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en la pantalla de bloqueo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours sur l'écran verrouillé"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nella schermata di blocco"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie na ekranie blokady"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso no ecrã de bloqueio"
+          }
+        }
+      }
+    },
+    "settings_live_activity_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it on the lock screen and in the Dynamic Island with Pause, Switch side and Stop & save, so you don't have to unlock the phone. It never shows your baby's name."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher sur l'écran verrouillé et dans la Dynamic Island avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'y apparaît jamais."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je na ekranie blokady i w Dynamic Island z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nigdy się tam nie pojawia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la no ecrã de bloqueio e na Dynamic Island com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. Nunca mostra o nome do seu bebé."
+          }
+        }
+      }
+    },
+    "settings_nursing_notification": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit in den Benachrichtigungen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed in the notifications"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en las notificaciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours dans les notifications"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nelle notifiche"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie w powiadomieniach"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso nas notificações"
+          }
+        }
+      }
+    },
+    "settings_nursing_notification_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it in the notifications with Pause, Switch side and Stop & save, so you don't have to unlock the phone. Your baby's name stays off the lock screen unless your phone shows all notification content."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher dans les notifications avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'apparaît pas sur l'écran verrouillé, sauf si votre téléphone y affiche tout le contenu des notifications."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je w powiadomieniach z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nie pojawia się na ekranie blokady, chyba że telefon pokazuje tam pełną treść powiadomień."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la nas notificações com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. O nome do seu bebé não aparece no ecrã de bloqueio, a não ser que o telemóvel mostre lá todo o conteúdo das notificações."
           }
         }
       }
@@ -38727,6 +39187,148 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não foi possível desenhar o widget. Abra o Sprout, ou remova-o e adicione-o de novo."
+          }
+        }
+      }
+    },
+    "widget_feeds_running": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeit läuft"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeiten laufen"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feed running"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feeds running"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld toma en curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tomas en curso"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétée en cours"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétées en cours"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppata in corso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppate in corso"
+                }
+              }
+            }
+          }
+        },
+        "pl": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwają"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmień trwa"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienie trwa"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwa"
+                }
+              }
+            }
+          }
+        },
+        "pt": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamada em curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamadas em curso"
+                }
+              }
+            }
           }
         }
       }

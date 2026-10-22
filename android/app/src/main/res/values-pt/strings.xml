@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Um salto de crescimento é comum %1$s — pode começar nos próximos dias.</string>
     <string name="settings_growth_spurts">Alertas de saltos de crescimento</string>
     <string name="settings_growth_spurts_desc">Avisar-me quando começar um período típico de salto de crescimento.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">A mamada em curso nas notificações</string>
+    <string name="settings_nursing_notification_desc">Enquanto uma mamada está a ser cronometrada, mostrá-la nas notificações com Pausar, Trocar de lado e Parar &amp; guardar, sem ter de desbloquear o telemóvel. O nome do seu bebé não aparece no ecrã de bloqueio, a não ser que o telemóvel mostre lá todo o conteúdo das notificações.</string>
+    <string name="settings_live_activity">A mamada em curso no ecrã de bloqueio</string>
+    <string name="settings_live_activity_desc">Enquanto uma mamada está a ser cronometrada, mostrá-la no ecrã de bloqueio e na Dynamic Island com Pausar, Trocar de lado e Parar &amp; guardar, sem ter de desbloquear o telemóvel. Nunca mostra o nome do seu bebé.</string>
+    <string name="nursing_channel_name">Mamada em curso</string>
+    <string name="nursing_channel_desc">Uma mamada enquanto está a ser cronometrada, com botões para a pausar, trocar de lado e guardar</string>
+    <string name="nursing_switch_side">Trocar de lado</string>
+    <string name="nursing_notif_on_break">Em pausa · %1$s à mama</string>
+    <string name="nursing_notif_feed_number">Mamada %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Alertas de saltos de crescimento</string>
     <string name="growth_spurt_channel_desc">Um aviso quando começa um período típico de salto de crescimento</string>
     <string name="growth_spurt_notif_title">Pode estar a começar um salto de crescimento</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">há %1$d h</string>
     <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>
     <string name="widget_last_breast">Última mama: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d mamada em curso</item>
+        <item quantity="other">%1$d mamadas em curso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Não foi possível desenhar o widget. Abra o Sprout, ou remova-o e adicione-o de novo.</string>
@@ -600,6 +614,7 @@
     <string name="home_chip_slept">Sono %1$s</string>
     <string name="home_chip_nappy">Fralda %1$s</string>
     <string name="home_live_nursing">Amamentação · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Amamentação · %2$s</string>
     <string name="home_live_asleep">%1$s está a dormir</string>
     <string name="home_live_open">Abrir</string>
     <string name="whats_new_label">Novidades no Sprout</string>

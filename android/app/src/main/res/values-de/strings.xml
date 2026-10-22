@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Ein Wachstumsschub ist %1$s häufig — er kann in den nächsten Tagen beginnen.</string>
     <string name="settings_growth_spurts">Wachstumsschub-Hinweise</string>
     <string name="settings_growth_spurts_desc">Sag mir Bescheid, wenn eine typische Wachstumsschub-Phase beginnt.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">Laufende Stillmahlzeit in den Benachrichtigungen</string>
+    <string name="settings_nursing_notification_desc">Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte.</string>
+    <string name="settings_live_activity">Laufende Stillmahlzeit auf dem Sperrbildschirm</string>
+    <string name="settings_live_activity_desc">Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie.</string>
+    <string name="nursing_channel_name">Laufende Stillmahlzeit</string>
+    <string name="nursing_channel_desc">Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern</string>
+    <string name="nursing_switch_side">Seite wechseln</string>
+    <string name="nursing_notif_on_break">Pausiert · %1$s an der Brust</string>
+    <string name="nursing_notif_feed_number">Stillmahlzeit %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Wachstumsschub-Hinweise</string>
     <string name="growth_spurt_channel_desc">Ein Hinweis, wenn eine typische Wachstumsschub-Phase beginnt</string>
     <string name="growth_spurt_notif_title">Vielleicht beginnt gerade ein Wachstumsschub</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
     <string name="widget_last_breast">Letzte Brust: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d Stillmahlzeit läuft</item>
+        <item quantity="other">%1$d Stillmahlzeiten laufen</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Widget konnte nicht gezeichnet werden. Öffne Sprout, oder entferne es und füge es neu hinzu.</string>
@@ -600,6 +614,7 @@
     <string name="home_chip_slept">Schlaf %1$s</string>
     <string name="home_chip_nappy">Windel %1$s</string>
     <string name="home_live_nursing">Stillen · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Stillen · %2$s</string>
     <string name="home_live_asleep">%1$s schläft</string>
     <string name="home_live_open">Öffnen</string>
     <string name="whats_new_label">Neu in Sprout</string>

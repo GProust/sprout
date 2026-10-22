@@ -5,6 +5,33 @@ All notable changes to Sprout are documented here. This project follows
 
 ## [Unreleased]
 
+- 👶👶 **Twins can feed together.** Each baby can now have a breastfeed running
+  at the same time — one at each breast is timed as two feeds, side by side.
+  Start Noah's feed from his card while Léa's is running and the timer offers the
+  breast that's free; pause, switch or save one and the other carries on.
+- 🏷️ **Every running feed says whose it is.** The dashboard shows one live row
+  per feed with the baby's name on it, a baby who is feeding shows *Feeding* and
+  the clock on their own card instead of the start buttons, and the widget shows
+  both clocks under their names.
+- 👶 **A feed is saved to the baby it was started for — always.** Starting one
+  twin's feed and then tapping the other's card used to open the first feed
+  again, and saving it could file it under the wrong baby without a word. Each
+  baby now has its own timer, so that can't happen. A feed you had running when
+  you updated carries on, on the baby who was selected.
+- ⏱️ **A running feed on the lock screen.** Turn it on in Settings and a
+  breastfeed you're timing shows in the notifications — on iPhone, on the lock
+  screen and in the Dynamic Island — with the time at the breast ticking and
+  buttons to **Pause**, **Switch side** and **Stop & save**, without unlocking
+  the phone. On a break it offers **Resume left** and **Resume right**, and the
+  clock stands still, just like the timer.
+- 🤝 **The same feed, wherever you tap.** A button on the lock screen does exactly
+  what the same button on the timer does: tapping *Pause* twice doesn't restart
+  the break, and *Stop & save* twice saves one feed. Twins feeding together get
+  one each.
+- 🔒 **Nothing about your baby on a locked screen.** It reads *Feeding · Left*, or
+  *Feed 1* and *Feed 2* with twins. Android shows your baby's name only if your
+  phone is set to show all notification content; on iPhone it never does. Nothing
+  is sent anywhere to show it, and swiping it away doesn't stop the feed.
 - 🏠 **Arrange the home screen your way.** Settings → **Customise home** lists
   every log on the dashboard: move the ones you use most to the top, and switch
   off the ones you never use. Nothing is lost — a log you switch off waits under

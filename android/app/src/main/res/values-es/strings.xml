@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Es habitual un estirón de crecimiento %1$s; puede empezar en los próximos días.</string>
     <string name="settings_growth_spurts">Avisos de estirones</string>
     <string name="settings_growth_spurts_desc">Avísame cuando empiece una época típica de estirón de crecimiento.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La toma en curso en las notificaciones</string>
+    <string name="settings_nursing_notification_desc">Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones.</string>
+    <string name="settings_live_activity">La toma en curso en la pantalla de bloqueo</string>
+    <string name="settings_live_activity_desc">Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé.</string>
+    <string name="nursing_channel_name">Toma en curso</string>
+    <string name="nursing_channel_desc">Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla</string>
+    <string name="nursing_switch_side">Cambiar de lado</string>
+    <string name="nursing_notif_on_break">En pausa · %1$s al pecho</string>
+    <string name="nursing_notif_feed_number">Toma %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avisos de estirones</string>
     <string name="growth_spurt_channel_desc">Un aviso cuando empieza una época típica de estirón de crecimiento</string>
     <string name="growth_spurt_notif_title">Puede que empiece un estirón de crecimiento</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">hace %1$d h</string>
     <string name="widget_ago_hours_minutes">hace %1$d h %2$d min</string>
     <string name="widget_last_breast">Último pecho: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d toma en curso</item>
+        <item quantity="other">%1$d tomas en curso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">No se pudo dibujar el widget. Abre Sprout, o quítalo y vuelve a añadirlo.</string>
@@ -600,6 +614,7 @@
     <string name="home_chip_slept">Sueño %1$s</string>
     <string name="home_chip_nappy">Pañal %1$s</string>
     <string name="home_live_nursing">Lactancia · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Lactancia · %2$s</string>
     <string name="home_live_asleep">%1$s está durmiendo</string>
     <string name="home_live_open">Abrir</string>
     <string name="whats_new_label">Novedades en Sprout</string>

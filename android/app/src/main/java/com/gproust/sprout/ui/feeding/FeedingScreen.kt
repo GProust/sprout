@@ -92,10 +92,10 @@ import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.foods.MealFoodsEditor
 import com.gproust.sprout.ui.foods.displayName
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
-import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -118,16 +118,38 @@ class FeedingViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
 
     /**
-     * The live session, straight from the store rather than a copy of it. There
-     * can be more than one of these ViewModels alive at a time — the widget can
-     * land on a second Feeding screen while the timer is open — and a private
-     * copy each is how the same breastfeed used to be saved more than once.
+     * Every running feed, straight from the store rather than a copy of it.
+     * There can be more than one of these ViewModels alive at a time — the
+     * widget can land on a second Feeding screen while the timer is open — and
+     * a private copy each is how the same breastfeed used to be saved more than
+     * once. More than one feed, too: with twins, each baby can have one running
+     * (BDR-23), so a screen looks its own up with [runningFor].
      */
-    val nursing: StateFlow<NursingSession?> = NursingSessionStore.sessions(context)
+    val nursing: StateFlow<List<NursingSession>> = NursingSessionStore.sessions(context)
 
-    /** The widget draws the running timer, so it follows every change to it. */
+    /**
+     * The selected baby's uid: the one whose history this screen lists, and so
+     * the one whose feed its bar shows and starts.
+     */
+    val activeBabyUid: StateFlow<String?> =
+        combine(repository.parentProfile, repository.babies) { parent, babies ->
+            babies.firstOrNull { it.id == parent?.activeBabyId }?.uid
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /** Each baby's name by uid, so a timer can say whose feed it is timing. */
+    val babyNames: StateFlow<Map<String, String>> = repository.babies
+        .map { babies -> babies.associate { it.uid to it.name } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
+    /** The selected baby's uid, read now rather than whenever the flow next emits. */
+    suspend fun activeBabyUidNow(): String? = repository.activeBabyUidNow()
+
+    /**
+     * The widget and the notification draw the running timers, so they follow
+     * every change to them (BDR-24).
+     */
     private fun refreshWidget() {
-        viewModelScope.launch { updateSproutWidget(context) }
+        viewModelScope.launch { NursingActions.refreshOutside(context, repository) }
     }
 
     fun add(entity: FeedingEntity) = viewModelScope.launch {
@@ -153,98 +175,62 @@ class FeedingViewModel(
     }
 
     /**
-     * Begin timing a breastfeeding session on [side] (left or right). A session
-     * already running is left alone: two ways into the timer opening at once is
-     * not a reason to time the feed twice.
+     * Begin timing a breastfeed for [babyUid] on [side] (left or right). A feed
+     * already running for that baby is left alone: two ways into the timer
+     * opening at once is not a reason to time one baby twice. Another baby's
+     * feed is no obstacle — twins can feed together (BDR-23).
      */
-    fun startNursing(side: BreastSide) {
-        val now = System.currentTimeMillis()
-        viewModelScope.launch {
-            // The feed belongs to the baby selected now, when it starts. A
-            // dashboard card selects its baby before it opens the timer.
-            val babyUid = repository.activeBabyUidNow()
-            NursingSessionStore.startIfIdle(
-                context,
-                NursingSession(
-                    sessionStart = now,
-                    currentSide = side,
-                    segmentStart = now,
-                    babyUid = babyUid,
-                ),
-            )
-            refreshWidget()
-        }
+    fun startNursing(side: BreastSide, babyUid: String?) {
+        NursingActions.start(context, side, babyUid)
+        refreshWidget()
     }
 
-    /** Bank the current breast as a completed segment and switch to the other. */
-    fun switchBreast() {
-        val s = nursing.value ?: return
-        NursingSessionStore.save(context, s.switched(System.currentTimeMillis()))
+    /** Bank [babyUid]'s current breast as a completed segment and switch to the other. */
+    fun switchBreast(babyUid: String?) {
+        NursingActions.apply(context, babyUid, NursingControl.SWITCH)
         refreshWidget()
     }
 
     /**
-     * Bank the breast being nursed and start a break — the burp between the
-     * sides, the nappy halfway through. The session stays open and keeps its
-     * start time; only the clock at the breast stops.
+     * Bank the breast [babyUid] is nursing at and start a break — the burp
+     * between the sides, the nappy halfway through. The session stays open and
+     * keeps its start time; only the clock at the breast stops. Another baby's
+     * feed carries on.
      */
-    fun pauseNursing() {
-        val s = nursing.value ?: return
-        NursingSessionStore.save(context, s.paused(System.currentTimeMillis()))
+    fun pauseNursing(babyUid: String?) {
+        NursingActions.apply(context, babyUid, NursingControl.PAUSE)
         refreshWidget()
     }
 
-    /** Come back from a break, on whichever breast the feed carries on with. */
-    fun resumeNursing(side: BreastSide) {
-        val s = nursing.value ?: return
-        NursingSessionStore.save(context, s.resumed(side, System.currentTimeMillis()))
+    /** Come back from a break, on whichever breast [babyUid]'s feed carries on with. */
+    fun resumeNursing(babyUid: String?, side: BreastSide) {
+        val control = if (side == BreastSide.RIGHT) NursingControl.RESUME_RIGHT else NursingControl.RESUME_LEFT
+        NursingActions.apply(context, babyUid, control)
         refreshWidget()
     }
 
     /**
-     * Finish the session and persist it as a feeding.
+     * Finish [babyUid]'s session and persist it as a feeding.
      *
      * The session is *taken* from the store before anything is saved, so that
      * of everything that might still be showing this timer — a second copy of
      * the nursing screen left on the back stack, a second tap on Save — only
      * one is ever handed something to log.
      */
-    fun stopNursing(notes: String = "") {
-        val s = NursingSessionStore.consume(context) ?: return
+    fun stopNursing(babyUid: String?, notes: String = "") {
+        val s = NursingActions.take(context, babyUid) ?: return
         val now = System.currentTimeMillis()
-        val all = s.segmentsAt(now)
-        val leftMs = all.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
-        val rightMs = all.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
-        val side = when {
-            leftMs > 0 && rightMs > 0 -> BreastSide.BOTH
-            rightMs > 0 -> BreastSide.RIGHT
-            else -> BreastSide.LEFT
-        }
-        val feed = FeedingEntity(
-            type = FeedType.BREAST,
-            side = side,
-            startTime = s.sessionStart,
-            // The feed ended when the last stretch did, not when Save was
-            // tapped: a session saved from a break would otherwise carry the
-            // whole break as feeding time it never was.
-            endTime = all.lastOrNull()?.endTime ?: now,
-            leftDurationMs = leftMs.takeIf { it > 0 },
-            rightDurationMs = rightMs.takeIf { it > 0 },
-            segments = all,
-            notes = notes.ifBlank { null },
-        )
         viewModelScope.launch {
             // To the baby the session was started for, not to whoever is
             // selected now. With twins, those two are not always the same.
-            val babyId = repository.addTimedFeeding(s.babyUid, feed) ?: return@launch
-            FeedingReminders.rescheduleForBaby(context, repository, babyId)
+            NursingActions.save(context, repository, s, notes, now)
         }
         refreshWidget()
     }
 
-    /** Discard the running session without saving it. */
-    fun cancelNursing() {
-        NursingSessionStore.consume(context)
+    /** Discard [babyUid]'s running session without saving it. */
+    fun cancelNursing(babyUid: String?) {
+        NursingActions.take(context, babyUid)
         refreshWidget()
     }
 }
@@ -252,13 +238,19 @@ class FeedingViewModel(
 @Composable
 fun FeedingScreen(
     onBack: () -> Unit = {},
-    onOpenNursing: (BreastSide) -> Unit = {},
+    /** Opens the live timer on a breast, for the baby named by uid. */
+    onOpenNursing: (BreastSide, String?) -> Unit = { _, _ -> },
     vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
 ) {
     val feedings by vm.feedings.collectAsState()
     val knownFoods by vm.knownFoods.collectAsState()
     val allergies by vm.allergies.collectAsState()
-    val nursing by vm.nursing.collectAsState()
+    val sessions by vm.nursing.collectAsState()
+    val activeBabyUid by vm.activeBabyUid.collectAsState()
+    // This is the selected baby's history, so its bar is the selected baby's
+    // feed. A twin's feed running at the same time is on the dashboard, with
+    // the twin's name on it (BDR-23).
+    val nursing = sessions.runningFor(activeBabyUid)
     val context = LocalContext.current
     var editing by remember { mutableStateOf<FeedingEntity?>(null) }
     var adding by remember { mutableStateOf(false) }
@@ -328,8 +320,8 @@ fun FeedingScreen(
         bottomBar = {
             NursingBar(
                 session = nursing,
-                onStart = onOpenNursing,
-                onResume = { nursing?.let { onOpenNursing(it.currentSide) } },
+                onStart = { side -> onOpenNursing(side, activeBabyUid) },
+                onResume = { nursing?.let { onOpenNursing(it.currentSide, it.babyUid) } },
             )
         },
     ) { padding ->
@@ -426,18 +418,26 @@ private fun NursingBar(
 }
 
 /**
- * Full-screen live breastfeeding timer. Started from the feeding screen's
- * Left/Right buttons; lets you switch sides (banking each segment's duration),
- * pause for a burp and come back on either breast, and stop to save, or cancel
- * to discard. Leaving via Back keeps the session running so it can be resumed.
+ * Full-screen live breastfeeding timer, for one baby. Started from the feeding
+ * screen's Left/Right buttons or a baby's card; lets you switch sides (banking
+ * each segment's duration), pause for a burp and come back on either breast,
+ * and stop to save, or cancel to discard. Leaving via Back keeps the session
+ * running so it can be resumed.
+ *
+ * [babyUid] is the baby whose feed this is. With twins feeding together each
+ * has a timer of its own (BDR-23), and a screen that looked up "the" feed would
+ * be showing whichever came first. Null asks for the selected baby, resolved
+ * once on arrival and then held.
  */
 @Composable
 fun NursingScreen(
     side: BreastSide,
+    babyUid: String? = null,
     onDone: () -> Unit = {},
     vm: FeedingViewModel = viewModel(factory = rememberSproutViewModelFactory()),
 ) {
-    val session by vm.nursing.collectAsState()
+    val sessions by vm.nursing.collectAsState()
+    val names by vm.babyNames.collectAsState()
 
     // Whether this copy of the screen has already made its start-or-resume
     // decision. Saved, so it survives the screen sitting on the back stack
@@ -447,21 +447,34 @@ fun NursingScreen(
     // somewhere else, and starting again is how a tap that looked like
     // "resume" turned into another breastfeed.
     var arrived by rememberSaveable { mutableStateOf(false) }
+    // Whose feed this is, once known. Saved with [arrived], so a screen coming
+    // back off the stack is still the same baby's timer.
+    var baby by rememberSaveable { mutableStateOf(babyUid) }
+    var resolved by rememberSaveable { mutableStateOf(babyUid != null) }
 
     LaunchedEffect(Unit) {
         when {
-            // First time here: start a session unless one is already running
-            // (resumed from the bar, or restored after process death).
+            // First time here: start a session unless that baby already has one
+            // running (resumed from the bar, or restored after process death).
             !arrived -> {
+                if (!resolved) {
+                    baby = vm.activeBabyUidNow()
+                    resolved = true
+                }
                 arrived = true
-                if (vm.nursing.value == null) vm.startNursing(side)
+                if (vm.nursing.value.runningFor(baby) == null) vm.startNursing(side, baby)
             }
             // Back on a screen whose feed has already been saved — there is
             // nothing left to show, so step off it rather than sit on a
             // spinner or start something new.
-            vm.nursing.value == null -> onDone()
+            vm.nursing.value.runningFor(baby) == null -> onDone()
         }
     }
+
+    val session = if (resolved) sessions.runningFor(baby) else null
+    // The baby's name under the clock, once there is more than one feed it
+    // could be: with one feed running there is nothing to tell apart.
+    val name = baby?.let { names[it] }?.takeIf { sessions.size > 1 }
 
     Scaffold(
         topBar = {
@@ -476,11 +489,12 @@ fun NursingScreen(
         } else {
             NursingRunning(
                 session = s,
-                onSwitch = vm::switchBreast,
-                onPause = vm::pauseNursing,
-                onResume = vm::resumeNursing,
-                onStop = { notes -> vm.stopNursing(notes); onDone() },
-                onCancel = { vm.cancelNursing(); onDone() },
+                babyName = name,
+                onSwitch = { vm.switchBreast(s.babyUid) },
+                onPause = { vm.pauseNursing(s.babyUid) },
+                onResume = { side -> vm.resumeNursing(s.babyUid, side) },
+                onStop = { notes -> vm.stopNursing(s.babyUid, notes); onDone() },
+                onCancel = { vm.cancelNursing(s.babyUid); onDone() },
                 modifier = Modifier.fillMaxSize().padding(padding),
             )
         }
@@ -490,6 +504,7 @@ fun NursingScreen(
 @Composable
 private fun NursingRunning(
     session: NursingSession,
+    babyName: String?,
     onSwitch: () -> Unit,
     onPause: () -> Unit,
     onResume: (BreastSide) -> Unit,
@@ -523,6 +538,13 @@ private fun NursingRunning(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(8.dp))
+        if (babyName != null) {
+            Text(
+                babyName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
         Text(
             formatClock(totalMs),
             style = MaterialTheme.typography.displayMedium,

@@ -116,6 +116,7 @@ struct RootView: View {
         .task {
             let model = model ?? HomeViewModel(repository: sprout.repository, settings: sprout.settingsStore)
             self.model = model
+            model.adoptUnnamedFeed()
             await model.observeEverything()
         }
         // A file handed to Sprout by another app opens the sharing screen,

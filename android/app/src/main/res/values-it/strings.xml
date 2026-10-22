@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Uno scatto di crescita è frequente %1$s: potrebbe iniziare nei prossimi giorni.</string>
     <string name="settings_growth_spurts">Avvisi scatti di crescita</string>
     <string name="settings_growth_spurts_desc">Avvisami quando inizia un tipico periodo di scatto di crescita.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La poppata in corso nelle notifiche</string>
+    <string name="settings_nursing_notification_desc">Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche.</string>
+    <string name="settings_live_activity">La poppata in corso nella schermata di blocco</string>
+    <string name="settings_live_activity_desc">Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino.</string>
+    <string name="nursing_channel_name">Poppata in corso</string>
+    <string name="nursing_channel_desc">Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla</string>
+    <string name="nursing_switch_side">Cambia lato</string>
+    <string name="nursing_notif_on_break">In pausa · %1$s al seno</string>
+    <string name="nursing_notif_feed_number">Poppata %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avvisi scatti di crescita</string>
     <string name="growth_spurt_channel_desc">Un avviso quando inizia un tipico periodo di scatto di crescita</string>
     <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
     <string name="widget_last_breast">Ultimo seno: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d poppata in corso</item>
+        <item quantity="other">%1$d poppate in corso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Impossibile disegnare il widget. Apri Sprout, oppure rimuovilo e aggiungilo di nuovo.</string>
@@ -600,6 +614,7 @@
     <string name="home_chip_slept">Sonno %1$s</string>
     <string name="home_chip_nappy">Pannolino %1$s</string>
     <string name="home_live_nursing">Allattamento · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Allattamento · %2$s</string>
     <string name="home_live_asleep">%1$s dorme</string>
     <string name="home_live_open">Apri</string>
     <string name="whats_new_label">Novità in Sprout</string>

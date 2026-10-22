@@ -260,6 +260,20 @@ final class HomeViewModel {
         )
     }
 
+    /// Back to a running feed. Its baby is selected on the way, so the screen
+    /// that opens shows the history — and the timer — of the baby being fed.
+    func selectBaby(of session: NursingSession) {
+        guard let baby = babies.first(where: { $0.baby.uid == session.babyUid })?.baby else { return }
+        select(baby)
+    }
+
+    /// A feed left running across the update to one-feed-per-baby has no baby
+    /// recorded; it is the selected baby's, as it would have been saved
+    /// (BDR-23). Does nothing on every later launch.
+    func adoptUnnamedFeed() {
+        NursingSessionStore.shared.adoptUnnamed(activeBabyUid: try? repository.activeBabyUidNow())
+    }
+
     func tick() {
         now = Clock.millis
         recompute()
@@ -320,6 +334,9 @@ struct HomeScreen: View {
     /// started while it is still on its way down is dropped.
     @State private var pendingDestination: LogDestination?
 
+    /// Every feed running on this phone, at most one per baby (BDR-23).
+    private var sessions: [NursingSession] { NursingSessionStore.shared.sessions }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.regular) {
@@ -338,11 +355,19 @@ struct HomeScreen: View {
                         .foregroundStyle(SproutColor.primary)
                     }
 
-                    // A feed on the timer, wherever it was started from. The
-                    // shared store rather than a copy, so the row goes the
-                    // moment the feed is saved, wherever it was saved from.
-                    if let session = NursingSessionStore.shared.session {
-                        LiveNursingRow(session: session) { onOpen(.feeding) }
+                    // A feed on the timer, wherever it was started from — one
+                    // row per baby feeding, each with its name, because twins
+                    // feeding together are two timers (BDR-23). The shared
+                    // store rather than a copy, so a row goes the moment its
+                    // feed is saved, wherever it was saved from.
+                    ForEach(sessions, id: \.babyUid) { session in
+                        LiveNursingRow(
+                            session: session,
+                            name: model.babies.first { $0.baby.uid == session.babyUid }?.baby.name
+                        ) {
+                            model.selectBaby(of: session)
+                            onOpen(.feeding)
+                        }
                     }
 
                     // A baby asleep right now is the one thing on this screen
@@ -375,6 +400,7 @@ struct HomeScreen: View {
                             summary: single,
                             tiles: model.homeTiles,
                             now: model.now,
+                            sessions: sessions,
                             onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
                             onGiveMedicine: { model.giveDose(of: $0) },
@@ -402,6 +428,7 @@ struct HomeScreen: View {
                             BabyCardView(
                                 summary: summary,
                                 now: model.now,
+                                sessions: sessions,
                                 onOpen: { model.select(summary.baby) },
                                 onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                                 onGiveMedicine: { model.giveDose(of: $0) },
@@ -511,8 +538,8 @@ private struct CheckInCard: View {
     }
 }
 
-/// "Feeding · Left — 12:34", from `LiveRow` in `ui/home/HomeScreen.kt`, with the
-/// one tap back to it.
+/// "Léa · Feeding · Left — 12:34", from `LiveRow` in `ui/home/HomeScreen.kt`,
+/// with the one tap back to it.
 ///
 /// The clock is time at the breast, not time since the feed began: it stops
 /// while a break runs, exactly as the timer's does (BDR-17). It is the one thing
@@ -520,6 +547,9 @@ private struct CheckInCard: View {
 /// making the whole summary recompute every second.
 private struct LiveNursingRow: View {
     let session: NursingSession
+    /// The baby being fed. Nil only when that baby is no longer here, and then
+    /// the row says what it can.
+    let name: String?
     let onOpen: () -> Void
 
     @State private var now = Clock.millis
@@ -529,7 +559,7 @@ private struct LiveNursingRow: View {
             Image(systemName: session.isPaused ? "pause.circle.fill" : "drop.fill")
                 .foregroundStyle(SproutColor.onPrimaryContainer)
             VStack(alignment: .leading, spacing: 2) {
-                Text(Str.t("home_live_nursing", state))
+                Text(title)
                     .font(.callout.weight(.medium))
                 Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
                     .font(.footnote)
@@ -551,11 +581,19 @@ private struct LiveNursingRow: View {
         }
     }
 
-    /// A feed on a break says so here too, or the dashboard shows a side that
+    private var title: String {
+        guard let name else { return Str.t("home_live_nursing", session.stateLabel) }
+        return Str.t("home_live_nursing_named", name, session.stateLabel)
+    }
+}
+
+extension NursingSession {
+    /// The breast a running feed is at, or that it is on a break. A feed on a
+    /// break says so wherever it is shown, or the screen shows a side that
     /// nobody is actually feeding on.
-    private var state: String {
-        if session.isPaused { return Str.t("feeding_paused") }
-        return session.currentSide == .RIGHT ? Str.t("side_right") : Str.t("side_left")
+    var stateLabel: String {
+        if isPaused { return Str.t("feeding_paused") }
+        return currentSide == .RIGHT ? Str.t("side_right") : Str.t("side_left")
     }
 }
 
