@@ -63,6 +63,8 @@ import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDate
 import com.gproust.sprout.ui.foods.catalogName
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.stats.WhoSex
 import kotlinx.coroutines.Dispatchers
@@ -380,7 +382,13 @@ fun ReportScreen(babyId: Long, onBack: () -> Unit) {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.report_screen_title), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.report_screen_title),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.REPORT) },
+            )
+        },
         // The two buttons sit in a bar of their own rather than at the foot of
         // the list. Everything above them is a choice with a sensible default,
         // so the common trip through this screen is "open it, tap PDF" — and a

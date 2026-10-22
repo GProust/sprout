@@ -91,6 +91,8 @@ import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.foods.MealFoodsEditor
 import com.gproust.sprout.ui.foods.displayName
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
@@ -321,7 +323,13 @@ fun FeedingScreen(
     val joinable = remember(feedings) { breastfeedJoinOffers(feedings) }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_feeding), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_feeding),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.FEEDING) },
+            )
+        },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.feeding_log_title)) { adding = true }
         },
@@ -465,7 +473,11 @@ fun NursingScreen(
 
     Scaffold(
         topBar = {
-            SproutTopBar(stringResource(R.string.feeding_breastfeeding), onBack = onDone)
+            SproutTopBar(
+                stringResource(R.string.feeding_breastfeeding),
+                onBack = onDone,
+                actions = { HelpButton(HelpPage.FEEDING) },
+            )
         },
     ) { padding ->
         val s = session

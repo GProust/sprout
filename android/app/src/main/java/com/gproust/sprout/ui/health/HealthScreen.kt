@@ -55,6 +55,8 @@ import com.gproust.sprout.ui.common.formatDateTime
 import com.gproust.sprout.ui.common.healingFieldLabel
 import com.gproust.sprout.ui.common.label
 import com.gproust.sprout.ui.common.moodEmoji
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -96,7 +98,15 @@ fun HealthScreen(onBack: () -> Unit) {
         )
     }
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_wellbeing), onBack = onBack) }) { padding ->
+    Scaffold(
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_wellbeing),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.WELLBEING) },
+            )
+        },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),

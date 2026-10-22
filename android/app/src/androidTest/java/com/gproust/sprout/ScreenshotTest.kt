@@ -752,6 +752,14 @@ class ScreenshotTest {
         // sentence as well as the fields.
         tapDesc("Add a medicine")
         save("12-medicines-2-new")
+        // And the page's help, opened from the ? in its top bar (BDR-26): the
+        // sheet with the most to say about what Sprout does *not* do — the
+        // light as arithmetic on the parent's own figures, and "No set gap"
+        // as no gap rule at all. Shown afresh so the editor above is gone; the
+        // sheet is its own window, so it goes through the full-screen path.
+        show { MedicinesScreen {} }
+        tapDesc("Help")
+        saveScreen("12-medicines-3-help")
 
         // First foods (BDR-20): each food with its own count, tastes and
         // servings apart, and how it went where that was noted. Then the meal

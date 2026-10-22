@@ -67,6 +67,8 @@ import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.startOfDay
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -108,7 +110,13 @@ fun DiaperScreen(onBack: () -> Unit = {}) {
     val byDay = remember(diapers) { diapers.groupBy { startOfDay(it.time) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_diapers), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_diapers),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.DIAPER) },
+            )
+        },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.diaper_log_title)) { adding = true }
         },
