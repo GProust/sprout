@@ -765,7 +765,7 @@ class ScreenshotTest {
         HomeLayoutSettings.setShown(app, HomeTileIds.TREATMENTS, false)
         show { CustomiseHomeScreen(onBack = {}) }
         save("11-settings-6-customise-home-arranged")
-        show { BabyScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { BabyScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         scrollTo("More")
         save("04-baby-2-arranged")
         tap("More")
