@@ -49,6 +49,7 @@ struct TreatmentsScreen: View {
         }
         .navigationTitle(Str.t("screen_treatments"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.treatments)
         .task {
             let model = model ?? TreatmentsViewModel(repository: sprout.repository)
             self.model = model

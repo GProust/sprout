@@ -105,6 +105,7 @@ struct FoodsScreen: View {
         }
         .navigationTitle(Str.t("screen_foods"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.foods)
         .task {
             let model = model ?? FoodsViewModel(repository: sprout.repository)
             self.model = model

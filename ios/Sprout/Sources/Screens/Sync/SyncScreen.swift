@@ -28,6 +28,7 @@ struct SyncScreen: View {
         }
         .navigationTitle(Str.t("screen_sync"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.sharing)
         .task {
             let model = model ?? sprout.makeSyncViewModel()
             self.model = model

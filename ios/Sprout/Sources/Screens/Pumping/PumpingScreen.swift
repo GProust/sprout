@@ -58,6 +58,7 @@ struct PumpingScreen: View {
         }
         .navigationTitle(Str.t("screen_pumping"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.pumping)
         .task {
             let model = model ?? PumpingViewModel(repository: sprout.repository)
             self.model = model

@@ -253,6 +253,10 @@ struct HomeScreen: View {
     /// Where *Show me* goes, once the sheet has finished closing: a push
     /// started while it is still on its way down is dropped.
     @State private var pendingDestination: LogDestination?
+    /// The dashboard's own help (BDR-26). Held here rather than through
+    /// `helpButton(_:)`, so the **?** can sit last in the same toolbar as the
+    /// two buttons already in this corner.
+    @State private var showingHelp = false
 
     var body: some View {
         ScrollView {
@@ -368,7 +372,7 @@ struct HomeScreen: View {
         .navigationTitle(Str.t("app_name"))
         .navigationBarTitleDisplayMode(.inline)
         // The two ways out of the dashboard that are not logs, in the same
-        // corner Android puts them.
+        // corner Android puts them, and the page's help after them.
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { onOpen(.profile) } label: {
@@ -385,6 +389,13 @@ struct HomeScreen: View {
                 // seven languages, and a label is a different word in each.
                 .accessibilityIdentifier("home-settings")
             }
+            // Last, where every other page keeps its help (BDR-26).
+            ToolbarItem(placement: .topBarTrailing) {
+                HelpToolbarButton(page: .home) { showingHelp = true }
+            }
+        }
+        .sheet(isPresented: $showingHelp) {
+            HelpSheet(page: .home)
         }
         .sproutStyle()
         .sheet(

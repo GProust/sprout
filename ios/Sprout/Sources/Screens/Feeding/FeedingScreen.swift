@@ -147,6 +147,7 @@ struct FeedingScreen: View {
         }
         .navigationTitle(Str.t("screen_feeding"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.feeding)
         .task {
             let model = model ?? FeedingViewModel(repository: sprout.repository)
             self.model = model
@@ -665,6 +666,7 @@ private struct NursingTimerScreen: View {
             .sproutStyle()
             .navigationTitle(Str.t("feeding_breastfeeding"))
             .navigationBarTitleDisplayMode(.inline)
+            .helpButton(.feeding)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Str.t("action_close")) { dismiss() }

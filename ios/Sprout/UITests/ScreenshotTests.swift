@@ -213,6 +213,25 @@ final class ScreenshotTests: XCTestCase {
             "07-medicines-2-new: no cancel button in the medicine editor"
         )
         cancel.tap()
+
+        // And the page's help, from the ? in its navigation bar (BDR-26): the
+        // sheet with the most to say about what Sprout does *not* do — the
+        // light as arithmetic on the parent's own figures, and "No set gap" as
+        // no gap rule at all. Both by identifier, for the same reason as above.
+        let help = app.buttons["help-medicines"]
+        XCTAssertTrue(
+            help.waitForExistence(timeout: 10),
+            "07-medicines-3-help: no help button on the medicines screen"
+        )
+        help.tap()
+        let close = app.buttons["help-close"]
+        XCTAssertTrue(
+            close.waitForExistence(timeout: 10),
+            "07-medicines-3-help: tapping the help button opened nothing"
+        )
+        try file(app, named: "07-medicines-3-help", language: language, waitingFor: close)
+        close.tap()
+
         app.navigationBars.buttons.element(boundBy: 0).tap()
     }
 
