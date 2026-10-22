@@ -472,7 +472,8 @@ class ScreenshotTest {
     @OptIn(ExperimentalGlanceRemoteViewsApi::class)
     private fun saveWidget(name: String) {
         val context = instrumentation.targetContext
-        val session = NursingSessionStore.load(context)
+        val sessions = NursingSessionStore.loadAll(context)
+        val babyNames = runBlocking { app.repository.babyNamesByUid() }
         val feed = runBlocking { app.repository.lastFeedForActiveBaby() }
         val lastBreast = runBlocking {
             app.repository.lastBreastFeedForActiveBaby(
@@ -483,7 +484,7 @@ class ScreenshotTest {
         val size = DpSize(180.dp, 110.dp)
         val remoteViews = runBlocking {
             GlanceRemoteViews().compose(context, size) {
-                GlanceTheme { SproutWidgetUi(session, feed, lastBreast, babyName) }
+                GlanceTheme { SproutWidgetUi(sessions, babyNames, feed, lastBreast, babyName) }
             }.remoteViews
         }
         val density = context.resources.displayMetrics.density
@@ -570,11 +571,11 @@ class ScreenshotTest {
         // Single-page screens. Two babies are seeded, so Home is the household
         // dashboard: a card each for Léa and Noah, carrying their own numbers
         // and their own feed button.
-        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { HomeScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         save("04-home")
         // The picked baby's own tab — the same pane the dashboard shows in
         // place when a family has only one child.
-        show { BabyScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { BabyScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         save("04-baby")
         // The parent's tab: the two logs that belong to a person rather than to
         // a child, plus the daily check-in.
@@ -841,7 +842,7 @@ class ScreenshotTest {
         // baby has no baby tab to find it on. Scrolled to the foot of the
         // pane, where that button and "See the statistics" sit.
         runBlocking { app.repository.archiveBaby(noahId) }
-        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { HomeScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         scrollTo("Share a record")
         save("04-home-2-one-baby")
     }

@@ -435,6 +435,10 @@
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
     <string name="widget_last_breast">Letzte Brust: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d Stillmahlzeit läuft</item>
+        <item quantity="other">%1$d Stillmahlzeiten laufen</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Widget konnte nicht gezeichnet werden. Öffne Sprout, oder entferne es und füge es neu hinzu.</string>
@@ -588,6 +592,7 @@
     <string name="home_chip_slept">Schlaf %1$s</string>
     <string name="home_chip_nappy">Windel %1$s</string>
     <string name="home_live_nursing">Stillen · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Stillen · %2$s</string>
     <string name="home_live_asleep">%1$s schläft</string>
     <string name="home_live_open">Öffnen</string>
     <string name="whats_new_label">Neu in Sprout</string>

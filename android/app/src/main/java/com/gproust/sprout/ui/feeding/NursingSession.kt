@@ -1,6 +1,8 @@
 package com.gproust.sprout.ui.feeding
 
 import com.gproust.sprout.data.local.BreastSide
+import com.gproust.sprout.data.local.FeedType
+import com.gproust.sprout.data.local.FeedingEntity
 import com.gproust.sprout.data.local.NursingSegment
 
 /**
@@ -73,6 +75,39 @@ data class NursingSession(
      * sides has always been.
      */
     fun switched(at: Long): NursingSession = paused(at).resumed(currentSide.other(), at)
+}
+
+/**
+ * The feed this session saves as, stopped at [now]: every stretch so far, the
+ * side or sides they were on, and [notes] if any. Its baby is not set here —
+ * that is resolved from [NursingSession.babyUid] by the repository, which is the
+ * only place that stamps a row.
+ *
+ * One function for every way a feed can be stopped, so a feed saved from the
+ * timer screen and one saved from anywhere else are the same feed.
+ */
+fun NursingSession.toFeeding(now: Long, notes: String = ""): FeedingEntity {
+    val all = segmentsAt(now)
+    val leftMs = all.filter { it.side == BreastSide.LEFT }.sumOf { it.endTime - it.startTime }
+    val rightMs = all.filter { it.side == BreastSide.RIGHT }.sumOf { it.endTime - it.startTime }
+    val side = when {
+        leftMs > 0 && rightMs > 0 -> BreastSide.BOTH
+        rightMs > 0 -> BreastSide.RIGHT
+        else -> BreastSide.LEFT
+    }
+    return FeedingEntity(
+        type = FeedType.BREAST,
+        side = side,
+        startTime = sessionStart,
+        // The feed ended when the last stretch did, not when Save was tapped:
+        // a session saved from a break would otherwise carry the whole break as
+        // feeding time it never was.
+        endTime = all.lastOrNull()?.endTime ?: now,
+        leftDurationMs = leftMs.takeIf { it > 0 },
+        rightDurationMs = rightMs.takeIf { it > 0 },
+        segments = all,
+        notes = notes.ifBlank { null },
+    )
 }
 
 /** The other breast. [BreastSide.BOTH] is a property of a saved feed, never of a live one. */

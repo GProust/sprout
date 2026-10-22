@@ -3,6 +3,22 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 👶👶 **Twins can feed together.** Each baby can now have a breastfeed running
+  at the same time — one at each breast is timed as two feeds, side by side.
+  Start Noah's feed from his card while Léa's is running and the timer offers the
+  breast that's free; pause, switch or save one and the other carries on.
+- 🏷️ **Every running feed says whose it is.** The dashboard shows one live row
+  per feed with the baby's name on it, a baby who is feeding shows *Feeding* and
+  the clock on their own card instead of the start buttons, and the widget shows
+  both clocks under their names.
+- 👶 **A feed is saved to the baby it was started for — always.** Starting one
+  twin's feed and then tapping the other's card used to open the first feed
+  again, and saving it could file it under the wrong baby without a word. Each
+  baby now has its own timer, so that can't happen. A feed you had running when
+  you updated carries on, on the baby who was selected.
+
 ## [1.14.0] — 2026-10-20
 
 - 🥕 **A page for first foods.** Logging a solid meal now lets you list what was

@@ -46,11 +46,13 @@ private const val CHIP_REFRESH_MS = 60_000L
 @Composable
 fun BabyScreen(
     onNavigate: (String) -> Unit,
-    onQuickFeed: (BreastSide) -> Unit,
+    /** Opens the live timer on a breast, for the baby named by uid. */
+    onQuickFeed: (BreastSide, String?) -> Unit,
     onShareRecord: (Long) -> Unit = {},
 ) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val sessions by vm.nursing.collectAsState()
     val activeId by vm.activeBabyId.collectAsState()
     val context = LocalContext.current
 
@@ -91,7 +93,8 @@ fun BabyScreen(
                 summary = summary,
                 tracksWellbeing = state.tracksWellbeing,
                 now = now,
-                onFeed = onQuickFeed,
+                sessions = sessions,
+                onFeed = { side -> onQuickFeed(side, summary.baby.uid) },
                 onNavigate = onNavigate,
                 onGiveMedicine = vm::giveDose,
                 onDismissMedicine = vm::dismiss,
