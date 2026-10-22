@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🏠 **Arrange the home screen your way.** Settings → **Customise home** lists
+  every log on the dashboard: move the ones you use most to the top, and switch
+  off the ones you never use. Nothing is lost — a log you switch off waits under
+  a **More** tile at the end of the grid, keeps sharing with your household's
+  phones, and still counts in Trends and in the record for your doctor. Nothing
+  changes until you change it, and **Restore the default order** puts it back.
+  Each row also moves with TalkBack or VoiceOver, no dragging needed.
+
 ## [1.14.0] — 2026-10-20
 
 - 🥕 **A page for first foods.** Logging a solid meal now lets you list what was

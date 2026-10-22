@@ -529,6 +529,18 @@
     <string name="screen_sync">Household sharing</string>
     <string name="settings_sharing">Sharing</string>
     <string name="settings_sync_hint">Share this baby\'s record with the other people looking after them — no account, no cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Home screen</string>
+    <string name="screen_customise_home">Customise home</string>
+    <string name="settings_customise_home_hint">Choose which logs the home screen shows, and in which order.</string>
+    <string name="customise_home_intro">Put the logs you use most first, and switch off the ones you don\'t use. Nothing is lost: a log that\'s switched off waits under More at the end of the grid, keeps sharing with your household\'s phones, and still counts in Trends and in the record for your doctor.</string>
+    <string name="customise_home_shown">Shown on home</string>
+    <string name="customise_home_hidden">Hidden, under More</string>
+    <string name="customise_home_move_up">Move up</string>
+    <string name="customise_home_move_down">Move down</string>
+    <string name="customise_home_moved">%1$s, position %2$d of %3$d</string>
+    <string name="customise_home_restore">Restore the default order</string>
+    <string name="home_more">More</string>
     <string name="sync_intro_title">One record, every phone in the household</string>
     <string name="sync_intro_body">Invite the other parent — or a grandparent who has the baby regularly. Once a phone has joined, everyone can send their entries across and Sprout merges them: no account, no server, and nothing kept anywhere but your own phones.</string>
     <string name="sync_invite">Invite a phone</string>

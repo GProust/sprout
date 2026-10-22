@@ -18,7 +18,7 @@ struct BabyScreen: View {
                     VStack(alignment: .leading, spacing: Spacing.regular) {
                         BabyPane(
                             summary: summary,
-                            tracksWellbeing: model.tracksWellbeing,
+                            tiles: model.homeTiles,
                             now: model.now,
                             onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,

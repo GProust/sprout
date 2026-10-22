@@ -33,6 +33,9 @@ import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
 import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.gproust.sprout.data.HOME_TILE_IDS
+import com.gproust.sprout.data.HomeTileIds
+import com.gproust.sprout.data.moveTile
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
@@ -61,7 +64,9 @@ import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.sync.Pairing
 import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.NearbySettings
+import com.gproust.sprout.ui.settings.CustomiseHomeScreen
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
+import com.gproust.sprout.ui.settings.HomeLayoutSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -333,6 +338,9 @@ class ScreenshotTest {
         // The "what's new" card is for a phone that has just updated. These
         // captures show the dashboard as it is every other day (BDR-22).
         WhatsNewSettings.markAllSeen(app)
+        // The grid as a phone nobody has arranged draws it (BDR-25): every
+        // tile, today's order, no More — whatever an earlier run left behind.
+        HomeLayoutSettings.clear(app)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
@@ -737,6 +745,31 @@ class ScreenshotTest {
         scrollToCheckInSection()
         save("11-settings-4-checkin-off")
         runBlocking { app.repository.setTrackWellbeing(true) }
+        // Customise home (BDR-25): every log with its switch and its two
+        // arrows, in the order the dashboard draws them — all on, as every
+        // phone starts.
+        show { CustomiseHomeScreen(onBack = {}) }
+        save("11-settings-5-customise-home")
+        // The same list as a family that bottle-feeds and has no treatment
+        // running might leave it: nappies moved up beside feeds, pumping and
+        // treatments put away. Then the baby's own tab drawing that, with the
+        // two waiting behind More, and the menu that lists them — a popup, so
+        // through the full-screen path. Put back afterwards, so every capture
+        // after these shows the grid every phone starts with.
+        HomeLayoutSettings.setOrder(
+            app,
+            moveTile(HOME_TILE_IDS, emptyList(), HomeTileIds.DIAPER, -2, tracksWellbeing = true),
+        )
+        HomeLayoutSettings.setShown(app, HomeTileIds.PUMPING, false)
+        HomeLayoutSettings.setShown(app, HomeTileIds.TREATMENTS, false)
+        show { CustomiseHomeScreen(onBack = {}) }
+        save("11-settings-6-customise-home-arranged")
+        show { BabyScreen(onNavigate = {}, onQuickFeed = {}) }
+        scrollTo("More")
+        save("04-baby-2-arranged")
+        tap("More")
+        saveScreen("04-baby-3-more")
+        HomeLayoutSettings.clear(app)
         show { TreatmentsScreen {} }
         save("12-treatments")
 

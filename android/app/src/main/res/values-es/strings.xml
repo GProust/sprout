@@ -443,6 +443,18 @@
     <string name="screen_sync">Compartir en el hogar</string>
     <string name="settings_sharing">Compartir</string>
     <string name="settings_sync_hint">Comparte el registro del bebé con las demás personas que lo cuidan: sin cuenta y sin nube.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Pantalla de inicio</string>
+    <string name="screen_customise_home">Personalizar el inicio</string>
+    <string name="settings_customise_home_hint">Elige qué muestra la pantalla de inicio y en qué orden.</string>
+    <string name="customise_home_intro">Pon primero lo que más registras y desactiva lo que no usas. No se pierde nada: lo desactivado espera en Más, al final de la cuadrícula, se sigue compartiendo con los teléfonos del hogar y sigue contando en Tendencias y en el registro para tu médico.</string>
+    <string name="customise_home_shown">Visible en el inicio</string>
+    <string name="customise_home_hidden">Oculto, en Más</string>
+    <string name="customise_home_move_up">Subir</string>
+    <string name="customise_home_move_down">Bajar</string>
+    <string name="customise_home_moved">%1$s, posición %2$d de %3$d</string>
+    <string name="customise_home_restore">Restablecer el orden predeterminado</string>
+    <string name="home_more">Más</string>
     <string name="sync_intro_title">Un solo registro, todos los teléfonos del hogar</string>
     <string name="sync_intro_body">Invita a la otra madre o al otro padre, o a una abuela que se queda con el bebé a menudo. Cuando un teléfono se une, cada persona puede enviar sus entradas y Sprout las combina: sin cuenta, sin servidor y sin que nada se guarde fuera de vuestros propios teléfonos.</string>
     <string name="sync_invite">Invitar a un teléfono</string>

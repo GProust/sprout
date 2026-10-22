@@ -22,6 +22,10 @@ final class HomeViewModel {
     /// The announcements the "New in Sprout" card offers, newest first; empty
     /// means no card (BDR-22).
     private(set) var whatsNew: [Int] = []
+    /// How this parent has arranged the log grid (BDR-25). Read once and held:
+    /// the store behind it is a plain key-value store, not an observable one,
+    /// and this model is the only thing that writes it.
+    private(set) var homeArrangement = HomeArrangement()
 
     /// Coarse enough for "2 h ago". The screen re-reads it on a timer rather
     /// than per frame; nothing here needs a second hand.
@@ -33,6 +37,8 @@ final class HomeViewModel {
     private let dismissals: MedicineDismissals
     /// What this parent has already read of what's new (BDR-22).
     private let whatsNewSettings: WhatsNewSettings
+    /// Where ``homeArrangement`` is kept: this phone's, backed up, never synced.
+    private let homeLayout: HomeLayoutSettings
 
     /// How far back a "last fed" can be found — the same week Android reads. It
     /// only bounds the read, so a few hours of drift over a long-lived process
@@ -43,7 +49,10 @@ final class HomeViewModel {
         self.repository = repository
         self.dismissals = MedicineDismissals(store: settings)
         self.whatsNewSettings = WhatsNewSettings(store: settings)
+        let homeLayout = HomeLayoutSettings(store: settings)
+        self.homeLayout = homeLayout
         self.latestDismissals = dismissals.all()
+        self.homeArrangement = homeLayout.arrangement
     }
 
     /// Eight observations feeding one summary.
@@ -164,6 +173,63 @@ final class HomeViewModel {
             lastCheckIn: profile.lastCheckIn,
             now: Clock.millis
         )
+    }
+
+    // MARK: - The log grid, as this parent arranged it (BDR-25)
+
+    /// What the grid draws, on the dashboard and on each baby's tab alike.
+    /// Wellbeing follows its own master switch (BDR-0006) whatever was stored.
+    var homeTiles: HomeTiles {
+        arrangeTiles(
+            defaults: homeTileIds,
+            storedOrder: homeArrangement.order,
+            hidden: homeArrangement.hidden,
+            tracksWellbeing: tracksWellbeing
+        )
+    }
+
+    /// What *Customise home* lists, in order: every tile, wellbeing only while
+    /// it is tracked.
+    var customisableTiles: [String] {
+        listedTiles(defaults: homeTileIds, storedOrder: homeArrangement.order, tracksWellbeing: tracksWellbeing)
+    }
+
+    /// *Move up* (-1) or *Move down* (+1) in *Customise home*.
+    func move(tile id: String, by offset: Int) {
+        storeTileOrder(
+            moveTile(
+                defaults: homeTileIds,
+                storedOrder: homeArrangement.order,
+                id: id,
+                by: offset,
+                tracksWellbeing: tracksWellbeing
+            )
+        )
+    }
+
+    /// A drag in *Customise home*, in the offsets of ``customisableTiles``.
+    func moveTiles(fromOffsets source: IndexSet, toOffset destination: Int) {
+        var listed = customisableTiles
+        listed.move(fromOffsets: source, toOffset: destination)
+        storeTileOrder(reorderTiles(defaults: homeTileIds, storedOrder: homeArrangement.order, listed: listed))
+    }
+
+    /// Shows a tile on the grid, or puts it behind *More*. Only ever the
+    /// parent's act: nothing in the app hides a log on its own.
+    func setTile(_ id: String, shown: Bool) {
+        homeLayout.setShown(id, shown)
+        homeArrangement = homeLayout.arrangement
+    }
+
+    /// Back to the default order; what is hidden stays hidden.
+    func restoreDefaultTileOrder() {
+        homeLayout.restoreDefaultOrder()
+        homeArrangement = homeLayout.arrangement
+    }
+
+    private func storeTileOrder(_ order: [String]) {
+        homeLayout.setOrder(order)
+        homeArrangement = homeLayout.arrangement
     }
 
     /// Read or put away: either way, the card has done its job (BDR-22).
@@ -307,7 +373,7 @@ struct HomeScreen: View {
                         // than it used to be (BDR-0009).
                         BabyPane(
                             summary: single,
-                            tracksWellbeing: model.tracksWellbeing,
+                            tiles: model.homeTiles,
                             now: model.now,
                             onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,

@@ -47,6 +47,9 @@ struct SettingsScreen: View {
                 questionsSection(profile)
             }
 
+            // After the check-in, whose switch decides whether the wellbeing
+            // tile is there to arrange at all, and before sharing (BDR-25).
+            homeSection
             sharingSection
             supportSection
         }
@@ -259,6 +262,26 @@ struct SettingsScreen: View {
             repository: sprout.repository,
             settings: sprout.settingsStore
         )
+    }
+
+    // MARK: - Home screen
+
+    /// The way in to arranging the dashboard's log grid (BDR-25).
+    private var homeSection: some View {
+        Section(Str.t("settings_home")) {
+            NavigationLink(value: LogDestination.customiseHome) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(Str.t("screen_customise_home"))
+                        // On the `Text`, for the reason the sharing row below
+                        // gives: a link's own identifier does not reach the
+                        // accessibility tree from inside a `Form`.
+                        .accessibilityIdentifier("settings-customise-home")
+                    Text(Str.t("settings_customise_home_hint"))
+                        .font(.caption)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                }
+            }
+        }
     }
 
     // MARK: - Sharing

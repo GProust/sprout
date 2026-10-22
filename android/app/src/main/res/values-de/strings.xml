@@ -443,6 +443,18 @@
     <string name="screen_sync">Haushalt teilen</string>
     <string name="settings_sharing">Teilen</string>
     <string name="settings_sync_hint">Teile die Aufzeichnungen des Babys mit den anderen, die sich kümmern — ohne Konto, ohne Cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Startbildschirm</string>
+    <string name="screen_customise_home">Start anpassen</string>
+    <string name="settings_customise_home_hint">Wähle, was der Startbildschirm zeigt und in welcher Reihenfolge.</string>
+    <string name="customise_home_intro">Stell nach vorn, was du am meisten einträgst, und schalte aus, was du nicht brauchst. Dabei geht nichts verloren: Was ausgeschaltet ist, wartet unter Mehr am Ende des Rasters, wird weiter mit den Handys im Haushalt geteilt und zählt weiter in den Trends und im Bericht für die Ärztin oder den Arzt.</string>
+    <string name="customise_home_shown">Auf dem Startbildschirm</string>
+    <string name="customise_home_hidden">Ausgeblendet, unter Mehr</string>
+    <string name="customise_home_move_up">Nach oben</string>
+    <string name="customise_home_move_down">Nach unten</string>
+    <string name="customise_home_moved">%1$s, Position %2$d von %3$d</string>
+    <string name="customise_home_restore">Standardreihenfolge wiederherstellen</string>
+    <string name="home_more">Mehr</string>
     <string name="sync_intro_title">Eine Aufzeichnung, alle Handys im Haushalt</string>
     <string name="sync_intro_body">Lade den anderen Elternteil ein — oder eine Großmutter, die das Baby regelmäßig hat. Sobald ein Handy dazugehört, kann jeder seine Einträge hinüberschicken und Sprout führt sie zusammen: ohne Konto, ohne Server und ohne dass irgendetwas woanders liegt als auf euren eigenen Handys.</string>
     <string name="sync_invite">Ein Handy einladen</string>

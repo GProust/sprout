@@ -443,6 +443,18 @@
     <string name="screen_sync">Partilha do agregado</string>
     <string name="settings_sharing">Partilha</string>
     <string name="settings_sync_hint">Partilhe o registo do bebé com as outras pessoas que cuidam dele — sem conta e sem nuvem.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Ecrã inicial</string>
+    <string name="screen_customise_home">Personalizar o início</string>
+    <string name="settings_customise_home_hint">Escolha o que o ecrã inicial mostra e por que ordem.</string>
+    <string name="customise_home_intro">Ponha primeiro o que regista mais e desative o que não usa. Nada se perde: o que estiver desativado espera em Mais, no fim da grelha, continua a ser partilhado com os telemóveis do agregado e continua a contar nas Tendências e no registo para o médico.</string>
+    <string name="customise_home_shown">Visível no início</string>
+    <string name="customise_home_hidden">Oculto, em Mais</string>
+    <string name="customise_home_move_up">Mover para cima</string>
+    <string name="customise_home_move_down">Mover para baixo</string>
+    <string name="customise_home_moved">%1$s, posição %2$d de %3$d</string>
+    <string name="customise_home_restore">Repor a ordem predefinida</string>
+    <string name="home_more">Mais</string>
     <string name="sync_intro_title">Um só registo, todos os telemóveis do agregado</string>
     <string name="sync_intro_body">Convide a outra mãe ou o outro pai, ou uma avó que fica com o bebé com regularidade. Assim que um telemóvel entra, cada um pode enviar os seus registos e o Sprout junta-os: sem conta, sem servidor e sem nada guardado fora dos vossos próprios telemóveis.</string>
     <string name="sync_invite">Convidar um telemóvel</string>
