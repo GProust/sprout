@@ -25,8 +25,9 @@ ADR log and are cross-linked from here.
   platform genuinely forces a different *mechanism* the record for it is an ADR
   ([ADR-0017](../adr/0017-grdb-for-the-ios-database.md),
   [ADR-0018](../adr/0018-where-ios-keeps-what-must-not-travel.md),
-  [ADR-0019](../adr/0019-a-reminder-decided-when-it-is-scheduled.md) are the
-  only three), and it changes nothing a BDR decided. The rule and its reasoning
+  [ADR-0019](../adr/0019-a-reminder-decided-when-it-is-scheduled.md),
+  [ADR-0020](../adr/0020-the-live-activity-is-the-one-ios-extension.md) are the
+  only four), and it changes nothing a BDR decided. The rule and its reasoning
   are in the [ADR log's conventions](../adr/README.md#one-decision-both-apps).
 - A capability one app has first is **not** a second decision. It is the same
   one, not yet built twice.
@@ -57,6 +58,10 @@ ADR log and are cross-linked from here.
 | [0020](0020-a-solid-meal-says-what-was-in-it.md) | A solid meal says what was in it, and each food keeps its own count | Product / Domain | Accepted |
 | [0021](0021-a-babys-allergies-as-the-household-knows-them.md) | A baby's allergies, as the household comes to know them | Product / Domain | Accepted |
 | [0022](0022-whats-new-is-a-card-the-parent-puts-away.md) | What's new is a card on the dashboard, and the parent puts it away | Product / UX | Accepted |
+| [0023](0023-one-running-breastfeed-per-baby.md) | A breastfeed belongs to the baby it was started for, and each baby can have one running | Product / Domain | Accepted |
+| [0024](0024-a-running-feed-outside-the-app.md) | A running feed is shown outside the app, and can be paused, switched and stopped from there | Product / UX | Accepted |
+| [0025](0025-the-home-screen-is-the-parents-to-arrange.md) | The home screen's logs are the parent's to arrange | Product / UX | Accepted |
+| [0026](0026-help-on-every-page-on-demand.md) | Help is on every page, on demand, and it explains the app, never the baby | Product / UX | Accepted |
 | [0027](0027-a-tour-after-onboarding-once-and-never-in-the-way.md) | A tour after onboarding, once, and never in the way | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

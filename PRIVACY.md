@@ -1,6 +1,6 @@
 # Privacy Policy — Sprout
 
-_Last updated: 2026-10-17 — see [Change history](#change-history) at the end._
+_Last updated: 2026-10-22 — see [Change history](#change-history) at the end._
 
 Sprout is a newborn and postpartum tracker for Android. This policy explains
 what the app does — and does not do — with your information.
@@ -146,6 +146,26 @@ them back to you.
   It is a list of what was logged, with no comment on it, and you can switch it
   off for that file.
 
+## A breastfeed on the lock screen
+
+If you switch it on in Settings, a breastfeed you are timing is shown outside the
+app — in the notifications on Android, as a Live Activity on the lock screen and
+in the Dynamic Island on iPhone — with buttons to pause it, switch side and save
+it.
+
+- **What a locked phone shows** is what the feed is, never whose it is:
+  *Feeding · Left* and the time at the breast, or *Feed 1* and *Feed 2* when two
+  are running. On Android, the notification's full version also names your baby;
+  your phone shows that version on the lock screen only if it is set to show all
+  notification content. On iPhone the baby's name is never shown there.
+- **Nothing leaves your phone** to show it or to answer its buttons. Your own phone
+  draws it from the feed you are timing, a button writes to the same database on
+  the same phone, and a feed in progress is still not shared with your household's
+  other phones until it is saved. The Android notification is not passed on to a
+  watch or another device, and the iPhone's Live Activity is updated by the app
+  alone — there is no server to update it from.
+- **It is off until you turn it on**, and turning it off takes it away at once.
+
 ## Children's data
 
 Sprout is a tool used by parents/caregivers to record information about an
@@ -215,7 +235,8 @@ out where you are, and Sprout never asks for the location permission at all. The
 scan is used solely to spot a phone from your own household, lasts a few seconds
 when you open the app, and never runs in the background.
 
-Sprout also asks to show notifications, if you turn on reminders.
+Sprout also asks to show notifications, if you turn on reminders or a breastfeed
+on the lock screen.
 
 ## Changes to this policy
 
@@ -227,6 +248,14 @@ source repository with a new "Last updated" date.
 Every change to this policy, with what actually changed. The repository keeps
 the full history, but a policy you have to run `git log` to understand is not
 one you can check.
+
+### 2026-10-22
+
+- Added the section on **a breastfeed on the lock screen**: what a locked phone
+  shows when you switch it on, that the baby's name is left off it, and that
+  nothing is sent anywhere to show it or to answer its buttons. The permissions
+  section now says the notification permission is also asked for when you turn
+  this on. Nothing about what Sprout collects or sends has changed.
 
 ### 2026-10-17
 

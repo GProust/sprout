@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Uno scatto di crescita è frequente %1$s: potrebbe iniziare nei prossimi giorni.</string>
     <string name="settings_growth_spurts">Avvisi scatti di crescita</string>
     <string name="settings_growth_spurts_desc">Avvisami quando inizia un tipico periodo di scatto di crescita.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La poppata in corso nelle notifiche</string>
+    <string name="settings_nursing_notification_desc">Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche.</string>
+    <string name="settings_live_activity">La poppata in corso nella schermata di blocco</string>
+    <string name="settings_live_activity_desc">Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino.</string>
+    <string name="nursing_channel_name">Poppata in corso</string>
+    <string name="nursing_channel_desc">Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla</string>
+    <string name="nursing_switch_side">Cambia lato</string>
+    <string name="nursing_notif_on_break">In pausa · %1$s al seno</string>
+    <string name="nursing_notif_feed_number">Poppata %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avvisi scatti di crescita</string>
     <string name="growth_spurt_channel_desc">Un avviso quando inizia un tipico periodo di scatto di crescita</string>
     <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
     <string name="widget_last_breast">Ultimo seno: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d poppata in corso</item>
+        <item quantity="other">%1$d poppate in corso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Impossibile disegnare il widget. Apri Sprout, oppure rimuovilo e aggiungilo di nuovo.</string>
@@ -443,6 +457,18 @@
     <string name="screen_sync">Condivisione in famiglia</string>
     <string name="settings_sharing">Condivisione</string>
     <string name="settings_sync_hint">Condividi il diario del bambino con le altre persone che se ne occupano: nessun account, nessun cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Schermata Home</string>
+    <string name="screen_customise_home">Personalizza la Home</string>
+    <string name="settings_customise_home_hint">Scegli cosa mostra la Home e in quale ordine.</string>
+    <string name="customise_home_intro">Metti per primo ciò che registri di più e disattiva ciò che non usi. Non si perde nulla: ciò che è disattivato aspetta in Altro, alla fine della griglia, continua a essere condiviso con i telefoni della famiglia e conta ancora in Andamento e nel resoconto per il medico.</string>
+    <string name="customise_home_shown">Visibile nella Home</string>
+    <string name="customise_home_hidden">Nascosto, in Altro</string>
+    <string name="customise_home_move_up">Sposta su</string>
+    <string name="customise_home_move_down">Sposta giù</string>
+    <string name="customise_home_moved">%1$s, posizione %2$d di %3$d</string>
+    <string name="customise_home_restore">Ripristina l\'ordine predefinito</string>
+    <string name="home_more">Altro</string>
     <string name="sync_intro_title">Un solo diario, tutti i telefoni della famiglia</string>
     <string name="sync_intro_body">Invita l\'altro genitore, o un nonno che tiene il bambino spesso. Quando un telefono entra, ciascuno può inviare le proprie voci e Sprout le unisce: nessun account, nessun server e niente conservato al di fuori dei vostri telefoni.</string>
     <string name="sync_invite">Invita un telefono</string>
@@ -588,6 +614,7 @@
     <string name="home_chip_slept">Sonno %1$s</string>
     <string name="home_chip_nappy">Pannolino %1$s</string>
     <string name="home_live_nursing">Allattamento · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Allattamento · %2$s</string>
     <string name="home_live_asleep">%1$s dorme</string>
     <string name="home_live_open">Apri</string>
     <string name="whats_new_label">Novità in Sprout</string>
@@ -596,6 +623,62 @@
     <string name="cd_whats_new_dismiss">Nascondi le novità</string>
     <string name="whats_new_1_title">Svezzamento</string>
     <string name="whats_new_1_body">Un pasto solido ora può dire cosa conteneva, e la pagina Svezzamento raccoglie ogni alimento che il tuo bambino ha conosciuto: quante volte, la prima e l\'ultima. Anche le allergie note hanno un posto tutto loro.</string>
+    <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
+    <string name="cd_help">Aiuto</string>
+    <string name="help_section_purpose">A cosa serve questa pagina</string>
+    <string name="help_section_how">Come si usa</string>
+    <string name="help_section_good_to_know">Buono a sapersi</string>
+    <string name="help_home_purpose">Tutta la famiglia a colpo d\'occhio: per ogni bambino, da quanto ha mangiato, dormito ed è stato cambiato, e cosa è in corso adesso.</string>
+    <string name="help_home_how">Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l\'ultima poppata, e l\'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino. Per scegliere quali riquadri compaiono e in che ordine, apri «Personalizza la Home» nelle Impostazioni; un riquadro disattivato aspetta in «Altro».\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio. I gemelli possono poppare insieme: ogni poppata in corso ha la sua riga, con il nome del bambino.</string>
+    <string name="help_home_good_to_know">Alcune schede compaiono solo quando hanno qualcosa da dire: il check-in quotidiano, una nota alle età in cui gli scatti di crescita sono frequenti, un farmaco con un\'attesa in corso e le novità dopo un aggiornamento. Nessuna ti ostacola. Le icone in alto aprono i tuoi bambini e le impostazioni.</string>
+    <string name="help_baby_purpose">Un bambino per conto suo: la stessa vista che la dashboard mostra quando c\'è un solo figlio, per il bambino che hai scelto.</string>
+    <string name="help_baby_how">Avvia una poppata, apri un registro dai riquadri, guarda i totali di oggi o passa alle statistiche e a «Condividi un resoconto». Per passare a un altro bambino, tocca la sua scheda nella dashboard.</string>
+    <string name="help_baby_good_to_know">Questa pagina compare quando i bambini sono almeno due e porta il nome di quello che hai scelto. Ogni registro che apri da qui è di quel bambino.</string>
+    <string name="help_trends_purpose">Cosa sommano i registri, giorno per giorno: pasti, sonno e pannolini, e la crescita rispetto agli standard dell\'OMS.</string>
+    <string name="help_trends_how">Scegli 7, 30 o 90 giorni. Ogni scheda mostra una media al giorno e una barra per ogni giorno; nella scheda dei pasti, scegli quale valore mostrare. Tocca una barra per vedere di cosa era fatta quella giornata, e trascina di lato o usa le frecce per tornare indietro nel tempo. I grafici si muovono insieme.\n\nNella scheda della crescita, tocca una misura per leggerla rispetto alle curve.</string>
+    <string name="help_trends_good_to_know">Le medie contano solo i giorni completi, così un oggi a metà non le abbassa, e un giorno senza nulla registrato conta come zero. Il periodo non va mai oltre la nascita.\n\nL\'area colorata sono gli standard dell\'OMS dal 3° al 97° percentile. Sprout non chiede mai il sesso del bambino, quindi ogni misura viene letta sulla curva delle femmine e su quella dei maschi e data come intervallo, per esempio P22–P34. Scegliere femmine o maschi cambia solo la curva sullo schermo e non viene salvato.</string>
+    <string name="help_you_purpose">Il tuo spazio: il tiralatte, il tuo benessere e il check-in quotidiano, ciò che riguarda te e non un bambino.</string>
+    <string name="help_you_how">Apri «Tiralatte» per le tue sessioni e la scorta di latte, «Benessere» per ripercorrere come ti senti nel tempo, o il check-in per rispondere alle poche domande di oggi.</string>
+    <string name="help_you_good_to_know">Tutto questo è tuo, non di un bambino: eliminare un bambino non lo tocca. Il tuo benessere e i tuoi check-in non lasciano mai questo telefono. Se disattivi il check-in quotidiano nelle impostazioni, spariscono entrambi da qui e tutto ciò che hai annotato resta.</string>
+    <string name="help_feeding_purpose">Tutti i pasti del bambino scelto — seno, biberon e solidi — dal più recente, e il timer per la poppata al seno.</string>
+    <string name="help_feeding_how">«Inizia a sinistra» o «Inizia a destra» apre il timer. Cambia lato strada facendo, tocca «Pausa» per un ruttino o un pannolino, poi «Riprendi a sinistra» o «Riprendi a destra», a seconda del seno che viene dopo. Tocca «Ferma &amp; salva» quando la poppata è finita.\n\nTocca + per registrare un pasto a posteriori, un biberon o un pasto solido. «Dettagli», su una poppata, mostra ogni tratto con i suoi orari.</string>
+    <string name="help_feeding_good_to_know">Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma. Ogni bambino ha il suo timer, quindi i gemelli possono poppare insieme, e una poppata in corso può comparire anche fuori dall\'app, con gli stessi pulsanti, se lo attivi nelle Impostazioni.\n\nSe hai salvato una poppata e ne hai iniziata un\'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola.</string>
+    <string name="help_pumping_purpose">Le tue sessioni di tiralatte e la scorta di latte: quanto ce n\'è adesso in frigo, in congelatore o a temperatura ambiente.</string>
+    <string name="help_pumping_how">Tocca + dopo una sessione per registrare quanto ne hai tirato e dove l\'hai messo. Quando il latte conservato viene bevuto o buttato, tocca «Segna come usato» ed esce dalla scorta.</string>
+    <string name="help_pumping_good_to_know">La scorta conta solo il latte che si può ancora dare: il latte usato, e quello conservato più a lungo dell\'indicazione di massima di questa pagina, resta fuori dai totali, anche se la sua voce rimane nella cronologia. Il tiralatte è tuo, non di un bambino. Viene condiviso con la tua famiglia, a meno che tu non disattivi «Condividi il latte tirato» nella pagina di condivisione.</string>
+    <string name="help_sleep_purpose">I sonni del tuo bambino, sonnellini e notti, dal più recente.</string>
+    <string name="help_sleep_how">Tocca + per registrare un sonno. Se il bambino dorme ancora, disattiva «Già sveglio» e il sonno continua; tocca «Risveglio» sulla sua scheda, o nella dashboard, quando si sveglia. Dove ha dormito e come era sdraiato sono facoltativi: tocca di nuovo una scelta per toglierla.</string>
+    <string name="help_sleep_good_to_know">Un sonno che supera la mezzanotte conta per entrambi i giorni nelle statistiche, e una volta sola come addormentamento il giorno in cui è iniziato. Sprout registra dove e come ha dormito il tuo bambino senza commentare. Per cambiare un sonno, eliminalo e registralo di nuovo.</string>
+    <string name="help_diaper_purpose">Ogni cambio di pannolino del bambino scelto, dal più recente.</string>
+    <string name="help_diaper_how">Tocca + e spunta «Urine», «Feci» o entrambe. Per le feci puoi scegliere il colore tra i campioni, o lasciarlo vuoto.</string>
+    <string name="help_diaper_good_to_know">Il colore viene conservato come l\'hai scelto, e Sprout non ne deduce nulla. I cambi si sommano nella dashboard e nelle statistiche, dove un cambio con entrambe conta una volta. Per cambiare una voce, eliminala e registrala di nuovo.</string>
+    <string name="help_growth_purpose">Le misure del tuo bambino — peso, altezza e circonferenza cranica — ogni volta che vengono prese.</string>
+    <string name="help_growth_how">Tocca + e compila quello che hai: ne basta una. Il peso è in grammi, l\'altezza e la circonferenza cranica in centimetri. Dal secondo peso in poi, un piccolo grafico mostra l\'andamento.</string>
+    <string name="help_growth_good_to_know">Per vedere le misure rispetto alle curve di crescita dell\'OMS, apri «Andamento». Le misure sono condivise con la tua famiglia e compaiono nel resoconto per il medico. Per cambiarne una, eliminala e aggiungila di nuovo.</string>
+    <string name="help_treatments_purpose">Trattamenti a calendario: qualcosa da dare ogni giorno, ogni settimana o ogni tot giorni, da una data di inizio fino alla fine.</string>
+    <string name="help_treatments_how">Tocca + per aggiungerne uno: il nome, una dose se vuoi, ogni quanto, gli orari e le date. «Ricordamelo» invia una notifica a ogni orario; disattivalo se preferisci. Tocca un trattamento per modificarlo.</string>
+    <string name="help_treatments_good_to_know">Un trattamento è un piano, non un registro di ogni dose: Sprout te lo ricorda, ma non annota se una dose è stata data. Un farmaco dato solo al bisogno va in «Al bisogno». I trattamenti finiti scendono in fondo all\'elenco.</string>
+    <string name="help_medicines_purpose">Farmaci dati solo quando servono, e la domanda che conta alle 3 di notte: si può già dare un\'altra dose?</string>
+    <string name="help_medicines_how">Tocca + per impostare un farmaco con i valori che ti hanno dato il medico o il foglietto illustrativo: l\'attesa più breve tra due dosi, un\'attesa abituale se c\'è e un massimo al giorno se te l\'hanno indicato. Poi tocca «Registra una dose» ogni volta che lo dai.\n\nTocca un farmaco per cambiarne i valori, e una dose nell\'elenco per correggerne l\'orario o la quantità.</string>
+    <string name="help_medicines_good_to_know">Il colore è un calcolo sui tuoi stessi valori, mai un consiglio. Rosso: l\'attesa più breve non è finita, o il massimo del giorno è raggiunto. Giallo: si può, ma prima della tua attesa abituale. Verde: non c\'è più niente da aspettare. Ogni colore ha anche la sua icona e la sua frase.\n\n«Nessun intervallo fisso» vuol dire che non ti è stata data nessuna attesa, non un\'attesa di zero: allora conta solo il massimo al giorno. Sprout non sa nulla di nessun farmaco, e «Registra una dose» funziona sempre, qualunque sia il colore.</string>
+    <string name="help_foods_purpose">Ogni alimento che il tuo bambino ha conosciuto in un pasto solido, una riga per alimento, e le allergie che la tua famiglia conosce.</string>
+    <string name="help_foods_how">Registra un pasto con + e indica cosa conteneva, dalla lista di Sprout o con parole tue. Per ogni alimento, indica se era «Solo un assaggio» o «Una porzione» e, se l\'hai notato, com\'è andata. Ogni alimento ha poi qui la sua riga: quante volte è stato offerto, assaggi e porzioni separati, la prima e l\'ultima volta.\n\n«Dettagli» mostra i pasti in cui c\'era un alimento. «Correggi» trasforma un alimento in un altro in tutti i pasti di questo bambino, per esempio un nome scritto a mano nello stesso alimento della lista. «Annota un\'allergia» ne aggiunge una in alto, e «Condividi l\'elenco» ne fa un PDF di una pagina.</string>
+    <string name="help_foods_good_to_know">Anche un assaggio conta come un\'offerta. Non c\'è un obiettivo, né un ordine da seguire, né un voto: i conteggi dicono solo ciò che è stato registrato. La lista di Sprout contiene solo nomi, nessuna età e nessun alimento segnato come allergene.\n\nSprout non suggerisce mai un\'allergia e non ti impedisce mai di registrare un alimento: quello che hai annotato mostra «Allergia annotata», niente di più. Se pensi che il tuo bambino abbia reagito a qualcosa, chiedi a un medico.</string>
+    <string name="help_wellbeing_purpose">Come stai, solo per te: il tuo umore e, se hai partorito o allatti, il tuo recupero. Il check-in di oggi e la cronologia nel tempo.</string>
+    <string name="help_wellbeing_how">Il check-in quotidiano fa alcune domande, una alla volta; «Non ora» lo rimanda a più tardi. In «Benessere» puoi aggiungere una voce da te e guardare indietro. Una domanda che preferisci non ricevere si può togliere con «Non farmi più questa domanda», o nelle impostazioni.</string>
+    <string name="help_wellbeing_good_to_know">Niente di tutto questo lascia il telefono: non è condiviso con la tua famiglia e non è nel resoconto per il medico. Il check-in aspetta nella dashboard e non è mai una notifica. Disattivarlo nelle impostazioni conserva tutto ciò che hai annotato.</string>
+    <string name="help_babies_purpose">I bambini di cui Sprout tiene il registro: uno solo, gemelli o fratelli.</string>
+    <string name="help_babies_how">Tocca «Aggiungi un bambino» e indica nome e data di nascita. «Rendi attivo» sceglie il bambino su cui si aprono i registri. Puoi modificare un nome o una data di nascita quando vuoi.\n\n«Smetti di monitorare» nasconde un bambino dalla dashboard e conserva la sua cronologia; puoi riportarlo da «Non in monitoraggio» quando vuoi.</string>
+    <string name="help_babies_good_to_know">Eliminare un bambino è definitivo: tutto ciò che è stato registrato per lui viene cancellato, su questo telefono e, al prossimo scambio, sugli altri telefoni della famiglia. Il tiralatte e il tuo benessere sono tuoi, quindi restano.</string>
+    <string name="help_sharing_purpose">Un unico registro per tutti i telefoni della famiglia — quello dell\'altro genitore, di un nonno — senza account e senza server.</string>
+    <string name="help_sharing_how">Tocca «Invita un telefono» e invia l\'invito con un\'app di cui ti fidi; sull\'altro telefono, tocca «Apri un invito ricevuto». I due telefoni mostrano allora lo stesso codice di famiglia di sei caratteri: confrontatelo una volta a voce.\n\nPoi «Invia le mie voci» e «Apri un file ricevuto» aggiornano i telefoni da qualunque posto. Se questo telefono lo offre, Sprout può anche scambiare da solo via Bluetooth quando siete insieme con Sprout aperto.</string>
+    <string name="help_sharing_good_to_know">Tutto ciò che riguarda i bambini viene condiviso, e anche la scorta di latte, a meno che tu non disattivi «Condividi il latte tirato». Il tuo benessere e i tuoi check-in, mai. Tutti in famiglia vedono tutto ciò che è condiviso e possono aggiungere.\n\nRimuovere un telefono cambia la chiave della famiglia, quindi ogni telefono che resta ha bisogno di un nuovo invito; il telefono rimosso tiene ciò che ha già. Un telefono ripristinato da un backup arriva con il registro ma fuori dalla famiglia: mandagli un nuovo invito.</string>
+    <string name="help_report_purpose">Un resoconto di ciò che hai registrato per un bambino, da dare a un medico: un PDF da leggere o stampare e un foglio di calcolo con le voci.</string>
+    <string name="help_report_how">Scegli il periodo, le cui date esatte vengono mostrate prima di creare qualsiasi cosa, e cosa includere. Poi tocca «Referto PDF» o «Foglio di calcolo» e scegli dove inviarlo. «Proteggi con una password» mette entrambi i file in un unico zip cifrato.</string>
+    <string name="help_report_good_to_know">Il documento riporta ciò che è stato registrato e non interpreta nulla. Il riferimento OMS che scegli vale solo per questo file e viene dimenticato quando esci; di base si usano entrambi, dati come intervallo. Le note restano fuori a meno che tu non le includa, e il tiralatte e il tuo benessere non ci sono mai.\n\nI file vengono creati su questo telefono e non vanno da nessuna parte finché non li invii. Sprout non conserva alcuna copia della password: dalla di persona o al telefono, non insieme al file.</string>
+    <string name="help_settings_purpose">Come funziona Sprout su questo telefono: la lingua, i promemoria, il check-in quotidiano e la condivisione con la tua famiglia.</string>
+    <string name="help_settings_how">Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l\'ultimo pasto è di un po\' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall\'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni. «Rivedi il tour» mostra di nuovo il breve tour della dashboard.</string>
+    <string name="help_settings_good_to_know">I promemoria dei pasti, gli avvisi sugli scatti di crescita e la poppata in corso fuori dall\'app restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c\'è già tutto.</string>
     <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
     <string name="tour_skip">Salta il tour</string>
     <string name="tour_done">Fatto</string>

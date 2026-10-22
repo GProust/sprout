@@ -18,8 +18,9 @@ struct BabyScreen: View {
                     VStack(alignment: .leading, spacing: Spacing.regular) {
                         BabyPane(
                             summary: summary,
-                            tracksWellbeing: model.tracksWellbeing,
+                            tiles: model.homeTiles,
                             now: model.now,
+                            sessions: NursingSessionStore.shared.sessions,
                             onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
                             onGiveMedicine: { model.giveDose(of: $0) },
@@ -44,6 +45,7 @@ struct BabyScreen: View {
         }
         .navigationTitle(model.selectedBaby?.baby.name ?? Str.t("nav_baby"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.baby)
         .sproutStyle()
     }
 }
@@ -97,6 +99,7 @@ struct YouScreen: View {
         }
         .navigationTitle(Str.t("nav_you"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.you)
         .sproutStyle()
     }
 }

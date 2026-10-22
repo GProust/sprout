@@ -88,6 +88,8 @@ import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.diaper.label
 import com.gproust.sprout.ui.diaper.swatch
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.sleep.label
 import com.gproust.sprout.ui.sleep.sleepDetails
@@ -250,7 +252,13 @@ fun StatsScreen(onBack: (() -> Unit)? = null) {
     val periodLabels = StatsPeriod.entries.associateWith { stringResource(it.labelRes) }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_stats), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_stats),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.TRENDS) },
+            )
+        },
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),

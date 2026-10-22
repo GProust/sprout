@@ -76,21 +76,27 @@ class TourTest {
 
     @Test
     fun aFeedStartingEndsIt() {
-        assertTrue(tourStepsAside(onDashboard = true, feedWasRunning = false, feedIsRunning = true))
+        assertTrue(tourStepsAside(onDashboard = true, feedingBefore = emptySet(), feedingNow = setOf("lea")))
+    }
+
+    /** Twins: the second feed starting beside the first is a feed starting. */
+    @Test
+    fun aTwinsFeedStartingBesideTheOtherEndsIt() {
+        assertTrue(tourStepsAside(onDashboard = true, feedingBefore = setOf("lea"), feedingNow = setOf("lea", "noah")))
     }
 
     /** A replay asked for in the middle of a feed is not cut short by that feed. */
     @Test
     fun aFeedAlreadyRunningDoesNotEndIt() {
-        assertFalse(tourStepsAside(onDashboard = true, feedWasRunning = true, feedIsRunning = true))
-        assertFalse(tourStepsAside(onDashboard = true, feedWasRunning = true, feedIsRunning = false))
-        assertFalse(tourStepsAside(onDashboard = true, feedWasRunning = false, feedIsRunning = false))
+        assertFalse(tourStepsAside(onDashboard = true, feedingBefore = setOf("lea"), feedingNow = setOf("lea")))
+        assertFalse(tourStepsAside(onDashboard = true, feedingBefore = setOf("lea"), feedingNow = emptySet()))
+        assertFalse(tourStepsAside(onDashboard = true, feedingBefore = emptySet(), feedingNow = emptySet()))
     }
 
     /** A tile, a tab, Settings, or a widget tap or a file arriving underneath it. */
     @Test
     fun leavingTheDashboardEndsIt() {
-        assertTrue(tourStepsAside(onDashboard = false, feedWasRunning = false, feedIsRunning = false))
+        assertTrue(tourStepsAside(onDashboard = false, feedingBefore = emptySet(), feedingNow = emptySet()))
     }
 
     @Test

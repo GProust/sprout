@@ -11,6 +11,11 @@ final class FeedingViewModel {
     var household: [Feeding] = []
     /// The active baby's allergies, marked on the meal form's foods (BDR-21).
     var allergies: [Allergy] = []
+    /// The selected baby's uid: the one whose history this screen lists, and so
+    /// the one whose feed its bar shows and starts.
+    var activeBabyUid: String?
+    /// Each baby's name by uid, so a timer can say whose feed it is timing.
+    var babyNames: [String: String] = [:]
 
     private let repository: SproutRepository
     private let store = NursingSessionStore.shared
@@ -19,10 +24,15 @@ final class FeedingViewModel {
         self.repository = repository
     }
 
-    /// The live session, read straight from the shared store rather than copied
-    /// out of it. See ``NursingSessionStore`` — a private copy per screen is how
-    /// the same breastfeed used to be saved more than once.
-    var nursing: NursingSession? { store.session }
+    /// The selected baby's running feed, read straight from the shared store
+    /// rather than copied out of it. See ``NursingSessionStore`` — a private copy
+    /// per screen is how the same breastfeed used to be saved more than once. A
+    /// twin's feed running at the same time is on the dashboard, with the twin's
+    /// name on it (BDR-23).
+    var nursing: NursingSession? { store.session(for: activeBabyUid) }
+
+    /// How many feeds are running on this phone, whoever's they are.
+    var runningCount: Int { store.sessions.count }
 
     func observeFeedings() async {
         let repository = self.repository
@@ -35,6 +45,19 @@ final class FeedingViewModel {
             }
             group.addTask {
                 await observe(repository.allergies) { [weak self] in self?.allergies = $0 }
+            }
+            group.addTask {
+                await observe(repository.parentProfile) { [weak self] _ in
+                    self?.activeBabyUid = try? repository.activeBabyUidNow()
+                }
+            }
+            group.addTask {
+                await observe(repository.babies) { [weak self] babies in
+                    self?.babyNames = Dictionary(
+                        babies.map { ($0.uid, $0.name) },
+                        uniquingKeysWith: { first, _ in first }
+                    )
+                }
             }
         }
     }
@@ -57,72 +80,52 @@ final class FeedingViewModel {
     /// neighbouring breastfeeds a short break apart, keyed by its uid.
     var joinOffers: [String: Feeding] { breastfeedJoinOffers(feedings) }
 
-    /// Begin timing on `side`. A session already running is left alone: two ways
-    /// into the timer opening at once is not a reason to time the feed twice.
+    /// Begin timing the selected baby's feed on `side`. A feed already running
+    /// for that baby is left alone: two ways into the timer opening at once is
+    /// not a reason to time one baby twice. Another baby's feed is no obstacle —
+    /// twins can feed together (BDR-23).
     func startNursing(on side: BreastSide) {
         let now = Clock.millis
+        // The feed belongs to the baby selected now, when it starts — read from
+        // the database rather than the observed copy, which may not have
+        // arrived yet.
+        let babyUid = (try? repository.activeBabyUidNow()) ?? activeBabyUid
+        activeBabyUid = babyUid
         store.startIfIdle(
-            NursingSession(
-                sessionStart: now,
-                currentSide: side,
-                segmentStart: now,
-                // The feed belongs to the baby selected now, when it starts.
-                babyUid: try? repository.activeBabyUidNow()
-            )
+            NursingSession(sessionStart: now, currentSide: side, segmentStart: now, babyUid: babyUid)
         )
     }
 
-    func switchBreast() { store.switchBreast(at: Clock.millis) }
+    func switchBreast(_ session: NursingSession) {
+        store.switchBreast(for: session.babyUid, at: Clock.millis)
+    }
 
     /// Bank the breast being nursed and start a break — the burp between the
-    /// sides, the nappy halfway through (BDR-17).
-    func pauseNursing() { store.pause(at: Clock.millis) }
+    /// sides, the nappy halfway through (BDR-17). Another baby's feed carries on.
+    func pauseNursing(_ session: NursingSession) {
+        store.pause(for: session.babyUid, at: Clock.millis)
+    }
 
     /// Come back from a break, on whichever breast the feed carries on with.
-    func resumeNursing(on side: BreastSide) { store.resume(on: side, at: Clock.millis) }
+    func resumeNursing(_ session: NursingSession, on side: BreastSide) {
+        store.resume(for: session.babyUid, on: side, at: Clock.millis)
+    }
 
-    /// Finish the session and persist it as a feed.
+    /// Finish `session` and persist it as a feed.
     ///
     /// The session is *taken* from the store before anything is saved, so that
     /// of everything which might still be showing this timer — a second copy of
     /// the nursing screen, a second tap on Save — only one is ever handed
     /// something to log.
-    func stopNursing(notes: String = "") {
-        guard let session = store.consume() else { return }
-        let now = Clock.millis
-        // On a break there is no stretch in progress, so what was nursed is
-        // exactly what was banked.
-        let all = session.allSegments(endingAt: now)
-
-        let left = all.filter { $0.side == .LEFT }.reduce(Int64(0)) { $0 + $1.durationMs }
-        let right = all.filter { $0.side == .RIGHT }.reduce(Int64(0)) { $0 + $1.durationMs }
-
-        let side: BreastSide = {
-            if left > 0 && right > 0 { return .BOTH }
-            if right > 0 { return .RIGHT }
-            return .LEFT
-        }()
-
-        let feed = Feeding(
-            type: .BREAST,
-            side: side,
-            startTime: session.sessionStart,
-            // The feed ended when the last stretch did, not when Save was
-            // tapped: a session saved from a break would otherwise carry the
-            // whole break as feeding time it never was.
-            endTime: all.last?.endTime ?? now,
-            leftDurationMs: left > 0 ? left : nil,
-            rightDurationMs: right > 0 ? right : nil,
-            segments: all,
-            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-        )
+    func stopNursing(_ session: NursingSession, notes: String = "") {
+        guard let taken = store.consume(session.babyUid) else { return }
         // To the baby the session was started for, not to whoever is selected
         // now. With twins, those two are not always the same.
-        try? repository.addTimedFeeding(feed, startedFor: session.babyUid)
+        try? repository.addTimedFeeding(taken.toFeeding(at: Clock.millis, notes: notes), startedFor: taken.babyUid)
     }
 
-    /// Discard the running session without saving it.
-    func cancelNursing() { store.clear() }
+    /// Discard `session` without saving it.
+    func cancelNursing(_ session: NursingSession) { _ = store.consume(session.babyUid) }
 
     var byDay: [(day: Int64, entries: [Feeding])] {
         Dictionary(grouping: feedings) { SproutFormat.startOfDay($0.startTime) }
@@ -147,6 +150,7 @@ struct FeedingScreen: View {
         }
         .navigationTitle(Str.t("screen_feeding"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.feeding)
         .task {
             let model = model ?? FeedingViewModel(repository: sprout.repository)
             self.model = model
@@ -516,6 +520,13 @@ private struct NursingTimerScreen: View {
         NavigationStack {
             VStack(spacing: Spacing.loose) {
                 if let session = model.nursing {
+                    // Whose feed this is, once there is more than one it could
+                    // be: with one running there is nothing to tell apart.
+                    if model.runningCount > 1, let uid = session.babyUid, let name = model.babyNames[uid] {
+                        Text(name)
+                            .font(.headline)
+                            .foregroundStyle(SproutColor.onSurface)
+                    }
                     Text(
                         session.isPaused
                             ? Str.t("feeding_paused_for", SproutFormat.clock(millis: session.pausedMs(at: now)))
@@ -592,7 +603,7 @@ private struct NursingTimerScreen: View {
                         HStack(spacing: Spacing.snug) {
                             ForEach([BreastSide.LEFT, BreastSide.RIGHT], id: \.self) { side in
                                 Button {
-                                    model.resumeNursing(on: side)
+                                    model.resumeNursing(session, on: side)
                                 } label: {
                                     Text(
                                         side == .LEFT
@@ -611,7 +622,7 @@ private struct NursingTimerScreen: View {
                     } else {
                         HStack(spacing: Spacing.snug) {
                             Button {
-                                model.pauseNursing()
+                                model.pauseNursing(session)
                             } label: {
                                 Text(Str.t("feeding_pause"))
                                     .font(.body.weight(.semibold))
@@ -623,7 +634,7 @@ private struct NursingTimerScreen: View {
                             .buttonStyle(.plain)
 
                             Button {
-                                model.switchBreast()
+                                model.switchBreast(session)
                             } label: {
                                 Text(
                                     session.currentSide == .LEFT
@@ -643,7 +654,7 @@ private struct NursingTimerScreen: View {
                     NotesField(text: $notes)
 
                     Button {
-                        model.stopNursing(notes: notes)
+                        model.stopNursing(session, notes: notes)
                         dismiss()
                     } label: {
                         Text(Str.t("feeding_stop_save"))
@@ -665,6 +676,7 @@ private struct NursingTimerScreen: View {
             .sproutStyle()
             .navigationTitle(Str.t("feeding_breastfeeding"))
             .navigationBarTitleDisplayMode(.inline)
+            .helpButton(.feeding)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Str.t("action_close")) { dismiss() }

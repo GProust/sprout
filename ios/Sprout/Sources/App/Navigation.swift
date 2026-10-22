@@ -132,6 +132,7 @@ struct RootView: View {
         .task {
             let model = model ?? HomeViewModel(repository: sprout.repository, settings: sprout.settingsStore)
             self.model = model
+            model.adoptUnnamedFeed()
             await model.observeEverything()
         }
         // A file handed to Sprout by another app opens the sharing screen,
@@ -155,13 +156,13 @@ struct RootView: View {
         // tile, a tab, Settings, a file arriving — or a feed starts.
         .onChange(of: TourSurroundings(
             onDashboard: onDashboard,
-            feedRunning: NursingSessionStore.shared.session != nil
+            feeding: Set(NursingSessionStore.shared.sessions.map(\.babyUid))
         )) { before, now in
             guard tourStep != nil,
                   tourStepsAside(
                       onDashboard: now.onDashboard,
-                      feedWasRunning: before.feedRunning,
-                      feedIsRunning: now.feedRunning
+                      feedingBefore: before.feeding,
+                      feedingNow: now.feeding
                   )
             else { return }
             tourStep = nil
@@ -313,6 +314,11 @@ struct RootView: View {
         case .profile: ProfileScreen()
         case .settings: SettingsScreen(onReplayTour: replayTour)
         case .sync: SyncScreen()
+        case .customiseHome:
+            // The dashboard's own model, because what this screen changes is
+            // what the grid draws: one arrangement, held in one place, read by
+            // Home and by each baby's tab alike (BDR-25).
+            if let model { CustomiseHomeScreen(model: model) }
         }
     }
 }
@@ -321,5 +327,7 @@ struct RootView: View {
 /// feed started from the dashboard — which also leaves it — is one change.
 private struct TourSurroundings: Equatable {
     var onDashboard: Bool
-    var feedRunning: Bool
+    /// The babies with a feed running, by uid: a twin's feed starting beside
+    /// the other's is a feed starting too (BDR-23).
+    var feeding: Set<String?>
 }

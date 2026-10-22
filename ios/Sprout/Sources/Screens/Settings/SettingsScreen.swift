@@ -35,6 +35,7 @@ struct SettingsScreen: View {
     @State private var feedingReminders = false
     @State private var feedingInterval = FeedingReminderSettings.defaultIntervalMinutes
     @State private var growthSpurtAlerts = false
+    @State private var runningFeedOutside = false
     /// Shown when iOS has been asked and said no. There is nothing to do about
     /// it from here — only Settings can change it — so the switch goes back off
     /// rather than sitting on while nothing arrives.
@@ -51,12 +52,16 @@ struct SettingsScreen: View {
                 questionsSection(profile)
             }
 
+            // After the check-in, whose switch decides whether the wellbeing
+            // tile is there to arrange at all, and before sharing (BDR-25).
+            homeSection
             sharingSection
             tourSection
             supportSection
         }
         .navigationTitle(Str.t("screen_settings"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.settings)
         .alert(Str.t("settings_support_no_browser"), isPresented: $noBrowser) {
             Button(Str.t("action_close"), role: .cancel) {}
         }
@@ -64,6 +69,7 @@ struct SettingsScreen: View {
             feedingReminders = FeedingReminderSettings.isEnabled(sprout.settingsStore)
             feedingInterval = FeedingReminderSettings.intervalMinutes(sprout.settingsStore)
             growthSpurtAlerts = GrowthSpurtSettings.isEnabled(sprout.settingsStore)
+            runningFeedOutside = NursingNotificationSettings.isEnabled(sprout.settingsStore)
         }
         .task {
             await observe(sprout.repository.parentProfile) { profile = $0 }
@@ -190,6 +196,20 @@ struct SettingsScreen: View {
                 }
             }
 
+            // A Live Activity rather than a notification (ADR-0020), so there
+            // is no notification permission to ask for: iOS's own switch for
+            // Live Activities is the parent's, in iOS Settings.
+            Toggle(isOn: Binding(
+                get: { runningFeedOutside },
+                set: { setRunningFeedOutside($0) }
+            )) {
+                settingLabel(
+                    Str.t("settings_live_activity"),
+                    Str.t("settings_live_activity_desc")
+                )
+            }
+            .accessibilityIdentifier("settings-running-feed")
+
             Toggle(isOn: Binding(
                 get: { growthSpurtAlerts },
                 set: { setGrowthSpurtAlerts($0) }
@@ -232,6 +252,14 @@ struct SettingsScreen: View {
         Task { await apply(on) { GrowthSpurtSettings.setEnabled($0, in: sprout.settingsStore) } }
     }
 
+    /// A running breastfeed on the lock screen (BDR-24): shown or taken away at
+    /// once, so a feed already running follows the switch.
+    private func setRunningFeedOutside(_ on: Bool) {
+        runningFeedOutside = on
+        NursingNotificationSettings.setEnabled(on, in: sprout.settingsStore)
+        NursingLiveActivities.sync(NursingSessionStore.shared.sessions)
+    }
+
     private func setFeedingInterval(_ minutes: Int) {
         feedingInterval = minutes
         FeedingReminderSettings.setIntervalMinutes(minutes, in: sprout.settingsStore)
@@ -264,6 +292,26 @@ struct SettingsScreen: View {
             repository: sprout.repository,
             settings: sprout.settingsStore
         )
+    }
+
+    // MARK: - Home screen
+
+    /// The way in to arranging the dashboard's log grid (BDR-25).
+    private var homeSection: some View {
+        Section(Str.t("settings_home")) {
+            NavigationLink(value: LogDestination.customiseHome) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(Str.t("screen_customise_home"))
+                        // On the `Text`, for the reason the sharing row below
+                        // gives: a link's own identifier does not reach the
+                        // accessibility tree from inside a `Form`.
+                        .accessibilityIdentifier("settings-customise-home")
+                    Text(Str.t("settings_customise_home_hint"))
+                        .font(.caption)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                }
+            }
+        }
     }
 
     // MARK: - Sharing

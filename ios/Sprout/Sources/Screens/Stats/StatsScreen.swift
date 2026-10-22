@@ -237,6 +237,7 @@ struct StatsScreen: View {
         }
         .navigationTitle(Str.t("screen_stats"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.trends)
         .task {
             let model = model ?? StatsViewModel(repository: sprout.repository)
             self.model = model

@@ -67,6 +67,7 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.report.ReportScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.settings.CustomiseHomeScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
@@ -96,7 +97,7 @@ object Routes {
     const val BABY = "baby"
     const val YOU = "you"
     const val FEEDING = "feeding"
-    const val FEEDING_NURSING = "feeding/nursing/{side}"
+    const val FEEDING_NURSING = "feeding/nursing/{side}?baby={baby}"
     const val PUMPING = "pumping"
     const val SLEEP = "sleep"
     const val DIAPER = "diaper"
@@ -110,10 +111,16 @@ object Routes {
     const val MEDICINES = "medicines"
     const val FOODS = "foods"
     const val SYNC = "settings/sync"
+    const val CUSTOMISE_HOME = "settings/home"
     const val REPORT = "report/{babyId}"
 
-    /** The live nursing screen for one breast, timer already running. */
-    fun nursing(side: BreastSide) = "feeding/nursing/${side.name}"
+    /**
+     * The live nursing screen for one breast, timer already running, for the
+     * baby named by [babyUid] — each baby has a timer of its own (BDR-23). Null
+     * asks for the selected baby.
+     */
+    fun nursing(side: BreastSide, babyUid: String?): String =
+        "feeding/nursing/${side.name}" + (babyUid?.let { "?baby=${Uri.encode(it)}" } ?: "")
 
     /** "Share a record" for one named baby — never for "whichever is active". */
     fun report(babyId: Long) = "report/$babyId"
@@ -210,8 +217,8 @@ private fun NavController.navigateToKnown(route: String) {
  * trip through here; leaving it there leaves a second timer for the same feed
  * a Back press away.
  */
-private fun NavController.navigateToNursing(side: BreastSide) {
-    navigate(Routes.nursing(side)) { popUpTo(Routes.FEEDING) }
+private fun NavController.navigateToNursing(side: BreastSide, babyUid: String?) {
+    navigate(Routes.nursing(side, babyUid)) { popUpTo(Routes.FEEDING) }
 }
 
 /** Babies and the current selection, for the shell's own bar. */
@@ -325,14 +332,16 @@ private fun MainScaffold(
     // feed. Before the nav graph has a route, this is the dashboard.
     val nursingSessions = remember(context) { NursingSessionStore.sessions(context) }
     val nursing by nursingSessions.collectAsState()
-    val feedRunning = nursing != null
-    var feedWasRunning by remember { mutableStateOf(feedRunning) }
+    // The babies with a feed running: a feed starts when one joins them, a
+    // twin's beside the other's included (BDR-23).
+    val feeding = nursing.map { it.babyUid }.toSet()
+    var feedingBefore by remember { mutableStateOf(feeding) }
     val onDashboard = currentRoute == null || currentRoute == Routes.HOME
-    LaunchedEffect(onDashboard, feedRunning) {
-        if (tourStep != null && tourStepsAside(onDashboard, feedWasRunning, feedRunning)) {
+    LaunchedEffect(onDashboard, feeding) {
+        if (tourStep != null && tourStepsAside(onDashboard, feedingBefore, feeding)) {
             tourStep = null
         }
-        feedWasRunning = feedRunning
+        feedingBefore = feeding
     }
     val tourShown = tourStep != null && currentRoute == Routes.HOME
 
@@ -357,14 +366,14 @@ private fun MainScaffold(
      * Home, and so the nursing screen can still share the feeding ViewModel that
      * owns the live session.
      */
-    fun openNursing(side: BreastSide) {
+    fun openNursing(side: BreastSide, babyUid: String?) {
         navController.navigate(Routes.FEEDING) {
             // Reuse the Feeding screen when it is already open: a second copy
             // of it is a second copy of everything the timer is shown by.
             popUpTo(Routes.FEEDING)
             launchSingleTop = true
         }
-        navController.navigateToNursing(side)
+        navController.navigateToNursing(side, babyUid)
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -408,7 +417,7 @@ private fun MainScaffold(
                     CompositionLocalProvider(LocalTourTargets provides tourTargets) {
                         HomeScreen(
                             onNavigate = { route -> navController.navigateToKnown(route) },
-                            onQuickFeed = { side -> openNursing(side) },
+                            onQuickFeed = { side, babyUid -> openNursing(side, babyUid) },
                             onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
                         )
                     }
@@ -416,7 +425,7 @@ private fun MainScaffold(
                 composable(Routes.BABY) {
                     BabyScreen(
                         onNavigate = { route -> navController.navigateToKnown(route) },
-                        onQuickFeed = { side -> openNursing(side) },
+                        onQuickFeed = { side, babyUid -> openNursing(side, babyUid) },
                         onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
                     )
                 }
@@ -426,16 +435,24 @@ private fun MainScaffold(
                 composable(Routes.FEEDING) {
                     FeedingScreen(
                         onBack = { navController.popBackStack() },
-                        onOpenNursing = { side -> navController.navigateToNursing(side) },
+                        onOpenNursing = { side, babyUid -> navController.navigateToNursing(side, babyUid) },
                     )
                 }
                 composable(
                     Routes.FEEDING_NURSING,
-                    arguments = listOf(navArgument("side") { type = NavType.StringType }),
+                    arguments = listOf(
+                        navArgument("side") { type = NavType.StringType },
+                        navArgument("baby") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
                 ) { entry ->
                     val side = entry.arguments?.getString("side")
                         ?.let { runCatching { BreastSide.valueOf(it) }.getOrNull() }
                         ?: BreastSide.LEFT
+                    val babyUid = entry.arguments?.getString("baby")
                     // Share the feeding screen's ViewModel so the live session is the
                     // same one its bottom bar started and can resume.
                     val feedingEntry = remember(entry) { navController.getBackStackEntry(Routes.FEEDING) }
@@ -443,7 +460,12 @@ private fun MainScaffold(
                         viewModelStoreOwner = feedingEntry,
                         factory = rememberSproutViewModelFactory(),
                     )
-                    NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
+                    NursingScreen(
+                        side = side,
+                        babyUid = babyUid,
+                        onDone = { navController.popBackStack() },
+                        vm = vm,
+                    )
                 }
                 composable(Routes.PUMPING) {
                     PumpingScreen(onBack = { navController.popBackStack() })
@@ -472,9 +494,13 @@ private fun MainScaffold(
                 composable(Routes.SETTINGS) {
                     SettingsScreen(
                         onBack = { navController.popBackStack() },
+                        onOpenCustomiseHome = { navController.navigate(Routes.CUSTOMISE_HOME) },
                         onOpenSync = { navController.navigate(Routes.SYNC) },
                         onReplayTour = { replayTour() },
                     )
+                }
+                composable(Routes.CUSTOMISE_HOME) {
+                    CustomiseHomeScreen(onBack = { navController.popBackStack() })
                 }
                 composable(Routes.SYNC) {
                     SyncScreen(

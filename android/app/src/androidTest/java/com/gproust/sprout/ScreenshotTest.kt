@@ -37,6 +37,9 @@ import androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi
 import androidx.glance.appwidget.GlanceRemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.gproust.sprout.data.HOME_TILE_IDS
+import com.gproust.sprout.data.HomeTileIds
+import com.gproust.sprout.data.moveTile
 import com.gproust.sprout.data.local.Bleeding
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.BreastState
@@ -67,7 +70,9 @@ import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.NearbySettings
 import com.gproust.sprout.data.TourStep
 import com.gproust.sprout.data.tourSteps
+import com.gproust.sprout.ui.settings.CustomiseHomeScreen
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
+import com.gproust.sprout.ui.settings.HomeLayoutSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
@@ -342,6 +347,9 @@ class ScreenshotTest {
         // The "what's new" card is for a phone that has just updated. These
         // captures show the dashboard as it is every other day (BDR-22).
         WhatsNewSettings.markAllSeen(app)
+        // The grid as a phone nobody has arranged draws it (BDR-25): every
+        // tile, today's order, no More — whatever an earlier run left behind.
+        HomeLayoutSettings.clear(app)
     }
 
     private val slot = mutableStateOf<@Composable () -> Unit>({})
@@ -481,7 +489,8 @@ class ScreenshotTest {
     @OptIn(ExperimentalGlanceRemoteViewsApi::class)
     private fun saveWidget(name: String) {
         val context = instrumentation.targetContext
-        val session = NursingSessionStore.load(context)
+        val sessions = NursingSessionStore.loadAll(context)
+        val babyNames = runBlocking { app.repository.babyNamesByUid() }
         val feed = runBlocking { app.repository.lastFeedForActiveBaby() }
         val lastBreast = runBlocking {
             app.repository.lastBreastFeedForActiveBaby(
@@ -492,7 +501,7 @@ class ScreenshotTest {
         val size = DpSize(180.dp, 110.dp)
         val remoteViews = runBlocking {
             GlanceRemoteViews().compose(context, size) {
-                GlanceTheme { SproutWidgetUi(session, feed, lastBreast, babyName) }
+                GlanceTheme { SproutWidgetUi(sessions, babyNames, feed, lastBreast, babyName) }
             }.remoteViews
         }
         val density = context.resources.displayMetrics.density
@@ -579,11 +588,11 @@ class ScreenshotTest {
         // Single-page screens. Two babies are seeded, so Home is the household
         // dashboard: a card each for Léa and Noah, carrying their own numbers
         // and their own feed button.
-        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { HomeScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         save("04-home")
         // The picked baby's own tab — the same pane the dashboard shows in
         // place when a family has only one child.
-        show { BabyScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { BabyScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         save("04-baby")
         // The parent's tab: the two logs that belong to a person rather than to
         // a child, plus the daily check-in.
@@ -746,6 +755,31 @@ class ScreenshotTest {
         scrollToCheckInSection()
         save("11-settings-4-checkin-off")
         runBlocking { app.repository.setTrackWellbeing(true) }
+        // Customise home (BDR-25): every log with its switch and its two
+        // arrows, in the order the dashboard draws them — all on, as every
+        // phone starts.
+        show { CustomiseHomeScreen(onBack = {}) }
+        save("11-settings-5-customise-home")
+        // The same list as a family that bottle-feeds and has no treatment
+        // running might leave it: nappies moved up beside feeds, pumping and
+        // treatments put away. Then the baby's own tab drawing that, with the
+        // two waiting behind More, and the menu that lists them — a popup, so
+        // through the full-screen path. Put back afterwards, so every capture
+        // after these shows the grid every phone starts with.
+        HomeLayoutSettings.setOrder(
+            app,
+            moveTile(HOME_TILE_IDS, emptyList(), HomeTileIds.DIAPER, -2, tracksWellbeing = true),
+        )
+        HomeLayoutSettings.setShown(app, HomeTileIds.PUMPING, false)
+        HomeLayoutSettings.setShown(app, HomeTileIds.TREATMENTS, false)
+        show { CustomiseHomeScreen(onBack = {}) }
+        save("11-settings-6-customise-home-arranged")
+        show { BabyScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
+        scrollTo("More")
+        save("04-baby-2-arranged")
+        tap("More")
+        saveScreen("04-baby-3-more")
+        HomeLayoutSettings.clear(app)
         show { TreatmentsScreen {} }
         save("12-treatments")
 
@@ -761,6 +795,14 @@ class ScreenshotTest {
         // sentence as well as the fields.
         tapDesc("Add a medicine")
         save("12-medicines-2-new")
+        // And the page's help, opened from the ? in its top bar (BDR-26): the
+        // sheet with the most to say about what Sprout does *not* do — the
+        // light as arithmetic on the parent's own figures, and "No set gap"
+        // as no gap rule at all. Shown afresh so the editor above is gone; the
+        // sheet is its own window, so it goes through the full-screen path.
+        show { MedicinesScreen {} }
+        tapDesc("Help")
+        saveScreen("12-medicines-3-help")
 
         // First foods (BDR-20): each food with its own count, tastes and
         // servings apart, and how it went where that was noted. Then the meal
@@ -850,7 +892,7 @@ class ScreenshotTest {
         // baby has no baby tab to find it on. Scrolled to the foot of the
         // pane, where that button and "See the statistics" sit.
         runBlocking { app.repository.archiveBaby(noahId) }
-        show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
+        show { HomeScreen(onNavigate = {}, onQuickFeed = { _, _ -> }) }
         scrollTo("Share a record")
         save("04-home-2-one-baby")
 
@@ -862,7 +904,7 @@ class ScreenshotTest {
         show {
             Box(Modifier.fillMaxSize()) {
                 CompositionLocalProvider(LocalTourTargets provides tourTargets) {
-                    HomeScreen(onNavigate = {}, onQuickFeed = {})
+                    HomeScreen(onNavigate = {}, onQuickFeed = { _, _ -> })
                 }
                 TourOverlay(
                     step = TourStep.LOG_TILES,

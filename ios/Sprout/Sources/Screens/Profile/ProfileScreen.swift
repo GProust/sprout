@@ -98,6 +98,7 @@ struct ProfileScreen: View {
         }
         .navigationTitle(Str.t("screen_babies"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.babies)
         .task {
             let model = model ?? ProfileViewModel(repository: sprout.repository)
             self.model = model

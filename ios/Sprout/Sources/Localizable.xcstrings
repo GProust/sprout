@@ -3243,6 +3243,52 @@
         }
       }
     },
+    "cd_help": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hilfe"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayuda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aide"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aiuto"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomoc"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajuda"
+          }
+        }
+      }
+    },
     "cd_hide_password": {
       "localizations": {
         "de": {
@@ -4113,6 +4159,328 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agora não"
+          }
+        }
+      }
+    },
+    "customise_home_hidden": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgeblendet, unter Mehr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden, under More"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oculto, en Más"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masqué, sous Plus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascosto, in Altro"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ukryte, pod Więcej"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oculto, em Mais"
+          }
+        }
+      }
+    },
+    "customise_home_intro": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stell nach vorn, was du am meisten einträgst, und schalte aus, was du nicht brauchst. Dabei geht nichts verloren: Was ausgeschaltet ist, wartet unter Mehr am Ende des Rasters, wird weiter mit den Handys im Haushalt geteilt und zählt weiter in den Trends und im Bericht für die Ärztin oder den Arzt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Put the logs you use most first, and switch off the ones you don't use. Nothing is lost: a log that's switched off waits under More at the end of the grid, keeps sharing with your household's phones, and still counts in Trends and in the record for your doctor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pon primero lo que más registras y desactiva lo que no usas. No se pierde nada: lo desactivado espera en Más, al final de la cuadrícula, se sigue compartiendo con los teléfonos del hogar y sigue contando en Tendencias y en el registro para tu médico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettez en premier ce que vous notez le plus, et désactivez ce dont vous ne vous servez pas. Rien n'est perdu : ce qui est désactivé attend sous Plus, à la fin de la grille, continue d'être partagé avec les téléphones du foyer et compte toujours dans les Tendances et dans le relevé pour votre médecin."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metti per primo ciò che registri di più e disattiva ciò che non usi. Non si perde nulla: ciò che è disattivato aspetta in Altro, alla fine della griglia, continua a essere condiviso con i telefoni della famiglia e conta ancora in Andamento e nel resoconto per il medico."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustaw na początku to, co zapisujesz najczęściej, i wyłącz to, czego nie używasz. Nic nie przepada: to, co wyłączone, czeka pod Więcej na końcu siatki, nadal jest współdzielone z telefonami domowników i nadal liczy się w Trendach i w zapisie dla lekarza."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ponha primeiro o que regista mais e desative o que não usa. Nada se perde: o que estiver desativado espera em Mais, no fim da grelha, continua a ser partilhado com os telemóveis do agregado e continua a contar nas Tendências e no registo para o médico."
+          }
+        }
+      }
+    },
+    "customise_home_move_down": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach unten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move down"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bajar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descendre"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta giù"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przesuń w dół"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover para baixo"
+          }
+        }
+      }
+    },
+    "customise_home_move_up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach oben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move up"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monter"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta su"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przesuń w górę"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover para cima"
+          }
+        }
+      }
+    },
+    "customise_home_moved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, Position %2$lld von %3$lld"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, position %2$lld of %3$lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posición %2$lld de %3$lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, position %2$lld sur %3$lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posizione %2$lld di %3$lld"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, pozycja %2$lld z %3$lld"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posição %2$lld de %3$lld"
+          }
+        }
+      }
+    },
+    "customise_home_restore": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standardreihenfolge wiederherstellen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore the default order"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer el orden predeterminado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir l'ordre par défaut"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina l'ordine predefinito"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przywróć domyślną kolejność"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repor a ordem predefinida"
+          }
+        }
+      }
+    },
+    "customise_home_shown": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf dem Startbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shown on home"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visible en el inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affiché sur l'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibile nella Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widoczne na ekranie startowym"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visível no início"
           }
         }
       }
@@ -15185,6 +15553,2490 @@
         }
       }
     },
+    "help_babies_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Baby zu löschen ist endgültig: Alles, was dafür eingetragen wurde, wird gelöscht, auf diesem Handy und beim nächsten Austausch auch auf den anderen Handys des Haushalts. Dein Abpumpen und dein Wohlbefinden gehören dir und bleiben deshalb."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleting a baby is for good: everything logged for them is erased, on this phone and, at the next exchange, on the household's other phones. Your pumping and your wellbeing are yours, so they stay."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar un bebé es definitivo: todo lo anotado para él se elimina, en este teléfono y, en el siguiente intercambio, en los demás teléfonos del hogar. Tu extracción y tu bienestar son tuyos, así que se quedan."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer un bébé est définitif : tout ce qui a été noté pour lui est effacé, sur ce téléphone et, au prochain échange, sur les autres téléphones du foyer. Votre tirage et votre bien-être vous appartiennent, ils restent donc."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminare un bambino è definitivo: tutto ciò che è stato registrato per lui viene cancellato, su questo telefono e, al prossimo scambio, sugli altri telefoni della famiglia. Il tiralatte e il tuo benessere sono tuoi, quindi restano."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usunięcie dziecka jest nieodwracalne: wszystko, co dla niego zapisano, zostaje skasowane, na tym telefonie i przy następnej wymianie na pozostałych telefonach domu. Twoje odciąganie i samopoczucie należą do Ciebie, więc zostają."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apagar um bebé é definitivo: tudo o que foi registado para ele é apagado, neste telemóvel e, na troca seguinte, nos outros telemóveis do agregado. A sua extração e o seu bem-estar são seus, por isso ficam."
+          }
+        }
+      }
+    },
+    "help_babies_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf „Baby hinzufügen“ und gib Namen und Geburtsdatum an. „Aktiv setzen“ wählt das Baby, für das sich die Protokolle öffnen. Name und Geburtsdatum kannst du jederzeit ändern.\n\n„Tracking beenden“ blendet ein Baby im Dashboard aus und behält seinen Verlauf; unter „Nicht aktiv“ holst du es zurück, wann immer du willst."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap “Add a baby” and give a name and a date of birth. “Make active” picks the baby the logs open on. You can edit a name or a birth date at any time.\n\n“Stop tracking” hides a baby from the dashboard and keeps their history; bring them back from “Not tracking” whenever you like."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca «Añadir un bebé» y pon un nombre y una fecha de nacimiento. «Marcar como activo» elige el bebé con el que se abren los registros. Puedes cambiar un nombre o una fecha de nacimiento cuando quieras.\n\n«Dejar de hacer seguimiento» oculta a un bebé del panel y conserva su historial; recupéralo desde «Sin seguimiento» cuando quieras."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Ajouter un bébé » et indiquez un prénom et une date de naissance. « Rendre actif » choisit le bébé sur lequel s'ouvrent les journaux. Vous pouvez modifier un prénom ou une date de naissance à tout moment.\n\n« Arrêter le suivi » masque un bébé du tableau de bord et garde son historique ; faites-le revenir depuis « Suivi arrêté » quand vous voulez."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca «Aggiungi un bambino» e indica nome e data di nascita. «Rendi attivo» sceglie il bambino su cui si aprono i registri. Puoi modificare un nome o una data di nascita quando vuoi.\n\n«Smetti di monitorare» nasconde un bambino dalla dashboard e conserva la sua cronologia; puoi riportarlo da «Non in monitoraggio» quando vuoi."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij „Dodaj dziecko” i podaj imię oraz datę urodzenia. „Ustaw jako aktywne” wybiera dziecko, na którym otwierają się dzienniki. Imię i datę urodzenia możesz zmienić w każdej chwili.\n\n„Przestań śledzić” ukrywa dziecko na pulpicie i zachowuje jego historię; przywrócisz je z sekcji „Nieśledzone”, kiedy zechcesz."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em «Adicionar um bebé» e indique um nome e uma data de nascimento. «Tornar ativo» escolhe o bebé em que os registos abrem. Pode alterar um nome ou uma data de nascimento quando quiser.\n\n«Parar de acompanhar» esconde um bebé do painel e mantém o seu histórico; traga-o de volta a partir de «Sem acompanhamento» quando quiser."
+          }
+        }
+      }
+    },
+    "help_babies_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Babys, für die Sprout Buch führt, ob eines, Zwillinge oder Geschwister."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The babies Sprout keeps a record for, whether one, twins or siblings."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bebés de los que Sprout lleva el registro, ya sea uno, gemelos o hermanos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les bébés dont Sprout tient le relevé, qu'il y en ait un, des jumeaux ou des frères et sœurs."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I bambini di cui Sprout tiene il registro: uno solo, gemelli o fratelli."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dzieci, dla których Sprout prowadzi zapis, czy to jedno, bliźnięta, czy rodzeństwo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os bebés de que o Sprout guarda registo, seja um, gémeos ou irmãos."
+          }
+        }
+      }
+    },
+    "help_baby_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Tab erscheint ab zwei Babys und trägt den Namen des ausgewählten. Jedes Protokoll, das du von hier öffnest, gehört zu diesem Baby."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tab appears once there are two or more babies, and it wears the name of the one you picked. Every log you open from here is that baby's."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta pestaña aparece cuando hay dos bebés o más, y lleva el nombre del que has elegido. Cada registro que abras desde aquí es de ese bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet onglet apparaît dès qu'il y a au moins deux bébés, et il porte le nom de celui que vous avez choisi. Chaque journal ouvert d'ici est celui de ce bébé."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa pagina compare quando i bambini sono almeno due e porta il nome di quello che hai scelto. Ogni registro che apri da qui è di quel bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta zakładka pojawia się, gdy dzieci jest co najmniej dwoje, i nosi imię wybranego dziecka. Każdy dziennik otwarty stąd należy do tego dziecka."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este separador aparece quando há dois bebés ou mais e tem o nome do que escolheu. Cada registo que abrir a partir daqui é desse bebé."
+          }
+        }
+      }
+    },
+    "help_baby_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte das Stillen, öffne ein Protokoll über die Kacheln, sieh dir die Summen von heute an oder geh weiter zur Statistik und zu „Bericht teilen“. Um zu einem anderen Baby zu wechseln, tippe auf seine Karte im Dashboard."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start a breastfeed, open a log from the tiles, see today's totals, or go on to the statistics and to “Share a record”. To switch to another baby, tap their card on the dashboard."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empieza una toma de pecho, abre un registro desde las casillas, consulta los totales de hoy o pasa a las estadísticas y a «Compartir un registro». Para cambiar a otro bebé, toca su tarjeta en el panel."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancez une tétée, ouvrez un journal depuis les tuiles, consultez les totaux du jour, ou passez aux statistiques et à « Partager un relevé ». Pour passer à un autre bébé, touchez sa carte sur le tableau de bord."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia una poppata, apri un registro dai riquadri, guarda i totali di oggi o passa alle statistiche e a «Condividi un resoconto». Per passare a un altro bambino, tocca la sua scheda nella dashboard."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zacznij karmienie piersią, otwórz dziennik z kafelków, sprawdź dzisiejsze sumy albo przejdź do statystyk i do „Udostępnij zapis”. Aby przejść do innego dziecka, dotknij jego karty na pulpicie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comece uma mamada, abra um registo a partir dos mosaicos, veja os totais de hoje ou passe às estatísticas e a «Partilhar um registo». Para mudar para outro bebé, toque no cartão dele no painel."
+          }
+        }
+      }
+    },
+    "help_baby_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Baby für sich: dieselbe Ansicht, die das Dashboard bei nur einem Kind zeigt, für das Baby, das du ausgewählt hast."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One baby on their own: the same view the dashboard shows when there's only one child, for the baby you picked."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un bebé por sí solo: la misma vista que muestra el panel cuando solo hay un niño, para el bebé que has elegido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un bébé à lui seul : la même vue que le tableau de bord lorsqu'il n'y a qu'un enfant, pour le bébé que vous avez choisi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un bambino per conto suo: la stessa vista che la dashboard mostra quando c'è un solo figlio, per il bambino che hai scelto."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedno dziecko osobno: ten sam widok, który pulpit pokazuje przy jednym dziecku, dla wybranego dziecka."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um bebé por si só: a mesma vista que o painel mostra quando há apenas uma criança, para o bebé que escolheu."
+          }
+        }
+      }
+    },
+    "help_diaper_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Farbe wird so gespeichert, wie du sie gewählt hast, und Sprout leitet nichts daraus ab. Wechsel werden im Dashboard und in der Statistik zusammengezählt, wobei ein Wechsel mit beidem einmal zählt. Um einen Eintrag zu ändern, lösche ihn und trag ihn neu ein."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The colour is kept as you picked it, and Sprout makes nothing of it. Changes add up on the dashboard and in the statistics, where a change with both counts once. To change an entry, delete it and log it again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El color se guarda tal como lo elegiste y Sprout no saca nada de él. Los cambios se suman en el panel y en las estadísticas, donde un cambio con ambas cuenta una vez. Para cambiar una entrada, bórrala y anótala de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La couleur est gardée telle que vous l'avez choisie, et Sprout n'en tire rien. Les changes s'additionnent sur le tableau de bord et dans les statistiques, où un change avec les deux compte une fois. Pour modifier une saisie, supprimez-la et notez-la à nouveau."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il colore viene conservato come l'hai scelto, e Sprout non ne deduce nulla. I cambi si sommano nella dashboard e nelle statistiche, dove un cambio con entrambe conta una volta. Per cambiare una voce, eliminala e registrala di nuovo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kolor zostaje zapisany tak, jak go wybrano, i Sprout nic z niego nie wnioskuje. Zmiany sumują się na pulpicie i w statystykach, gdzie zmiana z jednym i drugim liczy się raz. Aby zmienić wpis, usuń go i zapisz ponownie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cor fica guardada tal como a escolheu, e o Sprout não tira dela nenhuma conclusão. As mudas somam-se no painel e nas estatísticas, onde uma muda com ambas conta uma vez. Para alterar um registo, apague-o e registe-o de novo."
+          }
+        }
+      }
+    },
+    "help_diaper_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf + und hake „Urin“, „Stuhl“ oder beides an. Bei Stuhl kannst du die Farbe aus den Farbfeldern wählen oder weglassen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + and tick “Urine”, “Stool” or both. For a stool you can pick its colour from the swatches, or leave it out."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + y marca «Orina», «Heces» o ambas. Para las heces puedes elegir el color entre las muestras, o dejarlo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + et cochez « Urines », « Selles » ou les deux. Pour des selles, vous pouvez choisir leur couleur parmi les pastilles, ou la laisser de côté."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + e spunta «Urine», «Feci» o entrambe. Per le feci puoi scegliere il colore tra i campioni, o lasciarlo vuoto."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij + i zaznacz „Mocz”, „Stolec” albo oba. Przy stolcu możesz wybrać kolor z próbek albo go pominąć."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + e assinale «Urina», «Fezes» ou ambas. Para as fezes, pode escolher a cor entre as amostras, ou deixá-la de fora."
+          }
+        }
+      }
+    },
+    "help_diaper_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeder Windelwechsel des ausgewählten Babys, der neueste zuerst."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every nappy change for the baby you picked, newest first."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada cambio de pañal del bebé elegido, del más reciente al más antiguo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque change du bébé choisi, du plus récent au plus ancien."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni cambio di pannolino del bambino scelto, dal più recente."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każda zmiana pieluchy wybranego dziecka, od najnowszej."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada muda de fralda do bebé escolhido, da mais recente para a mais antiga."
+          }
+        }
+      }
+    },
+    "help_feeding_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Pause ist keine Zeit an der Brust: Der Timer steht still, solange pausiert ist, und eine gespeicherte Mahlzeit endet mit dem Ende ihres letzten Abschnitts. Den Timer zu verlassen stoppt ihn nicht. Jedes Baby hat seinen eigenen Timer, Zwillinge können also gleichzeitig trinken, und eine laufende Stillmahlzeit kann auch außerhalb der App erscheinen, mit denselben Tasten, wenn du das in den Einstellungen einschaltest.\n\nHast du eine Mahlzeit gespeichert und kurz darauf neu begonnen, kann die zweite „Mit vorheriger verbinden“ anbieten. Es wird gefragt, bevor sich etwas ändert, und Sprout verbindet Mahlzeiten nie von selbst: Nur du weißt, ob es eine einzige war."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A break is not time at the breast: the clock stops while you're paused, and a saved feed ends when its last stretch ended. Leaving the timer doesn't stop it. Each baby has a timer of its own, so twins can feed at the same time, and a running feed can also show outside the app, with the same buttons, if you turn that on in Settings.\n\nIf you saved a feed and started again a short while later, the second one may offer “Join with previous”. It asks before it changes anything, and Sprout never joins feeds on its own: only you know whether they were one feed."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una pausa no es tiempo al pecho: el cronómetro se detiene mientras estás en pausa, y una toma guardada termina cuando acabó su último tramo. Salir del cronómetro no lo detiene. Cada bebé tiene su propio cronómetro, así que los gemelos pueden mamar a la vez, y una toma en curso también puede verse fuera de la app, con los mismos botones, si lo activas en los Ajustes.\n\nSi guardaste una toma y empezaste otra poco después, la segunda puede ofrecer «Unir con la anterior». Pregunta antes de cambiar nada, y Sprout nunca une tomas por su cuenta: solo tú sabes si fueron una sola."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une pause n'est pas du temps au sein : le chronomètre s'arrête pendant la pause, et une tétée enregistrée se termine à la fin de sa dernière période. Quitter le chronomètre ne l'arrête pas. Chaque bébé a son propre chronomètre, des jumeaux peuvent donc téter en même temps, et une tétée en cours peut aussi s'afficher hors de l'app, avec les mêmes boutons, si vous l'activez dans les Paramètres.\n\nSi vous avez enregistré une tétée puis recommencé peu après, la seconde peut proposer « Fusionner avec la précédente ». Rien ne change sans votre accord, et Sprout ne fusionne jamais de tétées tout seul : il n'y a que vous pour savoir si c'était une seule tétée."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma. Ogni bambino ha il suo timer, quindi i gemelli possono poppare insieme, e una poppata in corso può comparire anche fuori dall'app, con gli stessi pulsanti, se lo attivi nelle Impostazioni.\n\nSe hai salvato una poppata e ne hai iniziata un'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przerwa to nie czas przy piersi: stoper stoi w czasie pauzy, a zapisane karmienie kończy się wtedy, gdy skończył się jego ostatni odcinek. Wyjście ze stopera go nie zatrzymuje. Każde dziecko ma własny stoper, więc bliźnięta mogą jeść jednocześnie, a trwające karmienie może być też widoczne poza aplikacją, z tymi samymi przyciskami, jeśli włączysz to w Ustawieniach.\n\nJeśli karmienie zostało zapisane, a chwilę później zaczęło się nowe, drugie może zaproponować „Połącz z poprzednim”. Pyta, zanim cokolwiek zmieni, a Sprout nigdy nie łączy karmień sam: tylko Ty wiesz, czy to było jedno karmienie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma pausa não é tempo à mama: o cronómetro para enquanto está em pausa, e uma mamada guardada termina quando acabou o seu último período. Sair do cronómetro não o para. Cada bebé tem o seu próprio cronómetro, por isso os gémeos podem mamar ao mesmo tempo, e uma mamada em curso também pode aparecer fora da app, com os mesmos botões, se o ativar nas Definições.\n\nSe guardou uma mamada e começou outra pouco depois, a segunda pode oferecer «Juntar à anterior». Pergunta antes de mudar o que quer que seja, e o Sprout nunca junta mamadas sozinho: só você sabe se foram uma só."
+          }
+        }
+      }
+    },
+    "help_feeding_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Links starten“ oder „Rechts starten“ öffnet den Timer. Wechsle zwischendurch die Seite, tippe auf „Pause“ für ein Bäuerchen oder eine Windel und dann auf „Links fortsetzen“ oder „Rechts fortsetzen“, je nachdem, welche Brust als Nächstes dran ist. Tippe auf „Stoppen & speichern“, wenn die Mahlzeit vorbei ist.\n\nTippe auf +, um eine Mahlzeit nachträglich einzutragen, eine Flasche oder Beikost. „Details“ zeigt bei einer Stillmahlzeit jeden Abschnitt mit seinen Uhrzeiten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Start left” or “Start right” opens the timer. Switch sides as you go, tap “Pause” for a burp or a nappy, then “Resume left” or “Resume right”, whichever breast comes next. Tap “Stop & save” when the feed is over.\n\nTap + to log a feed after the fact, a bottle or a meal. “Details” on a breastfeed shows each stretch with its times."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Empezar izquierdo» o «Empezar derecho» abre el cronómetro. Cambia de lado sobre la marcha, toca «Pausar» para un eructo o un pañal y luego «Seguir izquierdo» o «Seguir derecho», según el pecho que toque. Toca «Parar y guardar» cuando termine la toma.\n\nToca + para anotar una toma a posteriori, un biberón o una comida. «Detalles», en una toma de pecho, muestra cada tramo con sus horas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Démarrer à gauche » ou « Démarrer à droite » ouvre le chronomètre. Changez de côté au fil de la tétée, touchez « Pause » pour un rot ou une couche, puis « Reprendre à gauche » ou « Reprendre à droite », selon le sein qui suit. Touchez « Arrêter et enregistrer » quand la tétée est finie.\n\nTouchez + pour noter un repas après coup, un biberon ou un repas solide. « Détails », sur une tétée, montre chaque période avec ses heures."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Inizia a sinistra» o «Inizia a destra» apre il timer. Cambia lato strada facendo, tocca «Pausa» per un ruttino o un pannolino, poi «Riprendi a sinistra» o «Riprendi a destra», a seconda del seno che viene dopo. Tocca «Ferma & salva» quando la poppata è finita.\n\nTocca + per registrare un pasto a posteriori, un biberon o un pasto solido. «Dettagli», su una poppata, mostra ogni tratto con i suoi orari."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Zacznij od lewej” albo „Zacznij od prawej” otwiera stoper. Zmieniaj stronę w trakcie, dotknij „Pauza” na odbijanie albo zmianę pieluchy, a potem „Wznów lewą” albo „Wznów prawą”, zależnie od tego, która pierś jest następna. Dotknij „Zatrzymaj & zapisz”, gdy karmienie się skończy.\n\nDotknij +, aby zapisać karmienie po fakcie, butelkę albo posiłek. „Szczegóły” przy karmieniu piersią pokazują każdy odcinek z godzinami."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Começar à esquerda» ou «Começar à direita» abre o cronómetro. Mude de lado pelo caminho, toque em «Pausar» para o arroto ou para mudar a fralda e depois em «Retomar à esquerda» ou «Retomar à direita», conforme a mama que vem a seguir. Toque em «Parar & guardar» quando a mamada terminar.\n\nToque em + para registar uma refeição depois de acontecer, um biberão ou uma refeição sólida. «Detalhes», numa mamada, mostra cada período com as suas horas."
+          }
+        }
+      }
+    },
+    "help_feeding_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jede Mahlzeit des ausgewählten Babys — Brust, Flasche und Beikost — die neueste zuerst, und der Timer fürs Stillen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every feed for the baby you picked — breast, bottle and solids — newest first, and the live timer for a breastfeed."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las tomas del bebé elegido — pecho, biberón y sólidos — de la más reciente a la más antigua, y el cronómetro de la toma de pecho."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les repas du bébé choisi — sein, biberon et solides — du plus récent au plus ancien, et le chronomètre d'une tétée."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutti i pasti del bambino scelto — seno, biberon e solidi — dal più recente, e il timer per la poppata al seno."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wszystkie karmienia wybranego dziecka — pierś, butelka i pokarmy stałe — od najnowszego, oraz stoper karmienia piersią."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as refeições do bebé escolhido — mama, biberão e sólidos — da mais recente para a mais antiga, e o cronómetro da mamada."
+          }
+        }
+      }
+    },
+    "help_foods_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch nur Probieren zählt als einmal angeboten. Es gibt kein Ziel, keine Reihenfolge und keine Bewertung: Die Zahlen zeigen nur, was eingetragen wurde. Sprouts Liste enthält nur Namen, kein Alter und kein Lebensmittel, das als Allergen markiert ist.\n\nSprout schlägt nie eine Allergie vor und hindert dich nie daran, ein Lebensmittel einzutragen: Eines, das du notiert hast, zeigt „Allergie eingetragen“, mehr nicht. Wenn du glaubst, dass dein Baby auf etwas reagiert hat, frag eine Ärztin oder einen Arzt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A taste counts as an offer. There's no target, no order to follow and no grade: the counts are only what was logged. Sprout's list is just names, with no ages and no food marked as an allergen.\n\nSprout never suggests an allergy and never stops you logging a food: one you noted shows “Allergy noted”, and nothing more. If you think your baby reacted to something, ask a doctor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un alimento que solo se probó ya cuenta como ofrecido una vez. No hay objetivo, ni orden que seguir, ni nota: los recuentos solo dicen lo que se anotó. La lista de Sprout son solo nombres, sin edades y sin ningún alimento marcado como alérgeno.\n\nSprout nunca sugiere una alergia y nunca te impide anotar un alimento: el que hayas anotado muestra «Alergia anotada», nada más. Si crees que tu bebé ha reaccionado a algo, consulta a un médico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un simple goût compte déjà comme une fois où l'aliment a été proposé. Il n'y a ni objectif, ni ordre à suivre, ni note : les compteurs ne disent que ce qui a été noté. La liste de Sprout n'est que des noms, sans âges et sans aucun aliment marqué comme allergène.\n\nSprout ne suggère jamais d'allergie et ne vous empêche jamais de noter un aliment : celui que vous avez signalé affiche « Allergie notée », rien de plus. Si vous pensez que votre bébé a réagi à quelque chose, demandez à un médecin."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anche un assaggio conta come un'offerta. Non c'è un obiettivo, né un ordine da seguire, né un voto: i conteggi dicono solo ciò che è stato registrato. La lista di Sprout contiene solo nomi, nessuna età e nessun alimento segnato come allergene.\n\nSprout non suggerisce mai un'allergia e non ti impedisce mai di registrare un alimento: quello che hai annotato mostra «Allergia annotata», niente di più. Se pensi che il tuo bambino abbia reagito a qualcosa, chiedi a un medico."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spróbowanie też liczy się jako podanie. Nie ma celu, kolejności ani oceny: liczniki pokazują tylko to, co zapisano. Gotowa lista to same nazwy, bez wieku i bez żadnego pokarmu oznaczonego jako alergen.\n\nSprout nigdy nie sugeruje alergii i nigdy nie blokuje zapisu pokarmu: ten, przy którym zapisano alergię, pokazuje „Zapisana alergia” i nic więcej. Jeśli sądzisz, że dziecko na coś zareagowało, zapytaj lekarza."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma prova conta como uma oferta. Não há objetivo, nem ordem a seguir, nem nota: as contagens só dizem o que foi registado. A lista do Sprout são só nomes, sem idades e sem nenhum alimento marcado como alergénio.\n\nO Sprout nunca sugere uma alergia e nunca o impede de registar um alimento: o que tiver anotado mostra «Alergia registada», nada mais. Se acha que o seu bebé reagiu a alguma coisa, pergunte a um médico."
+          }
+        }
+      }
+    },
+    "help_foods_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trag mit + eine Mahlzeit ein und gib an, was darin war, aus Sprouts Liste oder in deinen eigenen Worten. Gib bei jedem Lebensmittel an, ob es „Nur probiert“ oder „Eine Portion“ war und, falls dir etwas aufgefallen ist, wie es ankam. Jedes Lebensmittel bekommt dann hier seine Zeile: wie oft es angeboten wurde, Probieren und Portionen getrennt, und das erste und das letzte Mal.\n\n„Details“ zeigt die Mahlzeiten, in denen ein Lebensmittel vorkam. „Korrigieren“ macht in jeder Mahlzeit dieses Babys aus einem Lebensmittel ein anderes, etwa aus einem selbst getippten Namen das Lebensmittel aus der Liste. „Allergie eintragen“ fügt oben eine hinzu, und „Liste teilen“ macht daraus ein einseitiges PDF."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log a meal with + and list what was in it, from Sprout's list or in your own words. For each food, say whether it was a taste or a serving and, if you noticed, how it went. Each food then gets its own line here: how many times it was offered, tastes and servings apart, and the first and last time.\n\n“Details” shows the meals a food was in. “Correct” turns a food into another on every meal of this baby's, such as a name you typed into the same food from the list. “Note an allergy” adds one at the top, and “Share the list” makes a one-page PDF of them."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra una comida con + y anota qué llevaba, de la lista de Sprout o con tus propias palabras. Para cada alimento, indica si fue «Solo probado» o «Una ración» y, si te fijaste, cómo fue. Cada alimento tiene entonces aquí su línea: cuántas veces se ofreció, probadas y raciones por separado, y la primera y la última vez.\n\n«Detalles» muestra las comidas en las que estuvo un alimento. «Corregir» convierte un alimento en otro en todas las comidas de este bebé, por ejemplo un nombre escrito a mano en el mismo alimento de la lista. «Anotar una alergia» añade una arriba, y «Compartir la lista» hace con ellas un PDF de una página."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notez un repas avec + et indiquez ce qu'il contenait, depuis la liste de Sprout ou avec vos propres mots. Pour chaque aliment, dites si c'était « Juste goûté » ou « Une portion » et, si vous l'avez remarqué, comment ça s'est passé. Chaque aliment a ensuite sa ligne ici : combien de fois il a été proposé, goûts et portions à part, et la première et la dernière fois.\n\n« Détails » montre les repas qui contenaient un aliment. « Corriger » transforme un aliment en un autre dans tous les repas de ce bébé, par exemple un nom tapé à la main en l'aliment de la liste. « Noter une allergie » en ajoute une en haut, et « Partager la liste » en fait un PDF d'une page."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra un pasto con + e indica cosa conteneva, dalla lista di Sprout o con parole tue. Per ogni alimento, indica se era «Solo un assaggio» o «Una porzione» e, se l'hai notato, com'è andata. Ogni alimento ha poi qui la sua riga: quante volte è stato offerto, assaggi e porzioni separati, la prima e l'ultima volta.\n\n«Dettagli» mostra i pasti in cui c'era un alimento. «Correggi» trasforma un alimento in un altro in tutti i pasti di questo bambino, per esempio un nome scritto a mano nello stesso alimento della lista. «Annota un'allergia» ne aggiunge una in alto, e «Condividi l'elenco» ne fa un PDF di una pagina."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapisz posiłek przyciskiem + i wpisz, co w nim było, z gotowej listy albo własnymi słowami. Przy każdym pokarmie zaznacz, czy było to „Na spróbowanie” czy „Cała porcja”, a jeśli to zauważysz, jak poszło. Każdy pokarm ma potem tutaj swój wiersz: ile razy był podany, spróbowania i porcje osobno, oraz pierwszy i ostatni raz.\n\n„Szczegóły” pokazują posiłki, w których był dany pokarm. „Popraw” zamienia jeden pokarm w inny we wszystkich posiłkach tego dziecka, na przykład wpisaną ręcznie nazwę w ten sam pokarm z listy. „Zapisz alergię” dodaje ją na górze, a „Udostępnij listę” tworzy z nich jednostronicowy PDF."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registe uma refeição com + e indique o que levava, da lista do Sprout ou por palavras suas. Para cada alimento, diga se foi «Só provou» ou «Uma porção» e, se reparou, como correu. Cada alimento tem depois aqui a sua linha: quantas vezes foi oferecido, provas e porções à parte, e a primeira e a última vez.\n\n«Detalhes» mostra as refeições em que um alimento esteve. «Corrigir» transforma um alimento noutro em todas as refeições deste bebé, por exemplo um nome escrito à mão no mesmo alimento da lista. «Registar uma alergia» acrescenta uma no topo, e «Partilhar a lista» faz delas um PDF de uma página."
+          }
+        }
+      }
+    },
+    "help_foods_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes Lebensmittel, das dein Baby bei einer Beikost-Mahlzeit kennengelernt hat, eine Zeile pro Lebensmittel, und die Allergien, die deine Familie kennt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every food your baby has met at a solid meal, one line each, and the allergies your family knows about."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento que tu bebé ha probado en una comida sólida, una línea por alimento, y las alergias que tu familia conoce."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque aliment que votre bébé a découvert lors d'un repas solide, une ligne par aliment, et les allergies que votre famille connaît."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni alimento che il tuo bambino ha conosciuto in un pasto solido, una riga per alimento, e le allergie che la tua famiglia conosce."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy pokarm, który Twoje dziecko poznało przy posiłku stałym, w osobnym wierszu, oraz alergie znane Twojej rodzinie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada alimento que o seu bebé conheceu numa refeição sólida, uma linha por alimento, e as alergias que a sua família conhece."
+          }
+        }
+      }
+    },
+    "help_growth_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um die Messungen mit den WHO-Wachstumskurven zu vergleichen, öffne „Trends“. Messungen werden mit deinem Haushalt geteilt und stehen im Bericht für die Ärztin oder den Arzt. Um eine zu ändern, lösche sie und trag sie neu ein."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To see the measurements against the WHO growth curves, open “Trends”. Measurements are shared with your household and go into the record for a doctor. To change one, delete it and add it again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para ver las medidas frente a las curvas de crecimiento de la OMS, abre «Tendencias». Las medidas se comparten con tu hogar y aparecen en el registro para el médico. Para cambiar una, bórrala y añádela de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour voir les mesures par rapport aux courbes de croissance de l'OMS, ouvrez « Tendances ». Les mesures sont partagées avec votre foyer et figurent dans le relevé pour le médecin. Pour en modifier une, supprimez-la et ajoutez-la à nouveau."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per vedere le misure rispetto alle curve di crescita dell'OMS, apri «Andamento». Le misure sono condivise con la tua famiglia e compaiono nel resoconto per il medico. Per cambiarne una, eliminala e aggiungila di nuovo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aby zobaczyć pomiary na tle siatek wzrastania WHO, otwórz „Trendy”. Pomiary są udostępniane domownikom i trafiają do zapisu dla lekarza. Aby zmienić pomiar, usuń go i dodaj ponownie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para ver as medidas face às curvas de crescimento da OMS, abra «Tendências». As medidas são partilhadas com o seu agregado e entram no registo para o médico. Para alterar uma, apague-a e adicione-a de novo."
+          }
+        }
+      }
+    },
+    "help_growth_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf + und füll aus, was du hast: Eine Messung genügt. Das Gewicht ist in Gramm, Größe und Kopfumfang in Zentimetern. Ab dem zweiten Gewicht zeigt ein kleines Diagramm den Verlauf."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + and fill in whichever you have: one is enough. Weight is in grams, height and head in centimetres. From the second weight on, a small chart shows the trend."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + y rellena lo que tengas: con una basta. El peso va en gramos, la altura y el perímetro craneal en centímetros. A partir del segundo peso, un pequeño gráfico muestra la tendencia."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + et remplissez ce que vous avez : une seule mesure suffit. Le poids est en grammes, la taille et le périmètre crânien en centimètres. Dès le deuxième poids, un petit graphique montre la tendance."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + e compila quello che hai: ne basta una. Il peso è in grammi, l'altezza e la circonferenza cranica in centimetri. Dal secondo peso in poi, un piccolo grafico mostra l'andamento."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij + i wpisz to, co masz: wystarczy jeden pomiar. Waga jest w gramach, wzrost i obwód głowy w centymetrach. Od drugiego ważenia mały wykres pokazuje trend."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + e preencha o que tiver: basta uma. O peso é em gramas, a altura e o perímetro cefálico em centímetros. A partir do segundo peso, um pequeno gráfico mostra a tendência."
+          }
+        }
+      }
+    },
+    "help_growth_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Messungen deines Babys — Gewicht, Größe und Kopfumfang — wann immer sie gemacht werden."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your baby's measurements — weight, height and head circumference — whenever they're taken."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las medidas de tu bebé — peso, altura y perímetro craneal — cada vez que se tomen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les mesures de votre bébé — poids, taille et périmètre crânien — chaque fois qu'elles sont prises."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le misure del tuo bambino — peso, altezza e circonferenza cranica — ogni volta che vengono prese."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomiary Twojego dziecka — waga, wzrost i obwód głowy — kiedykolwiek są robione."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As medidas do seu bebé — peso, altura e perímetro cefálico — sempre que forem tiradas."
+          }
+        }
+      }
+    },
+    "help_home_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manche Karten erscheinen nur, wenn es etwas zu sagen gibt: der tägliche Check-in, ein Hinweis in dem Alter, in dem Wachstumsschübe häufig sind, ein Medikament mit laufender Wartezeit und Neues nach einem Update. Keine davon steht dir im Weg. Die Symbole oben öffnen deine Babys und die Einstellungen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some cards only appear when there's something to say: the daily check-in, a note around the ages growth spurts are common, a medicine with a wait running, and what's new after an update. None of them stands in your way. The icons at the top open your babies and the settings."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algunas tarjetas solo aparecen cuando tienen algo que decir: el chequeo diario, una nota en las edades en que los estirones son frecuentes, un medicamento con una espera en curso y las novedades tras una actualización. Ninguna se interpone en tu camino. Los iconos de arriba abren tus bebés y los ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certaines cartes n'apparaissent que lorsqu'elles ont quelque chose à dire : le bilan du jour, une note aux âges où les pics de croissance sont fréquents, un médicament dont l'attente est en cours, et les nouveautés après une mise à jour. Aucune ne vous barre la route. Les icônes en haut ouvrent vos bébés et les paramètres."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcune schede compaiono solo quando hanno qualcosa da dire: il check-in quotidiano, una nota alle età in cui gli scatti di crescita sono frequenti, un farmaco con un'attesa in corso e le novità dopo un aggiornamento. Nessuna ti ostacola. Le icone in alto aprono i tuoi bambini e le impostazioni."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niektóre karty pojawiają się tylko wtedy, gdy mają coś do powiedzenia: codzienny wpis, notka w wieku, w którym skoki rozwojowe są częste, lek z trwającym odstępem i nowości po aktualizacji. Żadna nie staje Ci na drodze. Ikony na górze otwierają Twoje dzieci i ustawienia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alguns cartões só aparecem quando têm algo a dizer: a verificação diária, uma nota nas idades em que os saltos de crescimento são frequentes, um medicamento com uma espera em curso e as novidades depois de uma atualização. Nenhum lhe barra o caminho. Os ícones no topo abrem os seus bebés e as definições."
+          }
+        }
+      }
+    },
+    "help_home_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte das Stillen direkt im Dashboard: Der Hauptknopf ist die Brust, mit der die letzte Mahlzeit nicht begonnen hat, und die andere liegt daneben. Die Kacheln öffnen die einzelnen Protokolle, und „Heute“ zählt den bisherigen Tag zusammen. Bei mehreren Babys tippst du auf eine Karte, um den Tab dieses Babys zu öffnen. Welche Kacheln erscheinen und in welcher Reihenfolge, wählst du in den Einstellungen unter „Start anpassen“; eine ausgeschaltete Kachel wartet unter „Mehr“.\n\nEine laufende Stillmahlzeit oder ein schlafendes Baby erscheint oben, mit einem Knopf zum Öffnen oder um das Aufwachen einzutragen. Zwillinge können gleichzeitig trinken: Jede laufende Stillmahlzeit hat eine eigene Zeile mit dem Namen des Babys."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start a breastfeed from the dashboard: the main button is the breast the last feed didn't start on, and the other one is beside it. The tiles open each log, and “Today” adds up the day so far. With more than one baby, tap a card to open that baby's own tab. To choose which tiles show and in which order, open “Customise home” in Settings; a tile you switch off waits under “More”.\n\nA feed on the timer, or a baby asleep, shows at the top with a button to open it or to say they woke up. Twins can feed at the same time: each running feed has a row of its own, with the baby's name."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empieza una toma de pecho desde el panel: el botón principal es el pecho por el que no empezó la última toma, y el otro está al lado. Las casillas abren cada registro, y «Hoy» suma lo que va de día. Con más de un bebé, toca una tarjeta para abrir la pestaña de ese bebé. Para elegir qué casillas se muestran y en qué orden, abre «Personalizar el inicio» en los Ajustes; una casilla desactivada espera en «Más».\n\nUna toma en curso, o un bebé dormido, aparece arriba con un botón para abrirla o para anotar que se despertó. Los gemelos pueden mamar a la vez: cada toma en curso tiene su propia fila, con el nombre del bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancez une tétée depuis le tableau de bord : le bouton principal est le sein par lequel la dernière tétée n'a pas commencé, et l'autre est à côté. Les tuiles ouvrent chaque journal, et « Aujourd'hui » fait le total de la journée. Avec plusieurs bébés, touchez une carte pour ouvrir l'onglet de ce bébé. Pour choisir les tuiles affichées et leur ordre, ouvrez « Personnaliser l'accueil » dans les Paramètres ; une tuile désactivée attend sous « Plus ».\n\nUne tétée en cours, ou un bébé qui dort, s'affiche en haut avec un bouton pour l'ouvrir ou pour noter son réveil. Des jumeaux peuvent téter en même temps : chaque tétée en cours a sa propre ligne, avec le prénom du bébé."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l'ultima poppata, e l'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino. Per scegliere quali riquadri compaiono e in che ordine, apri «Personalizza la Home» nelle Impostazioni; un riquadro disattivato aspetta in «Altro».\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio. I gemelli possono poppare insieme: ogni poppata in corso ha la sua riga, con il nome del bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zacznij karmienie piersią prosto z pulpitu: główny przycisk to pierś, od której nie zaczęło się ostatnie karmienie, a druga jest obok. Kafelki otwierają poszczególne dzienniki, a „Dziś” podsumowuje dotychczasowy dzień. Przy kilkorgu dzieciach dotknij karty, aby otworzyć zakładkę tego dziecka. Które kafelki są widoczne i w jakiej kolejności, wybierzesz w Ustawieniach, w „Dostosuj ekran startowy”; wyłączony kafelek czeka pod „Więcej”.\n\nTrwające karmienie albo śpiące dziecko widać na górze, z przyciskiem, by je otworzyć albo zapisać pobudkę. Bliźnięta mogą jeść jednocześnie: każde trwające karmienie ma własny wiersz z imieniem dziecka."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comece uma mamada diretamente no painel: o botão principal é a mama por onde a última mamada não começou, e a outra está ao lado. Os mosaicos abrem cada registo, e «Hoje» soma o dia até agora. Com mais de um bebé, toque num cartão para abrir o separador desse bebé. Para escolher que mosaicos aparecem e por que ordem, abra «Personalizar o início» nas Definições; um mosaico desativado espera em «Mais».\n\nUma mamada em curso, ou um bebé a dormir, aparece no topo com um botão para a abrir ou para registar que acordou. Os gémeos podem mamar ao mesmo tempo: cada mamada em curso tem a sua própria linha, com o nome do bebé."
+          }
+        }
+      }
+    },
+    "help_home_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der ganze Haushalt auf einen Blick: für jedes Baby, wie lange die letzte Mahlzeit, der letzte Schlaf und die letzte Windel her sind, und was gerade läuft."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The whole household at a glance: for each baby, how long since they were fed, slept and changed, and anything that's running right now."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo el hogar de un vistazo: para cada bebé, cuánto hace que comió, durmió y se le cambió, y lo que está en marcha ahora mismo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout le foyer d'un coup d'œil : pour chaque bébé, depuis quand il a mangé, dormi et été changé, et ce qui est en cours en ce moment."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutta la famiglia a colpo d'occhio: per ogni bambino, da quanto ha mangiato, dormito ed è stato cambiato, e cosa è in corso adesso."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cały dom w jednym miejscu: dla każdego dziecka, ile czasu minęło od karmienia, snu i zmiany pieluchy, oraz co trwa w tej chwili."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo o agregado num relance: para cada bebé, há quanto tempo comeu, dormiu e mudou a fralda, e o que está a decorrer neste momento."
+          }
+        }
+      }
+    },
+    "help_medicines_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Farbe ist reine Rechnung mit deinen eigenen Angaben, nie ein Rat. Rot: Der kürzeste Abstand ist noch nicht vorbei, oder das Tagesmaximum ist erreicht. Gelb: erlaubt, aber früher als dein üblicher Abstand. Grün: Es gibt nichts mehr abzuwarten. Jede Farbe hat außerdem ihr eigenes Symbol und ihren eigenen Satz.\n\n„Kein fester Abstand“ heißt, dass dir gar kein Abstand genannt wurde, nicht ein Abstand von null: Dann zählt nur das Tagesmaximum. Sprout weiß nichts über irgendein Medikament, und „Gabe erfassen“ funktioniert immer, egal welche Farbe."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The colour is arithmetic on your own figures, never advice. Red: the shortest wait isn't over, or the day's maximum is used up. Amber: allowed, but sooner than your usual wait. Green: nothing left to wait for. Each colour also has its own icon and its own sentence.\n\n“No set gap” means you were given no wait at all, not a wait of zero: only the daily maximum counts. Sprout knows nothing about any medicine, and “Give a dose” always works, whatever the colour."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El color es aritmética con tus propias cifras, nunca un consejo. Rojo: la espera más corta no ha terminado, o se ha alcanzado el máximo del día. Ámbar: se puede, pero antes de tu espera habitual. Verde: no queda nada que esperar. Cada color tiene además su propio icono y su propia frase.\n\n«Sin intervalo fijo» significa que no te dieron ninguna espera, no una espera de cero: entonces solo cuenta el máximo diario. Sprout no sabe nada de ningún medicamento, y «Registrar una toma» siempre funciona, sea cual sea el color."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La couleur est un simple calcul sur vos propres chiffres, jamais un conseil. Rouge : l'attente la plus courte n'est pas écoulée, ou le maximum du jour est atteint. Orange : c'est permis, mais plus tôt que votre attente habituelle. Vert : plus rien à attendre. Chaque couleur a aussi sa propre icône et sa propre phrase.\n\n« Pas d'intervalle imposé » veut dire qu'on ne vous a donné aucune attente, et non une attente de zéro : seul le maximum par jour compte alors. Sprout ne sait rien d'aucun médicament, et « Noter une prise » fonctionne toujours, quelle que soit la couleur."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il colore è un calcolo sui tuoi stessi valori, mai un consiglio. Rosso: l'attesa più breve non è finita, o il massimo del giorno è raggiunto. Giallo: si può, ma prima della tua attesa abituale. Verde: non c'è più niente da aspettare. Ogni colore ha anche la sua icona e la sua frase.\n\n«Nessun intervallo fisso» vuol dire che non ti è stata data nessuna attesa, non un'attesa di zero: allora conta solo il massimo al giorno. Sprout non sa nulla di nessun farmaco, e «Registra una dose» funziona sempre, qualunque sia il colore."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kolor to rachunek na Twoich własnych wartościach, nigdy rada. Czerwony: najkrótszy odstęp jeszcze nie minął albo dzienne maksimum zostało osiągnięte. Żółty: można, ale wcześniej niż zwykły odstęp. Zielony: nie ma już na co czekać. Każdy kolor ma też własną ikonę i własne zdanie.\n\n„Bez stałej przerwy” znaczy, że nie podano żadnego odstępu, a nie odstęp zerowy: wtedy liczy się tylko dzienne maksimum. Sprout nic nie wie o żadnym leku, a „Zapisz dawkę” działa zawsze, bez względu na kolor."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cor é aritmética com os seus próprios valores, nunca um conselho. Vermelho: a espera mais curta ainda não passou, ou o máximo do dia foi atingido. Amarelo: pode dar-se, mas antes da sua espera habitual. Verde: já não há nada a esperar. Cada cor tem também o seu ícone e a sua frase.\n\n«Sem intervalo fixo» quer dizer que não lhe deram espera nenhuma, não uma espera de zero: aí só conta o máximo diário. O Sprout não sabe nada sobre nenhum medicamento, e «Registar uma toma» funciona sempre, seja qual for a cor."
+          }
+        }
+      }
+    },
+    "help_medicines_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf +, um ein Medikament mit den Angaben aus der ärztlichen Verordnung oder dem Beipackzettel einzurichten: der kürzeste Abstand zwischen zwei Gaben, ein üblicher Abstand, falls es einen gibt, und eine Höchstzahl pro Tag, falls dir eine genannt wurde. Tippe dann jedes Mal auf „Gabe erfassen“.\n\nTippe auf ein Medikament, um seine Angaben zu ändern, und auf eine Gabe in der Liste, um Uhrzeit oder Menge zu korrigieren."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + to set a medicine up with the figures your prescriber or the leaflet gave you: the shortest wait between doses, a usual wait if there is one, and a daily maximum if you were given one. Then tap “Give a dose” each time it's given.\n\nTap a medicine to change its figures, and a dose in the list to correct its time or amount."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + para configurar un medicamento con las cifras que te dio tu médico o el prospecto: la espera más corta entre tomas, una espera habitual si la hay y un máximo diario si te lo dieron. Luego toca «Registrar una toma» cada vez que lo des.\n\nToca un medicamento para cambiar sus cifras, y una toma de la lista para corregir su hora o su cantidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + pour configurer un médicament avec les chiffres donnés par votre médecin ou la notice : l'attente la plus courte entre deux prises, une attente habituelle s'il y en a une, et un maximum par jour si on vous en a donné un. Ensuite, touchez « Noter une prise » à chaque fois.\n\nTouchez un médicament pour modifier ses chiffres, et une prise dans la liste pour corriger son heure ou sa quantité."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + per impostare un farmaco con i valori che ti hanno dato il medico o il foglietto illustrativo: l'attesa più breve tra due dosi, un'attesa abituale se c'è e un massimo al giorno se te l'hanno indicato. Poi tocca «Registra una dose» ogni volta che lo dai.\n\nTocca un farmaco per cambiarne i valori, e una dose nell'elenco per correggerne l'orario o la quantità."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij +, aby dodać lek z wartościami od lekarza albo z ulotki: najkrótszy odstęp między dawkami, zwykły odstęp, jeśli jest, i dzienne maksimum, jeśli je podano. Potem dotykaj „Zapisz dawkę” za każdym razem, gdy go podajesz.\n\nDotknij leku, aby zmienić jego wartości, a dawki na liście, aby poprawić jej godzinę albo ilość."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + para configurar um medicamento com os valores que o seu médico ou o folheto informativo lhe deram: a espera mais curta entre tomas, uma espera habitual se houver, e um máximo diário se lho deram. Depois, toque em «Registar uma toma» sempre que o der.\n\nToque num medicamento para alterar os seus valores, e numa toma da lista para corrigir a hora ou a quantidade."
+          }
+        }
+      }
+    },
+    "help_medicines_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medikamente, die nur bei Bedarf gegeben werden, und die Frage, die um 3 Uhr nachts zählt: Darf schon die nächste Gabe sein?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medicines given only when they're needed, and the question that matters at 3 a.m.: can another dose be given yet?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medicamentos que solo se dan cuando hace falta, y la pregunta que importa a las 3 de la madrugada: ¿se puede dar ya otra toma?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les médicaments donnés seulement en cas de besoin, et la question qui compte à 3 h du matin : peut-on déjà donner une autre prise ?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Farmaci dati solo quando servono, e la domanda che conta alle 3 di notte: si può già dare un'altra dose?"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leki podawane tylko w razie potrzeby i pytanie, które liczy się o trzeciej w nocy: czy można już podać kolejną dawkę?"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medicamentos dados só quando são precisos, e a pergunta que importa às 3 da manhã: já se pode dar outra toma?"
+          }
+        }
+      }
+    },
+    "help_pumping_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Vorrat zählt nur Milch, die noch gegeben werden kann: Verbrauchte Milch und Milch, die länger als der Richtwert auf dieser Seite gelagert ist, fehlt in den Summen, ihr Eintrag bleibt aber im Verlauf. Abpumpen gehört dir, nicht einem Baby. Es wird mit deinem Haushalt geteilt, außer du schaltest „Abgepumpte Milch teilen“ auf der Seite zum Teilen aus."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The stash only counts milk that can still be given: used milk, and milk kept longer than the rough guide on this page, is left out of the totals, though its entry stays in the history. Pumping belongs to you rather than to a baby. It's shared with your household unless you switch off “Share expressed milk” on the sharing page."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La reserva solo cuenta la leche que aún se puede dar: la leche usada, y la guardada más tiempo del que indica la orientación de esta página, queda fuera de los totales, aunque su entrada sigue en el historial. La extracción es tuya, no de un bebé. Se comparte con tu hogar salvo que desactives «Compartir la leche extraída» en la página de compartir."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La réserve ne compte que le lait qui peut encore être donné : le lait consommé, et celui gardé plus longtemps que le repère de cette page, est exclu des totaux, mais sa saisie reste dans l'historique. Le tirage vous appartient, pas à un bébé. Il est partagé avec votre foyer, sauf si vous désactivez « Partager le lait tiré » sur la page de partage."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La scorta conta solo il latte che si può ancora dare: il latte usato, e quello conservato più a lungo dell'indicazione di massima di questa pagina, resta fuori dai totali, anche se la sua voce rimane nella cronologia. Il tiralatte è tuo, non di un bambino. Viene condiviso con la tua famiglia, a meno che tu non disattivi «Condividi il latte tirato» nella pagina di condivisione."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapas liczy tylko mleko, które wciąż można podać: zużyte mleko oraz mleko przechowywane dłużej, niż mówią orientacyjne wartości na tej stronie, nie wchodzi do sum, choć jego wpis zostaje w historii. Odciąganie należy do Ciebie, a nie do dziecka. Jest udostępniane domownikom, chyba że wyłączysz „Udostępniaj odciągnięte mleko” na stronie współdzielenia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A reserva só conta o leite que ainda pode ser dado: o leite usado, e o guardado durante mais tempo do que a indicação geral desta página, fica fora dos totais, embora o seu registo continue no histórico. A extração é sua, não de um bebé. É partilhada com o seu agregado, a não ser que desative «Partilhar o leite extraído» na página de partilha."
+          }
+        }
+      }
+    },
+    "help_pumping_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe nach einer Sitzung auf +, um einzutragen, wie viel es war und wohin die Milch kam. Wird gelagerte Milch getrunken oder weggeschüttet, tippe auf „Als verbraucht markieren“, und sie verlässt den Vorrat."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + after a session to log how much and where it went. When stored milk is drunk or thrown away, tap “Mark as used” and it leaves the stash."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + después de una sesión para anotar cuánto fue y dónde la guardaste. Cuando la leche guardada se bebe o se tira, toca «Marcar como usada» y sale de la reserva."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + après une séance pour noter la quantité et l'endroit où le lait est rangé. Quand du lait conservé est bu ou jeté, touchez « Marquer consommé » et il sort de la réserve."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + dopo una sessione per registrare quanto ne hai tirato e dove l'hai messo. Quando il latte conservato viene bevuto o buttato, tocca «Segna come usato» ed esce dalla scorta."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Po sesji dotknij +, aby zapisać, ile było i gdzie trafiło mleko. Gdy przechowywane mleko zostanie wypite albo wylane, dotknij „Oznacz jako zużyte”, a zniknie z zapasu."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + depois de uma sessão para registar quanto foi e onde ficou. Quando o leite guardado é bebido ou deitado fora, toque em «Marcar como usado» e ele sai da reserva."
+          }
+        }
+      }
+    },
+    "help_pumping_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Abpump-Sitzungen und der Milchvorrat: wie viel gerade im Kühlschrank, im Gefrierfach oder bei Zimmertemperatur steht."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your pumping sessions, and the milk stash: how much is in the fridge, in the freezer or out at room temperature right now."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus sesiones de extracción y la reserva de leche: cuánta hay ahora mismo en la nevera, en el congelador o a temperatura ambiente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos séances de tirage, et la réserve de lait : combien il y en a au frigo, au congélateur ou à température ambiante en ce moment."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le tue sessioni di tiralatte e la scorta di latte: quanto ce n'è adesso in frigo, in congelatore o a temperatura ambiente."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twoje sesje odciągania i zapas mleka: ile jest teraz w lodówce, w zamrażarce albo w temperaturze pokojowej."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As suas sessões de extração e a reserva de leite: quanto há neste momento no frigorífico, no congelador ou à temperatura ambiente."
+          }
+        }
+      }
+    },
+    "help_report_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Dokument gibt wieder, was eingetragen wurde, und deutet nichts. Die gewählte WHO-Referenz gilt nur für diese Datei und wird vergessen, sobald du den Bildschirm verlässt; standardmäßig werden beide verwendet und als Spanne angegeben. Notizen bleiben draußen, außer du nimmst sie auf, und Abpumpen und dein Wohlbefinden stehen nie darin.\n\nDie Dateien entstehen auf diesem Handy und gehen nirgendwohin, bis du sie verschickst. Sprout behält keine Kopie des Passworts: Gib es persönlich oder am Telefon weiter, nicht mit der Datei."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The document states what was logged and interprets nothing. The WHO reference you pick is for this file only and forgotten when you leave; by default both are used and shown as a span. Notes are left out unless you include them, and pumping and your wellbeing are never in it.\n\nThe files are made on this phone and go nowhere until you send them. Sprout keeps no copy of the password: give it in person or by phone, not with the file."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El documento dice lo que se anotó y no interpreta nada. La referencia de la OMS que elijas vale solo para este archivo y se olvida al salir; por defecto se usan las dos y se dan como intervalo. Las notas quedan fuera salvo que las incluyas, y la extracción y tu bienestar nunca aparecen.\n\nLos archivos se crean en este teléfono y no van a ninguna parte hasta que los envíes. Sprout no guarda ninguna copia de la contraseña: dásela en persona o por teléfono, no junto con el archivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le document dit ce qui a été noté et n'interprète rien. La référence OMS choisie ne vaut que pour ce fichier et est oubliée quand vous quittez l'écran ; par défaut, les deux sont utilisées et données sous forme d'intervalle. Les notes sont exclues sauf si vous les incluez, et le tirage et votre bien-être n'y figurent jamais.\n\nLes fichiers sont créés sur ce téléphone et ne vont nulle part tant que vous ne les envoyez pas. Sprout ne garde aucune copie du mot de passe : donnez-le en personne ou par téléphone, pas avec le fichier."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il documento riporta ciò che è stato registrato e non interpreta nulla. Il riferimento OMS che scegli vale solo per questo file e viene dimenticato quando esci; di base si usano entrambi, dati come intervallo. Le note restano fuori a meno che tu non le includa, e il tiralatte e il tuo benessere non ci sono mai.\n\nI file vengono creati su questo telefono e non vanno da nessuna parte finché non li invii. Sprout non conserva alcuna copia della password: dalla di persona o al telefono, non insieme al file."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokument podaje to, co zapisano, i niczego nie interpretuje. Wybrana siatka WHO dotyczy tylko tego pliku i jest zapominana po wyjściu z ekranu; domyślnie używane są obie, podane jako przedział. Notatki są pomijane, chyba że je dołączysz, a odciągania i Twojego samopoczucia nigdy tam nie ma.\n\nPliki powstają na tym telefonie i nigdzie nie trafiają, dopóki ich nie wyślesz. Sprout nie przechowuje kopii hasła: przekaż je osobiście albo przez telefon, nie razem z plikiem."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O documento diz o que foi registado e não interpreta nada. A referência da OMS que escolher vale só para este ficheiro e é esquecida quando sair; por omissão usam-se as duas, apresentadas como intervalo. As notas ficam de fora, a não ser que as inclua, e a extração e o seu bem-estar nunca lá aparecem.\n\nOs ficheiros são criados neste telemóvel e não vão para lado nenhum até os enviar. O Sprout não guarda nenhuma cópia da palavra-passe: dê-a pessoalmente ou por telefone, não junto com o ficheiro."
+          }
+        }
+      }
+    },
+    "help_report_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle den Zeitraum, dessen genaue Daten angezeigt werden, bevor etwas erstellt wird, und was hinein soll. Tippe dann auf „PDF-Bericht“ oder „Tabelle“ und wähle, wohin es gehen soll. „Mit einem Passwort schützen“ packt beide Dateien in ein verschlüsseltes Zip."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick the period, whose exact dates are shown before anything is made, and choose what to include. Then tap “PDF report” or “Spreadsheet” and pick where to send it. “Protect with a password” puts both files in one encrypted zip."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige el periodo, cuyas fechas exactas se muestran antes de crear nada, y qué incluir. Luego toca «Informe PDF» u «Hoja de cálculo» y elige adónde enviarlo. «Proteger con una contraseña» mete los dos archivos en un único zip cifrado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez la période, dont les dates exactes s'affichent avant que quoi que ce soit ne soit créé, et ce qu'il faut inclure. Puis touchez « Rapport PDF » ou « Tableur », et choisissez où l'envoyer. « Protéger par un mot de passe » met les deux fichiers dans un seul zip chiffré."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli il periodo, le cui date esatte vengono mostrate prima di creare qualsiasi cosa, e cosa includere. Poi tocca «Referto PDF» o «Foglio di calcolo» e scegli dove inviarlo. «Proteggi con una password» mette entrambi i file in un unico zip cifrato."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz okres, którego dokładne daty widać, zanim cokolwiek powstanie, oraz to, co ma się znaleźć w środku. Potem dotknij „Raport PDF” albo „Arkusz” i wybierz, dokąd wysłać. „Zabezpiecz hasłem” umieszcza oba pliki w jednym zaszyfrowanym archiwum zip."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha o período, cujas datas exatas aparecem antes de qualquer ficheiro ser criado, e o que incluir. Depois toque em «Relatório PDF» ou «Folha de cálculo» e escolha para onde enviar. «Proteger com uma palavra-passe» põe os dois ficheiros num único zip cifrado."
+          }
+        }
+      }
+    },
+    "help_report_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Bericht über das, was du für ein Baby eingetragen hast, für die Ärztin oder den Arzt: ein PDF zum Lesen oder Drucken und eine Tabelle der Einträge."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A record of what you've logged for one baby, to hand to a doctor: a PDF to read or print, and a spreadsheet of the entries."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un registro de lo que has anotado para un bebé, para dárselo a un médico: un PDF para leer o imprimir y una hoja de cálculo con las entradas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un relevé de ce que vous avez noté pour un bébé, à remettre à un médecin : un PDF à lire ou imprimer, et un tableur des saisies."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un resoconto di ciò che hai registrato per un bambino, da dare a un medico: un PDF da leggere o stampare e un foglio di calcolo con le voci."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapis tego, co zanotowano dla jednego dziecka, do przekazania lekarzowi: PDF do przeczytania albo wydruku i arkusz z wpisami."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um registo do que anotou para um bebé, para entregar a um médico: um PDF para ler ou imprimir, e uma folha de cálculo com os registos."
+          }
+        }
+      }
+    },
+    "help_section_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gut zu wissen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good to know"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conviene saber"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bon à savoir"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buono a sapersi"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warto wiedzieć"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bom saber"
+          }
+        }
+      }
+    },
+    "help_section_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "So funktioniert es"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How to use it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo se usa"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment l'utiliser"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Come si usa"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jak z niej korzystać"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como usar"
+          }
+        }
+      }
+    },
+    "help_section_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wofür diese Seite da ist"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What this page is for"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para qué sirve esta página"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À quoi sert cette page"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cosa serve questa pagina"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do czego służy ta strona"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para que serve esta página"
+          }
+        }
+      }
+    },
+    "help_settings_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mahlzeit-Erinnerungen, Wachstumsschub-Hinweise und die laufende Stillmahlzeit außerhalb der App bleiben aus, bis du sie einschaltest, und der Check-in ist nie eine Benachrichtigung. Diese Einstellungen gehören zu diesem Handy und werden nicht geteilt. Die Links unten öffnen eine Spendenseite in deinem Browser; eine Spende schaltet nichts frei, denn alles ist schon da."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feeding reminders, growth spurt alerts and a running feed outside the app stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren't shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los recordatorios de tomas, los avisos de estirones y la toma en curso fuera de la app están desactivados hasta que los actives, y el chequeo nunca es una notificación. Estos ajustes son de este teléfono y no se comparten. Los enlaces del final abren una página de donación en tu navegador; donar no desbloquea nada, porque ya está todo aquí."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les rappels de repas, les alertes de pics de croissance et la tétée en cours hors de l'app restent désactivés tant que vous ne les activez pas, et le bilan n'est jamais une notification. Ces réglages appartiennent à ce téléphone et ne sont pas partagés. Les liens en bas ouvrent une page de don dans votre navigateur ; un don ne débloque rien, car tout est déjà là."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I promemoria dei pasti, gli avvisi sugli scatti di crescita e la poppata in corso fuori dall'app restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c'è già tutto."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przypomnienia o karmieniu, powiadomienia o skokach rozwojowych i trwające karmienie poza aplikacją są wyłączone, dopóki ich nie włączysz, a codzienny wpis nigdy nie jest powiadomieniem. Te ustawienia należą do tego telefonu i nie są udostępniane. Linki na dole otwierają stronę darowizny w przeglądarce; darowizna niczego nie odblokowuje, bo wszystko już tu jest."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os lembretes de refeições, os alertas de saltos de crescimento e a mamada em curso fora da app ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui."
+          }
+        }
+      }
+    },
+    "help_settings_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle eine Sprache oder behalte die des Handys. Schalte „Mahlzeit-Erinnerungen“ ein für einen Hinweis, wenn die letzte Mahlzeit eine Weile her ist, und „Wachstumsschub-Hinweise“, wenn eine typische Wachstumsschub-Phase beginnt. Du kannst auch eine laufende Stillmahlzeit außerhalb der App zeigen – in den Benachrichtigungen oder auf dem Sperrbildschirm –, mit ihren Tasten. „Start anpassen“ wählt, welche Protokolle das Dashboard zeigt und in welcher Reihenfolge. Schalte den täglichen Check-in oder einzelne seiner Fragen ein oder aus. Unter „Haushalt teilen“ werden Handys verbunden. „Tour noch einmal ansehen“ zeigt die kurze Tour durch das Dashboard noch einmal."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a language, or keep the phone's. Turn on “Feeding reminders” for a nudge when it's been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. You can also show a breastfeed you're timing outside the app — in the notifications or on the lock screen — with its buttons. “Customise home” chooses which logs the dashboard shows, and in which order. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired. “Replay the tour” shows the short tour of the dashboard again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un idioma o quédate con el del teléfono. Activa «Recordatorios de tomas» para un aviso cuando haga rato de la última toma, y «Avisos de estirones» cuando empiece un periodo típico de estirón. También puedes mostrar la toma que estás cronometrando fuera de la app —en las notificaciones o en la pantalla de bloqueo— con sus botones. «Personalizar el inicio» elige qué registros muestra el panel y en qué orden. Activa o desactiva el chequeo diario, o cualquiera de sus preguntas. En «Compartir en el hogar» se vinculan los teléfonos. «Repetir el recorrido» vuelve a mostrar el breve recorrido por el panel."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez une langue, ou gardez celle du téléphone. Activez « Rappels de repas » pour un petit rappel quand le dernier repas remonte à un moment, et « Alertes pics de croissance » quand une période typique de pic commence. Vous pouvez aussi afficher la tétée que vous chronométrez hors de l'app — dans les notifications ou sur l'écran verrouillé — avec ses boutons. « Personnaliser l'accueil » choisit les journaux que le tableau de bord affiche, et dans quel ordre. Activez ou désactivez le bilan du jour, ou chacune de ses questions. « Partage du foyer » est l'endroit où les téléphones sont associés. « Revoir la visite » remontre la courte visite du tableau de bord."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l'ultimo pasto è di un po' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni. «Rivedi il tour» mostra di nuovo il breve tour della dashboard."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz język albo zostaw język telefonu. Włącz „Przypomnienia o karmieniu”, aby dostać sygnał, gdy od ostatniego karmienia minęło sporo czasu, oraz „Powiadomienia o skokach rozwojowych”, gdy zaczyna się typowy okres skoku. Możesz też pokazać mierzone karmienie piersią poza aplikacją – w powiadomieniach albo na ekranie blokady – z jego przyciskami. „Dostosuj ekran startowy” wybiera, które dzienniki pokazuje pulpit i w jakiej kolejności. Włącz albo wyłącz codzienny wpis lub dowolne z jego pytań. W sekcji „Współdzielenie w domu” łączy się telefony. „Obejrzyj przewodnik ponownie” pokazuje jeszcze raz krótki przewodnik po pulpicie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Também pode mostrar a mamada que está a cronometrar fora da app — nas notificações ou no ecrã de bloqueio — com os seus botões. «Personalizar o início» escolhe que registos o painel mostra e por que ordem. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis. «Rever a visita» mostra de novo a breve visita ao painel."
+          }
+        }
+      }
+    },
+    "help_settings_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie Sprout auf diesem Handy arbeitet: Sprache, Erinnerungen, der tägliche Check-in und das Teilen mit deinem Haushalt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How Sprout works on this phone: its language, reminders, the daily check-in, and sharing with your household."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo funciona Sprout en este teléfono: el idioma, los recordatorios, el chequeo diario y el uso compartido con tu hogar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment Sprout fonctionne sur ce téléphone : la langue, les rappels, le bilan du jour et le partage avec votre foyer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Come funziona Sprout su questo telefono: la lingua, i promemoria, il check-in quotidiano e la condivisione con la tua famiglia."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jak Sprout działa na tym telefonie: język, przypomnienia, codzienny wpis i współdzielenie z domownikami."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como o Sprout funciona neste telemóvel: a língua, os lembretes, a verificação diária e a partilha com o seu agregado."
+          }
+        }
+      }
+    },
+    "help_sharing_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles über die Babys wird geteilt, und auch der Milchvorrat, außer du schaltest „Abgepumpte Milch teilen“ aus. Dein Wohlbefinden und deine Check-ins nie. Alle im Haushalt sehen alles Geteilte und können etwas hinzufügen.\n\nEin Handy zu entfernen ändert den Schlüssel des Haushalts, also braucht jedes verbleibende Handy eine neue Einladung; das entfernte Handy behält, was es schon hat. Ein Handy, das aus einem Backup wiederhergestellt wurde, kommt mit dem Protokoll, aber nicht im Haushalt an: Schick ihm eine neue Einladung."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything about the babies travels, and the milk stash too unless you switch off “Share expressed milk”. Your wellbeing and check-ins never do. Everyone in the household sees everything shared and can add to it.\n\nRemoving a phone changes the household's key, so every phone that stays needs a fresh invitation; the removed phone keeps what it already has. A phone restored from a backup arrives with the record but not in the household: send it a new invitation."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo lo de los bebés se comparte, y la reserva de leche también salvo que desactives «Compartir la leche extraída». Tu bienestar y tus chequeos, nunca. Todos en el hogar ven todo lo compartido y pueden añadir.\n\nQuitar un teléfono cambia la clave del hogar, así que cada teléfono que se queda necesita una invitación nueva; el teléfono quitado conserva lo que ya tiene. Un teléfono restaurado desde una copia de seguridad llega con el registro, pero fuera del hogar: envíale una invitación nueva."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce qui concerne les bébés circule, et la réserve de lait aussi, sauf si vous désactivez « Partager le lait tiré ». Votre bien-être et vos bilans, jamais. Chaque membre du foyer voit tout ce qui est partagé et peut y ajouter.\n\nRetirer un téléphone change la clé du foyer : chaque téléphone qui reste a besoin d'une nouvelle invitation, et le téléphone retiré garde ce qu'il a déjà. Un téléphone restauré depuis une sauvegarde arrive avec le relevé mais hors du foyer : envoyez-lui une nouvelle invitation."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto ciò che riguarda i bambini viene condiviso, e anche la scorta di latte, a meno che tu non disattivi «Condividi il latte tirato». Il tuo benessere e i tuoi check-in, mai. Tutti in famiglia vedono tutto ciò che è condiviso e possono aggiungere.\n\nRimuovere un telefono cambia la chiave della famiglia, quindi ogni telefono che resta ha bisogno di un nuovo invito; il telefono rimosso tiene ciò che ha già. Un telefono ripristinato da un backup arriva con il registro ma fuori dalla famiglia: mandagli un nuovo invito."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wszystko o dzieciach jest udostępniane, a zapas mleka też, chyba że wyłączysz „Udostępniaj odciągnięte mleko”. Twoje samopoczucie i codzienne wpisy nigdy. Każdy w domu widzi wszystko, co udostępnione, i może coś dodać.\n\nUsunięcie telefonu zmienia klucz domu, więc każdy pozostały telefon potrzebuje nowego zaproszenia; usunięty telefon zachowuje to, co już ma. Telefon przywrócony z kopii zapasowej ma zapis, ale nie należy już do domu: wyślij mu nowe zaproszenie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tudo o que diz respeito aos bebés é partilhado, e a reserva de leite também, a não ser que desative «Partilhar o leite extraído». O seu bem-estar e as suas verificações, nunca. Todos no agregado veem tudo o que é partilhado e podem acrescentar.\n\nRemover um telemóvel muda a chave do agregado, por isso cada telemóvel que fica precisa de um novo convite; o telemóvel removido fica com o que já tem. Um telemóvel restaurado de uma cópia de segurança chega com o registo, mas fora do agregado: envie-lhe um novo convite."
+          }
+        }
+      }
+    },
+    "help_sharing_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf „Ein Handy einladen“ und schick die Einladung über eine App, der du vertraust; tippe auf dem anderen Handy auf „Erhaltene Einladung öffnen“. Beide Handys zeigen dann denselben sechsstelligen Haushaltscode: Lest ihn euch einmal gegenseitig vor.\n\nDanach bringen „Meine Einträge senden“ und „Erhaltene Datei öffnen“ die Handys von überall auf den neuesten Stand. Wo dieses Handy es anbietet, kann Sprout auch selbst per Bluetooth abgleichen, wenn ihr zusammen seid und Sprout geöffnet ist."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap “Invite a phone” and send the invitation through an app you trust; on the other phone, tap “Open an invitation I was sent”. Both phones then show the same six-character household code: read it to each other once.\n\nAfter that, “Send my entries” and “Open a file I was sent” bring phones up to date from anywhere. Where this phone offers it, Sprout can also exchange on its own over Bluetooth when you're together with Sprout open."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca «Invitar a un teléfono» y envía la invitación por una aplicación de confianza; en el otro teléfono, toca «Abrir una invitación recibida». Los dos teléfonos muestran entonces el mismo código de hogar de seis caracteres: comparadlo una vez en voz alta.\n\nDespués, «Enviar mis entradas» y «Abrir un archivo recibido» ponen los teléfonos al día desde cualquier sitio. Si este teléfono lo ofrece, Sprout también puede sincronizar por su cuenta por Bluetooth cuando estáis juntos con Sprout abierto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Inviter un téléphone » et envoyez l'invitation par une appli de confiance ; sur l'autre téléphone, touchez « Ouvrir une invitation reçue ». Les deux téléphones affichent alors le même code de foyer à six caractères : comparez-le une fois à voix haute.\n\nEnsuite, « Envoyer mes saisies » et « Ouvrir un fichier reçu » mettent les téléphones à jour, d'où que vous soyez. Quand ce téléphone le propose, Sprout peut aussi échanger tout seul en Bluetooth quand vous êtes ensemble avec Sprout ouvert."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca «Invita un telefono» e invia l'invito con un'app di cui ti fidi; sull'altro telefono, tocca «Apri un invito ricevuto». I due telefoni mostrano allora lo stesso codice di famiglia di sei caratteri: confrontatelo una volta a voce.\n\nPoi «Invia le mie voci» e «Apri un file ricevuto» aggiornano i telefoni da qualunque posto. Se questo telefono lo offre, Sprout può anche scambiare da solo via Bluetooth quando siete insieme con Sprout aperto."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij „Zaproś telefon” i wyślij zaproszenie przez aplikację, której ufasz; na drugim telefonie dotknij „Otwórz otrzymane zaproszenie”. Oba telefony pokażą wtedy ten sam sześcioznakowy kod domu: przeczytajcie go sobie raz na głos.\n\nPotem „Wyślij moje wpisy” i „Otwórz otrzymany plik” aktualizują telefony z dowolnego miejsca. Jeśli ten telefon to oferuje, Sprout może też sam wymieniać dane przez Bluetooth, gdy jesteście razem i Sprout jest otwarty."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em «Convidar um telemóvel» e envie o convite por uma aplicação de confiança; no outro telemóvel, toque em «Abrir um convite recebido». Os dois telemóveis mostram então o mesmo código do agregado com seis caracteres: confirmem-no uma vez em voz alta.\n\nDepois disso, «Enviar os meus registos» e «Abrir um ficheiro recebido» põem os telemóveis em dia a partir de qualquer lugar. Se este telemóvel o oferecer, o Sprout também pode trocar sozinho por Bluetooth quando estão juntos com o Sprout aberto."
+          }
+        }
+      }
+    },
+    "help_sharing_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Protokoll für alle Handys im Haushalt — das des anderen Elternteils, das einer Großmutter — ohne Konto und ohne Server."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One record for every phone in the household — the other parent's, a grandparent's — with no account and no server."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un solo registro para todos los teléfonos del hogar — el de la otra madre o el otro padre, el de una abuela — sin cuenta y sin servidor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un seul relevé pour tous les téléphones du foyer — celui de l'autre parent, d'un grand-parent — sans compte et sans serveur."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un unico registro per tutti i telefoni della famiglia — quello dell'altro genitore, di un nonno — senza account e senza server."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeden zapis dla wszystkich telefonów w domu — drugiego rodzica, babci — bez konta i bez serwera."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um só registo para todos os telemóveis do agregado — o da outra mãe ou do outro pai, o de uma avó — sem conta e sem servidor."
+          }
+        }
+      }
+    },
+    "help_sleep_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Schlaf über Mitternacht zählt in der Statistik für beide Tage und einmal als Einschlafen an dem Tag, an dem er begann. Sprout hält fest, wo und wie dein Baby geschlafen hat, und kommentiert es nicht. Um einen Schlaf zu ändern, lösche ihn und trag ihn neu ein."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A sleep that runs past midnight counts towards both days in the statistics, and once as a time settled on the day it began. Sprout records where and how your baby slept and makes no comment on it. To change a sleep, delete it and log it again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un sueño que pasa de medianoche cuenta para los dos días en las estadísticas, y una sola vez como vez dormido el día en que empezó. Sprout anota dónde y cómo durmió tu bebé sin comentar nada. Para cambiar un sueño, bórralo y anótalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un sommeil qui passe minuit compte pour les deux jours dans les statistiques, et une seule fois comme endormissement le jour où il a commencé. Sprout note où et comment votre bébé a dormi, sans aucun commentaire. Pour modifier un sommeil, supprimez-le et notez-le à nouveau."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un sonno che supera la mezzanotte conta per entrambi i giorni nelle statistiche, e una volta sola come addormentamento il giorno in cui è iniziato. Sprout registra dove e come ha dormito il tuo bambino senza commentare. Per cambiare un sonno, eliminalo e registralo di nuovo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sen trwający po północy liczy się w statystykach do obu dni, a raz jako zaśnięcie w dniu, w którym się zaczął. Sprout zapisuje, gdzie i jak spało Twoje dziecko, i niczego nie komentuje. Aby zmienić sen, usuń go i zapisz ponownie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um sono que passa da meia-noite conta para os dois dias nas estatísticas, e uma vez só como adormecer no dia em que começou. O Sprout regista onde e como o seu bebé dormiu, sem comentários. Para alterar um sono, apague-o e registe-o de novo."
+          }
+        }
+      }
+    },
+    "help_sleep_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf +, um einen Schlaf einzutragen. Schläft das Baby noch, schalte „Schon aufgewacht“ aus, und der Schlaf läuft weiter; tippe auf „Aufgewacht“ auf seiner Karte oder im Dashboard, wenn es wach wird. Wo es geschlafen hat und wie es lag, ist freiwillig: Tippe eine Auswahl erneut an, um sie zu löschen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + to log a sleep. If the baby is still asleep, switch off “Already woke up” and the sleep keeps running; tap “Woke up” on its card, or on the dashboard, when they wake. Where they slept and how they were lying are optional: tap a choice again to clear it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + para anotar un sueño. Si el bebé sigue dormido, desactiva «Ya se ha despertado» y el sueño sigue corriendo; toca «Se despertó» en su tarjeta, o en el panel, cuando se despierte. Dónde durmió y cómo estaba tumbado son opcionales: toca de nuevo una opción para quitarla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + pour noter un sommeil. Si le bébé dort encore, désactivez « Déjà réveillé(e) » et le sommeil continue ; touchez « Réveil » sur sa carte, ou sur le tableau de bord, quand il se réveille. L'endroit où il a dormi et sa position sont facultatifs : touchez à nouveau un choix pour l'effacer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + per registrare un sonno. Se il bambino dorme ancora, disattiva «Già sveglio» e il sonno continua; tocca «Risveglio» sulla sua scheda, o nella dashboard, quando si sveglia. Dove ha dormito e come era sdraiato sono facoltativi: tocca di nuovo una scelta per toglierla."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij +, aby zapisać sen. Jeśli dziecko wciąż śpi, wyłącz „Już się obudziło”, a sen będzie trwał; gdy się obudzi, dotknij „Pobudka” na jego karcie albo na pulpicie. Gdzie spało i jak leżało, jest opcjonalne: dotknij wyboru ponownie, aby go usunąć."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + para registar um sono. Se o bebé ainda estiver a dormir, desative «Já acordou» e o sono continua a contar; toque em «Acordou» no cartão dele, ou no painel, quando acordar. Onde dormiu e em que posição estava são opcionais: toque de novo numa opção para a limpar."
+          }
+        }
+      }
+    },
+    "help_sleep_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Schlafphasen deines Babys, Nickerchen wie Nächte, die neueste zuerst."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your baby's sleeps, naps and nights alike, newest first."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los sueños de tu bebé, siestas y noches por igual, del más reciente al más antiguo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les sommeils de votre bébé, siestes comme nuits, du plus récent au plus ancien."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I sonni del tuo bambino, sonnellini e notti, dal più recente."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sen Twojego dziecka, drzemki i noce, od najnowszego."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os sonos do seu bebé, sestas e noites, do mais recente para o mais antigo."
+          }
+        }
+      }
+    },
+    "help_treatments_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Behandlung ist ein Plan, keine Aufzeichnung jeder Gabe: Sprout erinnert dich, hält aber nicht fest, ob eine Gabe gegeben wurde. Ein Mittel, das nur bei Bedarf gegeben wird, gehört zu „Bei Bedarf“. Beendete Behandlungen rutschen ans Ende der Liste."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A treatment is a plan, not a record of each dose: Sprout reminds you, but doesn't note whether a dose was given. A medicine given only when it's needed belongs in “As needed” instead. Courses that have ended move to the bottom of the list."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un tratamiento es un plan, no un registro de cada toma: Sprout te lo recuerda, pero no anota si se dio. Un medicamento que solo se da cuando hace falta va en «Si hace falta». Los tratamientos terminados bajan al final de la lista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un traitement est un plan, pas un relevé de chaque prise : Sprout vous le rappelle, mais ne note pas si une prise a été donnée. Un médicament donné seulement en cas de besoin a sa place dans « Au besoin ». Les traitements terminés descendent en bas de la liste."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un trattamento è un piano, non un registro di ogni dose: Sprout te lo ricorda, ma non annota se una dose è stata data. Un farmaco dato solo al bisogno va in «Al bisogno». I trattamenti finiti scendono in fondo all'elenco."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leczenie to plan, a nie zapis każdej dawki: Sprout przypomina, ale nie zapisuje, czy dawka została podana. Lek podawany tylko w razie potrzeby należy do „Doraźnie”. Zakończone leczenie przesuwa się na koniec listy."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um tratamento é um plano, não um registo de cada toma: o Sprout lembra-o, mas não regista se uma toma foi dada. Um medicamento dado só quando é preciso pertence a «Se for preciso». Os tratamentos terminados descem para o fim da lista."
+          }
+        }
+      }
+    },
+    "help_treatments_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf +, um eine hinzuzufügen: Name, auf Wunsch eine Dosis, wie oft, die Uhrzeiten und die Daten. „Erinnere mich“ schickt zu jeder Uhrzeit eine Benachrichtigung; schalte es aus, wenn du das nicht möchtest. Tippe auf eine Behandlung, um sie zu ändern."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + to add one: its name, a dose if you like, how often, the times of day and the dates. “Remind me” sends a notification at each time; switch it off if you'd rather not. Tap a treatment to change it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + para añadir uno: su nombre, una dosis si quieres, cada cuánto, las horas y las fechas. «Recordármelo» envía una notificación a cada hora; desactívalo si lo prefieres. Toca un tratamiento para cambiarlo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez + pour en ajouter un : son nom, une dose si vous voulez, la fréquence, les heures et les dates. « Me rappeler » envoie une notification à chaque heure prévue ; désactivez-le si vous préférez. Touchez un traitement pour le modifier."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca + per aggiungerne uno: il nome, una dose se vuoi, ogni quanto, gli orari e le date. «Ricordamelo» invia una notifica a ogni orario; disattivalo se preferisci. Tocca un trattamento per modificarlo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dotknij +, aby dodać: nazwę, dawkę, jeśli chcesz, jak często, godziny i daty. „Przypomnij mi” wysyła powiadomienie o każdej godzinie; wyłącz to, jeśli wolisz. Dotknij leczenia, aby je zmienić."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toque em + para adicionar um: o nome, uma dose se quiser, com que frequência, as horas e as datas. «Lembrar-me» envia uma notificação a cada hora; desative-o se preferir. Toque num tratamento para o alterar."
+          }
+        }
+      }
+    },
+    "help_treatments_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behandlungen nach Kalender: etwas, das jeden Tag, jede Woche oder alle paar Tage gegeben wird, ab einem Startdatum, bis die Behandlung endet."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Courses on a calendar: something given every day, every week or every few days, from a start date until it ends."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratamientos con calendario: algo que se da cada día, cada semana o cada pocos días, desde una fecha de inicio hasta que termina."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des traitements au calendrier : quelque chose à donner chaque jour, chaque semaine ou tous les quelques jours, d'une date de début jusqu'à la fin."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trattamenti a calendario: qualcosa da dare ogni giorno, ogni settimana o ogni tot giorni, da una data di inizio fino alla fine."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leczenie według kalendarza: coś podawanego codziennie, co tydzień albo co kilka dni, od daty rozpoczęcia aż do końca."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratamentos com calendário: algo dado todos os dias, todas as semanas ou de poucos em poucos dias, desde uma data de início até terminar."
+          }
+        }
+      }
+    },
+    "help_trends_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durchschnitte zählen nur abgeschlossene Tage, damit ein halber heutiger Tag sie nicht nach unten zieht, und ein Tag ohne Eintrag zählt als null. Der Zeitraum reicht nie vor die Geburt zurück.\n\nDie farbige Fläche zeigt die WHO-Standards vom 3. bis zum 97. Perzentil. Sprout fragt nie nach dem Geschlecht des Babys, deshalb wird jede Messung an der Kurve für Mädchen und an der für Jungen abgelesen und als Spanne angegeben, etwa P22–P34. Mädchen oder Jungen zu wählen ändert nur die Kurve auf dem Bildschirm und wird nicht gespeichert."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Averages cover completed days only, so a half-lived today can't drag them down, and a day with nothing logged counts as zero. The window never reaches back before the birth.\n\nThe shaded band is the WHO standards from the 3rd to the 97th percentile. Sprout never asks a baby's sex, so each measurement is read against both the girls' and the boys' curves and given as a span, such as P22–P34. Choosing girls or boys only changes the curve on screen, and isn't saved."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las medias solo cuentan días completos, para que un hoy a medias no las baje, y un día sin nada anotado cuenta como cero. El periodo nunca retrocede más allá del nacimiento.\n\nLa zona sombreada son los patrones de la OMS del percentil 3 al 97. Sprout nunca pregunta el sexo del bebé, así que cada medida se lee frente a la curva de las niñas y la de los niños y se da como un intervalo, por ejemplo P22–P34. Elegir niñas o niños solo cambia la curva en pantalla y no se guarda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les moyennes ne comptent que les jours complets, pour qu'une journée à moitié vécue ne les fasse pas baisser, et un jour sans rien de noté compte pour zéro. La période ne remonte jamais avant la naissance.\n\nLa zone colorée correspond aux standards de l'OMS, du 3e au 97e percentile. Sprout ne demande jamais le sexe du bébé : chaque mesure est donc lue sur la courbe des filles et sur celle des garçons, et donnée sous forme d'intervalle, par exemple P22–P34. Choisir filles ou garçons ne change que la courbe affichée et n'est pas enregistré."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le medie contano solo i giorni completi, così un oggi a metà non le abbassa, e un giorno senza nulla registrato conta come zero. Il periodo non va mai oltre la nascita.\n\nL'area colorata sono gli standard dell'OMS dal 3° al 97° percentile. Sprout non chiede mai il sesso del bambino, quindi ogni misura viene letta sulla curva delle femmine e su quella dei maschi e data come intervallo, per esempio P22–P34. Scegliere femmine o maschi cambia solo la curva sullo schermo e non viene salvato."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Średnie liczą tylko pełne dni, żeby niedokończone dziś ich nie zaniżało, a dzień bez wpisów liczy się jako zero. Zakres nigdy nie sięga przed narodziny.\n\nZacieniowany obszar to standardy WHO od 3. do 97. centyla. Sprout nigdy nie pyta o płeć dziecka, więc każdy pomiar jest odczytywany na siatce dziewczynek i na siatce chłopców i podawany jako przedział, na przykład P22–P34. Wybór dziewczynek albo chłopców zmienia tylko krzywą na ekranie i nie jest zapisywany."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As médias só contam dias completos, para que um hoje a meio não as faça descer, e um dia sem nada registado conta como zero. O período nunca recua para antes do nascimento.\n\nA zona sombreada são os padrões da OMS do percentil 3 ao 97. O Sprout nunca pergunta o sexo do bebé, por isso cada medida é lida face à curva das meninas e à dos meninos e apresentada como um intervalo, por exemplo P22–P34. Escolher meninas ou meninos só muda a curva no ecrã e não fica guardado."
+          }
+        }
+      }
+    },
+    "help_trends_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle 7, 30 oder 90 Tage. Jede Karte zeigt einen Tagesdurchschnitt und einen Balken pro Tag; auf der Mahlzeiten-Karte wählst du, welcher Wert gezeigt wird. Tippe auf einen Balken, um zu sehen, woraus der Tag bestand, und wische seitlich oder nutze die Pfeile, um in der Zeit zurückzugehen. Die Diagramme bewegen sich gemeinsam.\n\nTippe auf der Wachstumskarte auf eine Messung, um sie an den Kurven abzulesen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose 7, 30 or 90 days. Each card shows a daily average and a bar for every day; on the feeding card, pick which figure to draw. Tap a bar to see what that day was made of, and drag sideways or use the arrows to go back in time. The charts move together.\n\nOn the growth card, tap a measurement to read it against the curves."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige 7, 30 o 90 días. Cada tarjeta muestra una media diaria y una barra por día; en la tarjeta de tomas, elige qué cifra ver. Toca una barra para ver de qué estuvo hecho ese día, y desliza de lado o usa las flechas para retroceder en el tiempo. Los gráficos se mueven juntos.\n\nEn la tarjeta de crecimiento, toca una medida para leerla frente a las curvas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez 7, 30 ou 90 jours. Chaque carte affiche une moyenne par jour et une barre pour chaque jour ; sur la carte des repas, choisissez le chiffre à afficher. Touchez une barre pour voir de quoi la journée était faite, et faites glisser latéralement ou utilisez les flèches pour remonter le temps. Les graphiques bougent ensemble.\n\nSur la carte de croissance, touchez une mesure pour la lire par rapport aux courbes."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli 7, 30 o 90 giorni. Ogni scheda mostra una media al giorno e una barra per ogni giorno; nella scheda dei pasti, scegli quale valore mostrare. Tocca una barra per vedere di cosa era fatta quella giornata, e trascina di lato o usa le frecce per tornare indietro nel tempo. I grafici si muovono insieme.\n\nNella scheda della crescita, tocca una misura per leggerla rispetto alle curve."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz 7, 30 albo 90 dni. Każda karta pokazuje średnią dzienną i słupek dla każdego dnia; na karcie karmienia wybierz, którą wartość pokazać. Dotknij słupka, aby zobaczyć, z czego składał się ten dzień, a przesuń w bok albo użyj strzałek, aby cofnąć się w czasie. Wykresy przesuwają się razem.\n\nNa karcie wzrostu dotknij pomiaru, aby odczytać go na tle siatek."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha 7, 30 ou 90 dias. Cada cartão mostra uma média diária e uma barra por dia; no cartão das refeições, escolha que valor mostrar. Toque numa barra para ver de que foi feito esse dia, e deslize para o lado ou use as setas para recuar no tempo. Os gráficos movem-se juntos.\n\nNo cartão do crescimento, toque numa medida para a ler face às curvas."
+          }
+        }
+      }
+    },
+    "help_trends_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was die Einträge Tag für Tag ergeben: Mahlzeiten, Schlaf und Windeln sowie das Wachstum im Vergleich zu den WHO-Standards."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What the logs add up to, day by day: feeds, sleep and nappies, and growth against the WHO standards."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo que suman los registros, día a día: tomas, sueño y pañales, y el crecimiento frente a los patrones de la OMS."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce que vos saisies donnent, jour après jour : repas, sommeil et couches, et la croissance par rapport aux standards de l'OMS."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cosa sommano i registri, giorno per giorno: pasti, sonno e pannolini, e la crescita rispetto agli standard dell'OMS."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Co wynika z wpisów, dzień po dniu: karmienia, sen i pieluchy, a także wzrost na tle standardów WHO."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O que os registos somam, dia a dia: refeições, sono e fraldas, e o crescimento face aos padrões da OMS."
+          }
+        }
+      }
+    },
+    "help_wellbeing_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts hiervon verlässt dieses Handy: Es wird nicht mit deinem Haushalt geteilt und steht nicht im Bericht für die Ärztin oder den Arzt. Der Check-in wartet im Dashboard und ist nie eine Benachrichtigung. Schaltest du ihn in den Einstellungen aus, bleibt alles Eingetragene erhalten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing here leaves this phone: it isn't shared with your household and isn't in the record for a doctor. The check-in waits on the dashboard and is never a notification. Turning it off in Settings keeps everything you've noted."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada de esto sale de este teléfono: no se comparte con tu hogar y no está en el registro para el médico. El chequeo espera en el panel y nunca es una notificación. Desactivarlo en los ajustes conserva todo lo que has anotado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien ici ne quitte ce téléphone : ce n'est pas partagé avec votre foyer et ce n'est pas dans le relevé pour le médecin. Le bilan attend sur le tableau de bord et n'est jamais une notification. Le désactiver dans les paramètres conserve tout ce que vous avez noté."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niente di tutto questo lascia il telefono: non è condiviso con la tua famiglia e non è nel resoconto per il medico. Il check-in aspetta nella dashboard e non è mai una notifica. Disattivarlo nelle impostazioni conserva tutto ciò che hai annotato."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nic z tego nie opuszcza tego telefonu: nie jest udostępniane domownikom ani nie trafia do zapisu dla lekarza. Wpis czeka na pulpicie i nigdy nie jest powiadomieniem. Wyłączenie go w ustawieniach zachowuje wszystko, co zapisano."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada disto sai deste telemóvel: não é partilhado com o seu agregado e não está no registo para o médico. A verificação espera no painel e nunca é uma notificação. Desativá-la nas definições mantém tudo o que registou."
+          }
+        }
+      }
+    },
+    "help_wellbeing_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der tägliche Check-in stellt ein paar Fragen, eine nach der anderen; „Jetzt nicht“ verschiebt ihn auf später. Unter „Wohlbefinden“ kannst du selbst einen Eintrag hinzufügen und zurückblicken. Eine Frage, die du nicht mehr gestellt bekommen möchtest, lässt sich mit „Diese Frage nicht mehr stellen“ oder in den Einstellungen abschalten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The daily check-in asks a few questions, one at a time; “Not now” leaves it for later. On “Wellbeing” you can add an entry yourself and look back. A question you'd rather not be asked can be stopped with “Don't ask me this anymore”, or in Settings."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El chequeo diario hace unas pocas preguntas, de una en una; «Ahora no» lo deja para más tarde. En «Bienestar» puedes añadir tú una entrada y mirar atrás. Una pregunta que prefieras que no te hagan se puede quitar con «No volver a preguntarme esto», o en los ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le bilan du jour pose quelques questions, une à la fois ; « Plus tard » vous laisse y revenir ensuite. Dans « Bien-être », vous pouvez ajouter une entrée vous-même et revenir en arrière. Une question que vous préférez ne plus voir peut être arrêtée avec « Ne plus me poser cette question », ou dans les paramètres."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il check-in quotidiano fa alcune domande, una alla volta; «Non ora» lo rimanda a più tardi. In «Benessere» puoi aggiungere una voce da te e guardare indietro. Una domanda che preferisci non ricevere si può togliere con «Non farmi più questa domanda», o nelle impostazioni."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codzienny wpis zadaje kilka pytań, po jednym; „Nie teraz” odkłada go na później. W sekcji „Samopoczucie” możesz też dodać własny wpis i wrócić do poprzednich. Pytanie, którego wolisz nie dostawać, wyłączysz przyciskiem „Nie zadawaj mi więcej tego pytania” albo w ustawieniach."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A verificação diária faz algumas perguntas, uma de cada vez; «Agora não» deixa-a para mais tarde. Em «Bem-estar» pode adicionar um registo por si e olhar para trás. Uma pergunta que prefira não receber pode ser desligada com «Não voltar a fazer-me esta pergunta», ou nas definições."
+          }
+        }
+      }
+    },
+    "help_wellbeing_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie es dir geht, nur für dich: deine Stimmung und, wenn du entbunden hast oder stillst, deine Erholung. Der Check-in von heute und der Verlauf über die Zeit."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How you're doing, for you alone: your mood and, if you gave birth or are breastfeeding, your recovery. Today's check-in, and the history over time."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo estás tú, solo para ti: tu estado de ánimo y, si diste a luz o estás dando el pecho, tu recuperación. El chequeo de hoy y el historial a lo largo del tiempo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment vous allez, rien que pour vous : votre humeur et, si vous avez accouché ou si vous allaitez, votre récupération. Le bilan du jour, et l'historique au fil du temps."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Come stai, solo per te: il tuo umore e, se hai partorito o allatti, il tuo recupero. Il check-in di oggi e la cronologia nel tempo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jak się czujesz, tylko dla Ciebie: Twój nastrój, a po porodzie albo przy karmieniu piersią także powrót do formy. Dzisiejszy wpis i historia w czasie."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como está, só para si: o seu humor e, se deu à luz ou está a amamentar, a sua recuperação. A verificação de hoje e o histórico ao longo do tempo."
+          }
+        }
+      }
+    },
+    "help_you_good_to_know": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das gehört dir, nicht einem Baby: Wird ein Baby gelöscht, bleibt es unberührt. Dein Wohlbefinden und deine Check-ins verlassen dieses Handy nie. Schaltest du den täglichen Check-in in den Einstellungen aus, verschwinden beide von hier, und alles Eingetragene bleibt erhalten."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These are yours, not a baby's, so deleting a baby leaves them as they are. Your wellbeing and check-ins never leave this phone. If you turn the daily check-in off in Settings, both disappear from here and everything you noted is kept."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo esto es tuyo, no de un bebé, así que borrar un bebé no lo toca. Tu bienestar y tus chequeos nunca salen de este teléfono. Si desactivas el chequeo diario en los ajustes, ambos desaparecen de aquí y todo lo que anotaste se conserva."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout cela vous appartient, pas à un bébé : supprimer un bébé n'y touche pas. Votre bien-être et vos bilans ne quittent jamais ce téléphone. Si vous désactivez le bilan du jour dans les paramètres, les deux disparaissent d'ici et tout ce que vous avez noté est conservé."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto questo è tuo, non di un bambino: eliminare un bambino non lo tocca. Il tuo benessere e i tuoi check-in non lasciano mai questo telefono. Se disattivi il check-in quotidiano nelle impostazioni, spariscono entrambi da qui e tutto ciò che hai annotato resta."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To należy do Ciebie, nie do dziecka, więc usunięcie dziecka tego nie rusza. Twoje samopoczucie i codzienne wpisy nigdy nie opuszczają tego telefonu. Jeśli wyłączysz codzienny wpis w ustawieniach, oba znikną stąd, a wszystko, co zapisano, zostanie zachowane."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isto é seu, não de um bebé: apagar um bebé não lhe toca. O seu bem-estar e as suas verificações nunca saem deste telemóvel. Se desativar a verificação diária nas definições, ambos desaparecem daqui e tudo o que registou é mantido."
+          }
+        }
+      }
+    },
+    "help_you_how": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne „Abpumpen“ für deine Sitzungen und den Milchvorrat, „Wohlbefinden“ für einen Rückblick, wie es dir ging, oder den Check-in für die wenigen Fragen von heute."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open “Pumping” for your sessions and the milk stash, “Wellbeing” to look back at how you've been, or the check-in to answer today's few questions."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre «Extracción» para tus sesiones y la reserva de leche, «Bienestar» para repasar cómo has estado, o el chequeo para responder a las pocas preguntas de hoy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez « Tirage » pour vos séances et la réserve de lait, « Bien-être » pour revoir comment vous allez au fil du temps, ou le bilan pour répondre aux quelques questions du jour."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri «Tiralatte» per le tue sessioni e la scorta di latte, «Benessere» per ripercorrere come ti senti nel tempo, o il check-in per rispondere alle poche domande di oggi."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otwórz „Odciąganie”, aby zobaczyć sesje i zapas mleka, „Samopoczucie”, aby przejrzeć, jak się czujesz w ostatnim czasie, albo wpis, aby odpowiedzieć na kilka dzisiejszych pytań."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra «Extração» para as suas sessões e a reserva de leite, «Bem-estar» para rever como tem estado, ou a verificação para responder às poucas perguntas de hoje."
+          }
+        }
+      }
+    },
+    "help_you_purpose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein eigener Bereich: Abpumpen, dein Wohlbefinden und der tägliche Check-in, also alles, was dich betrifft und nicht ein Baby."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your own corner: pumping, your wellbeing and the daily check-in, the things that are about you rather than about a baby."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu propio espacio: la extracción, tu bienestar y el chequeo diario, lo que tiene que ver contigo y no con un bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre espace à vous : le tirage, votre bien-être et le bilan du jour, ce qui vous concerne vous plutôt qu'un bébé."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo spazio: il tiralatte, il tuo benessere e il check-in quotidiano, ciò che riguarda te e non un bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twoje miejsce: odciąganie, Twoje samopoczucie i codzienny wpis, czyli to, co dotyczy Ciebie, a nie dziecka."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O seu espaço: a extração, o seu bem-estar e a verificação diária, o que diz respeito a si e não a um bebé."
+          }
+        }
+      }
+    },
     "history": {
       "localizations": {
         "de": {
@@ -15691,6 +18543,52 @@
         }
       }
     },
+    "home_live_nursing_named": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Stillen · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Feeding · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Lactancia · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Tétée · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Allattamento · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Karmienie · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Amamentação · %2$@"
+          }
+        }
+      }
+    },
     "home_live_open": {
       "localizations": {
         "de": {
@@ -15967,6 +18865,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Medicamentos se necessário"
+          }
+        }
+      }
+    },
+    "home_more": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altro"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Więcej"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais"
           }
         }
       }
@@ -19441,6 +22385,236 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eu"
+          }
+        }
+      }
+    },
+    "nursing_channel_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A breastfeed while it is being timed, with buttons to pause it, switch side and save it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une tétée pendant qu'elle est chronométrée, avec des boutons pour la mettre en pause, changer de sein et l'enregistrer"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie piersią w trakcie mierzenia czasu, z przyciskami do wstrzymania, zmiany piersi i zapisania"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma mamada enquanto está a ser cronometrada, com botões para a pausar, trocar de lado e guardar"
+          }
+        }
+      }
+    },
+    "nursing_channel_name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running breastfeed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma en curso"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée en cours"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata in corso"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada em curso"
+          }
+        }
+      }
+    },
+    "nursing_notif_feed_number": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stillmahlzeit %1$lld · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed %1$lld · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma %1$lld · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée %1$lld · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata %1$lld · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie %1$lld · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "nursing_notif_on_break": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausiert · %1$@ an der Brust"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On a break · %1$@ at the breast"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pausa · %1$@ al pecho"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pause · %1$@ au sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In pausa · %1$@ al seno"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przerwa · %1$@ przy piersi"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em pausa · %1$@ à mama"
+          }
+        }
+      }
+    },
+    "nursing_switch_side": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seite wechseln"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch side"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar de lado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia lato"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zmień pierś"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar de lado"
           }
         }
       }
@@ -26667,6 +29841,52 @@
         }
       }
     },
+    "screen_customise_home": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start anpassen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customise home"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizar el inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnaliser l'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizza la Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dostosuj ekran startowy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizar o início"
+          }
+        }
+      }
+    },
     "screen_diapers": {
       "localizations": {
         "de": {
@@ -27495,6 +30715,52 @@
         }
       }
     },
+    "settings_customise_home_hint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle, was der Startbildschirm zeigt und in welcher Reihenfolge."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which logs the home screen shows, and in which order."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige qué muestra la pantalla de inicio y en qué orden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez ce que l'accueil affiche, et dans quel ordre."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli cosa mostra la Home e in quale ordine."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz, co pokazuje ekran startowy i w jakiej kolejności."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha o que o ecrã inicial mostra e por que ordem."
+          }
+        }
+      }
+    },
     "settings_feeding_interval_label": {
       "localizations": {
         "de": {
@@ -27771,6 +31037,52 @@
         }
       }
     },
+    "settings_home": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home screen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla de inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran d'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schermata Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran startowy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ecrã inicial"
+          }
+        }
+      }
+    },
     "settings_language": {
       "localizations": {
         "de": {
@@ -27859,6 +31171,190 @@
           "stringUnit": {
             "state": "translated",
             "value": "Predefinição do sistema"
+          }
+        }
+      }
+    },
+    "settings_live_activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit auf dem Sperrbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed on the lock screen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en la pantalla de bloqueo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours sur l'écran verrouillé"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nella schermata di blocco"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie na ekranie blokady"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso no ecrã de bloqueio"
+          }
+        }
+      }
+    },
+    "settings_live_activity_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it on the lock screen and in the Dynamic Island with Pause, Switch side and Stop & save, so you don't have to unlock the phone. It never shows your baby's name."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher sur l'écran verrouillé et dans la Dynamic Island avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'y apparaît jamais."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je na ekranie blokady i w Dynamic Island z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nigdy się tam nie pojawia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la no ecrã de bloqueio e na Dynamic Island com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. Nunca mostra o nome do seu bebé."
+          }
+        }
+      }
+    },
+    "settings_nursing_notification": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit in den Benachrichtigungen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed in the notifications"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en las notificaciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours dans les notifications"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nelle notifiche"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie w powiadomieniach"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso nas notificações"
+          }
+        }
+      }
+    },
+    "settings_nursing_notification_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it in the notifications with Pause, Switch side and Stop & save, so you don't have to unlock the phone. Your baby's name stays off the lock screen unless your phone shows all notification content."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher dans les notifications avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'apparaît pas sur l'écran verrouillé, sauf si votre téléphone y affiche tout le contenu des notifications."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je w powiadomieniach z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nie pojawia się na ekranie blokady, chyba że telefon pokazuje tam pełną treść powiadomień."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la nas notificações com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. O nome do seu bebé não aparece no ecrã de bloqueio, a não ser que o telemóvel mostre lá todo o conteúdo das notificações."
           }
         }
       }
@@ -38865,6 +42361,148 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não foi possível desenhar o widget. Abra o Sprout, ou remova-o e adicione-o de novo."
+          }
+        }
+      }
+    },
+    "widget_feeds_running": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeit läuft"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeiten laufen"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feed running"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feeds running"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld toma en curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tomas en curso"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétée en cours"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétées en cours"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppata in corso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppate in corso"
+                }
+              }
+            }
+          }
+        },
+        "pl": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwają"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmień trwa"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienie trwa"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwa"
+                }
+              }
+            }
+          }
+        },
+        "pt": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamada em curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamadas em curso"
+                }
+              }
+            }
           }
         }
       }

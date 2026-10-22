@@ -17,11 +17,12 @@ import org.robolectric.annotation.Config
  * The widget reads this on every render, so a session that round-trips wrong is
  * a widget that shows the wrong side mid-feed.
  *
- * It is also the app's only copy of a running feed. The timer can be showing in
- * several places at once — the feeding screen's bar, the dashboard's live card,
- * a widget tap landing on Feeding while the timer is already open — and while
- * each of them kept a copy of its own, stopping the feed in one left the others
- * still holding it, and each of them could save the same breastfeed again.
+ * It is also the app's only copy of the running feeds, one per baby (BDR-23).
+ * A timer can be showing in several places at once — the feeding screen's bar,
+ * the dashboard's live card, a widget tap landing on Feeding while the timer is
+ * already open — and while each of them kept a copy of its own, stopping the
+ * feed in one left the others still holding it, and each of them could save the
+ * same breastfeed again.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], qualifiers = "en")
@@ -33,6 +34,15 @@ class NursingSessionStoreTest {
         sessionStart = 1_750_000_000_000L,
         currentSide = BreastSide.RIGHT,
         segmentStart = 1_750_000_000_000L,
+        babyUid = "baby-lea",
+    )
+
+    /** Noah's feed, beside Léa's: twins feeding together (BDR-23). */
+    private val twin = NursingSession(
+        sessionStart = 1_750_000_060_000L,
+        currentSide = BreastSide.LEFT,
+        segmentStart = 1_750_000_060_000L,
+        babyUid = "baby-noah",
     )
 
     @Before
@@ -42,29 +52,30 @@ class NursingSessionStoreTest {
     fun loadRoundTripsASavedSession() {
         NursingSessionStore.save(context, session)
 
-        val loaded = NursingSessionStore.load(context)
+        val loaded = NursingSessionStore.load(context, "baby-lea")
 
         assertEquals(session.currentSide, loaded?.currentSide)
         assertEquals(session.segmentStart, loaded?.segmentStart)
     }
 
     @Test
-    fun clearEndsTheSession() {
+    fun clearEndsEverySession() {
         NursingSessionStore.save(context, session)
+        NursingSessionStore.save(context, twin)
         NursingSessionStore.clear(context)
 
-        assertNull(NursingSessionStore.load(context))
+        assertEquals(emptyList<NursingSession>(), NursingSessionStore.loadAll(context))
     }
 
     @Test
-    fun everyReaderSeesTheSameSession() {
+    fun everyReaderSeesTheSameSessions() {
         val first = NursingSessionStore.sessions(context)
         val second = NursingSessionStore.sessions(context)
 
         NursingSessionStore.save(context, session)
 
-        assertEquals(session.sessionStart, first.value?.sessionStart)
-        assertEquals(session.sessionStart, second.value?.sessionStart)
+        assertEquals(session.sessionStart, first.value.single().sessionStart)
+        assertEquals(session.sessionStart, second.value.single().sessionStart)
     }
 
     @Test
@@ -72,9 +83,9 @@ class NursingSessionStoreTest {
         val watcher = NursingSessionStore.sessions(context)
         NursingSessionStore.save(context, session)
 
-        NursingSessionStore.consume(context)
+        NursingSessionStore.consume(context, "baby-lea")
 
-        assertNull(watcher.value)
+        assertEquals(emptyList<NursingSession>(), watcher.value)
     }
 
     /** The duplicate feeds: two screens stopping the one timer. */
@@ -82,16 +93,16 @@ class NursingSessionStoreTest {
     fun onlyOneCallerIsGivenTheSessionToSave() {
         NursingSessionStore.save(context, session)
 
-        val first = NursingSessionStore.consume(context)
-        val second = NursingSessionStore.consume(context)
+        val first = NursingSessionStore.consume(context, "baby-lea")
+        val second = NursingSessionStore.consume(context, "baby-lea")
 
         assertEquals(session.sessionStart, first?.sessionStart)
         assertNull(second)
     }
 
-    /** And two ways into the timer opening at once. */
+    /** And two ways into the timer opening at once, for one baby. */
     @Test
-    fun startingWhileOneRunsKeepsTheRunningSession() {
+    fun startingWhileOneRunsForThatBabyKeepsTheRunningSession() {
         NursingSessionStore.save(context, session)
         val later = session.copy(
             sessionStart = session.sessionStart + 60_000L,
@@ -101,7 +112,42 @@ class NursingSessionStoreTest {
         val running = NursingSessionStore.startIfIdle(context, later)
 
         assertEquals(session.sessionStart, running.sessionStart)
-        assertEquals(session.sessionStart, NursingSessionStore.load(context)?.sessionStart)
+        assertEquals(session.sessionStart, NursingSessionStore.load(context, "baby-lea")?.sessionStart)
+    }
+
+    /** The twin case: Léa's feed runs, Noah's starts beside it, and both are kept. */
+    @Test
+    fun startingForAnotherBabyRunsBothFeeds() {
+        NursingSessionStore.startIfIdle(context, session)
+
+        val running = NursingSessionStore.startIfIdle(context, twin)
+
+        assertEquals(twin, running)
+        assertEquals(listOf(session, twin), NursingSessionStore.loadAll(context))
+    }
+
+    /** Stop & save on one leaves the other running. */
+    @Test
+    fun savingOneFeedLeavesTheOtherRunning() {
+        NursingSessionStore.save(context, session)
+        NursingSessionStore.save(context, twin)
+
+        val taken = NursingSessionStore.consume(context, "baby-lea")
+
+        assertEquals(session, taken)
+        assertEquals(listOf(twin), NursingSessionStore.loadAll(context))
+    }
+
+    /** Pausing one feed does not pause the other. */
+    @Test
+    fun pausingOneFeedLeavesTheOtherNursing() {
+        NursingSessionStore.save(context, session)
+        NursingSessionStore.save(context, twin)
+
+        NursingSessionStore.update(context, "baby-noah") { it.paused(twin.sessionStart + 120_000L) }
+
+        assertEquals(true, NursingSessionStore.load(context, "baby-noah")?.isPaused)
+        assertEquals(session, NursingSessionStore.load(context, "baby-lea"))
     }
 
     /**
@@ -115,42 +161,58 @@ class NursingSessionStoreTest {
         NursingSessionStore.save(context, session.paused(pausedAt))
         NursingSessionStore.forgetInMemory()
 
-        val loaded = NursingSessionStore.load(context)
+        val loaded = NursingSessionStore.load(context, "baby-lea")
 
         assertEquals(pausedAt, loaded?.pausedAt)
         assertEquals(1, loaded?.segments?.size)
         assertEquals(8 * 60_000L, loaded?.nursedMs(pausedAt + 5 * 60_000L))
     }
 
-    /** A session stored before breaks existed is one that was nursing. */
     @Test
     fun aSessionWithNoBreakReadsBackAsNursing() {
         NursingSessionStore.save(context, session)
         NursingSessionStore.forgetInMemory()
 
-        assertNull(NursingSessionStore.load(context)?.pausedAt)
+        assertNull(NursingSessionStore.load(context, "baby-lea")?.pausedAt)
     }
 
     /**
-     * The baby the feed was started for comes back with it, or a feed left
-     * running while the phone is killed is saved to whichever twin is selected.
+     * Each feed comes back with its baby, or a feed left running while the
+     * phone is killed is saved to whichever twin is selected.
      */
     @Test
-    fun theBabyItWasStartedForSurvivesProcessDeath() {
-        NursingSessionStore.save(context, session.copy(babyUid = "baby-lea"))
+    fun everyFeedAndItsBabySurviveProcessDeath() {
+        NursingSessionStore.save(context, session)
+        NursingSessionStore.save(context, twin.paused(twin.sessionStart + 60_000L))
         NursingSessionStore.forgetInMemory()
 
-        assertEquals("baby-lea", NursingSessionStore.load(context)?.babyUid)
+        assertEquals(session, NursingSessionStore.load(context, "baby-lea"))
+        assertEquals(true, NursingSessionStore.load(context, "baby-noah")?.isPaused)
+        assertEquals(2, NursingSessionStore.loadAll(context).size)
     }
 
-    /** A session stored before the baby was recorded names none, rather than a wrong one. */
+    /**
+     * The one session a version before BDR-23 kept, as flat keys, is still
+     * there after the update: a feed running through it is neither lost nor
+     * moved to the wrong baby.
+     */
     @Test
-    fun aSessionFromBeforeTheBabyWasRecordedNamesNone() {
-        NursingSessionStore.save(context, session.copy(babyUid = "baby-lea"))
-        NursingSessionStore.save(context, session)
+    fun aSessionStoredByThePreviousVersionIsReadBack() {
+        storeAsThePreviousVersion(babyUid = "baby-lea")
+
+        assertEquals(session, NursingSessionStore.load(context, "baby-lea"))
+    }
+
+    /** One stored before the baby was recorded is given the selected baby, once. */
+    @Test
+    fun aSessionWithNoBabyIsGivenTheSelectedOne() {
+        storeAsThePreviousVersion(babyUid = null)
+
+        NursingSessionStore.adoptUnnamed(context, "baby-noah")
         NursingSessionStore.forgetInMemory()
 
-        assertNull(NursingSessionStore.load(context)?.babyUid)
+        assertEquals(session.copy(babyUid = "baby-noah"), NursingSessionStore.load(context, "baby-noah"))
+        assertNull(NursingSessionStore.load(context, null))
     }
 
     @Test
@@ -158,6 +220,20 @@ class NursingSessionStoreTest {
         val running = NursingSessionStore.startIfIdle(context, session)
 
         assertEquals(session.sessionStart, running.sessionStart)
-        assertEquals(session.currentSide, NursingSessionStore.load(context)?.currentSide)
+        assertEquals(session.currentSide, NursingSessionStore.load(context, "baby-lea")?.currentSide)
+    }
+
+    /** Writes [session] the way the store did when it kept one feed only. */
+    private fun storeAsThePreviousVersion(babyUid: String?) {
+        context.getSharedPreferences("nursing_session", Context.MODE_PRIVATE).edit()
+            .clear()
+            .putLong("sessionStart", session.sessionStart)
+            .putString("currentSide", session.currentSide.name)
+            .putLong("segmentStart", session.segmentStart)
+            .putString("segments", "")
+            .putLong("pausedAt", 0L)
+            .apply { if (babyUid != null) putString("babyUid", babyUid) }
+            .commit()
+        NursingSessionStore.forgetInMemory()
     }
 }

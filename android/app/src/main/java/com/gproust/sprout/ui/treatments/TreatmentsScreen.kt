@@ -69,6 +69,8 @@ import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDate
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -145,7 +147,13 @@ fun TreatmentsScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_treatments), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_treatments),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.TREATMENTS) },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { editing = newTreatment() }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.treatment_add))

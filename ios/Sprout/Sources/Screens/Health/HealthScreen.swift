@@ -53,6 +53,7 @@ struct HealthScreen: View {
         }
         .navigationTitle(Str.t("screen_wellbeing"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.wellbeing)
         .task {
             let model = model ?? HealthViewModel(repository: sprout.repository)
             self.model = model

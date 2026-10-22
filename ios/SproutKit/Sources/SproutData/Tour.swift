@@ -91,10 +91,13 @@ public func tourMarkAfterArrival(_ mark: TourMark?) -> TourMark? {
 /// file arriving underneath it — because the tour is about the dashboard and
 /// there is nothing left to point at. And it does the moment a feed starts:
 /// someone feeding a baby is not reading cards. Only a feed that *starts*
-/// counts, so a replay asked for with a feed already running is not cut short
-/// by it.
-public func tourStepsAside(onDashboard: Bool, feedWasRunning: Bool, feedIsRunning: Bool) -> Bool {
-    !onDashboard || (feedIsRunning && !feedWasRunning)
+/// counts — a baby feeding now who was not a moment ago, which is also a twin's
+/// feed starting beside the other's (BDR-23) — so a replay asked for with a
+/// feed already running is not cut short by it.
+///
+/// `feedingBefore` and `feedingNow` are the babies with a feed running, by uid.
+public func tourStepsAside(onDashboard: Bool, feedingBefore: Set<String?>, feedingNow: Set<String?>) -> Bool {
+    !onDashboard || !feedingNow.isSubset(of: feedingBefore)
 }
 
 /// Whether this phone owes the guided tour, or has had it, from

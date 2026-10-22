@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -65,10 +66,15 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
+/**
+ * A screen's top bar. [actions] sit at the trailing end — on every page the
+ * **?** that opens its help (BDR-26), so it is in the same place everywhere.
+ */
 @Composable
 fun SproutTopBar(
     title: String,
     onBack: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = { Text(title) },
@@ -82,6 +88,7 @@ fun SproutTopBar(
                 }
             }
         },
+        actions = actions,
     )
 }
 

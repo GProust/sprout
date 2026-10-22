@@ -106,8 +106,11 @@ fun tourMarkAfterArrival(mark: TourMark?): TourMark? =
  * widget tap or a file arriving underneath it — because the tour is about the
  * dashboard and there is nothing left to point at. And it does the moment a
  * feed starts: someone feeding a baby is not reading cards. Only a feed that
- * *starts* counts, so a replay asked for with a feed already running is not cut
- * short by it.
+ * *starts* counts — a baby feeding now who was not a moment ago, which is also
+ * a twin's feed starting beside the other's (BDR-23) — so a replay asked for
+ * with a feed already running is not cut short by it.
+ *
+ * [feedingBefore] and [feedingNow] are the babies with a feed running, by uid.
  */
-fun tourStepsAside(onDashboard: Boolean, feedWasRunning: Boolean, feedIsRunning: Boolean): Boolean =
-    !onDashboard || (feedIsRunning && !feedWasRunning)
+fun tourStepsAside(onDashboard: Boolean, feedingBefore: Set<String?>, feedingNow: Set<String?>): Boolean =
+    !onDashboard || !feedingBefore.containsAll(feedingNow)

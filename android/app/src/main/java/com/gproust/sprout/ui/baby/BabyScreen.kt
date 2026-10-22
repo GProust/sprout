@@ -27,6 +27,8 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.home.BabyPane
 import com.gproust.sprout.ui.home.GrowthSpurtNote
 import com.gproust.sprout.ui.home.HomeViewModel
@@ -46,11 +48,13 @@ private const val CHIP_REFRESH_MS = 60_000L
 @Composable
 fun BabyScreen(
     onNavigate: (String) -> Unit,
-    onQuickFeed: (BreastSide) -> Unit,
+    /** Opens the live timer on a breast, for the baby named by uid. */
+    onQuickFeed: (BreastSide, String?) -> Unit,
     onShareRecord: (Long) -> Unit = {},
 ) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val sessions by vm.nursing.collectAsState()
     val activeId by vm.activeBabyId.collectAsState()
     val context = LocalContext.current
 
@@ -69,7 +73,10 @@ fun BabyScreen(
 
     Scaffold(
         topBar = {
-            SproutTopBar(summary?.baby?.name ?: stringResource(R.string.nav_baby))
+            SproutTopBar(
+                summary?.baby?.name ?: stringResource(R.string.nav_baby),
+                actions = { HelpButton(HelpPage.BABY) },
+            )
         },
     ) { padding ->
         if (summary == null) {
@@ -91,7 +98,8 @@ fun BabyScreen(
                 summary = summary,
                 tracksWellbeing = state.tracksWellbeing,
                 now = now,
-                onFeed = onQuickFeed,
+                sessions = sessions,
+                onFeed = { side -> onQuickFeed(side, summary.baby.uid) },
                 onNavigate = onNavigate,
                 onGiveMedicine = vm::giveDose,
                 onDismissMedicine = vm::dismiss,

@@ -75,6 +75,8 @@ import com.gproust.sprout.ui.common.dayLabel
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.feeding.EditFeedingDialog
 import com.gproust.sprout.ui.feeding.FeedingForm
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.report.AllergyListPdf
 import com.gproust.sprout.ui.report.allergyList
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
@@ -312,7 +314,13 @@ fun FoodsScreen(
     val now = System.currentTimeMillis()
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_foods), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_foods),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.FOODS) },
+            )
+        },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.foods_log_meal)) { adding = true }
         },

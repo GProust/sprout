@@ -52,6 +52,8 @@ import com.gproust.sprout.ui.common.healingQuestion
 import com.gproust.sprout.ui.common.isOptional
 import com.gproust.sprout.ui.common.label
 import com.gproust.sprout.ui.common.moodEmoji
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.SharingStarted
@@ -323,9 +325,19 @@ private fun QuestionPage(
     }
 }
 
+/**
+ * "Not now", and the check-in's help. The flow has no top bar of its own, so
+ * the **?** sits beside the one way out, on every step; it opens the same sheet
+ * as the wellbeing page, because the two are one thing to explain (BDR-26).
+ */
 @Composable
 private fun SkipRow(onSkip: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         TextButton(onClick = onSkip) { Text(stringResource(R.string.checkin_skip)) }
+        HelpButton(HelpPage.WELLBEING)
     }
 }

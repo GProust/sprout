@@ -49,19 +49,24 @@ final class TourTests: XCTestCase {
     }
 
     func testAFeedStartingEndsIt() {
-        XCTAssertTrue(tourStepsAside(onDashboard: true, feedWasRunning: false, feedIsRunning: true))
+        XCTAssertTrue(tourStepsAside(onDashboard: true, feedingBefore: [], feedingNow: ["lea"]))
+    }
+
+    /// Twins: the second feed starting beside the first is a feed starting.
+    func testATwinsFeedStartingBesideTheOtherEndsIt() {
+        XCTAssertTrue(tourStepsAside(onDashboard: true, feedingBefore: ["lea"], feedingNow: ["lea", "noah"]))
     }
 
     /// A replay asked for in the middle of a feed is not cut short by that feed.
     func testAFeedAlreadyRunningDoesNotEndIt() {
-        XCTAssertFalse(tourStepsAside(onDashboard: true, feedWasRunning: true, feedIsRunning: true))
-        XCTAssertFalse(tourStepsAside(onDashboard: true, feedWasRunning: true, feedIsRunning: false))
-        XCTAssertFalse(tourStepsAside(onDashboard: true, feedWasRunning: false, feedIsRunning: false))
+        XCTAssertFalse(tourStepsAside(onDashboard: true, feedingBefore: ["lea"], feedingNow: ["lea"]))
+        XCTAssertFalse(tourStepsAside(onDashboard: true, feedingBefore: ["lea"], feedingNow: []))
+        XCTAssertFalse(tourStepsAside(onDashboard: true, feedingBefore: [], feedingNow: []))
     }
 
     /// A tile, a tab, Settings, or a file arriving underneath it.
     func testLeavingTheDashboardEndsIt() {
-        XCTAssertTrue(tourStepsAside(onDashboard: false, feedWasRunning: false, feedIsRunning: false))
+        XCTAssertTrue(tourStepsAside(onDashboard: false, feedingBefore: [], feedingNow: []))
     }
 
     func testOneBabyIsShownEveryStep() {

@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gproust.sprout.R
 import com.gproust.sprout.ui.common.SproutTopBar
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.home.HomeViewModel
 import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
@@ -52,7 +54,12 @@ fun YouScreen(onNavigate: (String) -> Unit) {
     val state by vm.uiState.collectAsState()
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.nav_you)) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.nav_you),
+                actions = { HelpButton(HelpPage.YOU) },
+            )
+        },
     ) { padding ->
         Column(
             Modifier

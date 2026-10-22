@@ -44,8 +44,8 @@ than anywhere else — see [`spec/README.md`](spec/README.md).
   records describe the product, and the same capability is meant to exist on both
   sides. Never write a second record because the other app now needs the same
   thing; a platform-scoped record is only for a mechanism the platform *forces*
-  (ADR-0017, ADR-0018, ADR-0019 are the only ones), it names the shared record it
-  applies, and it changes nothing that record decided. No BDR is ever
+  (ADR-0017, ADR-0018, ADR-0019, ADR-0020 are the only ones), it names the shared
+  record it applies, and it changes nothing that record decided. No BDR is ever
   platform-scoped. The rule is
   [ADR-0015](docs/adr/0015-native-ios-in-this-repository.md)'s and the
   [index](docs/adr/README.md#one-decision-both-apps) carries a `Scope` column so
@@ -213,6 +213,52 @@ things a change can quietly undo:
   through `addTimedFeeding`, never the active-baby `addFeeding`. With twins the
   selection is a mode that moves while the timer runs, and resolving it at save
   time is how one twin's feed was filed under the other (#115).
+
+Twins feed together, so the store holds **one running session per baby**, not
+one per phone ([BDR-23](docs/decisions/0023-one-running-breastfeed-per-baby.md)).
+`ui/feeding/NursingSessions.kt` and `SproutData/NursingSessions.swift` are the
+rules, as pure functions with the same cases on both sides:
+
+- **Everything is keyed by the baby's uid.** `startIfIdle` hands back the running
+  feed for *that* baby and starts one for any other; `consume`, pause, resume and
+  switch act on one baby's feed and leave the rest running. A screen looks its
+  feed up with `runningFor(uid)` — never "the first session", which with two
+  running is whichever started first. The nursing route carries `?baby=<uid>`.
+- **The old single session is still read once.** Android's flat keys in
+  `nursing_session.xml` and iOS's `nursing_session` dictionary become the list on
+  the next write; one without a baby is adopted by the selected baby at launch
+  (`adoptUnnamed`). Keep that read until no phone can still be carrying one.
+
+A running feed can also be shown outside the app, with the timer's own buttons
+([BDR-24](docs/decisions/0024-a-running-feed-outside-the-app.md)): an ongoing
+notification on Android, a Live Activity on iOS
+([ADR-0020](docs/adr/0020-the-live-activity-is-the-one-ios-extension.md)). Opt-in
+(`nursing_notification_enabled`, the same key on both). Five things a change can
+quietly undo:
+
+- **A tap outside is the timer's own act.** Every control goes through
+  `NursingActions` (Android) / `NursingSessionStore.apply` (iOS) and
+  `NursingSession.after(control)`, which ignores a control that no longer fits —
+  a second *Pause*, a stale *Switch* on a break. *Stop & save* is `take` then
+  `save`, so a second one finds nothing. `nursingControls` is the one list of
+  buttons for the timer, the notification and the Live Activity.
+- **Nothing runs.** No foreground service (it would need a permission
+  `AttackSurfaceTest` refuses) and nothing ticking: both platforms draw the clock
+  from a start time, so the notification and the activity are redrawn only when a
+  feed changes, and when the app or the phone comes up with one running.
+- **No new door on Android.** The buttons are broadcasts to the existing,
+  non-exported `FeedingReminderReceiver`; each feed's notification is tagged by
+  its baby's uid, and each button's `PendingIntent` is told apart by its data URI.
+- **A locked screen never names the baby.** Android's public version and the Live
+  Activity say *Feeding · Left*, or *Feed 1* / *Feed 2* with twins; the name is in
+  Android's private version only.
+- **The iOS extension only draws.** It links no SproutData, holds no entitlement
+  and gets everything it shows from the app; its buttons are
+  `NursingControlIntent`s that run in the app's process (`ios/Sprout/Shared/`),
+  which opens the database through the one `AppEnvironment.live()`.
+  `check_attack_surface.py` pins the extension at both layers and
+  `check_no_network.py` scans it; the release signs it with a profile of its own
+  (`APPLE_LIVE_ACTIVITY_PROFILE_BASE64`).
 
 Two feeds saved apart can also be joined back into the one feed they were
 ([BDR-19](docs/decisions/0019-two-breastfeeds-saved-apart-can-be-joined.md)) —
@@ -445,6 +491,61 @@ tested on both sides. Four things a change can quietly undo:
 - **The screenshot seeds mark everything seen**, or every dashboard capture
   carries the card.
 
+## Customising home
+
+The dashboard's log grid is the parent's to arrange — which tiles show, and in
+which order — from *Customise home* in Settings
+([BDR-25](docs/decisions/0025-the-home-screen-is-the-parents-to-arrange.md)).
+`data/HomeLayout.kt` and `SproutData/HomeLayout.swift` are the arithmetic, tested
+with the same cases on both sides. Five things a change can quietly undo:
+
+- **Nothing stored is today's grid.** Every tile shown, the old order, and no
+  *More* tile. A parent who never opens the screen sees no change, and both
+  screenshot runs start from empty settings and expect every tile.
+- **The ids are stored, so they are stable** (`HOME_TILE_IDS` / `homeTileIds`,
+  the names in iOS's `log-tile-<name>` identifiers). A new log appends its id on
+  both apps; a tile missing from a stored order appears shown at its default
+  place, and an unknown stored id is ignored. Never rename or reuse one.
+- **Hiding is presentation only, and only ever the parent's act.** A hidden log
+  waits behind *More*, still syncs and still counts in Trends and the record.
+  Nothing is hidden by default, suggested, or ordered by use — BDR-7 and BDR-20
+  refused the app deciding which logs a parent sees, and that still stands.
+- **Wellbeing's master switch still wins** (BDR-6): off, the tile is in neither
+  the grid, *More* nor the editor; back on, it returns where it was. Moves made
+  while it is off go through `moveTile` / `reorderTiles`, which keep its slot.
+- **One arrangement per phone, for every baby**, in the ordinary settings
+  (`HomeLayoutSettings`): backed up, never synced. The grid reads it itself on
+  Android and from `HomeViewModel` on iOS, so Home with one baby and each baby's
+  tab cannot draw two different grids.
+
+## Help on every page
+
+Every page has a **?** at the trailing end of its top bar, and it opens a sheet
+of text about that page: what it is for, how to use it, what is good to know
+([BDR-26](docs/decisions/0026-help-on-every-page-on-demand.md)). The list is
+`ui/help/HelpPages.kt` and `Screens/Help/HelpPages.swift`; the strings are
+`help_<page>_<section>`. Four things a change can quietly undo:
+
+- **It opens from the ? and from nowhere else.** No first launch, no badge, no
+  tip that appears by itself. Help that shows itself is the screen in front of
+  the dashboard that BDR-6 took out.
+- **One list, both apps, in the same order.** The two files name the section
+  headings, then the pages' titles, then each page's entries, with literal keys;
+  `HelpPagesTest` reads the Swift against the Kotlin and `check_string_keys.py`
+  the Kotlin against the Swift. A page or a section is added to both in one
+  commit, and no other string key goes in either file — both checks read every
+  key there, in order.
+- **The app, never the baby.** Each page's rules are its help's rules: no
+  medicine names, doses or intervals, the light as arithmetic on the parent's
+  own figures and "No set gap" as no gap rule (BDR-15, BDR-18); no ages, no
+  order of introduction, nothing about allergens (BDR-20, BDR-21); the band and
+  the span, never what a centile means (BDR-8, BDR-12); a break is not time at
+  the breast, and joining is offered, never done (BDR-17, BDR-19); what travels
+  between phones and what never does (ADR-0007 to 0011).
+- **A change to what a page does is a change to its help**, in the same PR and
+  all seven languages — nothing fails if it is forgotten. Controls are named by
+  their labels, in each language's own quotation marks, and a sheet describes
+  only what both apps do: "where this phone offers it" covers the rest.
 ## A tour after onboarding
 
 Right after onboarding, a few cards point at the dashboard's main areas, once

@@ -23,7 +23,15 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SOURCES = [ROOT / "Sprout" / "Sources", ROOT / "SproutKit" / "Sources"]
+# The app, what it shares with its Live Activity, the extension itself, and the
+# libraries: every Swift file that ships. The extension runs in a process of its
+# own, so leaving it out would be a second app nobody checked (ADR-0020).
+SOURCES = [
+    ROOT / "Sprout" / "Sources",
+    ROOT / "Sprout" / "Shared",
+    ROOT / "Sprout" / "LiveActivity",
+    ROOT / "SproutKit" / "Sources",
+]
 
 # Each entry is (pattern, what it would let the app do).
 FORBIDDEN = [

@@ -22,6 +22,11 @@ import kotlinx.coroutines.launch
  * Fires when a baby has gone too long without a feed (or after a reboot). Re-checks
  * the current state before posting — the setting may be off, the baby may be gone or
  * archived, or a feed may have just been logged — so a stale alarm never nags.
+ *
+ * It is also where the buttons on a running breastfeed's notification arrive
+ * (BDR-24): the same non-exported receiver, so that door costs no new component.
+ * And after a reboot it puts that notification back, since a feed left running
+ * survives one and the notification does not.
  */
 class FeedingReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -32,6 +37,11 @@ class FeedingReminderReceiver : BroadcastReceiver() {
                 FeedingReminders.ensureChannel(context)
                 if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
                     FeedingReminders.rescheduleAll(context, app.repository)
+                    NursingNotifications.refresh(context, app.repository)
+                    return@launch
+                }
+                if (intent.action == NursingNotifications.ACTION_CONTROL) {
+                    NursingNotifications.handle(context, app.repository, intent)
                     return@launch
                 }
 
