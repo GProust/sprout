@@ -472,6 +472,18 @@
     <string name="screen_sync">Współdzielenie w domu</string>
     <string name="settings_sharing">Współdzielenie</string>
     <string name="settings_sync_hint">Udostępnij zapisy dziecka pozostałym osobom, które się nim zajmują — bez konta i bez chmury.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Ekran startowy</string>
+    <string name="screen_customise_home">Dostosuj ekran startowy</string>
+    <string name="settings_customise_home_hint">Wybierz, co pokazuje ekran startowy i w jakiej kolejności.</string>
+    <string name="customise_home_intro">Ustaw na początku to, co zapisujesz najczęściej, i wyłącz to, czego nie używasz. Nic nie przepada: to, co wyłączone, czeka pod Więcej na końcu siatki, nadal jest współdzielone z telefonami domowników i nadal liczy się w Trendach i w zapisie dla lekarza.</string>
+    <string name="customise_home_shown">Widoczne na ekranie startowym</string>
+    <string name="customise_home_hidden">Ukryte, pod Więcej</string>
+    <string name="customise_home_move_up">Przesuń w górę</string>
+    <string name="customise_home_move_down">Przesuń w dół</string>
+    <string name="customise_home_moved">%1$s, pozycja %2$d z %3$d</string>
+    <string name="customise_home_restore">Przywróć domyślną kolejność</string>
+    <string name="home_more">Więcej</string>
     <string name="sync_intro_title">Jeden zapis, wszystkie telefony w domu</string>
     <string name="sync_intro_body">Zaproś drugiego rodzica albo babcię, która regularnie zajmuje się dzieckiem. Gdy telefon dołączy, każdy może wysłać swoje wpisy, a Sprout je scali: bez konta, bez serwera i bez przechowywania czegokolwiek poza waszymi własnymi telefonami.</string>
     <string name="sync_invite">Zaproś telefon</string>

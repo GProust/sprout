@@ -56,6 +56,7 @@ import com.gproust.sprout.ui.profile.ProfileScreen
 import com.gproust.sprout.ui.pumping.PumpingScreen
 import com.gproust.sprout.ui.report.ReportScreen
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.settings.CustomiseHomeScreen
 import com.gproust.sprout.ui.settings.SettingsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
@@ -88,6 +89,7 @@ object Routes {
     const val MEDICINES = "medicines"
     const val FOODS = "foods"
     const val SYNC = "settings/sync"
+    const val CUSTOMISE_HOME = "settings/home"
     const val REPORT = "report/{babyId}"
 
     /**
@@ -395,8 +397,12 @@ private fun MainScaffold(
             composable(Routes.SETTINGS) {
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
+                    onOpenCustomiseHome = { navController.navigate(Routes.CUSTOMISE_HOME) },
                     onOpenSync = { navController.navigate(Routes.SYNC) },
                 )
+            }
+            composable(Routes.CUSTOMISE_HOME) {
+                CustomiseHomeScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.SYNC) {
                 SyncScreen(

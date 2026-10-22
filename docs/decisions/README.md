@@ -60,5 +60,6 @@ ADR log and are cross-linked from here.
 | [0022](0022-whats-new-is-a-card-the-parent-puts-away.md) | What's new is a card on the dashboard, and the parent puts it away | Product / UX | Accepted |
 | [0023](0023-one-running-breastfeed-per-baby.md) | A breastfeed belongs to the baby it was started for, and each baby can have one running | Product / Domain | Accepted |
 | [0024](0024-a-running-feed-outside-the-app.md) | A running feed is shown outside the app, and can be paused, switched and stopped from there | Product / UX | Accepted |
+| [0025](0025-the-home-screen-is-the-parents-to-arrange.md) | The home screen's logs are the parent's to arrange | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

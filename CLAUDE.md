@@ -491,6 +491,33 @@ tested on both sides. Four things a change can quietly undo:
 - **The screenshot seeds mark everything seen**, or every dashboard capture
   carries the card.
 
+## Customising home
+
+The dashboard's log grid is the parent's to arrange — which tiles show, and in
+which order — from *Customise home* in Settings
+([BDR-25](docs/decisions/0025-the-home-screen-is-the-parents-to-arrange.md)).
+`data/HomeLayout.kt` and `SproutData/HomeLayout.swift` are the arithmetic, tested
+with the same cases on both sides. Five things a change can quietly undo:
+
+- **Nothing stored is today's grid.** Every tile shown, the old order, and no
+  *More* tile. A parent who never opens the screen sees no change, and both
+  screenshot runs start from empty settings and expect every tile.
+- **The ids are stored, so they are stable** (`HOME_TILE_IDS` / `homeTileIds`,
+  the names in iOS's `log-tile-<name>` identifiers). A new log appends its id on
+  both apps; a tile missing from a stored order appears shown at its default
+  place, and an unknown stored id is ignored. Never rename or reuse one.
+- **Hiding is presentation only, and only ever the parent's act.** A hidden log
+  waits behind *More*, still syncs and still counts in Trends and the record.
+  Nothing is hidden by default, suggested, or ordered by use — BDR-7 and BDR-20
+  refused the app deciding which logs a parent sees, and that still stands.
+- **Wellbeing's master switch still wins** (BDR-6): off, the tile is in neither
+  the grid, *More* nor the editor; back on, it returns where it was. Moves made
+  while it is off go through `moveTile` / `reorderTiles`, which keep its slot.
+- **One arrangement per phone, for every baby**, in the ordinary settings
+  (`HomeLayoutSettings`): backed up, never synced. The grid reads it itself on
+  Android and from `HomeViewModel` on iOS, so Home with one baby and each baby's
+  tab cannot draw two different grids.
+
 ## Asking for support
 
 Settings ends with two donation links (GitHub Sponsors, Buy Me a Coffee). The

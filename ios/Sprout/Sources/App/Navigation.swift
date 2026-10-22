@@ -208,6 +208,11 @@ struct RootView: View {
         case .profile: ProfileScreen()
         case .settings: SettingsScreen()
         case .sync: SyncScreen()
+        case .customiseHome:
+            // The dashboard's own model, because what this screen changes is
+            // what the grid draws: one arrangement, held in one place, read by
+            // Home and by each baby's tab alike (BDR-25).
+            if let model { CustomiseHomeScreen(model: model) }
         }
     }
 }

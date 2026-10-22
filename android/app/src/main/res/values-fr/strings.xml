@@ -516,6 +516,18 @@
     <string name="screen_sync">Partage du foyer</string>
     <string name="settings_sharing">Partage</string>
     <string name="settings_sync_hint">Partagez le suivi du bébé avec les autres personnes qui s\'en occupent — sans compte, sans cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Écran d\'accueil</string>
+    <string name="screen_customise_home">Personnaliser l\'accueil</string>
+    <string name="settings_customise_home_hint">Choisissez ce que l\'accueil affiche, et dans quel ordre.</string>
+    <string name="customise_home_intro">Mettez en premier ce que vous notez le plus, et désactivez ce dont vous ne vous servez pas. Rien n\'est perdu : ce qui est désactivé attend sous Plus, à la fin de la grille, continue d\'être partagé avec les téléphones du foyer et compte toujours dans les Tendances et dans le relevé pour votre médecin.</string>
+    <string name="customise_home_shown">Affiché sur l\'accueil</string>
+    <string name="customise_home_hidden">Masqué, sous Plus</string>
+    <string name="customise_home_move_up">Monter</string>
+    <string name="customise_home_move_down">Descendre</string>
+    <string name="customise_home_moved">%1$s, position %2$d sur %3$d</string>
+    <string name="customise_home_restore">Rétablir l\'ordre par défaut</string>
+    <string name="home_more">Plus</string>
     <string name="sync_intro_title">Un seul suivi, tous les téléphones du foyer</string>
     <string name="sync_intro_body">Invitez l\'autre parent — ou un grand-parent qui garde le bébé régulièrement. Une fois un téléphone entré dans le foyer, chacun peut envoyer ses saisies et Sprout les fusionne : sans compte, sans serveur, et rien n\'est conservé ailleurs que sur vos propres téléphones.</string>
     <string name="sync_invite">Inviter un téléphone</string>

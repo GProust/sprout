@@ -457,6 +457,18 @@
     <string name="screen_sync">Condivisione in famiglia</string>
     <string name="settings_sharing">Condivisione</string>
     <string name="settings_sync_hint">Condividi il diario del bambino con le altre persone che se ne occupano: nessun account, nessun cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Schermata Home</string>
+    <string name="screen_customise_home">Personalizza la Home</string>
+    <string name="settings_customise_home_hint">Scegli cosa mostra la Home e in quale ordine.</string>
+    <string name="customise_home_intro">Metti per primo ciò che registri di più e disattiva ciò che non usi. Non si perde nulla: ciò che è disattivato aspetta in Altro, alla fine della griglia, continua a essere condiviso con i telefoni della famiglia e conta ancora in Andamento e nel resoconto per il medico.</string>
+    <string name="customise_home_shown">Visibile nella Home</string>
+    <string name="customise_home_hidden">Nascosto, in Altro</string>
+    <string name="customise_home_move_up">Sposta su</string>
+    <string name="customise_home_move_down">Sposta giù</string>
+    <string name="customise_home_moved">%1$s, posizione %2$d di %3$d</string>
+    <string name="customise_home_restore">Ripristina l\'ordine predefinito</string>
+    <string name="home_more">Altro</string>
     <string name="sync_intro_title">Un solo diario, tutti i telefoni della famiglia</string>
     <string name="sync_intro_body">Invita l\'altro genitore, o un nonno che tiene il bambino spesso. Quando un telefono entra, ciascuno può inviare le proprie voci e Sprout le unisce: nessun account, nessun server e niente conservato al di fuori dei vostri telefoni.</string>
     <string name="sync_invite">Invita un telefono</string>

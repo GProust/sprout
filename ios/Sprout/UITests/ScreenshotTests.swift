@@ -76,6 +76,19 @@ final class ScreenshotTests: XCTestCase {
         gear.tap()
         try file(app, named: "12-settings", language: language)
 
+        // *Customise home* (BDR-25), the row just above sharing: every log with
+        // its switch and its two arrows, in the order the dashboard draws them.
+        // Looked up the same way as the sharing row below, for the same reason.
+        let customise = app.descendants(matching: .any)
+            .matching(identifier: "settings-customise-home").firstMatch
+        XCTAssertTrue(
+            scroll(app, to: customise),
+            "no Customise home row in settings, even after scrolling"
+        )
+        customise.tap()
+        try file(app, named: "12-settings-2-customise-home", language: language)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
         // By `descendants` rather than `buttons`: a `NavigationLink` inside a
         // `Form` is a cell on some iOS versions and a button on others, and
         // which one it is today is not something worth pinning a run to.
@@ -324,7 +337,7 @@ final class ScreenshotTests: XCTestCase {
 
     /// Scrolls until `element` is on screen, or gives up.
     ///
-    /// Sharing is the fifth of six sections in Settings, so on a phone it starts
+    /// Sharing is the sixth of seven sections in Settings, so on a phone it starts
     /// below the fold — and the captured image of that screen shows its top. A
     /// SwiftUI `Form` is a `List`, and a `List` builds rows lazily, so a row that
     /// has not been scrolled to may not be in the tree to query at all.

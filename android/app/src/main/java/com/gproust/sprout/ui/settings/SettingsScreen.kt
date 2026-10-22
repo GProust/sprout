@@ -73,9 +73,10 @@ private data class LanguageChoice(
 
 @Composable
 // onBack stays last so `SettingsScreen {}` keeps reading like its siblings
-// (ProfileScreen, TreatmentsScreen); the sync hop defaults to a no-op for
+// (ProfileScreen, TreatmentsScreen); the two hops default to a no-op for
 // previews and screenshot captures, which only render the screen.
 fun SettingsScreen(
+    onOpenCustomiseHome: () -> Unit = {},
     onOpenSync: () -> Unit = {},
     onBack: () -> Unit,
 ) {
@@ -265,6 +266,11 @@ fun SettingsScreen(
                 }
             }
 
+            // After the check-in, whose switch decides whether the wellbeing
+            // tile is there to arrange at all, and before sharing (BDR-25).
+            item { Spacer(Modifier.height(24.dp)) }
+            item { HomeScreenSection(onOpen = onOpenCustomiseHome) }
+
             item { Spacer(Modifier.height(24.dp)) }
             item { SharingSection(onOpenSync = onOpenSync) }
 
@@ -336,6 +342,32 @@ private fun SupportRow(label: String, hint: String, onClick: () -> Unit) {
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
+    }
+}
+
+/** The way in to arranging the dashboard's log grid (BDR-25). */
+@Composable
+private fun HomeScreenSection(onOpen: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_home),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onOpen).padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.screen_customise_home))
+                Text(
+                    stringResource(R.string.settings_customise_home_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+        }
     }
 }
 
