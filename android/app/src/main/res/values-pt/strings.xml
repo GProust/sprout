@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Um salto de crescimento é comum %1$s — pode começar nos próximos dias.</string>
     <string name="settings_growth_spurts">Alertas de saltos de crescimento</string>
     <string name="settings_growth_spurts_desc">Avisar-me quando começar um período típico de salto de crescimento.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">A mamada em curso nas notificações</string>
+    <string name="settings_nursing_notification_desc">Enquanto uma mamada está a ser cronometrada, mostrá-la nas notificações com Pausar, Trocar de lado e Parar &amp; guardar, sem ter de desbloquear o telemóvel. O nome do seu bebé não aparece no ecrã de bloqueio, a não ser que o telemóvel mostre lá todo o conteúdo das notificações.</string>
+    <string name="settings_live_activity">A mamada em curso no ecrã de bloqueio</string>
+    <string name="settings_live_activity_desc">Enquanto uma mamada está a ser cronometrada, mostrá-la no ecrã de bloqueio e na Dynamic Island com Pausar, Trocar de lado e Parar &amp; guardar, sem ter de desbloquear o telemóvel. Nunca mostra o nome do seu bebé.</string>
+    <string name="nursing_channel_name">Mamada em curso</string>
+    <string name="nursing_channel_desc">Uma mamada enquanto está a ser cronometrada, com botões para a pausar, trocar de lado e guardar</string>
+    <string name="nursing_switch_side">Trocar de lado</string>
+    <string name="nursing_notif_on_break">Em pausa · %1$s à mama</string>
+    <string name="nursing_notif_feed_number">Mamada %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Alertas de saltos de crescimento</string>
     <string name="growth_spurt_channel_desc">Um aviso quando começa um período típico de salto de crescimento</string>
     <string name="growth_spurt_notif_title">Pode estar a começar um salto de crescimento</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">há %1$d h</string>
     <string name="widget_ago_hours_minutes">há %1$d h %2$d min</string>
     <string name="widget_last_breast">Última mama: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d mamada em curso</item>
+        <item quantity="other">%1$d mamadas em curso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Não foi possível desenhar o widget. Abra o Sprout, ou remova-o e adicione-o de novo.</string>
@@ -443,6 +457,18 @@
     <string name="screen_sync">Partilha do agregado</string>
     <string name="settings_sharing">Partilha</string>
     <string name="settings_sync_hint">Partilhe o registo do bebé com as outras pessoas que cuidam dele — sem conta e sem nuvem.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Ecrã inicial</string>
+    <string name="screen_customise_home">Personalizar o início</string>
+    <string name="settings_customise_home_hint">Escolha o que o ecrã inicial mostra e por que ordem.</string>
+    <string name="customise_home_intro">Ponha primeiro o que regista mais e desative o que não usa. Nada se perde: o que estiver desativado espera em Mais, no fim da grelha, continua a ser partilhado com os telemóveis do agregado e continua a contar nas Tendências e no registo para o médico.</string>
+    <string name="customise_home_shown">Visível no início</string>
+    <string name="customise_home_hidden">Oculto, em Mais</string>
+    <string name="customise_home_move_up">Mover para cima</string>
+    <string name="customise_home_move_down">Mover para baixo</string>
+    <string name="customise_home_moved">%1$s, posição %2$d de %3$d</string>
+    <string name="customise_home_restore">Repor a ordem predefinida</string>
+    <string name="home_more">Mais</string>
     <string name="sync_intro_title">Um só registo, todos os telemóveis do agregado</string>
     <string name="sync_intro_body">Convide a outra mãe ou o outro pai, ou uma avó que fica com o bebé com regularidade. Assim que um telemóvel entra, cada um pode enviar os seus registos e o Sprout junta-os: sem conta, sem servidor e sem nada guardado fora dos vossos próprios telemóveis.</string>
     <string name="sync_invite">Convidar um telemóvel</string>
@@ -588,6 +614,7 @@
     <string name="home_chip_slept">Sono %1$s</string>
     <string name="home_chip_nappy">Fralda %1$s</string>
     <string name="home_live_nursing">Amamentação · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Amamentação · %2$s</string>
     <string name="home_live_asleep">%1$s está a dormir</string>
     <string name="home_live_open">Abrir</string>
     <string name="whats_new_label">Novidades no Sprout</string>
@@ -602,7 +629,7 @@
     <string name="help_section_how">Como usar</string>
     <string name="help_section_good_to_know">Bom saber</string>
     <string name="help_home_purpose">Todo o agregado num relance: para cada bebé, há quanto tempo comeu, dormiu e mudou a fralda, e o que está a decorrer neste momento.</string>
-    <string name="help_home_how">Comece uma mamada diretamente no painel: o botão principal é a mama por onde a última mamada não começou, e a outra está ao lado. Os mosaicos abrem cada registo, e «Hoje» soma o dia até agora. Com mais de um bebé, toque num cartão para abrir o separador desse bebé.\n\nUma mamada em curso, ou um bebé a dormir, aparece no topo com um botão para a abrir ou para registar que acordou.</string>
+    <string name="help_home_how">Comece uma mamada diretamente no painel: o botão principal é a mama por onde a última mamada não começou, e a outra está ao lado. Os mosaicos abrem cada registo, e «Hoje» soma o dia até agora. Com mais de um bebé, toque num cartão para abrir o separador desse bebé. Para escolher que mosaicos aparecem e por que ordem, abra «Personalizar o início» nas Definições; um mosaico desativado espera em «Mais».\n\nUma mamada em curso, ou um bebé a dormir, aparece no topo com um botão para a abrir ou para registar que acordou. Os gémeos podem mamar ao mesmo tempo: cada mamada em curso tem a sua própria linha, com o nome do bebé.</string>
     <string name="help_home_good_to_know">Alguns cartões só aparecem quando têm algo a dizer: a verificação diária, uma nota nas idades em que os saltos de crescimento são frequentes, um medicamento com uma espera em curso e as novidades depois de uma atualização. Nenhum lhe barra o caminho. Os ícones no topo abrem os seus bebés e as definições.</string>
     <string name="help_baby_purpose">Um bebé por si só: a mesma vista que o painel mostra quando há apenas uma criança, para o bebé que escolheu.</string>
     <string name="help_baby_how">Comece uma mamada, abra um registo a partir dos mosaicos, veja os totais de hoje ou passe às estatísticas e a «Partilhar um registo». Para mudar para outro bebé, toque no cartão dele no painel.</string>
@@ -615,7 +642,7 @@
     <string name="help_you_good_to_know">Isto é seu, não de um bebé: apagar um bebé não lhe toca. O seu bem-estar e as suas verificações nunca saem deste telemóvel. Se desativar a verificação diária nas definições, ambos desaparecem daqui e tudo o que registou é mantido.</string>
     <string name="help_feeding_purpose">Todas as refeições do bebé escolhido — mama, biberão e sólidos — da mais recente para a mais antiga, e o cronómetro da mamada.</string>
     <string name="help_feeding_how">«Começar à esquerda» ou «Começar à direita» abre o cronómetro. Mude de lado pelo caminho, toque em «Pausar» para o arroto ou para mudar a fralda e depois em «Retomar à esquerda» ou «Retomar à direita», conforme a mama que vem a seguir. Toque em «Parar &amp; guardar» quando a mamada terminar.\n\nToque em + para registar uma refeição depois de acontecer, um biberão ou uma refeição sólida. «Detalhes», numa mamada, mostra cada período com as suas horas.</string>
-    <string name="help_feeding_good_to_know">Uma pausa não é tempo à mama: o cronómetro para enquanto está em pausa, e uma mamada guardada termina quando acabou o seu último período. Sair do cronómetro não o para.\n\nSe guardou uma mamada e começou outra pouco depois, a segunda pode oferecer «Juntar à anterior». Pergunta antes de mudar o que quer que seja, e o Sprout nunca junta mamadas sozinho: só você sabe se foram uma só.</string>
+    <string name="help_feeding_good_to_know">Uma pausa não é tempo à mama: o cronómetro para enquanto está em pausa, e uma mamada guardada termina quando acabou o seu último período. Sair do cronómetro não o para. Cada bebé tem o seu próprio cronómetro, por isso os gémeos podem mamar ao mesmo tempo, e uma mamada em curso também pode aparecer fora da app, com os mesmos botões, se o ativar nas Definições.\n\nSe guardou uma mamada e começou outra pouco depois, a segunda pode oferecer «Juntar à anterior». Pergunta antes de mudar o que quer que seja, e o Sprout nunca junta mamadas sozinho: só você sabe se foram uma só.</string>
     <string name="help_pumping_purpose">As suas sessões de extração e a reserva de leite: quanto há neste momento no frigorífico, no congelador ou à temperatura ambiente.</string>
     <string name="help_pumping_how">Toque em + depois de uma sessão para registar quanto foi e onde ficou. Quando o leite guardado é bebido ou deitado fora, toque em «Marcar como usado» e ele sai da reserva.</string>
     <string name="help_pumping_good_to_know">A reserva só conta o leite que ainda pode ser dado: o leite usado, e o guardado durante mais tempo do que a indicação geral desta página, fica fora dos totais, embora o seu registo continue no histórico. A extração é sua, não de um bebé. É partilhada com o seu agregado, a não ser que desative «Partilhar o leite extraído» na página de partilha.</string>
@@ -650,8 +677,8 @@
     <string name="help_report_how">Escolha o período, cujas datas exatas aparecem antes de qualquer ficheiro ser criado, e o que incluir. Depois toque em «Relatório PDF» ou «Folha de cálculo» e escolha para onde enviar. «Proteger com uma palavra-passe» põe os dois ficheiros num único zip cifrado.</string>
     <string name="help_report_good_to_know">O documento diz o que foi registado e não interpreta nada. A referência da OMS que escolher vale só para este ficheiro e é esquecida quando sair; por omissão usam-se as duas, apresentadas como intervalo. As notas ficam de fora, a não ser que as inclua, e a extração e o seu bem-estar nunca lá aparecem.\n\nOs ficheiros são criados neste telemóvel e não vão para lado nenhum até os enviar. O Sprout não guarda nenhuma cópia da palavra-passe: dê-a pessoalmente ou por telefone, não junto com o ficheiro.</string>
     <string name="help_settings_purpose">Como o Sprout funciona neste telemóvel: a língua, os lembretes, a verificação diária e a partilha com o seu agregado.</string>
-    <string name="help_settings_how">Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis.</string>
-    <string name="help_settings_good_to_know">Os lembretes de refeições e os alertas de saltos de crescimento ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui.</string>
+    <string name="help_settings_how">Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Também pode mostrar a mamada que está a cronometrar fora da app — nas notificações ou no ecrã de bloqueio — com os seus botões. «Personalizar o início» escolhe que registos o painel mostra e por que ordem. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis.</string>
+    <string name="help_settings_good_to_know">Os lembretes de refeições, os alertas de saltos de crescimento e a mamada em curso fora da app ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui.</string>
     <string name="sleep_woke_up">Acordou</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">A extração, o seu bem-estar e a verificação diária.</string>

@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Es habitual un estirón de crecimiento %1$s; puede empezar en los próximos días.</string>
     <string name="settings_growth_spurts">Avisos de estirones</string>
     <string name="settings_growth_spurts_desc">Avísame cuando empiece una época típica de estirón de crecimiento.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La toma en curso en las notificaciones</string>
+    <string name="settings_nursing_notification_desc">Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones.</string>
+    <string name="settings_live_activity">La toma en curso en la pantalla de bloqueo</string>
+    <string name="settings_live_activity_desc">Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé.</string>
+    <string name="nursing_channel_name">Toma en curso</string>
+    <string name="nursing_channel_desc">Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla</string>
+    <string name="nursing_switch_side">Cambiar de lado</string>
+    <string name="nursing_notif_on_break">En pausa · %1$s al pecho</string>
+    <string name="nursing_notif_feed_number">Toma %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avisos de estirones</string>
     <string name="growth_spurt_channel_desc">Un aviso cuando empieza una época típica de estirón de crecimiento</string>
     <string name="growth_spurt_notif_title">Puede que empiece un estirón de crecimiento</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">hace %1$d h</string>
     <string name="widget_ago_hours_minutes">hace %1$d h %2$d min</string>
     <string name="widget_last_breast">Último pecho: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d toma en curso</item>
+        <item quantity="other">%1$d tomas en curso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">No se pudo dibujar el widget. Abre Sprout, o quítalo y vuelve a añadirlo.</string>
@@ -443,6 +457,18 @@
     <string name="screen_sync">Compartir en el hogar</string>
     <string name="settings_sharing">Compartir</string>
     <string name="settings_sync_hint">Comparte el registro del bebé con las demás personas que lo cuidan: sin cuenta y sin nube.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Pantalla de inicio</string>
+    <string name="screen_customise_home">Personalizar el inicio</string>
+    <string name="settings_customise_home_hint">Elige qué muestra la pantalla de inicio y en qué orden.</string>
+    <string name="customise_home_intro">Pon primero lo que más registras y desactiva lo que no usas. No se pierde nada: lo desactivado espera en Más, al final de la cuadrícula, se sigue compartiendo con los teléfonos del hogar y sigue contando en Tendencias y en el registro para tu médico.</string>
+    <string name="customise_home_shown">Visible en el inicio</string>
+    <string name="customise_home_hidden">Oculto, en Más</string>
+    <string name="customise_home_move_up">Subir</string>
+    <string name="customise_home_move_down">Bajar</string>
+    <string name="customise_home_moved">%1$s, posición %2$d de %3$d</string>
+    <string name="customise_home_restore">Restablecer el orden predeterminado</string>
+    <string name="home_more">Más</string>
     <string name="sync_intro_title">Un solo registro, todos los teléfonos del hogar</string>
     <string name="sync_intro_body">Invita a la otra madre o al otro padre, o a una abuela que se queda con el bebé a menudo. Cuando un teléfono se une, cada persona puede enviar sus entradas y Sprout las combina: sin cuenta, sin servidor y sin que nada se guarde fuera de vuestros propios teléfonos.</string>
     <string name="sync_invite">Invitar a un teléfono</string>
@@ -588,6 +614,7 @@
     <string name="home_chip_slept">Sueño %1$s</string>
     <string name="home_chip_nappy">Pañal %1$s</string>
     <string name="home_live_nursing">Lactancia · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Lactancia · %2$s</string>
     <string name="home_live_asleep">%1$s está durmiendo</string>
     <string name="home_live_open">Abrir</string>
     <string name="whats_new_label">Novedades en Sprout</string>
@@ -602,7 +629,7 @@
     <string name="help_section_how">Cómo se usa</string>
     <string name="help_section_good_to_know">Conviene saber</string>
     <string name="help_home_purpose">Todo el hogar de un vistazo: para cada bebé, cuánto hace que comió, durmió y se le cambió, y lo que está en marcha ahora mismo.</string>
-    <string name="help_home_how">Empieza una toma de pecho desde el panel: el botón principal es el pecho por el que no empezó la última toma, y el otro está al lado. Las casillas abren cada registro, y «Hoy» suma lo que va de día. Con más de un bebé, toca una tarjeta para abrir la pestaña de ese bebé.\n\nUna toma en curso, o un bebé dormido, aparece arriba con un botón para abrirla o para anotar que se despertó.</string>
+    <string name="help_home_how">Empieza una toma de pecho desde el panel: el botón principal es el pecho por el que no empezó la última toma, y el otro está al lado. Las casillas abren cada registro, y «Hoy» suma lo que va de día. Con más de un bebé, toca una tarjeta para abrir la pestaña de ese bebé. Para elegir qué casillas se muestran y en qué orden, abre «Personalizar el inicio» en los Ajustes; una casilla desactivada espera en «Más».\n\nUna toma en curso, o un bebé dormido, aparece arriba con un botón para abrirla o para anotar que se despertó. Los gemelos pueden mamar a la vez: cada toma en curso tiene su propia fila, con el nombre del bebé.</string>
     <string name="help_home_good_to_know">Algunas tarjetas solo aparecen cuando tienen algo que decir: el chequeo diario, una nota en las edades en que los estirones son frecuentes, un medicamento con una espera en curso y las novedades tras una actualización. Ninguna se interpone en tu camino. Los iconos de arriba abren tus bebés y los ajustes.</string>
     <string name="help_baby_purpose">Un bebé por sí solo: la misma vista que muestra el panel cuando solo hay un niño, para el bebé que has elegido.</string>
     <string name="help_baby_how">Empieza una toma de pecho, abre un registro desde las casillas, consulta los totales de hoy o pasa a las estadísticas y a «Compartir un registro». Para cambiar a otro bebé, toca su tarjeta en el panel.</string>
@@ -615,7 +642,7 @@
     <string name="help_you_good_to_know">Todo esto es tuyo, no de un bebé, así que borrar un bebé no lo toca. Tu bienestar y tus chequeos nunca salen de este teléfono. Si desactivas el chequeo diario en los ajustes, ambos desaparecen de aquí y todo lo que anotaste se conserva.</string>
     <string name="help_feeding_purpose">Todas las tomas del bebé elegido — pecho, biberón y sólidos — de la más reciente a la más antigua, y el cronómetro de la toma de pecho.</string>
     <string name="help_feeding_how">«Empezar izquierdo» o «Empezar derecho» abre el cronómetro. Cambia de lado sobre la marcha, toca «Pausar» para un eructo o un pañal y luego «Seguir izquierdo» o «Seguir derecho», según el pecho que toque. Toca «Parar y guardar» cuando termine la toma.\n\nToca + para anotar una toma a posteriori, un biberón o una comida. «Detalles», en una toma de pecho, muestra cada tramo con sus horas.</string>
-    <string name="help_feeding_good_to_know">Una pausa no es tiempo al pecho: el cronómetro se detiene mientras estás en pausa, y una toma guardada termina cuando acabó su último tramo. Salir del cronómetro no lo detiene.\n\nSi guardaste una toma y empezaste otra poco después, la segunda puede ofrecer «Unir con la anterior». Pregunta antes de cambiar nada, y Sprout nunca une tomas por su cuenta: solo tú sabes si fueron una sola.</string>
+    <string name="help_feeding_good_to_know">Una pausa no es tiempo al pecho: el cronómetro se detiene mientras estás en pausa, y una toma guardada termina cuando acabó su último tramo. Salir del cronómetro no lo detiene. Cada bebé tiene su propio cronómetro, así que los gemelos pueden mamar a la vez, y una toma en curso también puede verse fuera de la app, con los mismos botones, si lo activas en los Ajustes.\n\nSi guardaste una toma y empezaste otra poco después, la segunda puede ofrecer «Unir con la anterior». Pregunta antes de cambiar nada, y Sprout nunca une tomas por su cuenta: solo tú sabes si fueron una sola.</string>
     <string name="help_pumping_purpose">Tus sesiones de extracción y la reserva de leche: cuánta hay ahora mismo en la nevera, en el congelador o a temperatura ambiente.</string>
     <string name="help_pumping_how">Toca + después de una sesión para anotar cuánto fue y dónde la guardaste. Cuando la leche guardada se bebe o se tira, toca «Marcar como usada» y sale de la reserva.</string>
     <string name="help_pumping_good_to_know">La reserva solo cuenta la leche que aún se puede dar: la leche usada, y la guardada más tiempo del que indica la orientación de esta página, queda fuera de los totales, aunque su entrada sigue en el historial. La extracción es tuya, no de un bebé. Se comparte con tu hogar salvo que desactives «Compartir la leche extraída» en la página de compartir.</string>
@@ -650,8 +677,8 @@
     <string name="help_report_how">Elige el periodo, cuyas fechas exactas se muestran antes de crear nada, y qué incluir. Luego toca «Informe PDF» u «Hoja de cálculo» y elige adónde enviarlo. «Proteger con una contraseña» mete los dos archivos en un único zip cifrado.</string>
     <string name="help_report_good_to_know">El documento dice lo que se anotó y no interpreta nada. La referencia de la OMS que elijas vale solo para este archivo y se olvida al salir; por defecto se usan las dos y se dan como intervalo. Las notas quedan fuera salvo que las incluyas, y la extracción y tu bienestar nunca aparecen.\n\nLos archivos se crean en este teléfono y no van a ninguna parte hasta que los envíes. Sprout no guarda ninguna copia de la contraseña: dásela en persona o por teléfono, no junto con el archivo.</string>
     <string name="help_settings_purpose">Cómo funciona Sprout en este teléfono: el idioma, los recordatorios, el chequeo diario y el uso compartido con tu hogar.</string>
-    <string name="help_settings_how">Elige un idioma o quédate con el del teléfono. Activa «Recordatorios de tomas» para un aviso cuando haga rato de la última toma, y «Avisos de estirones» cuando empiece un periodo típico de estirón. Activa o desactiva el chequeo diario, o cualquiera de sus preguntas. En «Compartir en el hogar» se vinculan los teléfonos.</string>
-    <string name="help_settings_good_to_know">Los recordatorios de tomas y los avisos de estirones están desactivados hasta que los actives, y el chequeo nunca es una notificación. Estos ajustes son de este teléfono y no se comparten. Los enlaces del final abren una página de donación en tu navegador; donar no desbloquea nada, porque ya está todo aquí.</string>
+    <string name="help_settings_how">Elige un idioma o quédate con el del teléfono. Activa «Recordatorios de tomas» para un aviso cuando haga rato de la última toma, y «Avisos de estirones» cuando empiece un periodo típico de estirón. También puedes mostrar la toma que estás cronometrando fuera de la app —en las notificaciones o en la pantalla de bloqueo— con sus botones. «Personalizar el inicio» elige qué registros muestra el panel y en qué orden. Activa o desactiva el chequeo diario, o cualquiera de sus preguntas. En «Compartir en el hogar» se vinculan los teléfonos.</string>
+    <string name="help_settings_good_to_know">Los recordatorios de tomas, los avisos de estirones y la toma en curso fuera de la app están desactivados hasta que los actives, y el chequeo nunca es una notificación. Estos ajustes son de este teléfono y no se comparten. Los enlaces del final abren una página de donación en tu navegador; donar no desbloquea nada, porque ya está todo aquí.</string>
     <string name="sleep_woke_up">Se despertó</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">La extracción, tu bienestar y el chequeo diario.</string>

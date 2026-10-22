@@ -610,18 +610,26 @@ allowed to create or fetch one on its own.
 2. **The profile.** <https://developer.apple.com/account/resources/profiles> →
    **+** → *Distribution → App Store Connect*, App ID `com.gproust.sprout`, the
    certificate from step 1. Download the `.mobileprovision`.
-3. **Both as text:** `base64 -i <file> | pbcopy` on a Mac, and paste.
+3. **The Live Activity's profile** ([ADR-0020](adr/0020-the-live-activity-is-the-one-ios-extension.md)).
+   The extension ships inside the app but is signed for its own identifier, so
+   it needs an App ID and a profile of its own:
+   <https://developer.apple.com/account/resources/identifiers> → **+** → *App
+   IDs → App*, explicit Bundle ID `com.gproust.sprout.LiveActivity`, **no
+   capabilities ticked**. Then a second *Distribution → App Store Connect*
+   profile for that App ID, with the same certificate. Download it.
+4. **All three as text:** `base64 -i <file> | pbcopy` on a Mac, and paste.
 
 | Secret | Value |
 |---|---|
 | `APPLE_DISTRIBUTION_P12_BASE64` | the `.p12` from step 1, base64 |
 | `APPLE_DISTRIBUTION_P12_PASSWORD` | the password it was exported with |
 | `APPLE_PROVISIONING_PROFILE_BASE64` | the `.mobileprovision` from step 2, base64 |
+| `APPLE_LIVE_ACTIVITY_PROFILE_BASE64` | the `.mobileprovision` from step 3, base64 |
 
 The team id is not a secret of its own: it is read from the profile. The
-certificate lasts a year and the profile expires with it; each run says when,
-and `check_signing.py` says which one has run out. Renewing means both secrets
-again, because a profile names the certificate it was made with.
+certificate lasts a year and the profiles expire with it; each run says when,
+and `check_signing.py` says which one has run out. Renewing means all three
+secrets again, because a profile names the certificate it was made with.
 
 **What they can do:** sign a build of Sprout that only App Store Connect will
 take — which also needs the API key. If they leak, revoke the certificate at

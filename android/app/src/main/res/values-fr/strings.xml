@@ -480,6 +480,16 @@
     <string name="growth_spurt_soon_body">Un pic de croissance est fréquent %1$s — il peut commencer dans les prochains jours.</string>
     <string name="settings_growth_spurts">Alertes pics de croissance</string>
     <string name="settings_growth_spurts_desc">Me prévenir quand une période typique de pic de croissance commence.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La tétée en cours dans les notifications</string>
+    <string name="settings_nursing_notification_desc">Pendant qu\'une tétée est chronométrée, l\'afficher dans les notifications avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n\'apparaît pas sur l\'écran verrouillé, sauf si votre téléphone y affiche tout le contenu des notifications.</string>
+    <string name="settings_live_activity">La tétée en cours sur l\'écran verrouillé</string>
+    <string name="settings_live_activity_desc">Pendant qu\'une tétée est chronométrée, l\'afficher sur l\'écran verrouillé et dans la Dynamic Island avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n\'y apparaît jamais.</string>
+    <string name="nursing_channel_name">Tétée en cours</string>
+    <string name="nursing_channel_desc">Une tétée pendant qu\'elle est chronométrée, avec des boutons pour la mettre en pause, changer de sein et l\'enregistrer</string>
+    <string name="nursing_switch_side">Changer de sein</string>
+    <string name="nursing_notif_on_break">En pause · %1$s au sein</string>
+    <string name="nursing_notif_feed_number">Tétée %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Alertes pics de croissance</string>
     <string name="growth_spurt_channel_desc">Un petit signe quand une période typique de pic de croissance commence</string>
     <string name="growth_spurt_notif_title">Un pic de croissance commence peut-être</string>
@@ -494,6 +504,10 @@
     <string name="widget_ago_hours">il y a %1$d h</string>
     <string name="widget_ago_hours_minutes">il y a %1$d h %2$d min</string>
     <string name="widget_last_breast">Dernier sein : %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d tétée en cours</item>
+        <item quantity="other">%1$d tétées en cours</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Impossible d\'afficher le widget. Ouvrez Sprout, ou retirez-le et rajoutez-le.</string>
@@ -502,6 +516,18 @@
     <string name="screen_sync">Partage du foyer</string>
     <string name="settings_sharing">Partage</string>
     <string name="settings_sync_hint">Partagez le suivi du bébé avec les autres personnes qui s\'en occupent — sans compte, sans cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Écran d\'accueil</string>
+    <string name="screen_customise_home">Personnaliser l\'accueil</string>
+    <string name="settings_customise_home_hint">Choisissez ce que l\'accueil affiche, et dans quel ordre.</string>
+    <string name="customise_home_intro">Mettez en premier ce que vous notez le plus, et désactivez ce dont vous ne vous servez pas. Rien n\'est perdu : ce qui est désactivé attend sous Plus, à la fin de la grille, continue d\'être partagé avec les téléphones du foyer et compte toujours dans les Tendances et dans le relevé pour votre médecin.</string>
+    <string name="customise_home_shown">Affiché sur l\'accueil</string>
+    <string name="customise_home_hidden">Masqué, sous Plus</string>
+    <string name="customise_home_move_up">Monter</string>
+    <string name="customise_home_move_down">Descendre</string>
+    <string name="customise_home_moved">%1$s, position %2$d sur %3$d</string>
+    <string name="customise_home_restore">Rétablir l\'ordre par défaut</string>
+    <string name="home_more">Plus</string>
     <string name="sync_intro_title">Un seul suivi, tous les téléphones du foyer</string>
     <string name="sync_intro_body">Invitez l\'autre parent — ou un grand-parent qui garde le bébé régulièrement. Une fois un téléphone entré dans le foyer, chacun peut envoyer ses saisies et Sprout les fusionne : sans compte, sans serveur, et rien n\'est conservé ailleurs que sur vos propres téléphones.</string>
     <string name="sync_invite">Inviter un téléphone</string>
@@ -647,6 +673,7 @@
     <string name="home_chip_slept">Sommeil %1$s</string>
     <string name="home_chip_nappy">Couche %1$s</string>
     <string name="home_live_nursing">Tétée · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Tétée · %2$s</string>
     <string name="home_live_asleep">%1$s dort</string>
     <string name="home_live_open">Ouvrir</string>
     <string name="whats_new_label">Nouveau dans Sprout</string>
@@ -661,7 +688,7 @@
     <string name="help_section_how">Comment l\'utiliser</string>
     <string name="help_section_good_to_know">Bon à savoir</string>
     <string name="help_home_purpose">Tout le foyer d\'un coup d\'œil : pour chaque bébé, depuis quand il a mangé, dormi et été changé, et ce qui est en cours en ce moment.</string>
-    <string name="help_home_how">Lancez une tétée depuis le tableau de bord : le bouton principal est le sein par lequel la dernière tétée n\'a pas commencé, et l\'autre est à côté. Les tuiles ouvrent chaque journal, et « Aujourd\'hui » fait le total de la journée. Avec plusieurs bébés, touchez une carte pour ouvrir l\'onglet de ce bébé.\n\nUne tétée en cours, ou un bébé qui dort, s\'affiche en haut avec un bouton pour l\'ouvrir ou pour noter son réveil.</string>
+    <string name="help_home_how">Lancez une tétée depuis le tableau de bord : le bouton principal est le sein par lequel la dernière tétée n\'a pas commencé, et l\'autre est à côté. Les tuiles ouvrent chaque journal, et « Aujourd\'hui » fait le total de la journée. Avec plusieurs bébés, touchez une carte pour ouvrir l\'onglet de ce bébé. Pour choisir les tuiles affichées et leur ordre, ouvrez « Personnaliser l\'accueil » dans les Paramètres ; une tuile désactivée attend sous « Plus ».\n\nUne tétée en cours, ou un bébé qui dort, s\'affiche en haut avec un bouton pour l\'ouvrir ou pour noter son réveil. Des jumeaux peuvent téter en même temps : chaque tétée en cours a sa propre ligne, avec le prénom du bébé.</string>
     <string name="help_home_good_to_know">Certaines cartes n\'apparaissent que lorsqu\'elles ont quelque chose à dire : le bilan du jour, une note aux âges où les pics de croissance sont fréquents, un médicament dont l\'attente est en cours, et les nouveautés après une mise à jour. Aucune ne vous barre la route. Les icônes en haut ouvrent vos bébés et les paramètres.</string>
     <string name="help_baby_purpose">Un bébé à lui seul : la même vue que le tableau de bord lorsqu\'il n\'y a qu\'un enfant, pour le bébé que vous avez choisi.</string>
     <string name="help_baby_how">Lancez une tétée, ouvrez un journal depuis les tuiles, consultez les totaux du jour, ou passez aux statistiques et à « Partager un relevé ». Pour passer à un autre bébé, touchez sa carte sur le tableau de bord.</string>
@@ -674,7 +701,7 @@
     <string name="help_you_good_to_know">Tout cela vous appartient, pas à un bébé : supprimer un bébé n\'y touche pas. Votre bien-être et vos bilans ne quittent jamais ce téléphone. Si vous désactivez le bilan du jour dans les paramètres, les deux disparaissent d\'ici et tout ce que vous avez noté est conservé.</string>
     <string name="help_feeding_purpose">Tous les repas du bébé choisi — sein, biberon et solides — du plus récent au plus ancien, et le chronomètre d\'une tétée.</string>
     <string name="help_feeding_how">« Démarrer à gauche » ou « Démarrer à droite » ouvre le chronomètre. Changez de côté au fil de la tétée, touchez « Pause » pour un rot ou une couche, puis « Reprendre à gauche » ou « Reprendre à droite », selon le sein qui suit. Touchez « Arrêter et enregistrer » quand la tétée est finie.\n\nTouchez + pour noter un repas après coup, un biberon ou un repas solide. « Détails », sur une tétée, montre chaque période avec ses heures.</string>
-    <string name="help_feeding_good_to_know">Une pause n\'est pas du temps au sein : le chronomètre s\'arrête pendant la pause, et une tétée enregistrée se termine à la fin de sa dernière période. Quitter le chronomètre ne l\'arrête pas.\n\nSi vous avez enregistré une tétée puis recommencé peu après, la seconde peut proposer « Fusionner avec la précédente ». Rien ne change sans votre accord, et Sprout ne fusionne jamais de tétées tout seul : il n\'y a que vous pour savoir si c\'était une seule tétée.</string>
+    <string name="help_feeding_good_to_know">Une pause n\'est pas du temps au sein : le chronomètre s\'arrête pendant la pause, et une tétée enregistrée se termine à la fin de sa dernière période. Quitter le chronomètre ne l\'arrête pas. Chaque bébé a son propre chronomètre, des jumeaux peuvent donc téter en même temps, et une tétée en cours peut aussi s\'afficher hors de l\'app, avec les mêmes boutons, si vous l\'activez dans les Paramètres.\n\nSi vous avez enregistré une tétée puis recommencé peu après, la seconde peut proposer « Fusionner avec la précédente ». Rien ne change sans votre accord, et Sprout ne fusionne jamais de tétées tout seul : il n\'y a que vous pour savoir si c\'était une seule tétée.</string>
     <string name="help_pumping_purpose">Vos séances de tirage, et la réserve de lait : combien il y en a au frigo, au congélateur ou à température ambiante en ce moment.</string>
     <string name="help_pumping_how">Touchez + après une séance pour noter la quantité et l\'endroit où le lait est rangé. Quand du lait conservé est bu ou jeté, touchez « Marquer consommé » et il sort de la réserve.</string>
     <string name="help_pumping_good_to_know">La réserve ne compte que le lait qui peut encore être donné : le lait consommé, et celui gardé plus longtemps que le repère de cette page, est exclu des totaux, mais sa saisie reste dans l\'historique. Le tirage vous appartient, pas à un bébé. Il est partagé avec votre foyer, sauf si vous désactivez « Partager le lait tiré » sur la page de partage.</string>
@@ -709,8 +736,8 @@
     <string name="help_report_how">Choisissez la période, dont les dates exactes s\'affichent avant que quoi que ce soit ne soit créé, et ce qu\'il faut inclure. Puis touchez « Rapport PDF » ou « Tableur », et choisissez où l\'envoyer. « Protéger par un mot de passe » met les deux fichiers dans un seul zip chiffré.</string>
     <string name="help_report_good_to_know">Le document dit ce qui a été noté et n\'interprète rien. La référence OMS choisie ne vaut que pour ce fichier et est oubliée quand vous quittez l\'écran ; par défaut, les deux sont utilisées et données sous forme d\'intervalle. Les notes sont exclues sauf si vous les incluez, et le tirage et votre bien-être n\'y figurent jamais.\n\nLes fichiers sont créés sur ce téléphone et ne vont nulle part tant que vous ne les envoyez pas. Sprout ne garde aucune copie du mot de passe : donnez-le en personne ou par téléphone, pas avec le fichier.</string>
     <string name="help_settings_purpose">Comment Sprout fonctionne sur ce téléphone : la langue, les rappels, le bilan du jour et le partage avec votre foyer.</string>
-    <string name="help_settings_how">Choisissez une langue, ou gardez celle du téléphone. Activez « Rappels de repas » pour un petit rappel quand le dernier repas remonte à un moment, et « Alertes pics de croissance » quand une période typique de pic commence. Activez ou désactivez le bilan du jour, ou chacune de ses questions. « Partage du foyer » est l\'endroit où les téléphones sont associés.</string>
-    <string name="help_settings_good_to_know">Les rappels de repas et les alertes de pics de croissance restent désactivés tant que vous ne les activez pas, et le bilan n\'est jamais une notification. Ces réglages appartiennent à ce téléphone et ne sont pas partagés. Les liens en bas ouvrent une page de don dans votre navigateur ; un don ne débloque rien, car tout est déjà là.</string>
+    <string name="help_settings_how">Choisissez une langue, ou gardez celle du téléphone. Activez « Rappels de repas » pour un petit rappel quand le dernier repas remonte à un moment, et « Alertes pics de croissance » quand une période typique de pic commence. Vous pouvez aussi afficher la tétée que vous chronométrez hors de l\'app — dans les notifications ou sur l\'écran verrouillé — avec ses boutons. « Personnaliser l\'accueil » choisit les journaux que le tableau de bord affiche, et dans quel ordre. Activez ou désactivez le bilan du jour, ou chacune de ses questions. « Partage du foyer » est l\'endroit où les téléphones sont associés.</string>
+    <string name="help_settings_good_to_know">Les rappels de repas, les alertes de pics de croissance et la tétée en cours hors de l\'app restent désactivés tant que vous ne les activez pas, et le bilan n\'est jamais une notification. Ces réglages appartiennent à ce téléphone et ne sont pas partagés. Les liens en bas ouvrent une page de don dans votre navigateur ; un don ne débloque rien, car tout est déjà là.</string>
     <string name="sleep_woke_up">Réveil</string>
     <string name="cd_open_baby">Ouvrir %1$s</string>
     <string name="you_intro">Le tirage, votre bien-être et le bilan du jour.</string>

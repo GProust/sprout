@@ -11,8 +11,13 @@ import SwiftUI
 /// it one view is what makes those two arrangements the same screen.
 struct BabyPane<Header: View>: View {
     let summary: BabySummary
-    let tracksWellbeing: Bool
+    /// The log grid as this parent arranged it (BDR-25) — the same value on the
+    /// dashboard and on each baby's tab, so the two cannot draw different grids.
+    let tiles: HomeTiles
     let now: Int64
+    /// Every feed running on this phone; this baby's, if any, replaces the
+    /// start buttons.
+    let sessions: [NursingSession]
     let onFeed: (BreastSide) -> Void
     let onOpen: (LogDestination) -> Void
     let onGiveMedicine: (MedicineWatch) -> Void
@@ -25,7 +30,7 @@ struct BabyPane<Header: View>: View {
             header()
 
             SinceChips(summary: summary, now: now)
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
+            FeedOrRunning(summary: summary, sessions: sessions, onFeed: onFeed)
 
             // Under the feed buttons, and above the log grid the medicine would
             // otherwise be three taps down in. Feeding is what this screen is
@@ -41,7 +46,7 @@ struct BabyPane<Header: View>: View {
             )
 
             SectionLabel(Str.t("home_log"))
-            LogGrid(tracksWellbeing: tracksWellbeing, onOpen: onOpen)
+            LogGrid(tiles: tiles, onOpen: onOpen)
 
             SectionLabel(Str.t("home_today"))
             TodayRow(summary: summary)
@@ -81,6 +86,9 @@ struct BabyPane<Header: View>: View {
 struct BabyCardView: View {
     let summary: BabySummary
     let now: Int64
+    /// Every feed running on this phone; this baby's, if any, replaces the
+    /// start buttons.
+    let sessions: [NursingSession]
     let onOpen: () -> Void
     let onFeed: (BreastSide) -> Void
     let onGiveMedicine: (MedicineWatch) -> Void
@@ -107,7 +115,7 @@ struct BabyCardView: View {
             .accessibilityLabel(Str.t("cd_open_baby", summary.baby.name))
 
             SinceChips(summary: summary, now: now)
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
+            FeedOrRunning(summary: summary, sessions: sessions, onFeed: onFeed)
             MedicineWatchCard(
                 watches: summary.medicines,
                 now: now,
@@ -149,6 +157,68 @@ struct SinceChips: View {
             .padding(.vertical, Spacing.hairline + 2)
             .background(SproutColor.background, in: Capsule())
             .foregroundStyle(SproutColor.onSurfaceVariant)
+    }
+}
+
+/// A baby's feed buttons — or, while that baby is feeding, the feed itself.
+///
+/// A baby has one mouth, so a baby whose feed is running is offered that feed
+/// back rather than a second one; the other twin's card still starts theirs, on
+/// the breast nobody is at (BDR-23).
+struct FeedOrRunning: View {
+    let summary: BabySummary
+    let sessions: [NursingSession]
+    let onFeed: (BreastSide) -> Void
+
+    var body: some View {
+        if let running = sessions.runningFor(summary.baby.uid) {
+            // The same path as starting: the store hands back the feed already
+            // running, and the timer shows it rather than starting another.
+            RunningFeedButton(session: running) { onFeed(running.currentSide) }
+        } else {
+            QuickFeed(
+                next: sideForNextFeed(sessions, babyUid: summary.baby.uid, fromHistory: summary.nextSide),
+                onFeed: onFeed
+            )
+        }
+    }
+}
+
+/// "Feeding · Left   4:12" on a baby's own card, one tap back to the timer.
+///
+/// Time at the breast, as everywhere (BDR-17): the clock stops on a break. It is
+/// the one thing on the card with a second hand, so it keeps its own.
+private struct RunningFeedButton: View {
+    let session: NursingSession
+    let onOpen: () -> Void
+
+    @State private var now = Clock.millis
+
+    var body: some View {
+        Button(action: onOpen) {
+            HStack {
+                Image(systemName: session.isPaused ? "pause.circle.fill" : "drop.fill")
+                Text(Str.t("home_live_nursing", session.stateLabel))
+                    .font(.callout.weight(.medium))
+                Spacer()
+                Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
+                    .font(.callout.weight(.semibold))
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, Spacing.regular)
+            .padding(.vertical, Spacing.snug)
+            .frame(maxWidth: .infinity)
+            .background(SproutColor.primaryContainer, in: RoundedRectangle(cornerRadius: Radius.control))
+            .foregroundStyle(SproutColor.onPrimaryContainer)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("baby-running-feed")
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                now = Clock.millis
+            }
+        }
     }
 }
 
@@ -200,10 +270,10 @@ enum LogDestination: Hashable {
     case feeding, pumping, sleep, diaper, growth, treatments, medicines, foods, wellbeing
     case stats, checkIn
     case report(Int64)
-    /// Not logs — the two the dashboard's toolbar opens, and the sync screen
+    /// Not logs — the two the dashboard's toolbar opens, and the two screens
     /// behind Settings. They travel through the same push so there is one way
     /// into a screen rather than two.
-    case profile, settings, sync
+    case profile, settings, sync, customiseHome
 
     /// The tile's accessibility identifier, and the only handle the screenshot
     /// run has on it. An identifier and not the visible label, because the
@@ -227,6 +297,51 @@ enum LogDestination: Hashable {
         case .profile: return "profile"
         case .settings: return "settings"
         case .sync: return "sync"
+        case .customiseHome: return "customiseHome"
+        }
+    }
+}
+
+/// One of the dashboard's log tiles: what it says, its symbol, and where it
+/// goes.
+///
+/// One definition for the three places a tile appears — the grid, the *More*
+/// menu and *Customise home* — so a log reads the same in all of them. A named
+/// type rather than a tuple: `ForEach` cannot destructure a tuple element into
+/// closure parameters, and `\.2` is not a key path Swift will form.
+struct HomeTile: Identifiable {
+    let label: String
+    let symbol: String
+    let destination: LogDestination
+
+    var id: LogDestination { destination }
+
+    /// The tile a stored id names (BDR-25), from `homeTile` in
+    /// `ui/home/HomeTile.kt`; nil for an id this version does not know, which
+    /// ``tileOrder(defaults:stored:)`` has already dropped. The ids are the
+    /// names ``LogDestination/tileIdentifier`` carries.
+    static func named(_ tileId: String) -> HomeTile? {
+        switch tileId {
+        case "feeding":
+            return HomeTile(label: Str.t("nav_feed"), symbol: "drop.fill", destination: .feeding)
+        case "pumping":
+            return HomeTile(label: Str.t("screen_pumping"), symbol: "drop.triangle.fill", destination: .pumping)
+        case "sleep":
+            return HomeTile(label: Str.t("nav_sleep"), symbol: "moon.zzz.fill", destination: .sleep)
+        case "diaper":
+            return HomeTile(label: Str.t("nav_diaper"), symbol: "figure.child", destination: .diaper)
+        case "growth":
+            return HomeTile(label: Str.t("nav_growth"), symbol: "ruler", destination: .growth)
+        case "treatments":
+            return HomeTile(label: Str.t("screen_treatments"), symbol: "pills.fill", destination: .treatments)
+        case "medicines":
+            return HomeTile(label: Str.t("screen_medicines"), symbol: "cross.vial.fill", destination: .medicines)
+        case "foods":
+            return HomeTile(label: Str.t("screen_foods"), symbol: "fork.knife", destination: .foods)
+        case wellbeingTileId:
+            return HomeTile(label: Str.t("screen_wellbeing"), symbol: "heart.fill", destination: .wellbeing)
+        default:
+            return nil
         }
     }
 }
@@ -237,44 +352,22 @@ enum LogDestination: Hashable {
 /// navigation bar holds five, Home takes one of those seats, and the arithmetic
 /// stranded treatments in a list next to pumping with nothing to say why. There
 /// is no seat to lose in a grid.
+///
+/// **Which tiles, and in which order, is the parent's** (BDR-25), from
+/// *Customise home*. With nothing stored this is the grid it always was: every
+/// tile, First foods after the others so that no tile a parent reached for by
+/// position moved, and there for every baby, because when diversification
+/// starts is not the app's to decide (BDR-20). Wellbeing is dropped for a parent
+/// who has turned their own tracking off, and its history stays, untouched. A
+/// tile the parent hid waits behind *More*, at the end, so its screen is still
+/// one tap away — and *More* is drawn only when something is behind it.
 struct LogGrid: View {
-    let tracksWellbeing: Bool
+    let tiles: HomeTiles
     let onOpen: (LogDestination) -> Void
 
-    /// A named type rather than a tuple: `ForEach` cannot destructure a tuple
-    /// element into closure parameters, and `\.2` is not a key path Swift will
-    /// form.
-    private struct Tile: Identifiable {
-        let label: String
-        let symbol: String
-        let destination: LogDestination
-
-        var id: LogDestination { destination }
-    }
-
-    private var tiles: [Tile] {
-        var tiles: [Tile] = [
-            Tile(label: Str.t("nav_feed"), symbol: "drop.fill", destination: .feeding),
-            Tile(label: Str.t("screen_pumping"), symbol: "drop.triangle.fill", destination: .pumping),
-            Tile(label: Str.t("nav_sleep"), symbol: "moon.zzz.fill", destination: .sleep),
-            Tile(label: Str.t("nav_diaper"), symbol: "figure.child", destination: .diaper),
-            Tile(label: Str.t("nav_growth"), symbol: "ruler", destination: .growth),
-            Tile(label: Str.t("screen_treatments"), symbol: "pills.fill", destination: .treatments),
-            Tile(label: Str.t("screen_medicines"), symbol: "cross.vial.fill", destination: .medicines),
-            // After the others rather than beside Feed, so no tile a parent
-            // reaches for by position has moved; and for every baby, because
-            // when diversification starts is not the app's to decide (BDR-20).
-            Tile(label: Str.t("screen_foods"), symbol: "fork.knife", destination: .foods),
-        ]
-        // Dropped for a parent who has turned their own tracking off; the
-        // history stays, untouched.
-        if tracksWellbeing {
-            tiles.append(Tile(label: Str.t("screen_wellbeing"), symbol: "heart.fill", destination: .wellbeing))
-        }
-        return tiles
-    }
-
     var body: some View {
+        let shown = tiles.shown.compactMap(HomeTile.named)
+        let hidden = tiles.hidden.compactMap(HomeTile.named)
         // Three columns, fixed. A short last row keeps its tiles the same width
         // as a full one's rather than letting three columns become one wide
         // button.
@@ -282,32 +375,62 @@ struct LogGrid: View {
             columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.tight), count: 3),
             spacing: Spacing.tight
         ) {
-            ForEach(tiles) { tile in
+            ForEach(shown) { tile in
                 Button {
                     onOpen(tile.destination)
                 } label: {
-                    VStack(spacing: Spacing.hairline + 2) {
-                        Image(systemName: tile.symbol)
-                            .font(.title3)
-                            .foregroundStyle(SproutColor.primary)
-                        Text(tile.label)
-                            .font(.caption)
-                            .foregroundStyle(SproutColor.onSurface)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Spacing.snug + 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: Radius.control)
-                            .stroke(SproutColor.outline.opacity(0.4), lineWidth: 1)
-                    )
+                    TileFace(label: tile.label, symbol: tile.symbol)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(tile.destination.tileIdentifier)
             }
+
+            // A menu on the tile rather than a screen of its own: what it lists
+            // is a handful of ways out, and the parent who hid them is the one
+            // who knows what is there.
+            if !hidden.isEmpty {
+                Menu {
+                    ForEach(hidden) { tile in
+                        Button {
+                            onOpen(tile.destination)
+                        } label: {
+                            Label(tile.label, systemImage: tile.symbol)
+                        }
+                    }
+                } label: {
+                    TileFace(label: Str.t("home_more"), symbol: "ellipsis.circle")
+                }
+                .menuStyle(.button)
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("log-tile-more")
+            }
         }
+    }
+}
+
+/// What a tile looks like, for a log and for *More* alike.
+private struct TileFace: View {
+    let label: String
+    let symbol: String
+
+    var body: some View {
+        VStack(spacing: Spacing.hairline + 2) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(SproutColor.primary)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(SproutColor.onSurface)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Spacing.snug + 2)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.control)
+                .stroke(SproutColor.outline.opacity(0.4), lineWidth: 1)
+        )
     }
 }
 

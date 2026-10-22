@@ -44,8 +44,8 @@ than anywhere else — see [`spec/README.md`](spec/README.md).
   records describe the product, and the same capability is meant to exist on both
   sides. Never write a second record because the other app now needs the same
   thing; a platform-scoped record is only for a mechanism the platform *forces*
-  (ADR-0017, ADR-0018, ADR-0019 are the only ones), it names the shared record it
-  applies, and it changes nothing that record decided. No BDR is ever
+  (ADR-0017, ADR-0018, ADR-0019, ADR-0020 are the only ones), it names the shared
+  record it applies, and it changes nothing that record decided. No BDR is ever
   platform-scoped. The rule is
   [ADR-0015](docs/adr/0015-native-ios-in-this-repository.md)'s and the
   [index](docs/adr/README.md#one-decision-both-apps) carries a `Scope` column so
@@ -213,6 +213,52 @@ things a change can quietly undo:
   through `addTimedFeeding`, never the active-baby `addFeeding`. With twins the
   selection is a mode that moves while the timer runs, and resolving it at save
   time is how one twin's feed was filed under the other (#115).
+
+Twins feed together, so the store holds **one running session per baby**, not
+one per phone ([BDR-23](docs/decisions/0023-one-running-breastfeed-per-baby.md)).
+`ui/feeding/NursingSessions.kt` and `SproutData/NursingSessions.swift` are the
+rules, as pure functions with the same cases on both sides:
+
+- **Everything is keyed by the baby's uid.** `startIfIdle` hands back the running
+  feed for *that* baby and starts one for any other; `consume`, pause, resume and
+  switch act on one baby's feed and leave the rest running. A screen looks its
+  feed up with `runningFor(uid)` — never "the first session", which with two
+  running is whichever started first. The nursing route carries `?baby=<uid>`.
+- **The old single session is still read once.** Android's flat keys in
+  `nursing_session.xml` and iOS's `nursing_session` dictionary become the list on
+  the next write; one without a baby is adopted by the selected baby at launch
+  (`adoptUnnamed`). Keep that read until no phone can still be carrying one.
+
+A running feed can also be shown outside the app, with the timer's own buttons
+([BDR-24](docs/decisions/0024-a-running-feed-outside-the-app.md)): an ongoing
+notification on Android, a Live Activity on iOS
+([ADR-0020](docs/adr/0020-the-live-activity-is-the-one-ios-extension.md)). Opt-in
+(`nursing_notification_enabled`, the same key on both). Five things a change can
+quietly undo:
+
+- **A tap outside is the timer's own act.** Every control goes through
+  `NursingActions` (Android) / `NursingSessionStore.apply` (iOS) and
+  `NursingSession.after(control)`, which ignores a control that no longer fits —
+  a second *Pause*, a stale *Switch* on a break. *Stop & save* is `take` then
+  `save`, so a second one finds nothing. `nursingControls` is the one list of
+  buttons for the timer, the notification and the Live Activity.
+- **Nothing runs.** No foreground service (it would need a permission
+  `AttackSurfaceTest` refuses) and nothing ticking: both platforms draw the clock
+  from a start time, so the notification and the activity are redrawn only when a
+  feed changes, and when the app or the phone comes up with one running.
+- **No new door on Android.** The buttons are broadcasts to the existing,
+  non-exported `FeedingReminderReceiver`; each feed's notification is tagged by
+  its baby's uid, and each button's `PendingIntent` is told apart by its data URI.
+- **A locked screen never names the baby.** Android's public version and the Live
+  Activity say *Feeding · Left*, or *Feed 1* / *Feed 2* with twins; the name is in
+  Android's private version only.
+- **The iOS extension only draws.** It links no SproutData, holds no entitlement
+  and gets everything it shows from the app; its buttons are
+  `NursingControlIntent`s that run in the app's process (`ios/Sprout/Shared/`),
+  which opens the database through the one `AppEnvironment.live()`.
+  `check_attack_surface.py` pins the extension at both layers and
+  `check_no_network.py` scans it; the release signs it with a profile of its own
+  (`APPLE_LIVE_ACTIVITY_PROFILE_BASE64`).
 
 Two feeds saved apart can also be joined back into the one feed they were
 ([BDR-19](docs/decisions/0019-two-breastfeeds-saved-apart-can-be-joined.md)) —
@@ -444,6 +490,33 @@ tested on both sides. Four things a change can quietly undo:
   ends, which is why it re-reads the store on every recompute.
 - **The screenshot seeds mark everything seen**, or every dashboard capture
   carries the card.
+
+## Customising home
+
+The dashboard's log grid is the parent's to arrange — which tiles show, and in
+which order — from *Customise home* in Settings
+([BDR-25](docs/decisions/0025-the-home-screen-is-the-parents-to-arrange.md)).
+`data/HomeLayout.kt` and `SproutData/HomeLayout.swift` are the arithmetic, tested
+with the same cases on both sides. Five things a change can quietly undo:
+
+- **Nothing stored is today's grid.** Every tile shown, the old order, and no
+  *More* tile. A parent who never opens the screen sees no change, and both
+  screenshot runs start from empty settings and expect every tile.
+- **The ids are stored, so they are stable** (`HOME_TILE_IDS` / `homeTileIds`,
+  the names in iOS's `log-tile-<name>` identifiers). A new log appends its id on
+  both apps; a tile missing from a stored order appears shown at its default
+  place, and an unknown stored id is ignored. Never rename or reuse one.
+- **Hiding is presentation only, and only ever the parent's act.** A hidden log
+  waits behind *More*, still syncs and still counts in Trends and the record.
+  Nothing is hidden by default, suggested, or ordered by use — BDR-7 and BDR-20
+  refused the app deciding which logs a parent sees, and that still stands.
+- **Wellbeing's master switch still wins** (BDR-6): off, the tile is in neither
+  the grid, *More* nor the editor; back on, it returns where it was. Moves made
+  while it is off go through `moveTile` / `reorderTiles`, which keep its slot.
+- **One arrangement per phone, for every baby**, in the ordinary settings
+  (`HomeLayoutSettings`): backed up, never synced. The grid reads it itself on
+  Android and from `HomeViewModel` on iOS, so Home with one baby and each baby's
+  tab cannot draw two different grids.
 
 ## Help on every page
 

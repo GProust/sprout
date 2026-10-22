@@ -43,12 +43,15 @@ struct SproutApp: App {
                         return
                     }
                     #endif
-                    environment = try AppEnvironment.onDisk()
+                    environment = try AppEnvironment.live()
                     // A *Give a dose* tapped from the lock screen can launch the
                     // app from cold; the response is waiting by the time the
                     // database is open.
                     if let environment {
                         MedicineNotificationActions.shared.attach(environment)
+                        // A feed still running when the app comes up gets its
+                        // Live Activity back, or loses it if the switch is off.
+                        NursingLiveActivities.attach(settings: environment.settingsStore)
                     }
                 } catch {
                     // ADR-0002: there is no server copy of any of this, so a

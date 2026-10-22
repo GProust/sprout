@@ -80,7 +80,9 @@ suspend fun renderSproutWidgets(context: Context, appWidgetIds: IntArray) {
     for (id in appWidgetIds) {
         try {
             val views = glanceRemoteViews.compose(context, widgetSize(manager, id)) {
-                GlanceTheme { SproutWidgetUi(data.session, data.feed, data.lastBreast, data.babyName) }
+                GlanceTheme {
+                    SproutWidgetUi(data.sessions, data.babyNames, data.feed, data.lastBreast, data.babyName)
+                }
             }.remoteViews
             manager.updateAppWidget(id, views)
         } catch (e: CancellationException) {
@@ -114,7 +116,7 @@ private fun scheduleWidgetTick(context: Context, data: WidgetData) {
     val pending = tickIntent(context)
     // Past two days the widget shows an absolute date, which never goes stale,
     // so there is nothing left to tick for.
-    val ticking = data.session != null ||
+    val ticking = data.sessions.isNotEmpty() ||
         data.feed?.startTime?.let { System.currentTimeMillis() - it < RELATIVE_TIME_LIMIT_MS } == true
     if (!ticking) {
         alarms.cancel(pending)
@@ -172,7 +174,10 @@ private const val DEFAULT_WIDGET_HEIGHT_DP = 110
 
 /** Everything one render needs, read once. */
 private class WidgetData(
-    val session: NursingSession?,
+    /** Every running feed, at most one per baby (BDR-23). */
+    val sessions: List<NursingSession>,
+    /** Each baby's name by uid, which is how a running feed names its baby. */
+    val babyNames: Map<String, String>,
     val feed: FeedingEntity?,
     val lastBreast: FeedingEntity?,
     val babyName: String?,
@@ -183,7 +188,8 @@ private suspend fun loadWidgetData(context: Context): WidgetData {
         context.applicationContext as SproutApplication
     }
     return WidgetData(
-        session = readForWidget("nursing session") { NursingSessionStore.load(context) },
+        sessions = readForWidget("nursing sessions") { NursingSessionStore.loadAll(context) }.orEmpty(),
+        babyNames = readForWidget("baby names") { app?.repository?.babyNamesByUid() }.orEmpty(),
         feed = readForWidget("last feed") { app?.repository?.lastFeedForActiveBaby() },
         lastBreast = readForWidget("last breastfeed") {
             app?.repository?.lastBreastFeedForActiveBaby(
@@ -277,10 +283,17 @@ private suspend fun <T> readForWidget(
         null
     }
 
-/** The widget's root content: the live session when one runs, else the last feed. */
+/**
+ * The widget's root content: the live sessions when any run, else the last feed.
+ *
+ * One running feed is drawn as it always was. Twins feeding together are two
+ * small timers, each under its baby's name; more than that is a count, because
+ * a 2x1 widget has room for two clocks and no more (BDR-23).
+ */
 @Composable
 internal fun SproutWidgetUi(
-    session: NursingSession?,
+    sessions: List<NursingSession>,
+    babyNames: Map<String, String>,
     feed: FeedingEntity?,
     lastBreast: FeedingEntity?,
     babyName: String?,
@@ -296,10 +309,26 @@ internal fun SproutWidgetUi(
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (session != null) {
-            NursingLines(session, babyName)
-        } else {
-            LastFeedLines(feed, lastBreast, babyName)
+        when {
+            sessions.isEmpty() -> LastFeedLines(feed, lastBreast, babyName)
+            // The feed's own baby, not the selected one: with twins those differ.
+            sessions.size == 1 -> NursingLines(
+                sessions.single(),
+                sessions.single().babyUid?.let { babyNames[it] } ?: babyName,
+            )
+            sessions.size == 2 -> sessions.forEach { session ->
+                CompactNursingLines(session, session.babyUid?.let { babyNames[it] })
+            }
+            else -> {
+                CaptionText(null, context.getString(R.string.feeding_breastfeeding))
+                HeadlineText(
+                    context.resources.getQuantityString(
+                        R.plurals.widget_feeds_running,
+                        sessions.size,
+                        sessions.size,
+                    ),
+                )
+            }
         }
     }
 }
@@ -345,13 +374,36 @@ private fun NursingLines(session: NursingSession, babyName: String?) {
         ),
     )
     SideText(session.currentSide)
-    // Glance has no chronometer, so embed classic RemoteViews: the launcher
-    // ticks it every second with no widget refreshes at all.
-    //
-    // It counts the time at the breast rather than the time since the feed
-    // began — the number the app shows — so a break leaves the two agreeing.
-    // The launcher cannot be asked to pause a chronometer, so a stopped one is
-    // told where to stand and left there until the widget is next redrawn.
+    NursingChronometer(session)
+}
+
+/**
+ * One of two feeds running side by side: whose, which breast, and the clock —
+ * small enough that two fit where one used to.
+ */
+@Composable
+private fun CompactNursingLines(session: NursingSession, babyName: String?) {
+    val context = LocalContext.current
+    CaptionText(
+        babyName,
+        context.getString(if (session.isPaused) R.string.feeding_paused else sideLabel(session.currentSide)),
+    )
+    NursingChronometer(session)
+}
+
+/**
+ * A running feed's clock. Glance has no chronometer, so this embeds classic
+ * RemoteViews: the launcher ticks it every second with no widget refreshes at
+ * all.
+ *
+ * It counts the time at the breast rather than the time since the feed began —
+ * the number the app shows — so a break leaves the two agreeing. The launcher
+ * cannot be asked to pause a chronometer, so a stopped one is told where to
+ * stand and left there until the widget is next redrawn.
+ */
+@Composable
+private fun NursingChronometer(session: NursingSession) {
+    val context = LocalContext.current
     val nursed = session.nursedMs(System.currentTimeMillis())
     val timer = RemoteViews(context.packageName, R.layout.widget_nursing_timer).apply {
         setChronometer(

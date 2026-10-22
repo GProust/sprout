@@ -6,9 +6,10 @@ name: iOS release
 # whatever the branch holds, so run it from main.
 #
 #   1. archives the Release configuration for a device, signed with the
-#      distribution certificate and the App Store profile from the repository
-#      secrets (docs/RELEASING.md §9), after ios/tools/check_signing.py has
-#      checked that the three of them belong together;
+#      distribution certificate and the two App Store profiles from the
+#      repository secrets — the app's, and its Live Activity extension's
+#      (ADR-0020) — after ios/tools/check_signing.py has checked that they
+#      belong together (docs/RELEASING.md §9);
 #   2. exports the .ipa, and checks the app inside it with
 #      check_attack_surface.py — the Info.plist, the linked libraries and the
 #      entitlements the signature carries, which is the build that is sent;
@@ -123,10 +124,17 @@ jobs:
           P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
           P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
           PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          LIVE_ACTIVITY_PROFILE_BASE64: ${{ secrets.APPLE_LIVE_ACTIVITY_PROFILE_BASE64 }}
         run: |
           set -euo pipefail
           if [ -z "$P12_BASE64" ] || [ -z "$P12_PASSWORD" ] || [ -z "$PROFILE_BASE64" ]; then
             echo "::error::APPLE_DISTRIBUTION_P12_BASE64, APPLE_DISTRIBUTION_P12_PASSWORD and APPLE_PROVISIONING_PROFILE_BASE64 must all be set as repository secrets"
+            exit 1
+          fi
+          # The Live Activity is a bundle of its own inside the app, signed for
+          # its own identifier, so it needs a profile of its own (ADR-0020).
+          if [ -z "$LIVE_ACTIVITY_PROFILE_BASE64" ]; then
+            echo "::error::APPLE_LIVE_ACTIVITY_PROFILE_BASE64 must be set: an App Store profile for com.gproust.sprout.LiveActivity (docs/RELEASING.md §9)"
             exit 1
           fi
           umask 077
@@ -137,7 +145,11 @@ jobs:
           python3 - <<'PY'
           import base64, os
           folder = os.path.join(os.environ["RUNNER_TEMP"], "signing")
-          for variable, name in (("P12_BASE64", "distribution.p12"), ("PROFILE_BASE64", "profile.mobileprovision")):
+          for variable, name in (
+              ("P12_BASE64", "distribution.p12"),
+              ("PROFILE_BASE64", "profile.mobileprovision"),
+              ("LIVE_ACTIVITY_PROFILE_BASE64", "live-activity.mobileprovision"),
+          ):
               with open(os.path.join(folder, name), "wb") as f:
                   f.write(base64.b64decode(os.environ[variable]))
           PY
@@ -167,15 +179,31 @@ jobs:
             cp "$signing/profile.mobileprovision" "$folder/$profile.mobileprovision"
           done
           cat "$signing/checked" >> "$GITHUB_OUTPUT"
+
+          # The extension's profile, checked against the same certificate and
+          # its own bundle id, and installed beside the app's.
+          security cms -D -i "$signing/live-activity.mobileprovision" -o "$signing/live-activity.plist"
+          security find-identity -v -p codesigning "$keychain" \
+            | python3 ios/tools/check_signing.py "$signing/live-activity.plist" \
+                com.gproust.sprout.LiveActivity APPLE_LIVE_ACTIVITY_PROFILE_BASE64 \
+            > "$signing/checked-live-activity"
+          live_activity_profile="$(sed -n 's/^profile=//p' "$signing/checked-live-activity")"
+          for folder in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                        "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            cp "$signing/live-activity.mobileprovision" "$folder/$live_activity_profile.mobileprovision"
+          done
+          echo "live_activity_profile=$live_activity_profile" >> "$GITHUB_OUTPUT"
           echo "keychain=$keychain" >> "$GITHUB_OUTPUT"
 
-      # The team and the profile go in as SPROUT_* variables, which only the
-      # Sprout target's Release configuration reads (project.yml says why).
+      # The team and the profiles go in as SPROUT_* variables, which only the
+      # Release configurations of the app and its extension read (project.yml
+      # says why).
       - name: Archive
         env:
           BUILD: ${{ steps.version.outputs.build }}
           TEAM_ID: ${{ steps.signing.outputs.team }}
           PROFILE: ${{ steps.signing.outputs.profile }}
+          LIVE_ACTIVITY_PROFILE: ${{ steps.signing.outputs.live_activity_profile }}
           KEYCHAIN: ${{ steps.signing.outputs.keychain }}
         run: |
           set -euo pipefail
@@ -183,6 +211,7 @@ jobs:
             signing=(
               SPROUT_TEAM_ID="$TEAM_ID"
               SPROUT_PROVISIONING_PROFILE="$PROFILE"
+              SPROUT_LIVE_ACTIVITY_PROFILE="$LIVE_ACTIVITY_PROFILE"
               OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN"
             )
           else
@@ -224,6 +253,7 @@ jobs:
         env:
           TEAM_ID: ${{ steps.signing.outputs.team }}
           PROFILE: ${{ steps.signing.outputs.profile }}
+          LIVE_ACTIVITY_PROFILE: ${{ steps.signing.outputs.live_activity_profile }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -235,7 +265,10 @@ jobs:
                   "teamID": os.environ["TEAM_ID"],
                   "signingStyle": "manual",
                   "signingCertificate": "Apple Distribution",
-                  "provisioningProfiles": {"com.gproust.sprout": os.environ["PROFILE"]},
+                  "provisioningProfiles": {
+                      "com.gproust.sprout": os.environ["PROFILE"],
+                      "com.gproust.sprout.LiveActivity": os.environ["LIVE_ACTIVITY_PROFILE"],
+                  },
                   # The build number is the one this run was given, never one
                   # Xcode picks on its own.
                   "manageAppVersionAndBuildNumber": False,
@@ -328,16 +361,18 @@ jobs:
             --skip_waiting_for_build_processing true \
             --skip_submission true
 
-      - name: Remove the certificate, the profile and the key
+      - name: Remove the certificate, the profiles and the key
         if: always()
         env:
           PROFILE: ${{ steps.signing.outputs.profile }}
+          LIVE_ACTIVITY_PROFILE: ${{ steps.signing.outputs.live_activity_profile }}
         run: |
           if [ -f "$RUNNER_TEMP/signing/sprout.keychain-db" ]; then
             security delete-keychain "$RUNNER_TEMP/signing/sprout.keychain-db" || true
           fi
-          if [ -n "$PROFILE" ]; then
-            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE.mobileprovision" \
-                  "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$PROFILE.mobileprovision"
-          fi
+          for installed in "$PROFILE" "$LIVE_ACTIVITY_PROFILE"; do
+            [ -n "$installed" ] || continue
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$installed.mobileprovision" \
+                  "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$installed.mobileprovision"
+          done
           rm -rf "$RUNNER_TEMP/signing" "$RUNNER_TEMP/app-store-connect.json"

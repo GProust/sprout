@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Ein Wachstumsschub ist %1$s häufig — er kann in den nächsten Tagen beginnen.</string>
     <string name="settings_growth_spurts">Wachstumsschub-Hinweise</string>
     <string name="settings_growth_spurts_desc">Sag mir Bescheid, wenn eine typische Wachstumsschub-Phase beginnt.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">Laufende Stillmahlzeit in den Benachrichtigungen</string>
+    <string name="settings_nursing_notification_desc">Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte.</string>
+    <string name="settings_live_activity">Laufende Stillmahlzeit auf dem Sperrbildschirm</string>
+    <string name="settings_live_activity_desc">Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie.</string>
+    <string name="nursing_channel_name">Laufende Stillmahlzeit</string>
+    <string name="nursing_channel_desc">Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern</string>
+    <string name="nursing_switch_side">Seite wechseln</string>
+    <string name="nursing_notif_on_break">Pausiert · %1$s an der Brust</string>
+    <string name="nursing_notif_feed_number">Stillmahlzeit %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Wachstumsschub-Hinweise</string>
     <string name="growth_spurt_channel_desc">Ein Hinweis, wenn eine typische Wachstumsschub-Phase beginnt</string>
     <string name="growth_spurt_notif_title">Vielleicht beginnt gerade ein Wachstumsschub</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">vor %1$d Std.</string>
     <string name="widget_ago_hours_minutes">vor %1$d Std. %2$d Min.</string>
     <string name="widget_last_breast">Letzte Brust: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d Stillmahlzeit läuft</item>
+        <item quantity="other">%1$d Stillmahlzeiten laufen</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Widget konnte nicht gezeichnet werden. Öffne Sprout, oder entferne es und füge es neu hinzu.</string>
@@ -443,6 +457,18 @@
     <string name="screen_sync">Haushalt teilen</string>
     <string name="settings_sharing">Teilen</string>
     <string name="settings_sync_hint">Teile die Aufzeichnungen des Babys mit den anderen, die sich kümmern — ohne Konto, ohne Cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Startbildschirm</string>
+    <string name="screen_customise_home">Start anpassen</string>
+    <string name="settings_customise_home_hint">Wähle, was der Startbildschirm zeigt und in welcher Reihenfolge.</string>
+    <string name="customise_home_intro">Stell nach vorn, was du am meisten einträgst, und schalte aus, was du nicht brauchst. Dabei geht nichts verloren: Was ausgeschaltet ist, wartet unter Mehr am Ende des Rasters, wird weiter mit den Handys im Haushalt geteilt und zählt weiter in den Trends und im Bericht für die Ärztin oder den Arzt.</string>
+    <string name="customise_home_shown">Auf dem Startbildschirm</string>
+    <string name="customise_home_hidden">Ausgeblendet, unter Mehr</string>
+    <string name="customise_home_move_up">Nach oben</string>
+    <string name="customise_home_move_down">Nach unten</string>
+    <string name="customise_home_moved">%1$s, Position %2$d von %3$d</string>
+    <string name="customise_home_restore">Standardreihenfolge wiederherstellen</string>
+    <string name="home_more">Mehr</string>
     <string name="sync_intro_title">Eine Aufzeichnung, alle Handys im Haushalt</string>
     <string name="sync_intro_body">Lade den anderen Elternteil ein — oder eine Großmutter, die das Baby regelmäßig hat. Sobald ein Handy dazugehört, kann jeder seine Einträge hinüberschicken und Sprout führt sie zusammen: ohne Konto, ohne Server und ohne dass irgendetwas woanders liegt als auf euren eigenen Handys.</string>
     <string name="sync_invite">Ein Handy einladen</string>
@@ -588,6 +614,7 @@
     <string name="home_chip_slept">Schlaf %1$s</string>
     <string name="home_chip_nappy">Windel %1$s</string>
     <string name="home_live_nursing">Stillen · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Stillen · %2$s</string>
     <string name="home_live_asleep">%1$s schläft</string>
     <string name="home_live_open">Öffnen</string>
     <string name="whats_new_label">Neu in Sprout</string>
@@ -602,7 +629,7 @@
     <string name="help_section_how">So funktioniert es</string>
     <string name="help_section_good_to_know">Gut zu wissen</string>
     <string name="help_home_purpose">Der ganze Haushalt auf einen Blick: für jedes Baby, wie lange die letzte Mahlzeit, der letzte Schlaf und die letzte Windel her sind, und was gerade läuft.</string>
-    <string name="help_home_how">Starte das Stillen direkt im Dashboard: Der Hauptknopf ist die Brust, mit der die letzte Mahlzeit nicht begonnen hat, und die andere liegt daneben. Die Kacheln öffnen die einzelnen Protokolle, und „Heute“ zählt den bisherigen Tag zusammen. Bei mehreren Babys tippst du auf eine Karte, um den Tab dieses Babys zu öffnen.\n\nEine laufende Stillmahlzeit oder ein schlafendes Baby erscheint oben, mit einem Knopf zum Öffnen oder um das Aufwachen einzutragen.</string>
+    <string name="help_home_how">Starte das Stillen direkt im Dashboard: Der Hauptknopf ist die Brust, mit der die letzte Mahlzeit nicht begonnen hat, und die andere liegt daneben. Die Kacheln öffnen die einzelnen Protokolle, und „Heute“ zählt den bisherigen Tag zusammen. Bei mehreren Babys tippst du auf eine Karte, um den Tab dieses Babys zu öffnen. Welche Kacheln erscheinen und in welcher Reihenfolge, wählst du in den Einstellungen unter „Start anpassen“; eine ausgeschaltete Kachel wartet unter „Mehr“.\n\nEine laufende Stillmahlzeit oder ein schlafendes Baby erscheint oben, mit einem Knopf zum Öffnen oder um das Aufwachen einzutragen. Zwillinge können gleichzeitig trinken: Jede laufende Stillmahlzeit hat eine eigene Zeile mit dem Namen des Babys.</string>
     <string name="help_home_good_to_know">Manche Karten erscheinen nur, wenn es etwas zu sagen gibt: der tägliche Check-in, ein Hinweis in dem Alter, in dem Wachstumsschübe häufig sind, ein Medikament mit laufender Wartezeit und Neues nach einem Update. Keine davon steht dir im Weg. Die Symbole oben öffnen deine Babys und die Einstellungen.</string>
     <string name="help_baby_purpose">Ein Baby für sich: dieselbe Ansicht, die das Dashboard bei nur einem Kind zeigt, für das Baby, das du ausgewählt hast.</string>
     <string name="help_baby_how">Starte das Stillen, öffne ein Protokoll über die Kacheln, sieh dir die Summen von heute an oder geh weiter zur Statistik und zu „Bericht teilen“. Um zu einem anderen Baby zu wechseln, tippe auf seine Karte im Dashboard.</string>
@@ -615,7 +642,7 @@
     <string name="help_you_good_to_know">Das gehört dir, nicht einem Baby: Wird ein Baby gelöscht, bleibt es unberührt. Dein Wohlbefinden und deine Check-ins verlassen dieses Handy nie. Schaltest du den täglichen Check-in in den Einstellungen aus, verschwinden beide von hier, und alles Eingetragene bleibt erhalten.</string>
     <string name="help_feeding_purpose">Jede Mahlzeit des ausgewählten Babys — Brust, Flasche und Beikost — die neueste zuerst, und der Timer fürs Stillen.</string>
     <string name="help_feeding_how">„Links starten“ oder „Rechts starten“ öffnet den Timer. Wechsle zwischendurch die Seite, tippe auf „Pause“ für ein Bäuerchen oder eine Windel und dann auf „Links fortsetzen“ oder „Rechts fortsetzen“, je nachdem, welche Brust als Nächstes dran ist. Tippe auf „Stoppen &amp; speichern“, wenn die Mahlzeit vorbei ist.\n\nTippe auf +, um eine Mahlzeit nachträglich einzutragen, eine Flasche oder Beikost. „Details“ zeigt bei einer Stillmahlzeit jeden Abschnitt mit seinen Uhrzeiten.</string>
-    <string name="help_feeding_good_to_know">Eine Pause ist keine Zeit an der Brust: Der Timer steht still, solange pausiert ist, und eine gespeicherte Mahlzeit endet mit dem Ende ihres letzten Abschnitts. Den Timer zu verlassen stoppt ihn nicht.\n\nHast du eine Mahlzeit gespeichert und kurz darauf neu begonnen, kann die zweite „Mit vorheriger verbinden“ anbieten. Es wird gefragt, bevor sich etwas ändert, und Sprout verbindet Mahlzeiten nie von selbst: Nur du weißt, ob es eine einzige war.</string>
+    <string name="help_feeding_good_to_know">Eine Pause ist keine Zeit an der Brust: Der Timer steht still, solange pausiert ist, und eine gespeicherte Mahlzeit endet mit dem Ende ihres letzten Abschnitts. Den Timer zu verlassen stoppt ihn nicht. Jedes Baby hat seinen eigenen Timer, Zwillinge können also gleichzeitig trinken, und eine laufende Stillmahlzeit kann auch außerhalb der App erscheinen, mit denselben Tasten, wenn du das in den Einstellungen einschaltest.\n\nHast du eine Mahlzeit gespeichert und kurz darauf neu begonnen, kann die zweite „Mit vorheriger verbinden“ anbieten. Es wird gefragt, bevor sich etwas ändert, und Sprout verbindet Mahlzeiten nie von selbst: Nur du weißt, ob es eine einzige war.</string>
     <string name="help_pumping_purpose">Deine Abpump-Sitzungen und der Milchvorrat: wie viel gerade im Kühlschrank, im Gefrierfach oder bei Zimmertemperatur steht.</string>
     <string name="help_pumping_how">Tippe nach einer Sitzung auf +, um einzutragen, wie viel es war und wohin die Milch kam. Wird gelagerte Milch getrunken oder weggeschüttet, tippe auf „Als verbraucht markieren“, und sie verlässt den Vorrat.</string>
     <string name="help_pumping_good_to_know">Der Vorrat zählt nur Milch, die noch gegeben werden kann: Verbrauchte Milch und Milch, die länger als der Richtwert auf dieser Seite gelagert ist, fehlt in den Summen, ihr Eintrag bleibt aber im Verlauf. Abpumpen gehört dir, nicht einem Baby. Es wird mit deinem Haushalt geteilt, außer du schaltest „Abgepumpte Milch teilen“ auf der Seite zum Teilen aus.</string>
@@ -650,8 +677,8 @@
     <string name="help_report_how">Wähle den Zeitraum, dessen genaue Daten angezeigt werden, bevor etwas erstellt wird, und was hinein soll. Tippe dann auf „PDF-Bericht“ oder „Tabelle“ und wähle, wohin es gehen soll. „Mit einem Passwort schützen“ packt beide Dateien in ein verschlüsseltes Zip.</string>
     <string name="help_report_good_to_know">Das Dokument gibt wieder, was eingetragen wurde, und deutet nichts. Die gewählte WHO-Referenz gilt nur für diese Datei und wird vergessen, sobald du den Bildschirm verlässt; standardmäßig werden beide verwendet und als Spanne angegeben. Notizen bleiben draußen, außer du nimmst sie auf, und Abpumpen und dein Wohlbefinden stehen nie darin.\n\nDie Dateien entstehen auf diesem Handy und gehen nirgendwohin, bis du sie verschickst. Sprout behält keine Kopie des Passworts: Gib es persönlich oder am Telefon weiter, nicht mit der Datei.</string>
     <string name="help_settings_purpose">Wie Sprout auf diesem Handy arbeitet: Sprache, Erinnerungen, der tägliche Check-in und das Teilen mit deinem Haushalt.</string>
-    <string name="help_settings_how">Wähle eine Sprache oder behalte die des Handys. Schalte „Mahlzeit-Erinnerungen“ ein für einen Hinweis, wenn die letzte Mahlzeit eine Weile her ist, und „Wachstumsschub-Hinweise“, wenn eine typische Wachstumsschub-Phase beginnt. Schalte den täglichen Check-in oder einzelne seiner Fragen ein oder aus. Unter „Haushalt teilen“ werden Handys verbunden.</string>
-    <string name="help_settings_good_to_know">Mahlzeit-Erinnerungen und Wachstumsschub-Hinweise bleiben aus, bis du sie einschaltest, und der Check-in ist nie eine Benachrichtigung. Diese Einstellungen gehören zu diesem Handy und werden nicht geteilt. Die Links unten öffnen eine Spendenseite in deinem Browser; eine Spende schaltet nichts frei, denn alles ist schon da.</string>
+    <string name="help_settings_how">Wähle eine Sprache oder behalte die des Handys. Schalte „Mahlzeit-Erinnerungen“ ein für einen Hinweis, wenn die letzte Mahlzeit eine Weile her ist, und „Wachstumsschub-Hinweise“, wenn eine typische Wachstumsschub-Phase beginnt. Du kannst auch eine laufende Stillmahlzeit außerhalb der App zeigen – in den Benachrichtigungen oder auf dem Sperrbildschirm –, mit ihren Tasten. „Start anpassen“ wählt, welche Protokolle das Dashboard zeigt und in welcher Reihenfolge. Schalte den täglichen Check-in oder einzelne seiner Fragen ein oder aus. Unter „Haushalt teilen“ werden Handys verbunden.</string>
+    <string name="help_settings_good_to_know">Mahlzeit-Erinnerungen, Wachstumsschub-Hinweise und die laufende Stillmahlzeit außerhalb der App bleiben aus, bis du sie einschaltest, und der Check-in ist nie eine Benachrichtigung. Diese Einstellungen gehören zu diesem Handy und werden nicht geteilt. Die Links unten öffnen eine Spendenseite in deinem Browser; eine Spende schaltet nichts frei, denn alles ist schon da.</string>
     <string name="sleep_woke_up">Aufgewacht</string>
     <string name="cd_open_baby">%1$s öffnen</string>
     <string name="you_intro">Abpumpen, dein Wohlbefinden und der tägliche Check-in.</string>

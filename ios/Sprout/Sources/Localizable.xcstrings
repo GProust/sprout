@@ -4163,6 +4163,328 @@
         }
       }
     },
+    "customise_home_hidden": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgeblendet, unter Mehr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden, under More"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oculto, en Más"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masqué, sous Plus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascosto, in Altro"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ukryte, pod Więcej"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oculto, em Mais"
+          }
+        }
+      }
+    },
+    "customise_home_intro": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stell nach vorn, was du am meisten einträgst, und schalte aus, was du nicht brauchst. Dabei geht nichts verloren: Was ausgeschaltet ist, wartet unter Mehr am Ende des Rasters, wird weiter mit den Handys im Haushalt geteilt und zählt weiter in den Trends und im Bericht für die Ärztin oder den Arzt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Put the logs you use most first, and switch off the ones you don't use. Nothing is lost: a log that's switched off waits under More at the end of the grid, keeps sharing with your household's phones, and still counts in Trends and in the record for your doctor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pon primero lo que más registras y desactiva lo que no usas. No se pierde nada: lo desactivado espera en Más, al final de la cuadrícula, se sigue compartiendo con los teléfonos del hogar y sigue contando en Tendencias y en el registro para tu médico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettez en premier ce que vous notez le plus, et désactivez ce dont vous ne vous servez pas. Rien n'est perdu : ce qui est désactivé attend sous Plus, à la fin de la grille, continue d'être partagé avec les téléphones du foyer et compte toujours dans les Tendances et dans le relevé pour votre médecin."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metti per primo ciò che registri di più e disattiva ciò che non usi. Non si perde nulla: ciò che è disattivato aspetta in Altro, alla fine della griglia, continua a essere condiviso con i telefoni della famiglia e conta ancora in Andamento e nel resoconto per il medico."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustaw na początku to, co zapisujesz najczęściej, i wyłącz to, czego nie używasz. Nic nie przepada: to, co wyłączone, czeka pod Więcej na końcu siatki, nadal jest współdzielone z telefonami domowników i nadal liczy się w Trendach i w zapisie dla lekarza."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ponha primeiro o que regista mais e desative o que não usa. Nada se perde: o que estiver desativado espera em Mais, no fim da grelha, continua a ser partilhado com os telemóveis do agregado e continua a contar nas Tendências e no registo para o médico."
+          }
+        }
+      }
+    },
+    "customise_home_move_down": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach unten"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move down"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bajar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descendre"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta giù"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przesuń w dół"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover para baixo"
+          }
+        }
+      }
+    },
+    "customise_home_move_up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach oben"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move up"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monter"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta su"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przesuń w górę"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover para cima"
+          }
+        }
+      }
+    },
+    "customise_home_moved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, Position %2$lld von %3$lld"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, position %2$lld of %3$lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posición %2$lld de %3$lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, position %2$lld sur %3$lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posizione %2$lld di %3$lld"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, pozycja %2$lld z %3$lld"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, posição %2$lld de %3$lld"
+          }
+        }
+      }
+    },
+    "customise_home_restore": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standardreihenfolge wiederherstellen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore the default order"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer el orden predeterminado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir l'ordre par défaut"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina l'ordine predefinito"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przywróć domyślną kolejność"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repor a ordem predefinida"
+          }
+        }
+      }
+    },
+    "customise_home_shown": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf dem Startbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shown on home"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visible en el inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affiché sur l'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibile nella Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widoczne na ekranie startowym"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visível no início"
+          }
+        }
+      }
+    },
     "day_today": {
       "localizations": {
         "de": {
@@ -15650,43 +15972,43 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eine Pause ist keine Zeit an der Brust: Der Timer steht still, solange pausiert ist, und eine gespeicherte Mahlzeit endet mit dem Ende ihres letzten Abschnitts. Den Timer zu verlassen stoppt ihn nicht.\n\nHast du eine Mahlzeit gespeichert und kurz darauf neu begonnen, kann die zweite „Mit vorheriger verbinden“ anbieten. Es wird gefragt, bevor sich etwas ändert, und Sprout verbindet Mahlzeiten nie von selbst: Nur du weißt, ob es eine einzige war."
+            "value": "Eine Pause ist keine Zeit an der Brust: Der Timer steht still, solange pausiert ist, und eine gespeicherte Mahlzeit endet mit dem Ende ihres letzten Abschnitts. Den Timer zu verlassen stoppt ihn nicht. Jedes Baby hat seinen eigenen Timer, Zwillinge können also gleichzeitig trinken, und eine laufende Stillmahlzeit kann auch außerhalb der App erscheinen, mit denselben Tasten, wenn du das in den Einstellungen einschaltest.\n\nHast du eine Mahlzeit gespeichert und kurz darauf neu begonnen, kann die zweite „Mit vorheriger verbinden“ anbieten. Es wird gefragt, bevor sich etwas ändert, und Sprout verbindet Mahlzeiten nie von selbst: Nur du weißt, ob es eine einzige war."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A break is not time at the breast: the clock stops while you're paused, and a saved feed ends when its last stretch ended. Leaving the timer doesn't stop it.\n\nIf you saved a feed and started again a short while later, the second one may offer “Join with previous”. It asks before it changes anything, and Sprout never joins feeds on its own: only you know whether they were one feed."
+            "value": "A break is not time at the breast: the clock stops while you're paused, and a saved feed ends when its last stretch ended. Leaving the timer doesn't stop it. Each baby has a timer of its own, so twins can feed at the same time, and a running feed can also show outside the app, with the same buttons, if you turn that on in Settings.\n\nIf you saved a feed and started again a short while later, the second one may offer “Join with previous”. It asks before it changes anything, and Sprout never joins feeds on its own: only you know whether they were one feed."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una pausa no es tiempo al pecho: el cronómetro se detiene mientras estás en pausa, y una toma guardada termina cuando acabó su último tramo. Salir del cronómetro no lo detiene.\n\nSi guardaste una toma y empezaste otra poco después, la segunda puede ofrecer «Unir con la anterior». Pregunta antes de cambiar nada, y Sprout nunca une tomas por su cuenta: solo tú sabes si fueron una sola."
+            "value": "Una pausa no es tiempo al pecho: el cronómetro se detiene mientras estás en pausa, y una toma guardada termina cuando acabó su último tramo. Salir del cronómetro no lo detiene. Cada bebé tiene su propio cronómetro, así que los gemelos pueden mamar a la vez, y una toma en curso también puede verse fuera de la app, con los mismos botones, si lo activas en los Ajustes.\n\nSi guardaste una toma y empezaste otra poco después, la segunda puede ofrecer «Unir con la anterior». Pregunta antes de cambiar nada, y Sprout nunca une tomas por su cuenta: solo tú sabes si fueron una sola."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Une pause n'est pas du temps au sein : le chronomètre s'arrête pendant la pause, et une tétée enregistrée se termine à la fin de sa dernière période. Quitter le chronomètre ne l'arrête pas.\n\nSi vous avez enregistré une tétée puis recommencé peu après, la seconde peut proposer « Fusionner avec la précédente ». Rien ne change sans votre accord, et Sprout ne fusionne jamais de tétées tout seul : il n'y a que vous pour savoir si c'était une seule tétée."
+            "value": "Une pause n'est pas du temps au sein : le chronomètre s'arrête pendant la pause, et une tétée enregistrée se termine à la fin de sa dernière période. Quitter le chronomètre ne l'arrête pas. Chaque bébé a son propre chronomètre, des jumeaux peuvent donc téter en même temps, et une tétée en cours peut aussi s'afficher hors de l'app, avec les mêmes boutons, si vous l'activez dans les Paramètres.\n\nSi vous avez enregistré une tétée puis recommencé peu après, la seconde peut proposer « Fusionner avec la précédente ». Rien ne change sans votre accord, et Sprout ne fusionne jamais de tétées tout seul : il n'y a que vous pour savoir si c'était une seule tétée."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma.\n\nSe hai salvato una poppata e ne hai iniziata un'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola."
+            "value": "Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma. Ogni bambino ha il suo timer, quindi i gemelli possono poppare insieme, e una poppata in corso può comparire anche fuori dall'app, con gli stessi pulsanti, se lo attivi nelle Impostazioni.\n\nSe hai salvato una poppata e ne hai iniziata un'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Przerwa to nie czas przy piersi: stoper stoi w czasie pauzy, a zapisane karmienie kończy się wtedy, gdy skończył się jego ostatni odcinek. Wyjście ze stopera go nie zatrzymuje.\n\nJeśli karmienie zostało zapisane, a chwilę później zaczęło się nowe, drugie może zaproponować „Połącz z poprzednim”. Pyta, zanim cokolwiek zmieni, a Sprout nigdy nie łączy karmień sam: tylko Ty wiesz, czy to było jedno karmienie."
+            "value": "Przerwa to nie czas przy piersi: stoper stoi w czasie pauzy, a zapisane karmienie kończy się wtedy, gdy skończył się jego ostatni odcinek. Wyjście ze stopera go nie zatrzymuje. Każde dziecko ma własny stoper, więc bliźnięta mogą jeść jednocześnie, a trwające karmienie może być też widoczne poza aplikacją, z tymi samymi przyciskami, jeśli włączysz to w Ustawieniach.\n\nJeśli karmienie zostało zapisane, a chwilę później zaczęło się nowe, drugie może zaproponować „Połącz z poprzednim”. Pyta, zanim cokolwiek zmieni, a Sprout nigdy nie łączy karmień sam: tylko Ty wiesz, czy to było jedno karmienie."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uma pausa não é tempo à mama: o cronómetro para enquanto está em pausa, e uma mamada guardada termina quando acabou o seu último período. Sair do cronómetro não o para.\n\nSe guardou uma mamada e começou outra pouco depois, a segunda pode oferecer «Juntar à anterior». Pergunta antes de mudar o que quer que seja, e o Sprout nunca junta mamadas sozinho: só você sabe se foram uma só."
+            "value": "Uma pausa não é tempo à mama: o cronómetro para enquanto está em pausa, e uma mamada guardada termina quando acabou o seu último período. Sair do cronómetro não o para. Cada bebé tem o seu próprio cronómetro, por isso os gémeos podem mamar ao mesmo tempo, e uma mamada em curso também pode aparecer fora da app, com os mesmos botões, se o ativar nas Definições.\n\nSe guardou uma mamada e começou outra pouco depois, a segunda pode oferecer «Juntar à anterior». Pergunta antes de mudar o que quer que seja, e o Sprout nunca junta mamadas sozinho: só você sabe se foram uma só."
           }
         }
       }
@@ -16110,43 +16432,43 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starte das Stillen direkt im Dashboard: Der Hauptknopf ist die Brust, mit der die letzte Mahlzeit nicht begonnen hat, und die andere liegt daneben. Die Kacheln öffnen die einzelnen Protokolle, und „Heute“ zählt den bisherigen Tag zusammen. Bei mehreren Babys tippst du auf eine Karte, um den Tab dieses Babys zu öffnen.\n\nEine laufende Stillmahlzeit oder ein schlafendes Baby erscheint oben, mit einem Knopf zum Öffnen oder um das Aufwachen einzutragen."
+            "value": "Starte das Stillen direkt im Dashboard: Der Hauptknopf ist die Brust, mit der die letzte Mahlzeit nicht begonnen hat, und die andere liegt daneben. Die Kacheln öffnen die einzelnen Protokolle, und „Heute“ zählt den bisherigen Tag zusammen. Bei mehreren Babys tippst du auf eine Karte, um den Tab dieses Babys zu öffnen. Welche Kacheln erscheinen und in welcher Reihenfolge, wählst du in den Einstellungen unter „Start anpassen“; eine ausgeschaltete Kachel wartet unter „Mehr“.\n\nEine laufende Stillmahlzeit oder ein schlafendes Baby erscheint oben, mit einem Knopf zum Öffnen oder um das Aufwachen einzutragen. Zwillinge können gleichzeitig trinken: Jede laufende Stillmahlzeit hat eine eigene Zeile mit dem Namen des Babys."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start a breastfeed from the dashboard: the main button is the breast the last feed didn't start on, and the other one is beside it. The tiles open each log, and “Today” adds up the day so far. With more than one baby, tap a card to open that baby's own tab.\n\nA feed on the timer, or a baby asleep, shows at the top with a button to open it or to say they woke up."
+            "value": "Start a breastfeed from the dashboard: the main button is the breast the last feed didn't start on, and the other one is beside it. The tiles open each log, and “Today” adds up the day so far. With more than one baby, tap a card to open that baby's own tab. To choose which tiles show and in which order, open “Customise home” in Settings; a tile you switch off waits under “More”.\n\nA feed on the timer, or a baby asleep, shows at the top with a button to open it or to say they woke up. Twins can feed at the same time: each running feed has a row of its own, with the baby's name."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Empieza una toma de pecho desde el panel: el botón principal es el pecho por el que no empezó la última toma, y el otro está al lado. Las casillas abren cada registro, y «Hoy» suma lo que va de día. Con más de un bebé, toca una tarjeta para abrir la pestaña de ese bebé.\n\nUna toma en curso, o un bebé dormido, aparece arriba con un botón para abrirla o para anotar que se despertó."
+            "value": "Empieza una toma de pecho desde el panel: el botón principal es el pecho por el que no empezó la última toma, y el otro está al lado. Las casillas abren cada registro, y «Hoy» suma lo que va de día. Con más de un bebé, toca una tarjeta para abrir la pestaña de ese bebé. Para elegir qué casillas se muestran y en qué orden, abre «Personalizar el inicio» en los Ajustes; una casilla desactivada espera en «Más».\n\nUna toma en curso, o un bebé dormido, aparece arriba con un botón para abrirla o para anotar que se despertó. Los gemelos pueden mamar a la vez: cada toma en curso tiene su propia fila, con el nombre del bebé."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lancez une tétée depuis le tableau de bord : le bouton principal est le sein par lequel la dernière tétée n'a pas commencé, et l'autre est à côté. Les tuiles ouvrent chaque journal, et « Aujourd'hui » fait le total de la journée. Avec plusieurs bébés, touchez une carte pour ouvrir l'onglet de ce bébé.\n\nUne tétée en cours, ou un bébé qui dort, s'affiche en haut avec un bouton pour l'ouvrir ou pour noter son réveil."
+            "value": "Lancez une tétée depuis le tableau de bord : le bouton principal est le sein par lequel la dernière tétée n'a pas commencé, et l'autre est à côté. Les tuiles ouvrent chaque journal, et « Aujourd'hui » fait le total de la journée. Avec plusieurs bébés, touchez une carte pour ouvrir l'onglet de ce bébé. Pour choisir les tuiles affichées et leur ordre, ouvrez « Personnaliser l'accueil » dans les Paramètres ; une tuile désactivée attend sous « Plus ».\n\nUne tétée en cours, ou un bébé qui dort, s'affiche en haut avec un bouton pour l'ouvrir ou pour noter son réveil. Des jumeaux peuvent téter en même temps : chaque tétée en cours a sa propre ligne, avec le prénom du bébé."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l'ultima poppata, e l'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino.\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio."
+            "value": "Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l'ultima poppata, e l'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino. Per scegliere quali riquadri compaiono e in che ordine, apri «Personalizza la Home» nelle Impostazioni; un riquadro disattivato aspetta in «Altro».\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio. I gemelli possono poppare insieme: ogni poppata in corso ha la sua riga, con il nome del bambino."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zacznij karmienie piersią prosto z pulpitu: główny przycisk to pierś, od której nie zaczęło się ostatnie karmienie, a druga jest obok. Kafelki otwierają poszczególne dzienniki, a „Dziś” podsumowuje dotychczasowy dzień. Przy kilkorgu dzieciach dotknij karty, aby otworzyć zakładkę tego dziecka.\n\nTrwające karmienie albo śpiące dziecko widać na górze, z przyciskiem, by je otworzyć albo zapisać pobudkę."
+            "value": "Zacznij karmienie piersią prosto z pulpitu: główny przycisk to pierś, od której nie zaczęło się ostatnie karmienie, a druga jest obok. Kafelki otwierają poszczególne dzienniki, a „Dziś” podsumowuje dotychczasowy dzień. Przy kilkorgu dzieciach dotknij karty, aby otworzyć zakładkę tego dziecka. Które kafelki są widoczne i w jakiej kolejności, wybierzesz w Ustawieniach, w „Dostosuj ekran startowy”; wyłączony kafelek czeka pod „Więcej”.\n\nTrwające karmienie albo śpiące dziecko widać na górze, z przyciskiem, by je otworzyć albo zapisać pobudkę. Bliźnięta mogą jeść jednocześnie: każde trwające karmienie ma własny wiersz z imieniem dziecka."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comece uma mamada diretamente no painel: o botão principal é a mama por onde a última mamada não começou, e a outra está ao lado. Os mosaicos abrem cada registo, e «Hoje» soma o dia até agora. Com mais de um bebé, toque num cartão para abrir o separador desse bebé.\n\nUma mamada em curso, ou um bebé a dormir, aparece no topo com um botão para a abrir ou para registar que acordou."
+            "value": "Comece uma mamada diretamente no painel: o botão principal é a mama por onde a última mamada não começou, e a outra está ao lado. Os mosaicos abrem cada registo, e «Hoje» soma o dia até agora. Com mais de um bebé, toque num cartão para abrir o separador desse bebé. Para escolher que mosaicos aparecem e por que ordem, abra «Personalizar o início» nas Definições; um mosaico desativado espera em «Mais».\n\nUma mamada em curso, ou um bebé a dormir, aparece no topo com um botão para a abrir ou para registar que acordou. Os gémeos podem mamar ao mesmo tempo: cada mamada em curso tem a sua própria linha, com o nome do bebé."
           }
         }
       }
@@ -16754,43 +17076,43 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mahlzeit-Erinnerungen und Wachstumsschub-Hinweise bleiben aus, bis du sie einschaltest, und der Check-in ist nie eine Benachrichtigung. Diese Einstellungen gehören zu diesem Handy und werden nicht geteilt. Die Links unten öffnen eine Spendenseite in deinem Browser; eine Spende schaltet nichts frei, denn alles ist schon da."
+            "value": "Mahlzeit-Erinnerungen, Wachstumsschub-Hinweise und die laufende Stillmahlzeit außerhalb der App bleiben aus, bis du sie einschaltest, und der Check-in ist nie eine Benachrichtigung. Diese Einstellungen gehören zu diesem Handy und werden nicht geteilt. Die Links unten öffnen eine Spendenseite in deinem Browser; eine Spende schaltet nichts frei, denn alles ist schon da."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Feeding reminders and growth spurt alerts stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren't shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here."
+            "value": "Feeding reminders, growth spurt alerts and a running feed outside the app stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren't shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los recordatorios de tomas y los avisos de estirones están desactivados hasta que los actives, y el chequeo nunca es una notificación. Estos ajustes son de este teléfono y no se comparten. Los enlaces del final abren una página de donación en tu navegador; donar no desbloquea nada, porque ya está todo aquí."
+            "value": "Los recordatorios de tomas, los avisos de estirones y la toma en curso fuera de la app están desactivados hasta que los actives, y el chequeo nunca es una notificación. Estos ajustes son de este teléfono y no se comparten. Los enlaces del final abren una página de donación en tu navegador; donar no desbloquea nada, porque ya está todo aquí."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les rappels de repas et les alertes de pics de croissance restent désactivés tant que vous ne les activez pas, et le bilan n'est jamais une notification. Ces réglages appartiennent à ce téléphone et ne sont pas partagés. Les liens en bas ouvrent une page de don dans votre navigateur ; un don ne débloque rien, car tout est déjà là."
+            "value": "Les rappels de repas, les alertes de pics de croissance et la tétée en cours hors de l'app restent désactivés tant que vous ne les activez pas, et le bilan n'est jamais une notification. Ces réglages appartiennent à ce téléphone et ne sont pas partagés. Les liens en bas ouvrent une page de don dans votre navigateur ; un don ne débloque rien, car tout est déjà là."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "I promemoria dei pasti e gli avvisi sugli scatti di crescita restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c'è già tutto."
+            "value": "I promemoria dei pasti, gli avvisi sugli scatti di crescita e la poppata in corso fuori dall'app restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c'è già tutto."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Przypomnienia o karmieniu i powiadomienia o skokach rozwojowych są wyłączone, dopóki ich nie włączysz, a codzienny wpis nigdy nie jest powiadomieniem. Te ustawienia należą do tego telefonu i nie są udostępniane. Linki na dole otwierają stronę darowizny w przeglądarce; darowizna niczego nie odblokowuje, bo wszystko już tu jest."
+            "value": "Przypomnienia o karmieniu, powiadomienia o skokach rozwojowych i trwające karmienie poza aplikacją są wyłączone, dopóki ich nie włączysz, a codzienny wpis nigdy nie jest powiadomieniem. Te ustawienia należą do tego telefonu i nie są udostępniane. Linki na dole otwierają stronę darowizny w przeglądarce; darowizna niczego nie odblokowuje, bo wszystko już tu jest."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Os lembretes de refeições e os alertas de saltos de crescimento ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui."
+            "value": "Os lembretes de refeições, os alertas de saltos de crescimento e a mamada em curso fora da app ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui."
           }
         }
       }
@@ -16800,43 +17122,43 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wähle eine Sprache oder behalte die des Handys. Schalte „Mahlzeit-Erinnerungen“ ein für einen Hinweis, wenn die letzte Mahlzeit eine Weile her ist, und „Wachstumsschub-Hinweise“, wenn eine typische Wachstumsschub-Phase beginnt. Schalte den täglichen Check-in oder einzelne seiner Fragen ein oder aus. Unter „Haushalt teilen“ werden Handys verbunden."
+            "value": "Wähle eine Sprache oder behalte die des Handys. Schalte „Mahlzeit-Erinnerungen“ ein für einen Hinweis, wenn die letzte Mahlzeit eine Weile her ist, und „Wachstumsschub-Hinweise“, wenn eine typische Wachstumsschub-Phase beginnt. Du kannst auch eine laufende Stillmahlzeit außerhalb der App zeigen – in den Benachrichtigungen oder auf dem Sperrbildschirm –, mit ihren Tasten. „Start anpassen“ wählt, welche Protokolle das Dashboard zeigt und in welcher Reihenfolge. Schalte den täglichen Check-in oder einzelne seiner Fragen ein oder aus. Unter „Haushalt teilen“ werden Handys verbunden."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose a language, or keep the phone's. Turn on “Feeding reminders” for a nudge when it's been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired."
+            "value": "Choose a language, or keep the phone's. Turn on “Feeding reminders” for a nudge when it's been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. You can also show a breastfeed you're timing outside the app — in the notifications or on the lock screen — with its buttons. “Customise home” chooses which logs the dashboard shows, and in which order. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Elige un idioma o quédate con el del teléfono. Activa «Recordatorios de tomas» para un aviso cuando haga rato de la última toma, y «Avisos de estirones» cuando empiece un periodo típico de estirón. Activa o desactiva el chequeo diario, o cualquiera de sus preguntas. En «Compartir en el hogar» se vinculan los teléfonos."
+            "value": "Elige un idioma o quédate con el del teléfono. Activa «Recordatorios de tomas» para un aviso cuando haga rato de la última toma, y «Avisos de estirones» cuando empiece un periodo típico de estirón. También puedes mostrar la toma que estás cronometrando fuera de la app —en las notificaciones o en la pantalla de bloqueo— con sus botones. «Personalizar el inicio» elige qué registros muestra el panel y en qué orden. Activa o desactiva el chequeo diario, o cualquiera de sus preguntas. En «Compartir en el hogar» se vinculan los teléfonos."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choisissez une langue, ou gardez celle du téléphone. Activez « Rappels de repas » pour un petit rappel quand le dernier repas remonte à un moment, et « Alertes pics de croissance » quand une période typique de pic commence. Activez ou désactivez le bilan du jour, ou chacune de ses questions. « Partage du foyer » est l'endroit où les téléphones sont associés."
+            "value": "Choisissez une langue, ou gardez celle du téléphone. Activez « Rappels de repas » pour un petit rappel quand le dernier repas remonte à un moment, et « Alertes pics de croissance » quand une période typique de pic commence. Vous pouvez aussi afficher la tétée que vous chronométrez hors de l'app — dans les notifications ou sur l'écran verrouillé — avec ses boutons. « Personnaliser l'accueil » choisit les journaux que le tableau de bord affiche, et dans quel ordre. Activez ou désactivez le bilan du jour, ou chacune de ses questions. « Partage du foyer » est l'endroit où les téléphones sont associés."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l'ultimo pasto è di un po' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni."
+            "value": "Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l'ultimo pasto è di un po' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wybierz język albo zostaw język telefonu. Włącz „Przypomnienia o karmieniu”, aby dostać sygnał, gdy od ostatniego karmienia minęło sporo czasu, oraz „Powiadomienia o skokach rozwojowych”, gdy zaczyna się typowy okres skoku. Włącz albo wyłącz codzienny wpis lub dowolne z jego pytań. W sekcji „Współdzielenie w domu” łączy się telefony."
+            "value": "Wybierz język albo zostaw język telefonu. Włącz „Przypomnienia o karmieniu”, aby dostać sygnał, gdy od ostatniego karmienia minęło sporo czasu, oraz „Powiadomienia o skokach rozwojowych”, gdy zaczyna się typowy okres skoku. Możesz też pokazać mierzone karmienie piersią poza aplikacją – w powiadomieniach albo na ekranie blokady – z jego przyciskami. „Dostosuj ekran startowy” wybiera, które dzienniki pokazuje pulpit i w jakiej kolejności. Włącz albo wyłącz codzienny wpis lub dowolne z jego pytań. W sekcji „Współdzielenie w domu” łączy się telefony."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis."
+            "value": "Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Também pode mostrar a mamada que está a cronometrar fora da app — nas notificações ou no ecrã de bloqueio — com os seus botões. «Personalizar o início» escolhe que registos o painel mostra e por que ordem. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis."
           }
         }
       }
@@ -18221,6 +18543,52 @@
         }
       }
     },
+    "home_live_nursing_named": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Stillen · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Feeding · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Lactancia · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Tétée · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Allattamento · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Karmienie · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Amamentação · %2$@"
+          }
+        }
+      }
+    },
     "home_live_open": {
       "localizations": {
         "de": {
@@ -18497,6 +18865,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Medicamentos se necessário"
+          }
+        }
+      }
+    },
+    "home_more": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altro"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Więcej"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais"
           }
         }
       }
@@ -21971,6 +22385,236 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eu"
+          }
+        }
+      }
+    },
+    "nursing_channel_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A breastfeed while it is being timed, with buttons to pause it, switch side and save it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une tétée pendant qu'elle est chronométrée, avec des boutons pour la mettre en pause, changer de sein et l'enregistrer"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie piersią w trakcie mierzenia czasu, z przyciskami do wstrzymania, zmiany piersi i zapisania"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma mamada enquanto está a ser cronometrada, com botões para a pausar, trocar de lado e guardar"
+          }
+        }
+      }
+    },
+    "nursing_channel_name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running breastfeed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma en curso"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée en cours"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata in corso"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada em curso"
+          }
+        }
+      }
+    },
+    "nursing_notif_feed_number": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stillmahlzeit %1$lld · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed %1$lld · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toma %1$lld · %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tétée %1$lld · %2$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppata %1$lld · %2$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie %1$lld · %2$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mamada %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "nursing_notif_on_break": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausiert · %1$@ an der Brust"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On a break · %1$@ at the breast"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pausa · %1$@ al pecho"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En pause · %1$@ au sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In pausa · %1$@ al seno"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przerwa · %1$@ przy piersi"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em pausa · %1$@ à mama"
+          }
+        }
+      }
+    },
+    "nursing_switch_side": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seite wechseln"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch side"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar de lado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de sein"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia lato"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zmień pierś"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar de lado"
           }
         }
       }
@@ -29197,6 +29841,52 @@
         }
       }
     },
+    "screen_customise_home": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start anpassen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customise home"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizar el inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnaliser l'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizza la Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dostosuj ekran startowy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizar o início"
+          }
+        }
+      }
+    },
     "screen_diapers": {
       "localizations": {
         "de": {
@@ -30025,6 +30715,52 @@
         }
       }
     },
+    "settings_customise_home_hint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle, was der Startbildschirm zeigt und in welcher Reihenfolge."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which logs the home screen shows, and in which order."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige qué muestra la pantalla de inicio y en qué orden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez ce que l'accueil affiche, et dans quel ordre."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli cosa mostra la Home e in quale ordine."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz, co pokazuje ekran startowy i w jakiej kolejności."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha o que o ecrã inicial mostra e por que ordem."
+          }
+        }
+      }
+    },
     "settings_feeding_interval_label": {
       "localizations": {
         "de": {
@@ -30301,6 +31037,52 @@
         }
       }
     },
+    "settings_home": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home screen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantalla de inicio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran d'accueil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schermata Home"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran startowy"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ecrã inicial"
+          }
+        }
+      }
+    },
     "settings_language": {
       "localizations": {
         "de": {
@@ -30389,6 +31171,190 @@
           "stringUnit": {
             "state": "translated",
             "value": "Predefinição do sistema"
+          }
+        }
+      }
+    },
+    "settings_live_activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit auf dem Sperrbildschirm"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed on the lock screen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en la pantalla de bloqueo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours sur l'écran verrouillé"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nella schermata di blocco"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie na ekranie blokady"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso no ecrã de bloqueio"
+          }
+        }
+      }
+    },
+    "settings_live_activity_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it on the lock screen and in the Dynamic Island with Pause, Switch side and Stop & save, so you don't have to unlock the phone. It never shows your baby's name."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher sur l'écran verrouillé et dans la Dynamic Island avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'y apparaît jamais."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je na ekranie blokady i w Dynamic Island z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nigdy się tam nie pojawia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la no ecrã de bloqueio e na Dynamic Island com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. Nunca mostra o nome do seu bebé."
+          }
+        }
+      }
+    },
+    "settings_nursing_notification": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Stillmahlzeit in den Benachrichtigungen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A running feed in the notifications"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma en curso en las notificaciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée en cours dans les notifications"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata in corso nelle notifiche"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trwające karmienie w powiadomieniach"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada em curso nas notificações"
+          }
+        }
+      }
+    },
+    "settings_nursing_notification_desc": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen & speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While a breastfeed is being timed, show it in the notifications with Pause, Switch side and Stop & save, so you don't have to unlock the phone. Your baby's name stays off the lock screen unless your phone shows all notification content."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant qu'une tétée est chronométrée, l'afficher dans les notifications avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n'apparaît pas sur l'écran verrouillé, sauf si votre téléphone y affiche tout le contenu des notifications."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma & salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy mierzysz czas karmienia piersią, pokazuj je w powiadomieniach z przyciskami Pauza, Zmień pierś i Zatrzymaj & zapisz – bez odblokowywania telefonu. Imię dziecka nie pojawia się na ekranie blokady, chyba że telefon pokazuje tam pełną treść powiadomień."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma mamada está a ser cronometrada, mostrá-la nas notificações com Pausar, Trocar de lado e Parar & guardar, sem ter de desbloquear o telemóvel. O nome do seu bebé não aparece no ecrã de bloqueio, a não ser que o telemóvel mostre lá todo o conteúdo das notificações."
           }
         }
       }
@@ -40751,6 +41717,148 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não foi possível desenhar o widget. Abra o Sprout, ou remova-o e adicione-o de novo."
+          }
+        }
+      }
+    },
+    "widget_feeds_running": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeit läuft"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld Stillmahlzeiten laufen"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feed running"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld feeds running"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld toma en curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tomas en curso"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétée en cours"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld tétées en cours"
+                }
+              }
+            }
+          }
+        },
+        "it": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppata in corso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld poppate in corso"
+                }
+              }
+            }
+          }
+        },
+        "pl": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwają"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmień trwa"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienie trwa"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld karmienia trwa"
+                }
+              }
+            }
+          }
+        },
+        "pt": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamada em curso"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$lld mamadas em curso"
+                }
+              }
+            }
           }
         }
       }

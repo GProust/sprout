@@ -3,6 +3,7 @@ package com.gproust.sprout.ui.home
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,31 +11,39 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.BabyChangingStation
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bedtime
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDrink
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Vaccines
-import androidx.compose.material.icons.filled.Monitor
-import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,14 +52,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
+import com.gproust.sprout.data.HOME_TILE_IDS
+import com.gproust.sprout.data.arrangeTiles
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.ui.common.SectionLabel
 import com.gproust.sprout.ui.common.StatCard
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.common.formatClock
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
+import com.gproust.sprout.ui.feeding.NursingSession
+import com.gproust.sprout.ui.feeding.runningFor
+import com.gproust.sprout.ui.feeding.sideForNextFeed
 import com.gproust.sprout.ui.navigation.Routes
+import kotlinx.coroutines.delay
+import com.gproust.sprout.ui.settings.HomeLayoutSettings
 
 /**
  * Everything about one baby that isn't a history list: how long since each of
@@ -67,6 +84,8 @@ fun BabyPane(
     summary: BabySummary,
     tracksWellbeing: Boolean,
     now: Long,
+    /** Every feed running on this phone; this baby's, if any, replaces the start buttons. */
+    sessions: List<NursingSession>,
     onFeed: (BreastSide) -> Unit,
     onNavigate: (String) -> Unit,
     onGiveMedicine: (MedicineWatch) -> Unit,
@@ -83,7 +102,7 @@ fun BabyPane(
         SinceChips(summary, now)
 
         Spacer(Modifier.height(12.dp))
-        QuickFeed(summary.nextSide, onFeed)
+        FeedOrRunning(summary, sessions, onFeed)
 
         // Under the feed buttons, and above the log grid the medicine would
         // otherwise be three taps down in. Feeding is what this screen is opened
@@ -154,6 +173,8 @@ fun BabyPane(
 fun BabyCard(
     summary: BabySummary,
     now: Long,
+    /** Every feed running on this phone; this baby's, if any, replaces the start buttons. */
+    sessions: List<NursingSession>,
     onOpen: () -> Unit,
     onFeed: (BreastSide) -> Unit,
     onGiveMedicine: (MedicineWatch) -> Unit,
@@ -187,7 +208,7 @@ fun BabyCard(
             SinceChips(summary, now)
 
             Spacer(Modifier.height(12.dp))
-            QuickFeed(summary.nextSide, onFeed)
+            FeedOrRunning(summary, sessions, onFeed)
 
             if (summary.medicines.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
@@ -262,6 +283,70 @@ private fun SinceChip(icon: ImageVector, label: String) {
 }
 
 /**
+ * A baby's feed buttons — or, while that baby is feeding, the feed itself.
+ *
+ * A baby has one mouth, so a baby whose feed is running is offered that feed
+ * back rather than a second one; the other twin's card still starts theirs, on
+ * the breast nobody is at (BDR-23).
+ */
+@Composable
+private fun FeedOrRunning(
+    summary: BabySummary,
+    sessions: List<NursingSession>,
+    onFeed: (BreastSide) -> Unit,
+) {
+    val running = sessions.runningFor(summary.baby.uid)
+    if (running != null) {
+        // The same path as starting: the timer finds the feed already running
+        // and shows it rather than starting another.
+        RunningFeed(running, onOpen = { onFeed(running.currentSide) })
+    } else {
+        QuickFeed(sideForNextFeed(sessions, summary.baby.uid, summary.nextSide), onFeed)
+    }
+}
+
+/**
+ * "Feeding · Left   4:12" on a baby's own card, one tap back to the timer.
+ *
+ * Time at the breast, as everywhere (BDR-17): the clock stops on a break. It is
+ * the one thing on the card with a second hand, so it keeps its own.
+ */
+@Composable
+private fun RunningFeed(session: NursingSession, onOpen: () -> Unit) {
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(session.sessionStart) {
+        while (true) {
+            now = System.currentTimeMillis()
+            delay(1_000)
+        }
+    }
+    FilledTonalButton(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
+        Icon(
+            Icons.Filled.LocalDrink,
+            contentDescription = null,
+            modifier = Modifier.size(ButtonDefaults.IconSize),
+        )
+        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+        Text(
+            stringResource(R.string.home_live_nursing, stringResource(nursingStateRes(session))),
+            modifier = Modifier.weight(1f),
+        )
+        Text(formatClock(session.nursedMs(now)), fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/**
+ * The breast a running feed is at, or that it is on a break — never a side
+ * nobody is actually feeding on.
+ */
+@StringRes
+internal fun nursingStateRes(session: NursingSession): Int = when {
+    session.isPaused -> R.string.feeding_paused
+    session.currentSide == BreastSide.RIGHT -> R.string.side_right
+    else -> R.string.side_left
+}
+
+/**
  * Start a breastfeed without going through the feeding screen first.
  *
  * [next] is the breast the last session did *not* begin on, so the suggested
@@ -313,37 +398,46 @@ private fun sideLabel(side: BreastSide) = when (side) {
 }
 
 /**
- * The eight things there are to log, as tiles rather than a stack of identical
+ * The things there are to log, as tiles rather than a stack of identical
  * buttons. Wellbeing joins them only for a parent who tracks it; treatments is
  * here rather than in the bottom bar, where there was never a seat for it, and
  * as-needed medicine sits beside it as its own tile — the two are asked about at
  * different moments and a screen that mixed them would serve neither (BDR-15).
  *
- * First foods comes after them rather than beside Feed, so that no tile a
- * parent already reaches for by position has moved; and it is there for every
- * baby, because when diversification starts is not the app's to decide
- * (BDR-20).
+ * **Which tiles, and in which order, is the parent's** (BDR-25), from
+ * *Customise home*. With nothing stored this is the grid it always was: every
+ * tile, First foods after the others so that no tile a parent already reached
+ * for by position moved, and there for every baby, because when
+ * diversification starts is not the app's to decide (BDR-20). A tile the parent
+ * hid waits behind *More*, at the end, so its screen is still one tap away —
+ * and *More* is drawn only when something is behind it.
+ *
+ * The arrangement is read here rather than handed down, so the dashboard with
+ * one baby and each baby's own tab cannot draw two different grids.
  */
 @Composable
 fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Modifier = Modifier) {
-    val tiles = buildList {
-        add(Tile(R.string.nav_feed, Icons.Filled.LocalDrink, Routes.FEEDING))
-        add(Tile(R.string.screen_pumping, Icons.Filled.WaterDrop, Routes.PUMPING))
-        add(Tile(R.string.nav_sleep, Icons.Filled.Bedtime, Routes.SLEEP))
-        add(Tile(R.string.nav_diaper, Icons.Filled.BabyChangingStation, Routes.DIAPER))
-        add(Tile(R.string.nav_growth, Icons.Filled.Monitor, Routes.GROWTH))
-        add(Tile(R.string.screen_treatments, Icons.Filled.Medication, Routes.TREATMENTS))
-        add(Tile(R.string.screen_medicines, Icons.Filled.Vaccines, Routes.MEDICINES))
-        add(Tile(R.string.screen_foods, Icons.Filled.Restaurant, Routes.FOODS))
-        if (tracksWellbeing) {
-            add(Tile(R.string.screen_wellbeing, Icons.Filled.Favorite, Routes.HEALTH))
-        }
+    val context = LocalContext.current
+    val arrangement by HomeLayoutSettings.arrangement(context).collectAsState()
+    val tiles = arrangeTiles(HOME_TILE_IDS, arrangement.order, arrangement.hidden, tracksWellbeing)
+    val hidden = tiles.hidden.mapNotNull(::homeTile)
+    val cells = buildList<GridCell> {
+        tiles.shown.mapNotNull(::homeTile).forEach { add(GridCell.Log(it)) }
+        if (hidden.isNotEmpty()) add(GridCell.More)
     }
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        tiles.chunked(3).forEach { row ->
+        cells.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                row.forEach { tile ->
-                    LogTile(tile, Modifier.weight(1f), onNavigate)
+                row.forEach { cell ->
+                    when (cell) {
+                        is GridCell.Log -> LogTile(
+                            label = stringResource(cell.tile.labelRes),
+                            icon = cell.tile.icon,
+                            modifier = Modifier.weight(1f),
+                            onClick = { onNavigate(cell.tile.route) },
+                        )
+                        GridCell.More -> MoreTile(hidden, Modifier.weight(1f), onNavigate)
+                    }
                 }
                 // Keeps a short last row's tiles the same width as a full one's
                 // rather than letting three columns become one wide button.
@@ -353,25 +447,61 @@ fun LogGrid(tracksWellbeing: Boolean, onNavigate: (String) -> Unit, modifier: Mo
     }
 }
 
-private data class Tile(val labelRes: Int, val icon: ImageVector, val route: String)
+/** A place in the grid: one log, or the *More* that gathers the hidden ones. */
+private sealed interface GridCell {
+    data class Log(val tile: HomeTile) : GridCell
+    data object More : GridCell
+}
+
+/**
+ * The logs the parent put away, one tap from the grid all the same.
+ *
+ * A menu on the tile rather than a screen of its own: what it lists is a
+ * handful of ways out, and the parent who hid them is the one who knows what is
+ * there.
+ */
+@Composable
+private fun MoreTile(hidden: List<HomeTile>, modifier: Modifier, onNavigate: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box(modifier) {
+        LogTile(
+            label = stringResource(R.string.home_more),
+            icon = Icons.Filled.MoreHoriz,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { open = true },
+        )
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            hidden.forEach { tile ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(tile.labelRes)) },
+                    leadingIcon = { Icon(tile.icon, contentDescription = null) },
+                    onClick = {
+                        open = false
+                        onNavigate(tile.route)
+                    },
+                )
+            }
+        }
+    }
+}
 
 @Composable
-private fun LogTile(tile: Tile, modifier: Modifier, onNavigate: (String) -> Unit) {
+private fun LogTile(label: String, icon: ImageVector, modifier: Modifier, onClick: () -> Unit) {
     OutlinedCard(
-        modifier = modifier.clickable { onNavigate(tile.route) },
+        modifier = modifier.clickable(onClick = onClick),
     ) {
         Column(
             Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
-                tile.icon,
+                icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp),
             )
             Text(
-                stringResource(tile.labelRes),
+                label,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(top = 6.dp),
             )

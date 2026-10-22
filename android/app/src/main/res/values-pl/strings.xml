@@ -434,6 +434,16 @@
     <string name="growth_spurt_soon_body">Skok rozwojowy często pojawia się %1$s — może zacząć się w najbliższych dniach.</string>
     <string name="settings_growth_spurts">Powiadomienia o skokach rozwojowych</string>
     <string name="settings_growth_spurts_desc">Daj mi znać, gdy zaczyna się typowy okres skoku rozwojowego.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">Trwające karmienie w powiadomieniach</string>
+    <string name="settings_nursing_notification_desc">Gdy mierzysz czas karmienia piersią, pokazuj je w powiadomieniach z przyciskami Pauza, Zmień pierś i Zatrzymaj &amp; zapisz – bez odblokowywania telefonu. Imię dziecka nie pojawia się na ekranie blokady, chyba że telefon pokazuje tam pełną treść powiadomień.</string>
+    <string name="settings_live_activity">Trwające karmienie na ekranie blokady</string>
+    <string name="settings_live_activity_desc">Gdy mierzysz czas karmienia piersią, pokazuj je na ekranie blokady i w Dynamic Island z przyciskami Pauza, Zmień pierś i Zatrzymaj &amp; zapisz – bez odblokowywania telefonu. Imię dziecka nigdy się tam nie pojawia.</string>
+    <string name="nursing_channel_name">Trwające karmienie</string>
+    <string name="nursing_channel_desc">Karmienie piersią w trakcie mierzenia czasu, z przyciskami do wstrzymania, zmiany piersi i zapisania</string>
+    <string name="nursing_switch_side">Zmień pierś</string>
+    <string name="nursing_notif_on_break">Przerwa · %1$s przy piersi</string>
+    <string name="nursing_notif_feed_number">Karmienie %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Powiadomienia o skokach rozwojowych</string>
     <string name="growth_spurt_channel_desc">Powiadomienie, gdy zaczyna się typowy okres skoku rozwojowego</string>
     <string name="growth_spurt_notif_title">Być może zaczyna się skok rozwojowy</string>
@@ -448,6 +458,12 @@
     <string name="widget_ago_hours">%1$d godz. temu</string>
     <string name="widget_ago_hours_minutes">%1$d godz. %2$d min temu</string>
     <string name="widget_last_breast">Ostatnia pierś: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d karmienie trwa</item>
+        <item quantity="few">%1$d karmienia trwają</item>
+        <item quantity="many">%1$d karmień trwa</item>
+        <item quantity="other">%1$d karmienia trwa</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Nie udało się narysować widżetu. Otwórz Sprout albo usuń go i dodaj ponownie.</string>
@@ -456,6 +472,18 @@
     <string name="screen_sync">Współdzielenie w domu</string>
     <string name="settings_sharing">Współdzielenie</string>
     <string name="settings_sync_hint">Udostępnij zapisy dziecka pozostałym osobom, które się nim zajmują — bez konta i bez chmury.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Ekran startowy</string>
+    <string name="screen_customise_home">Dostosuj ekran startowy</string>
+    <string name="settings_customise_home_hint">Wybierz, co pokazuje ekran startowy i w jakiej kolejności.</string>
+    <string name="customise_home_intro">Ustaw na początku to, co zapisujesz najczęściej, i wyłącz to, czego nie używasz. Nic nie przepada: to, co wyłączone, czeka pod Więcej na końcu siatki, nadal jest współdzielone z telefonami domowników i nadal liczy się w Trendach i w zapisie dla lekarza.</string>
+    <string name="customise_home_shown">Widoczne na ekranie startowym</string>
+    <string name="customise_home_hidden">Ukryte, pod Więcej</string>
+    <string name="customise_home_move_up">Przesuń w górę</string>
+    <string name="customise_home_move_down">Przesuń w dół</string>
+    <string name="customise_home_moved">%1$s, pozycja %2$d z %3$d</string>
+    <string name="customise_home_restore">Przywróć domyślną kolejność</string>
+    <string name="home_more">Więcej</string>
     <string name="sync_intro_title">Jeden zapis, wszystkie telefony w domu</string>
     <string name="sync_intro_body">Zaproś drugiego rodzica albo babcię, która regularnie zajmuje się dzieckiem. Gdy telefon dołączy, każdy może wysłać swoje wpisy, a Sprout je scali: bez konta, bez serwera i bez przechowywania czegokolwiek poza waszymi własnymi telefonami.</string>
     <string name="sync_invite">Zaproś telefon</string>
@@ -607,6 +635,7 @@
     <string name="home_chip_slept">Sen %1$s</string>
     <string name="home_chip_nappy">Pielucha %1$s</string>
     <string name="home_live_nursing">Karmienie · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Karmienie · %2$s</string>
     <string name="home_live_asleep">%1$s śpi</string>
     <string name="home_live_open">Otwórz</string>
     <string name="whats_new_label">Nowość w Sprout</string>
@@ -621,7 +650,7 @@
     <string name="help_section_how">Jak z niej korzystać</string>
     <string name="help_section_good_to_know">Warto wiedzieć</string>
     <string name="help_home_purpose">Cały dom w jednym miejscu: dla każdego dziecka, ile czasu minęło od karmienia, snu i zmiany pieluchy, oraz co trwa w tej chwili.</string>
-    <string name="help_home_how">Zacznij karmienie piersią prosto z pulpitu: główny przycisk to pierś, od której nie zaczęło się ostatnie karmienie, a druga jest obok. Kafelki otwierają poszczególne dzienniki, a „Dziś” podsumowuje dotychczasowy dzień. Przy kilkorgu dzieciach dotknij karty, aby otworzyć zakładkę tego dziecka.\n\nTrwające karmienie albo śpiące dziecko widać na górze, z przyciskiem, by je otworzyć albo zapisać pobudkę.</string>
+    <string name="help_home_how">Zacznij karmienie piersią prosto z pulpitu: główny przycisk to pierś, od której nie zaczęło się ostatnie karmienie, a druga jest obok. Kafelki otwierają poszczególne dzienniki, a „Dziś” podsumowuje dotychczasowy dzień. Przy kilkorgu dzieciach dotknij karty, aby otworzyć zakładkę tego dziecka. Które kafelki są widoczne i w jakiej kolejności, wybierzesz w Ustawieniach, w „Dostosuj ekran startowy”; wyłączony kafelek czeka pod „Więcej”.\n\nTrwające karmienie albo śpiące dziecko widać na górze, z przyciskiem, by je otworzyć albo zapisać pobudkę. Bliźnięta mogą jeść jednocześnie: każde trwające karmienie ma własny wiersz z imieniem dziecka.</string>
     <string name="help_home_good_to_know">Niektóre karty pojawiają się tylko wtedy, gdy mają coś do powiedzenia: codzienny wpis, notka w wieku, w którym skoki rozwojowe są częste, lek z trwającym odstępem i nowości po aktualizacji. Żadna nie staje Ci na drodze. Ikony na górze otwierają Twoje dzieci i ustawienia.</string>
     <string name="help_baby_purpose">Jedno dziecko osobno: ten sam widok, który pulpit pokazuje przy jednym dziecku, dla wybranego dziecka.</string>
     <string name="help_baby_how">Zacznij karmienie piersią, otwórz dziennik z kafelków, sprawdź dzisiejsze sumy albo przejdź do statystyk i do „Udostępnij zapis”. Aby przejść do innego dziecka, dotknij jego karty na pulpicie.</string>
@@ -634,7 +663,7 @@
     <string name="help_you_good_to_know">To należy do Ciebie, nie do dziecka, więc usunięcie dziecka tego nie rusza. Twoje samopoczucie i codzienne wpisy nigdy nie opuszczają tego telefonu. Jeśli wyłączysz codzienny wpis w ustawieniach, oba znikną stąd, a wszystko, co zapisano, zostanie zachowane.</string>
     <string name="help_feeding_purpose">Wszystkie karmienia wybranego dziecka — pierś, butelka i pokarmy stałe — od najnowszego, oraz stoper karmienia piersią.</string>
     <string name="help_feeding_how">„Zacznij od lewej” albo „Zacznij od prawej” otwiera stoper. Zmieniaj stronę w trakcie, dotknij „Pauza” na odbijanie albo zmianę pieluchy, a potem „Wznów lewą” albo „Wznów prawą”, zależnie od tego, która pierś jest następna. Dotknij „Zatrzymaj &amp; zapisz”, gdy karmienie się skończy.\n\nDotknij +, aby zapisać karmienie po fakcie, butelkę albo posiłek. „Szczegóły” przy karmieniu piersią pokazują każdy odcinek z godzinami.</string>
-    <string name="help_feeding_good_to_know">Przerwa to nie czas przy piersi: stoper stoi w czasie pauzy, a zapisane karmienie kończy się wtedy, gdy skończył się jego ostatni odcinek. Wyjście ze stopera go nie zatrzymuje.\n\nJeśli karmienie zostało zapisane, a chwilę później zaczęło się nowe, drugie może zaproponować „Połącz z poprzednim”. Pyta, zanim cokolwiek zmieni, a Sprout nigdy nie łączy karmień sam: tylko Ty wiesz, czy to było jedno karmienie.</string>
+    <string name="help_feeding_good_to_know">Przerwa to nie czas przy piersi: stoper stoi w czasie pauzy, a zapisane karmienie kończy się wtedy, gdy skończył się jego ostatni odcinek. Wyjście ze stopera go nie zatrzymuje. Każde dziecko ma własny stoper, więc bliźnięta mogą jeść jednocześnie, a trwające karmienie może być też widoczne poza aplikacją, z tymi samymi przyciskami, jeśli włączysz to w Ustawieniach.\n\nJeśli karmienie zostało zapisane, a chwilę później zaczęło się nowe, drugie może zaproponować „Połącz z poprzednim”. Pyta, zanim cokolwiek zmieni, a Sprout nigdy nie łączy karmień sam: tylko Ty wiesz, czy to było jedno karmienie.</string>
     <string name="help_pumping_purpose">Twoje sesje odciągania i zapas mleka: ile jest teraz w lodówce, w zamrażarce albo w temperaturze pokojowej.</string>
     <string name="help_pumping_how">Po sesji dotknij +, aby zapisać, ile było i gdzie trafiło mleko. Gdy przechowywane mleko zostanie wypite albo wylane, dotknij „Oznacz jako zużyte”, a zniknie z zapasu.</string>
     <string name="help_pumping_good_to_know">Zapas liczy tylko mleko, które wciąż można podać: zużyte mleko oraz mleko przechowywane dłużej, niż mówią orientacyjne wartości na tej stronie, nie wchodzi do sum, choć jego wpis zostaje w historii. Odciąganie należy do Ciebie, a nie do dziecka. Jest udostępniane domownikom, chyba że wyłączysz „Udostępniaj odciągnięte mleko” na stronie współdzielenia.</string>
@@ -669,8 +698,8 @@
     <string name="help_report_how">Wybierz okres, którego dokładne daty widać, zanim cokolwiek powstanie, oraz to, co ma się znaleźć w środku. Potem dotknij „Raport PDF” albo „Arkusz” i wybierz, dokąd wysłać. „Zabezpiecz hasłem” umieszcza oba pliki w jednym zaszyfrowanym archiwum zip.</string>
     <string name="help_report_good_to_know">Dokument podaje to, co zapisano, i niczego nie interpretuje. Wybrana siatka WHO dotyczy tylko tego pliku i jest zapominana po wyjściu z ekranu; domyślnie używane są obie, podane jako przedział. Notatki są pomijane, chyba że je dołączysz, a odciągania i Twojego samopoczucia nigdy tam nie ma.\n\nPliki powstają na tym telefonie i nigdzie nie trafiają, dopóki ich nie wyślesz. Sprout nie przechowuje kopii hasła: przekaż je osobiście albo przez telefon, nie razem z plikiem.</string>
     <string name="help_settings_purpose">Jak Sprout działa na tym telefonie: język, przypomnienia, codzienny wpis i współdzielenie z domownikami.</string>
-    <string name="help_settings_how">Wybierz język albo zostaw język telefonu. Włącz „Przypomnienia o karmieniu”, aby dostać sygnał, gdy od ostatniego karmienia minęło sporo czasu, oraz „Powiadomienia o skokach rozwojowych”, gdy zaczyna się typowy okres skoku. Włącz albo wyłącz codzienny wpis lub dowolne z jego pytań. W sekcji „Współdzielenie w domu” łączy się telefony.</string>
-    <string name="help_settings_good_to_know">Przypomnienia o karmieniu i powiadomienia o skokach rozwojowych są wyłączone, dopóki ich nie włączysz, a codzienny wpis nigdy nie jest powiadomieniem. Te ustawienia należą do tego telefonu i nie są udostępniane. Linki na dole otwierają stronę darowizny w przeglądarce; darowizna niczego nie odblokowuje, bo wszystko już tu jest.</string>
+    <string name="help_settings_how">Wybierz język albo zostaw język telefonu. Włącz „Przypomnienia o karmieniu”, aby dostać sygnał, gdy od ostatniego karmienia minęło sporo czasu, oraz „Powiadomienia o skokach rozwojowych”, gdy zaczyna się typowy okres skoku. Możesz też pokazać mierzone karmienie piersią poza aplikacją – w powiadomieniach albo na ekranie blokady – z jego przyciskami. „Dostosuj ekran startowy” wybiera, które dzienniki pokazuje pulpit i w jakiej kolejności. Włącz albo wyłącz codzienny wpis lub dowolne z jego pytań. W sekcji „Współdzielenie w domu” łączy się telefony.</string>
+    <string name="help_settings_good_to_know">Przypomnienia o karmieniu, powiadomienia o skokach rozwojowych i trwające karmienie poza aplikacją są wyłączone, dopóki ich nie włączysz, a codzienny wpis nigdy nie jest powiadomieniem. Te ustawienia należą do tego telefonu i nie są udostępniane. Linki na dole otwierają stronę darowizny w przeglądarce; darowizna niczego nie odblokowuje, bo wszystko już tu jest.</string>
     <string name="sleep_woke_up">Pobudka</string>
     <string name="cd_open_baby">Otwórz: %1$s</string>
     <string name="you_intro">Odciąganie, Twoje samopoczucie i codzienny wpis.</string>

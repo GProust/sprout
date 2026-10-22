@@ -22,6 +22,10 @@ final class HomeViewModel {
     /// The announcements the "New in Sprout" card offers, newest first; empty
     /// means no card (BDR-22).
     private(set) var whatsNew: [Int] = []
+    /// How this parent has arranged the log grid (BDR-25). Read once and held:
+    /// the store behind it is a plain key-value store, not an observable one,
+    /// and this model is the only thing that writes it.
+    private(set) var homeArrangement = HomeArrangement()
 
     /// Coarse enough for "2 h ago". The screen re-reads it on a timer rather
     /// than per frame; nothing here needs a second hand.
@@ -33,6 +37,8 @@ final class HomeViewModel {
     private let dismissals: MedicineDismissals
     /// What this parent has already read of what's new (BDR-22).
     private let whatsNewSettings: WhatsNewSettings
+    /// Where ``homeArrangement`` is kept: this phone's, backed up, never synced.
+    private let homeLayout: HomeLayoutSettings
 
     /// How far back a "last fed" can be found — the same week Android reads. It
     /// only bounds the read, so a few hours of drift over a long-lived process
@@ -43,7 +49,10 @@ final class HomeViewModel {
         self.repository = repository
         self.dismissals = MedicineDismissals(store: settings)
         self.whatsNewSettings = WhatsNewSettings(store: settings)
+        let homeLayout = HomeLayoutSettings(store: settings)
+        self.homeLayout = homeLayout
         self.latestDismissals = dismissals.all()
+        self.homeArrangement = homeLayout.arrangement
     }
 
     /// Eight observations feeding one summary.
@@ -166,6 +175,63 @@ final class HomeViewModel {
         )
     }
 
+    // MARK: - The log grid, as this parent arranged it (BDR-25)
+
+    /// What the grid draws, on the dashboard and on each baby's tab alike.
+    /// Wellbeing follows its own master switch (BDR-0006) whatever was stored.
+    var homeTiles: HomeTiles {
+        arrangeTiles(
+            defaults: homeTileIds,
+            storedOrder: homeArrangement.order,
+            hidden: homeArrangement.hidden,
+            tracksWellbeing: tracksWellbeing
+        )
+    }
+
+    /// What *Customise home* lists, in order: every tile, wellbeing only while
+    /// it is tracked.
+    var customisableTiles: [String] {
+        listedTiles(defaults: homeTileIds, storedOrder: homeArrangement.order, tracksWellbeing: tracksWellbeing)
+    }
+
+    /// *Move up* (-1) or *Move down* (+1) in *Customise home*.
+    func move(tile id: String, by offset: Int) {
+        storeTileOrder(
+            moveTile(
+                defaults: homeTileIds,
+                storedOrder: homeArrangement.order,
+                id: id,
+                by: offset,
+                tracksWellbeing: tracksWellbeing
+            )
+        )
+    }
+
+    /// A drag in *Customise home*, in the offsets of ``customisableTiles``.
+    func moveTiles(fromOffsets source: IndexSet, toOffset destination: Int) {
+        var listed = customisableTiles
+        listed.move(fromOffsets: source, toOffset: destination)
+        storeTileOrder(reorderTiles(defaults: homeTileIds, storedOrder: homeArrangement.order, listed: listed))
+    }
+
+    /// Shows a tile on the grid, or puts it behind *More*. Only ever the
+    /// parent's act: nothing in the app hides a log on its own.
+    func setTile(_ id: String, shown: Bool) {
+        homeLayout.setShown(id, shown)
+        homeArrangement = homeLayout.arrangement
+    }
+
+    /// Back to the default order; what is hidden stays hidden.
+    func restoreDefaultTileOrder() {
+        homeLayout.restoreDefaultOrder()
+        homeArrangement = homeLayout.arrangement
+    }
+
+    private func storeTileOrder(_ order: [String]) {
+        homeLayout.setOrder(order)
+        homeArrangement = homeLayout.arrangement
+    }
+
     /// Read or put away: either way, the card has done its job (BDR-22).
     func markWhatsNewSeen() {
         whatsNewSettings.markAllSeen()
@@ -192,6 +258,20 @@ final class HomeViewModel {
                 babyUid: baby.uid
             )
         )
+    }
+
+    /// Back to a running feed. Its baby is selected on the way, so the screen
+    /// that opens shows the history — and the timer — of the baby being fed.
+    func selectBaby(of session: NursingSession) {
+        guard let baby = babies.first(where: { $0.baby.uid == session.babyUid })?.baby else { return }
+        select(baby)
+    }
+
+    /// A feed left running across the update to one-feed-per-baby has no baby
+    /// recorded; it is the selected baby's, as it would have been saved
+    /// (BDR-23). Does nothing on every later launch.
+    func adoptUnnamedFeed() {
+        NursingSessionStore.shared.adoptUnnamed(activeBabyUid: try? repository.activeBabyUidNow())
     }
 
     func tick() {
@@ -258,6 +338,9 @@ struct HomeScreen: View {
     /// two buttons already in this corner.
     @State private var showingHelp = false
 
+    /// Every feed running on this phone, at most one per baby (BDR-23).
+    private var sessions: [NursingSession] { NursingSessionStore.shared.sessions }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.regular) {
@@ -276,11 +359,19 @@ struct HomeScreen: View {
                         .foregroundStyle(SproutColor.primary)
                     }
 
-                    // A feed on the timer, wherever it was started from. The
-                    // shared store rather than a copy, so the row goes the
-                    // moment the feed is saved, wherever it was saved from.
-                    if let session = NursingSessionStore.shared.session {
-                        LiveNursingRow(session: session) { onOpen(.feeding) }
+                    // A feed on the timer, wherever it was started from — one
+                    // row per baby feeding, each with its name, because twins
+                    // feeding together are two timers (BDR-23). The shared
+                    // store rather than a copy, so a row goes the moment its
+                    // feed is saved, wherever it was saved from.
+                    ForEach(sessions, id: \.babyUid) { session in
+                        LiveNursingRow(
+                            session: session,
+                            name: model.babies.first { $0.baby.uid == session.babyUid }?.baby.name
+                        ) {
+                            model.selectBaby(of: session)
+                            onOpen(.feeding)
+                        }
                     }
 
                     // A baby asleep right now is the one thing on this screen
@@ -311,8 +402,9 @@ struct HomeScreen: View {
                         // than it used to be (BDR-0009).
                         BabyPane(
                             summary: single,
-                            tracksWellbeing: model.tracksWellbeing,
+                            tiles: model.homeTiles,
                             now: model.now,
+                            sessions: sessions,
                             onFeed: { model.startFeed(for: single.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
                             onGiveMedicine: { model.giveDose(of: $0) },
@@ -340,6 +432,7 @@ struct HomeScreen: View {
                             BabyCardView(
                                 summary: summary,
                                 now: model.now,
+                                sessions: sessions,
                                 onOpen: { model.select(summary.baby) },
                                 onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                                 onGiveMedicine: { model.giveDose(of: $0) },
@@ -456,8 +549,8 @@ private struct CheckInCard: View {
     }
 }
 
-/// "Feeding · Left — 12:34", from `LiveRow` in `ui/home/HomeScreen.kt`, with the
-/// one tap back to it.
+/// "Léa · Feeding · Left — 12:34", from `LiveRow` in `ui/home/HomeScreen.kt`,
+/// with the one tap back to it.
 ///
 /// The clock is time at the breast, not time since the feed began: it stops
 /// while a break runs, exactly as the timer's does (BDR-17). It is the one thing
@@ -465,6 +558,9 @@ private struct CheckInCard: View {
 /// making the whole summary recompute every second.
 private struct LiveNursingRow: View {
     let session: NursingSession
+    /// The baby being fed. Nil only when that baby is no longer here, and then
+    /// the row says what it can.
+    let name: String?
     let onOpen: () -> Void
 
     @State private var now = Clock.millis
@@ -474,7 +570,7 @@ private struct LiveNursingRow: View {
             Image(systemName: session.isPaused ? "pause.circle.fill" : "drop.fill")
                 .foregroundStyle(SproutColor.onPrimaryContainer)
             VStack(alignment: .leading, spacing: 2) {
-                Text(Str.t("home_live_nursing", state))
+                Text(title)
                     .font(.callout.weight(.medium))
                 Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
                     .font(.footnote)
@@ -496,11 +592,19 @@ private struct LiveNursingRow: View {
         }
     }
 
-    /// A feed on a break says so here too, or the dashboard shows a side that
+    private var title: String {
+        guard let name else { return Str.t("home_live_nursing", session.stateLabel) }
+        return Str.t("home_live_nursing_named", name, session.stateLabel)
+    }
+}
+
+extension NursingSession {
+    /// The breast a running feed is at, or that it is on a break. A feed on a
+    /// break says so wherever it is shown, or the screen shows a side that
     /// nobody is actually feeding on.
-    private var state: String {
-        if session.isPaused { return Str.t("feeding_paused") }
-        return session.currentSide == .RIGHT ? Str.t("side_right") : Str.t("side_left")
+    var stateLabel: String {
+        if isPaused { return Str.t("feeding_paused") }
+        return currentSide == .RIGHT ? Str.t("side_right") : Str.t("side_left")
     }
 }
 

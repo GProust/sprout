@@ -385,6 +385,14 @@ class SproutRepository(
      */
     suspend fun activeBabyName(): String? = activeBabyIdNow()?.let { db.babyDao().nameById(it) }
 
+    /**
+     * Each tracked baby's name by uid: how a running feed, which names its baby
+     * by uid (BDR-23), is labelled where the app's own screens are not — the
+     * widget, the notification.
+     */
+    suspend fun babyNamesByUid(): Map<String, String> =
+        db.babyDao().activeBabiesOnce().associate { it.uid to it.name }
+
     // Sleep
     val sleeps: Flow<List<SleepEntity>> = activeBabyId.flatMapLatest { id ->
         if (id == null) flowOf(emptyList()) else db.sleepDao().observeForBaby(id)

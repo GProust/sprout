@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Uno scatto di crescita è frequente %1$s: potrebbe iniziare nei prossimi giorni.</string>
     <string name="settings_growth_spurts">Avvisi scatti di crescita</string>
     <string name="settings_growth_spurts_desc">Avvisami quando inizia un tipico periodo di scatto di crescita.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La poppata in corso nelle notifiche</string>
+    <string name="settings_nursing_notification_desc">Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche.</string>
+    <string name="settings_live_activity">La poppata in corso nella schermata di blocco</string>
+    <string name="settings_live_activity_desc">Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino.</string>
+    <string name="nursing_channel_name">Poppata in corso</string>
+    <string name="nursing_channel_desc">Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla</string>
+    <string name="nursing_switch_side">Cambia lato</string>
+    <string name="nursing_notif_on_break">In pausa · %1$s al seno</string>
+    <string name="nursing_notif_feed_number">Poppata %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avvisi scatti di crescita</string>
     <string name="growth_spurt_channel_desc">Un avviso quando inizia un tipico periodo di scatto di crescita</string>
     <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>
@@ -435,6 +445,10 @@
     <string name="widget_ago_hours">%1$d h fa</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min fa</string>
     <string name="widget_last_breast">Ultimo seno: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d poppata in corso</item>
+        <item quantity="other">%1$d poppate in corso</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Impossibile disegnare il widget. Apri Sprout, oppure rimuovilo e aggiungilo di nuovo.</string>
@@ -443,6 +457,18 @@
     <string name="screen_sync">Condivisione in famiglia</string>
     <string name="settings_sharing">Condivisione</string>
     <string name="settings_sync_hint">Condividi il diario del bambino con le altre persone che se ne occupano: nessun account, nessun cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Schermata Home</string>
+    <string name="screen_customise_home">Personalizza la Home</string>
+    <string name="settings_customise_home_hint">Scegli cosa mostra la Home e in quale ordine.</string>
+    <string name="customise_home_intro">Metti per primo ciò che registri di più e disattiva ciò che non usi. Non si perde nulla: ciò che è disattivato aspetta in Altro, alla fine della griglia, continua a essere condiviso con i telefoni della famiglia e conta ancora in Andamento e nel resoconto per il medico.</string>
+    <string name="customise_home_shown">Visibile nella Home</string>
+    <string name="customise_home_hidden">Nascosto, in Altro</string>
+    <string name="customise_home_move_up">Sposta su</string>
+    <string name="customise_home_move_down">Sposta giù</string>
+    <string name="customise_home_moved">%1$s, posizione %2$d di %3$d</string>
+    <string name="customise_home_restore">Ripristina l\'ordine predefinito</string>
+    <string name="home_more">Altro</string>
     <string name="sync_intro_title">Un solo diario, tutti i telefoni della famiglia</string>
     <string name="sync_intro_body">Invita l\'altro genitore, o un nonno che tiene il bambino spesso. Quando un telefono entra, ciascuno può inviare le proprie voci e Sprout le unisce: nessun account, nessun server e niente conservato al di fuori dei vostri telefoni.</string>
     <string name="sync_invite">Invita un telefono</string>
@@ -588,6 +614,7 @@
     <string name="home_chip_slept">Sonno %1$s</string>
     <string name="home_chip_nappy">Pannolino %1$s</string>
     <string name="home_live_nursing">Allattamento · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Allattamento · %2$s</string>
     <string name="home_live_asleep">%1$s dorme</string>
     <string name="home_live_open">Apri</string>
     <string name="whats_new_label">Novità in Sprout</string>
@@ -602,7 +629,7 @@
     <string name="help_section_how">Come si usa</string>
     <string name="help_section_good_to_know">Buono a sapersi</string>
     <string name="help_home_purpose">Tutta la famiglia a colpo d\'occhio: per ogni bambino, da quanto ha mangiato, dormito ed è stato cambiato, e cosa è in corso adesso.</string>
-    <string name="help_home_how">Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l\'ultima poppata, e l\'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino.\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio.</string>
+    <string name="help_home_how">Avvia una poppata direttamente dalla dashboard: il pulsante principale è il seno da cui non è iniziata l\'ultima poppata, e l\'altro è accanto. I riquadri aprono ogni registro, e «Oggi» somma la giornata finora. Con più bambini, tocca una scheda per aprire la pagina di quel bambino. Per scegliere quali riquadri compaiono e in che ordine, apri «Personalizza la Home» nelle Impostazioni; un riquadro disattivato aspetta in «Altro».\n\nUna poppata in corso, o un bambino che dorme, compare in alto con un pulsante per aprirla o per segnare il risveglio. I gemelli possono poppare insieme: ogni poppata in corso ha la sua riga, con il nome del bambino.</string>
     <string name="help_home_good_to_know">Alcune schede compaiono solo quando hanno qualcosa da dire: il check-in quotidiano, una nota alle età in cui gli scatti di crescita sono frequenti, un farmaco con un\'attesa in corso e le novità dopo un aggiornamento. Nessuna ti ostacola. Le icone in alto aprono i tuoi bambini e le impostazioni.</string>
     <string name="help_baby_purpose">Un bambino per conto suo: la stessa vista che la dashboard mostra quando c\'è un solo figlio, per il bambino che hai scelto.</string>
     <string name="help_baby_how">Avvia una poppata, apri un registro dai riquadri, guarda i totali di oggi o passa alle statistiche e a «Condividi un resoconto». Per passare a un altro bambino, tocca la sua scheda nella dashboard.</string>
@@ -615,7 +642,7 @@
     <string name="help_you_good_to_know">Tutto questo è tuo, non di un bambino: eliminare un bambino non lo tocca. Il tuo benessere e i tuoi check-in non lasciano mai questo telefono. Se disattivi il check-in quotidiano nelle impostazioni, spariscono entrambi da qui e tutto ciò che hai annotato resta.</string>
     <string name="help_feeding_purpose">Tutti i pasti del bambino scelto — seno, biberon e solidi — dal più recente, e il timer per la poppata al seno.</string>
     <string name="help_feeding_how">«Inizia a sinistra» o «Inizia a destra» apre il timer. Cambia lato strada facendo, tocca «Pausa» per un ruttino o un pannolino, poi «Riprendi a sinistra» o «Riprendi a destra», a seconda del seno che viene dopo. Tocca «Ferma &amp; salva» quando la poppata è finita.\n\nTocca + per registrare un pasto a posteriori, un biberon o un pasto solido. «Dettagli», su una poppata, mostra ogni tratto con i suoi orari.</string>
-    <string name="help_feeding_good_to_know">Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma.\n\nSe hai salvato una poppata e ne hai iniziata un\'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola.</string>
+    <string name="help_feeding_good_to_know">Una pausa non è tempo al seno: il timer si ferma finché sei in pausa, e una poppata salvata finisce quando è finito il suo ultimo tratto. Uscire dal timer non lo ferma. Ogni bambino ha il suo timer, quindi i gemelli possono poppare insieme, e una poppata in corso può comparire anche fuori dall\'app, con gli stessi pulsanti, se lo attivi nelle Impostazioni.\n\nSe hai salvato una poppata e ne hai iniziata un\'altra poco dopo, la seconda può proporre «Unisci alla precedente». Chiede prima di cambiare qualcosa, e Sprout non unisce mai le poppate da solo: solo tu sai se erano una poppata sola.</string>
     <string name="help_pumping_purpose">Le tue sessioni di tiralatte e la scorta di latte: quanto ce n\'è adesso in frigo, in congelatore o a temperatura ambiente.</string>
     <string name="help_pumping_how">Tocca + dopo una sessione per registrare quanto ne hai tirato e dove l\'hai messo. Quando il latte conservato viene bevuto o buttato, tocca «Segna come usato» ed esce dalla scorta.</string>
     <string name="help_pumping_good_to_know">La scorta conta solo il latte che si può ancora dare: il latte usato, e quello conservato più a lungo dell\'indicazione di massima di questa pagina, resta fuori dai totali, anche se la sua voce rimane nella cronologia. Il tiralatte è tuo, non di un bambino. Viene condiviso con la tua famiglia, a meno che tu non disattivi «Condividi il latte tirato» nella pagina di condivisione.</string>
@@ -650,8 +677,8 @@
     <string name="help_report_how">Scegli il periodo, le cui date esatte vengono mostrate prima di creare qualsiasi cosa, e cosa includere. Poi tocca «Referto PDF» o «Foglio di calcolo» e scegli dove inviarlo. «Proteggi con una password» mette entrambi i file in un unico zip cifrato.</string>
     <string name="help_report_good_to_know">Il documento riporta ciò che è stato registrato e non interpreta nulla. Il riferimento OMS che scegli vale solo per questo file e viene dimenticato quando esci; di base si usano entrambi, dati come intervallo. Le note restano fuori a meno che tu non le includa, e il tiralatte e il tuo benessere non ci sono mai.\n\nI file vengono creati su questo telefono e non vanno da nessuna parte finché non li invii. Sprout non conserva alcuna copia della password: dalla di persona o al telefono, non insieme al file.</string>
     <string name="help_settings_purpose">Come funziona Sprout su questo telefono: la lingua, i promemoria, il check-in quotidiano e la condivisione con la tua famiglia.</string>
-    <string name="help_settings_how">Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l\'ultimo pasto è di un po\' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni.</string>
-    <string name="help_settings_good_to_know">I promemoria dei pasti e gli avvisi sugli scatti di crescita restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c\'è già tutto.</string>
+    <string name="help_settings_how">Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l\'ultimo pasto è di un po\' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall\'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni.</string>
+    <string name="help_settings_good_to_know">I promemoria dei pasti, gli avvisi sugli scatti di crescita e la poppata in corso fuori dall\'app restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c\'è già tutto.</string>
     <string name="sleep_woke_up">Risveglio</string>
     <string name="cd_open_baby">Apri %1$s</string>
     <string name="you_intro">Il tiralatte, il tuo benessere e il check-in quotidiano.</string>

@@ -55,6 +55,7 @@ import com.gproust.sprout.R
 import com.gproust.sprout.SproutApplication
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.notifications.GrowthSpurtReminders
+import com.gproust.sprout.notifications.NursingNotifications
 import com.gproust.sprout.ui.common.ChoiceChips
 import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
@@ -74,9 +75,10 @@ private data class LanguageChoice(
 
 @Composable
 // onBack stays last so `SettingsScreen {}` keeps reading like its siblings
-// (ProfileScreen, TreatmentsScreen); the sync hop defaults to a no-op for
+// (ProfileScreen, TreatmentsScreen); the two hops default to a no-op for
 // previews and screenshot captures, which only render the screen.
 fun SettingsScreen(
+    onOpenCustomiseHome: () -> Unit = {},
     onOpenSync: () -> Unit = {},
     onBack: () -> Unit,
 ) {
@@ -108,11 +110,25 @@ fun SettingsScreen(
     var remindersEnabled by remember { mutableStateOf(FeedingReminderSettings.isEnabled(context)) }
     var intervalMinutes by remember { mutableIntStateOf(FeedingReminderSettings.intervalMinutes(context)) }
     var growthSpurtsEnabled by remember { mutableStateOf(GrowthSpurtSettings.isEnabled(context)) }
+    var nursingNotificationEnabled by remember {
+        mutableStateOf(NursingNotificationSettings.isEnabled(context))
+    }
     val profile by repository.parentProfile.collectAsState(initial = null)
 
     fun reschedule() {
         scope.launch(Dispatchers.IO) { FeedingReminders.rescheduleAll(context, repository) }
     }
+
+    /** Shows or takes away a feed already running, the moment the answer changes. */
+    fun refreshNursingNotification() {
+        scope.launch(Dispatchers.IO) { NursingNotifications.refresh(context, repository) }
+    }
+
+    // Its own launcher, because the answer matters here: a feed may already be
+    // running, and the notification for it should appear as soon as it may.
+    val nursingPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { refreshNursingNotification() }
 
     Scaffold(
         topBar = {
@@ -163,6 +179,22 @@ fun SettingsScreen(
                         intervalMinutes = minutes
                         FeedingReminderSettings.setIntervalMinutes(context, minutes)
                         reschedule()
+                    },
+                )
+            }
+
+            item { Spacer(Modifier.height(24.dp)) }
+            item {
+                NursingNotificationSection(
+                    enabled = nursingNotificationEnabled,
+                    onToggle = { on ->
+                        nursingNotificationEnabled = on
+                        NursingNotificationSettings.setEnabled(context, on)
+                        if (on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            nursingPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            refreshNursingNotification()
+                        }
                     },
                 )
             }
@@ -242,6 +274,11 @@ fun SettingsScreen(
                 }
             }
 
+            // After the check-in, whose switch decides whether the wellbeing
+            // tile is there to arrange at all, and before sharing (BDR-25).
+            item { Spacer(Modifier.height(24.dp)) }
+            item { HomeScreenSection(onOpen = onOpenCustomiseHome) }
+
             item { Spacer(Modifier.height(24.dp)) }
             item { SharingSection(onOpenSync = onOpenSync) }
 
@@ -316,6 +353,32 @@ private fun SupportRow(label: String, hint: String, onClick: () -> Unit) {
     }
 }
 
+/** The way in to arranging the dashboard's log grid (BDR-25). */
+@Composable
+private fun HomeScreenSection(onOpen: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_home),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onOpen).padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.screen_customise_home))
+                Text(
+                    stringResource(R.string.settings_customise_home_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+        }
+    }
+}
+
 /** The way in to sharing a baby's record with the other parent. */
 @Composable
 private fun SharingSection(onOpenSync: () -> Unit) {
@@ -339,6 +402,28 @@ private fun SharingSection(onOpenSync: () -> Unit) {
             }
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
         }
+    }
+}
+
+/**
+ * A running breastfeed in the notifications (BDR-24). Off until a parent turns
+ * it on, which is when the permission is asked for — never when a feed starts.
+ */
+@Composable
+private fun NursingNotificationSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(
+                stringResource(R.string.settings_nursing_notification),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                stringResource(R.string.settings_nursing_notification_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = enabled, onCheckedChange = onToggle)
     }
 }
 

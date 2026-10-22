@@ -507,6 +507,16 @@
     <string name="growth_spurt_soon_body">A growth spurt is common %1$s — it may start in the next few days.</string>
     <string name="settings_growth_spurts">Growth spurt alerts</string>
     <string name="settings_growth_spurts_desc">Give me a heads-up when a typical growth spurt period begins.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">A running feed in the notifications</string>
+    <string name="settings_nursing_notification_desc">While a breastfeed is being timed, show it in the notifications with Pause, Switch side and Stop &amp; save, so you don\'t have to unlock the phone. Your baby\'s name stays off the lock screen unless your phone shows all notification content.</string>
+    <string name="settings_live_activity">A running feed on the lock screen</string>
+    <string name="settings_live_activity_desc">While a breastfeed is being timed, show it on the lock screen and in the Dynamic Island with Pause, Switch side and Stop &amp; save, so you don\'t have to unlock the phone. It never shows your baby\'s name.</string>
+    <string name="nursing_channel_name">Running breastfeed</string>
+    <string name="nursing_channel_desc">A breastfeed while it is being timed, with buttons to pause it, switch side and save it</string>
+    <string name="nursing_switch_side">Switch side</string>
+    <string name="nursing_notif_on_break">On a break · %1$s at the breast</string>
+    <string name="nursing_notif_feed_number">Feed %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Growth spurt alerts</string>
     <string name="growth_spurt_channel_desc">A heads-up when a typical growth spurt period begins</string>
     <string name="growth_spurt_notif_title">A growth spurt may be starting</string>
@@ -521,6 +531,10 @@
     <string name="widget_ago_hours">%1$d h ago</string>
     <string name="widget_ago_hours_minutes">%1$d h %2$d min ago</string>
     <string name="widget_last_breast">Last breast: %1$s · %2$s</string>
+    <plurals name="widget_feeds_running">
+        <item quantity="one">%1$d feed running</item>
+        <item quantity="other">%1$d feeds running</item>
+    </plurals>
 
     <!-- Shown on the home screen when the widget can't be drawn -->
     <string name="widget_error">Couldn\'t draw the widget. Open Sprout, or remove and add it again.</string>
@@ -529,6 +543,18 @@
     <string name="screen_sync">Household sharing</string>
     <string name="settings_sharing">Sharing</string>
     <string name="settings_sync_hint">Share this baby\'s record with the other people looking after them — no account, no cloud.</string>
+    <!-- Customising the home screen's log grid (BDR-25) -->
+    <string name="settings_home">Home screen</string>
+    <string name="screen_customise_home">Customise home</string>
+    <string name="settings_customise_home_hint">Choose which logs the home screen shows, and in which order.</string>
+    <string name="customise_home_intro">Put the logs you use most first, and switch off the ones you don\'t use. Nothing is lost: a log that\'s switched off waits under More at the end of the grid, keeps sharing with your household\'s phones, and still counts in Trends and in the record for your doctor.</string>
+    <string name="customise_home_shown">Shown on home</string>
+    <string name="customise_home_hidden">Hidden, under More</string>
+    <string name="customise_home_move_up">Move up</string>
+    <string name="customise_home_move_down">Move down</string>
+    <string name="customise_home_moved">%1$s, position %2$d of %3$d</string>
+    <string name="customise_home_restore">Restore the default order</string>
+    <string name="home_more">More</string>
     <string name="sync_intro_title">One record, every phone in the household</string>
     <string name="sync_intro_body">Invite the other parent — or a grandparent who has the baby regularly. Once a phone has joined, everyone can send their entries across and Sprout merges them: no account, no server, and nothing kept anywhere but your own phones.</string>
     <string name="sync_invite">Invite a phone</string>
@@ -674,6 +700,7 @@
     <string name="home_chip_slept">Slept %1$s</string>
     <string name="home_chip_nappy">Nappy %1$s</string>
     <string name="home_live_nursing">Feeding · %1$s</string>
+    <string name="home_live_nursing_named">%1$s · Feeding · %2$s</string>
     <string name="home_live_asleep">%1$s is asleep</string>
     <string name="home_live_open">Open</string>
     <string name="whats_new_label">New in Sprout</string>
@@ -688,7 +715,7 @@
     <string name="help_section_how">How to use it</string>
     <string name="help_section_good_to_know">Good to know</string>
     <string name="help_home_purpose">The whole household at a glance: for each baby, how long since they were fed, slept and changed, and anything that\'s running right now.</string>
-    <string name="help_home_how">Start a breastfeed from the dashboard: the main button is the breast the last feed didn\'t start on, and the other one is beside it. The tiles open each log, and “Today” adds up the day so far. With more than one baby, tap a card to open that baby\'s own tab.\n\nA feed on the timer, or a baby asleep, shows at the top with a button to open it or to say they woke up.</string>
+    <string name="help_home_how">Start a breastfeed from the dashboard: the main button is the breast the last feed didn\'t start on, and the other one is beside it. The tiles open each log, and “Today” adds up the day so far. With more than one baby, tap a card to open that baby\'s own tab. To choose which tiles show and in which order, open “Customise home” in Settings; a tile you switch off waits under “More”.\n\nA feed on the timer, or a baby asleep, shows at the top with a button to open it or to say they woke up. Twins can feed at the same time: each running feed has a row of its own, with the baby\'s name.</string>
     <string name="help_home_good_to_know">Some cards only appear when there\'s something to say: the daily check-in, a note around the ages growth spurts are common, a medicine with a wait running, and what\'s new after an update. None of them stands in your way. The icons at the top open your babies and the settings.</string>
     <string name="help_baby_purpose">One baby on their own: the same view the dashboard shows when there\'s only one child, for the baby you picked.</string>
     <string name="help_baby_how">Start a breastfeed, open a log from the tiles, see today\'s totals, or go on to the statistics and to “Share a record”. To switch to another baby, tap their card on the dashboard.</string>
@@ -701,7 +728,7 @@
     <string name="help_you_good_to_know">These are yours, not a baby\'s, so deleting a baby leaves them as they are. Your wellbeing and check-ins never leave this phone. If you turn the daily check-in off in Settings, both disappear from here and everything you noted is kept.</string>
     <string name="help_feeding_purpose">Every feed for the baby you picked — breast, bottle and solids — newest first, and the live timer for a breastfeed.</string>
     <string name="help_feeding_how">“Start left” or “Start right” opens the timer. Switch sides as you go, tap “Pause” for a burp or a nappy, then “Resume left” or “Resume right”, whichever breast comes next. Tap “Stop &amp; save” when the feed is over.\n\nTap + to log a feed after the fact, a bottle or a meal. “Details” on a breastfeed shows each stretch with its times.</string>
-    <string name="help_feeding_good_to_know">A break is not time at the breast: the clock stops while you\'re paused, and a saved feed ends when its last stretch ended. Leaving the timer doesn\'t stop it.\n\nIf you saved a feed and started again a short while later, the second one may offer “Join with previous”. It asks before it changes anything, and Sprout never joins feeds on its own: only you know whether they were one feed.</string>
+    <string name="help_feeding_good_to_know">A break is not time at the breast: the clock stops while you\'re paused, and a saved feed ends when its last stretch ended. Leaving the timer doesn\'t stop it. Each baby has a timer of its own, so twins can feed at the same time, and a running feed can also show outside the app, with the same buttons, if you turn that on in Settings.\n\nIf you saved a feed and started again a short while later, the second one may offer “Join with previous”. It asks before it changes anything, and Sprout never joins feeds on its own: only you know whether they were one feed.</string>
     <string name="help_pumping_purpose">Your pumping sessions, and the milk stash: how much is in the fridge, in the freezer or out at room temperature right now.</string>
     <string name="help_pumping_how">Tap + after a session to log how much and where it went. When stored milk is drunk or thrown away, tap “Mark as used” and it leaves the stash.</string>
     <string name="help_pumping_good_to_know">The stash only counts milk that can still be given: used milk, and milk kept longer than the rough guide on this page, is left out of the totals, though its entry stays in the history. Pumping belongs to you rather than to a baby. It\'s shared with your household unless you switch off “Share expressed milk” on the sharing page.</string>
@@ -736,8 +763,8 @@
     <string name="help_report_how">Pick the period, whose exact dates are shown before anything is made, and choose what to include. Then tap “PDF report” or “Spreadsheet” and pick where to send it. “Protect with a password” puts both files in one encrypted zip.</string>
     <string name="help_report_good_to_know">The document states what was logged and interprets nothing. The WHO reference you pick is for this file only and forgotten when you leave; by default both are used and shown as a span. Notes are left out unless you include them, and pumping and your wellbeing are never in it.\n\nThe files are made on this phone and go nowhere until you send them. Sprout keeps no copy of the password: give it in person or by phone, not with the file.</string>
     <string name="help_settings_purpose">How Sprout works on this phone: its language, reminders, the daily check-in, and sharing with your household.</string>
-    <string name="help_settings_how">Choose a language, or keep the phone\'s. Turn on “Feeding reminders” for a nudge when it\'s been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired.</string>
-    <string name="help_settings_good_to_know">Feeding reminders and growth spurt alerts stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren\'t shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here.</string>
+    <string name="help_settings_how">Choose a language, or keep the phone\'s. Turn on “Feeding reminders” for a nudge when it\'s been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. You can also show a breastfeed you\'re timing outside the app — in the notifications or on the lock screen — with its buttons. “Customise home” chooses which logs the dashboard shows, and in which order. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired.</string>
+    <string name="help_settings_good_to_know">Feeding reminders, growth spurt alerts and a running feed outside the app stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren\'t shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here.</string>
     <string name="sleep_woke_up">Woke up</string>
     <string name="cd_open_baby">Open %1$s</string>
     <string name="you_intro">Pumping, your wellbeing and the daily check-in.</string>

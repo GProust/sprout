@@ -33,13 +33,15 @@ So, when writing a new record:
   between phones, and what a screen promises are product questions, and a second
   record for the other app would be a second answer waiting to disagree.
 - **A platform-scoped record is for a mechanism the platform forces**, never for
-  a behaviour. There have been three such forcings, and they are the whole list:
+  a behaviour. There have been four such forcings, and they are the whole list:
   iOS has no Room ([ADR-0017](0017-grdb-for-the-ios-database.md), the other half
   of [ADR-0004](0004-native-android-compose-mvvm-room.md)'s storage choice), no
   per-key backup exclusion
-  ([ADR-0018](0018-where-ios-keeps-what-must-not-travel.md)), and nothing of ours
+  ([ADR-0018](0018-where-ios-keeps-what-must-not-travel.md)), nothing of ours
   runs when a notification fires
-  ([ADR-0019](0019-a-reminder-decided-when-it-is-scheduled.md)).
+  ([ADR-0019](0019-a-reminder-decided-when-it-is-scheduled.md)), and a
+  notification cannot show a clock that moves
+  ([ADR-0020](0020-the-live-activity-is-the-one-ios-extension.md)).
 - **Such a record names the shared one it applies**, in its first lines, and
   changes nothing that record decided. ADR-0018 and ADR-0019 are the shape to
   copy: each opens by saying which record it is applying and to which app.
@@ -51,7 +53,7 @@ So, when writing a new record:
   not move.
 
 The `Scope` column below is that rule, made visible. **No BDR is
-platform-scoped**, and only four ADRs are — two of them the same storage question
+platform-scoped**, and only five ADRs are — two of them the same storage question
 asked of two databases.
 
 ## Index
@@ -77,6 +79,7 @@ asked of two databases.
 | [0017](0017-grdb-for-the-ios-database.md) | GRDB for the iOS database, and Room's schema as the source | iOS | Accepted |
 | [0018](0018-where-ios-keeps-what-must-not-travel.md) | Where iOS keeps what must not travel | iOS | Accepted |
 | [0019](0019-a-reminder-decided-when-it-is-scheduled.md) | A reminder decided when it is scheduled | iOS | Accepted |
+| [0020](0020-the-live-activity-is-the-one-ios-extension.md) | The Live Activity is the one iOS extension | iOS | Accepted |
 
 Two of those titles read as Android's and are not, which is what the column is
 for:
