@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gproust.sprout.data.SproutRepository
 import com.gproust.sprout.data.local.DeliveryType
 import com.gproust.sprout.data.local.ParentProfileEntity
+import com.gproust.sprout.ui.tour.TourSettings
 import com.gproust.sprout.ui.whatsnew.WhatsNewSettings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -46,6 +47,11 @@ class StartupViewModel(
         // (BDR-22). Before the profile is saved, because saving it is what
         // opens the dashboard.
         WhatsNewSettings.markAllSeen(context)
+        // This is also the one launch that cannot be the middle of a feed, so
+        // the dashboard about to open owes a short tour of itself (BDR-27).
+        // Nothing else ever writes it: a phone that already had a profile —
+        // set up before the tour existed, or restored — is never shown round.
+        TourSettings.markPending(context)
         viewModelScope.launch {
             val babyId = if (babyName.isNotBlank()) {
                 repository.addBaby(babyName, birthDate)

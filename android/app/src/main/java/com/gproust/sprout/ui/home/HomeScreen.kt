@@ -56,6 +56,7 @@ import com.gproust.sprout.data.ANNOUNCEMENT_IDS
 import com.gproust.sprout.data.MEDICINE_DAY_MS
 import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.TourStep
 import com.gproust.sprout.data.announcementsToShow
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.local.DiaperEntity
@@ -76,6 +77,7 @@ import com.gproust.sprout.ui.common.upcomingGrowthSpurt
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
+import com.gproust.sprout.ui.tour.tourTarget
 import com.gproust.sprout.ui.whatsnew.WhatsNewCard
 import com.gproust.sprout.ui.whatsnew.WhatsNewSettings
 import com.gproust.sprout.ui.whatsnew.WhatsNewSheet
@@ -347,7 +349,10 @@ fun HomeScreen(
                             contentDescription = stringResource(R.string.screen_babies),
                         )
                     }
-                    IconButton(onClick = { onNavigate(Routes.SETTINGS) }) {
+                    IconButton(
+                        onClick = { onNavigate(Routes.SETTINGS) },
+                        modifier = Modifier.tourTarget(TourStep.SETTINGS),
+                    ) {
                         Icon(
                             Icons.Filled.Settings,
                             contentDescription = stringResource(R.string.cd_settings),
@@ -429,12 +434,19 @@ fun HomeScreen(
                     GrowthSpurtNote(it)
                 }
             } else {
-                state.babies.forEach { summary ->
+                state.babies.forEachIndexed { index, summary ->
                     BabyCard(
                         summary = summary,
                         now = now,
                         onOpen = { withBaby(summary.baby.id) { onNavigate(Routes.BABY) } },
                         onFeed = { side -> withBaby(summary.baby.id) { onQuickFeed(side) } },
+                        // The tour points at one card's buttons, the first's,
+                        // rather than ringing whichever card reported last.
+                        feedModifier = if (index == 0) {
+                            Modifier.tourTarget(TourStep.BREASTFEED)
+                        } else {
+                            Modifier
+                        },
                         onGiveMedicine = vm::giveDose,
                         onDismissMedicine = vm::dismiss,
                         // Selects the baby on the way, so the screen that opens

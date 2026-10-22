@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
+import com.gproust.sprout.data.TourStep
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.MedicineWatch
 import com.gproust.sprout.ui.common.SectionLabel
@@ -51,6 +52,7 @@ import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatRelative
 import com.gproust.sprout.ui.navigation.Routes
+import com.gproust.sprout.ui.tour.tourTarget
 
 /**
  * Everything about one baby that isn't a history list: how long since each of
@@ -83,7 +85,9 @@ fun BabyPane(
         SinceChips(summary, now)
 
         Spacer(Modifier.height(12.dp))
-        QuickFeed(summary.nextSide, onFeed)
+        // Both marked for the tour (BDR-27), which only reads them on the
+        // dashboard: on the baby's own tab they report nothing.
+        QuickFeed(summary.nextSide, onFeed, modifier = Modifier.tourTarget(TourStep.BREASTFEED))
 
         // Under the feed buttons, and above the log grid the medicine would
         // otherwise be three taps down in. Feeding is what this screen is opened
@@ -103,7 +107,7 @@ fun BabyPane(
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_log))
         Spacer(Modifier.height(8.dp))
-        LogGrid(tracksWellbeing, onNavigate)
+        LogGrid(tracksWellbeing, onNavigate, modifier = Modifier.tourTarget(TourStep.LOG_TILES))
 
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_today))
@@ -160,6 +164,7 @@ fun BabyCard(
     onDismissMedicine: (MedicineWatch) -> Unit,
     onOpenMedicines: () -> Unit,
     modifier: Modifier = Modifier,
+    feedModifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     Card(modifier = modifier.fillMaxWidth()) {
@@ -187,7 +192,7 @@ fun BabyCard(
             SinceChips(summary, now)
 
             Spacer(Modifier.height(12.dp))
-            QuickFeed(summary.nextSide, onFeed)
+            QuickFeed(summary.nextSide, onFeed, modifier = feedModifier)
 
             if (summary.medicines.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))

@@ -17,14 +17,22 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.gproust.sprout.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,6 +47,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gproust.sprout.data.SproutRepository
+import com.gproust.sprout.data.TourStep
+import com.gproust.sprout.data.TourTrigger
 import com.gproust.sprout.data.local.BabyEntity
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.ui.baby.BabyScreen
@@ -47,6 +57,7 @@ import com.gproust.sprout.ui.diaper.DiaperScreen
 import com.gproust.sprout.ui.feeding.FeedingScreen
 import com.gproust.sprout.ui.feeding.FeedingViewModel
 import com.gproust.sprout.ui.feeding.NursingScreen
+import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.foods.FoodsScreen
 import com.gproust.sprout.ui.growth.GrowthScreen
 import com.gproust.sprout.ui.health.HealthScreen
@@ -61,13 +72,24 @@ import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
 import com.gproust.sprout.ui.medicines.MedicinesScreen
+import com.gproust.sprout.ui.tour.LocalTourTargets
+import com.gproust.sprout.ui.tour.TourOverlay
+import com.gproust.sprout.ui.tour.TourSettings
+import com.gproust.sprout.ui.tour.TourTargets
+import com.gproust.sprout.ui.tour.tourTarget
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.you.YouScreen
 import com.gproust.sprout.ui.startup.Startup
 import com.gproust.sprout.ui.startup.StartupViewModel
+import com.gproust.sprout.data.tourMarkAfterArrival
+import com.gproust.sprout.data.tourStarts
+import com.gproust.sprout.data.tourStepAfter
+import com.gproust.sprout.data.tourSteps
+import com.gproust.sprout.data.tourStepsAside
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 object Routes {
     const val HOME = "home"
@@ -193,12 +215,19 @@ private fun NavController.navigateToNursing(side: BreastSide) {
 }
 
 /** Babies and the current selection, for the shell's own bar. */
-class ShellViewModel(repository: SproutRepository) : ViewModel() {
+class ShellViewModel(private val repository: SproutRepository) : ViewModel() {
     val babies = repository.babies
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val activeBabyId = repository.parentProfile
         .map { it?.activeBabyId }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /**
+     * How many babies the dashboard lists, read once rather than off [babies]:
+     * the tour's steps depend on it, and right after onboarding that flow has
+     * not yet caught up with the baby just added.
+     */
+    suspend fun babyCount(): Int = repository.activeBabies().size
 }
 
 /**
@@ -251,6 +280,62 @@ private fun MainScaffold(
 
     val showBottomBar = currentRoute in bottomDestinations.map { it.route }
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // The guided tour (BDR-27): the step on screen, if one is, and how many
+    // babies it was started for, which decides its steps. Saveable, so turning
+    // the phone or changing the language half-way through keeps the place.
+    var tourStep by rememberSaveable { mutableStateOf<TourStep?>(null) }
+    var tourBabies by rememberSaveable { mutableIntStateOf(0) }
+    val tourTargets = remember { TourTargets() }
+    // Taken before the effects below consume them: a launch that was for a
+    // widget tap or a file never starts the tour, because what the parent
+    // asked for wins.
+    val openedForSomethingElse = remember { routeRequest != null || syncFile != null }
+
+    /**
+     * Starts the tour if [trigger] should, on the steps the dashboard can show.
+     * Arriving spends an owed tour whether or not it starts, so it is offered
+     * on the launch onboarding finished on and on no later one.
+     */
+    suspend fun maybeStartTour(trigger: TourTrigger) {
+        val mark = TourSettings.mark(context)
+        if (trigger == TourTrigger.ARRIVAL) {
+            val spent = tourMarkAfterArrival(mark)
+            if (spent != mark) TourSettings.store(context, spent)
+        }
+        if (tourStarts(trigger, mark, openedForSomethingElse)) {
+            val count = shellVm.babyCount()
+            tourBabies = count
+            tourStep = tourSteps(count).firstOrNull()
+        }
+    }
+
+    LaunchedEffect(Unit) { maybeStartTour(TourTrigger.ARRIVAL) }
+
+    /** Settings → *Replay the tour*: back to the dashboard it is about, then from the top. */
+    fun replayTour() {
+        navController.popBackStack(Routes.HOME, inclusive = false)
+        scope.launch { maybeStartTour(TourTrigger.REPLAY) }
+    }
+
+    // The tour gets out of the way the moment the parent goes anywhere — a
+    // tile, a tab, Settings, a widget tap or a file arriving — or starts a
+    // feed. Before the nav graph has a route, this is the dashboard.
+    val nursingSessions = remember(context) { NursingSessionStore.sessions(context) }
+    val nursing by nursingSessions.collectAsState()
+    val feedRunning = nursing != null
+    var feedWasRunning by remember { mutableStateOf(feedRunning) }
+    val onDashboard = currentRoute == null || currentRoute == Routes.HOME
+    LaunchedEffect(onDashboard, feedRunning) {
+        if (tourStep != null && tourStepsAside(onDashboard, feedWasRunning, feedRunning)) {
+            tourStep = null
+        }
+        feedWasRunning = feedRunning
+    }
+    val tourShown = tourStep != null && currentRoute == Routes.HOME
+
     // Honour a route the launching intent asked for (widget tap → Feeding),
     // then consume it so it doesn't re-fire on recomposition or rotation.
     LaunchedEffect(routeRequest) {
@@ -282,129 +367,158 @@ private fun MainScaffold(
         navController.navigateToNursing(side)
     }
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                NavigationBar {
-                    // The baby's own tab only earns a seat once there is a
-                    // choice to make; with one baby the dashboard is already it.
-                    val visible = bottomDestinations.filter {
-                        it.route != Routes.BABY || babies.size > 1
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            // While a step is up, what the scrim dims is hidden from TalkBack as
+            // well as from sight: the card is the only thing on the screen.
+            modifier = if (tourShown) Modifier.clearAndSetSemantics {} else Modifier,
+            bottomBar = {
+                if (showBottomBar) {
+                    CompositionLocalProvider(LocalTourTargets provides tourTargets) {
+                        NavigationBar(modifier = Modifier.tourTarget(TourStep.BOTTOM_BAR)) {
+                            // The baby's own tab only earns a seat once there is a
+                            // choice to make; with one baby the dashboard is already it.
+                            val visible = bottomDestinations.filter {
+                                it.route != Routes.BABY || babies.size > 1
+                            }
+                            visible.forEach { dest ->
+                                val selected = backStackEntry?.destination?.hierarchy
+                                    ?.any { it.route == dest.route } == true
+                                val label = babyTabLabel(dest, babies, activeBabyId)
+                                NavigationBarItem(
+                                    selected = selected,
+                                    onClick = { navController.navigateToBottomDestination(dest.route) },
+                                    icon = { Icon(dest.icon, contentDescription = label) },
+                                    label = { Text(label) },
+                                )
+                            }
+                        }
                     }
-                    visible.forEach { dest ->
-                        val selected = backStackEntry?.destination?.hierarchy
-                            ?.any { it.route == dest.route } == true
-                        val label = babyTabLabel(dest, babies, activeBabyId)
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = { navController.navigateToBottomDestination(dest.route) },
-                            icon = { Icon(dest.icon, contentDescription = label) },
-                            label = { Text(label) },
+                }
+            },
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = Routes.HOME,
+                modifier = Modifier.padding(innerPadding),
+            ) {
+                composable(Routes.HOME) {
+                    // The dashboard is the only screen whose areas the tour points
+                    // at; the baby's own tab draws the same pane and reports nothing.
+                    CompositionLocalProvider(LocalTourTargets provides tourTargets) {
+                        HomeScreen(
+                            onNavigate = { route -> navController.navigateToKnown(route) },
+                            onQuickFeed = { side -> openNursing(side) },
+                            onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
                         )
                     }
                 }
+                composable(Routes.BABY) {
+                    BabyScreen(
+                        onNavigate = { route -> navController.navigateToKnown(route) },
+                        onQuickFeed = { side -> openNursing(side) },
+                        onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
+                    )
+                }
+                composable(Routes.YOU) {
+                    YouScreen(onNavigate = { route -> navController.navigateToKnown(route) })
+                }
+                composable(Routes.FEEDING) {
+                    FeedingScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenNursing = { side -> navController.navigateToNursing(side) },
+                    )
+                }
+                composable(
+                    Routes.FEEDING_NURSING,
+                    arguments = listOf(navArgument("side") { type = NavType.StringType }),
+                ) { entry ->
+                    val side = entry.arguments?.getString("side")
+                        ?.let { runCatching { BreastSide.valueOf(it) }.getOrNull() }
+                        ?: BreastSide.LEFT
+                    // Share the feeding screen's ViewModel so the live session is the
+                    // same one its bottom bar started and can resume.
+                    val feedingEntry = remember(entry) { navController.getBackStackEntry(Routes.FEEDING) }
+                    val vm: FeedingViewModel = viewModel(
+                        viewModelStoreOwner = feedingEntry,
+                        factory = rememberSproutViewModelFactory(),
+                    )
+                    NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
+                }
+                composable(Routes.PUMPING) {
+                    PumpingScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.SLEEP) {
+                    SleepScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.DIAPER) {
+                    DiaperScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.GROWTH) {
+                    GrowthScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.HEALTH) {
+                    HealthScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.STATS) {
+                    StatsScreen()
+                }
+                composable(Routes.CHECKIN) {
+                    CheckInRoute(onDone = { navController.popBackStack() })
+                }
+                composable(Routes.PROFILE) {
+                    ProfileScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.SETTINGS) {
+                    SettingsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenSync = { navController.navigate(Routes.SYNC) },
+                        onReplayTour = { replayTour() },
+                    )
+                }
+                composable(Routes.SYNC) {
+                    SyncScreen(
+                        onBack = { navController.popBackStack() },
+                        incomingFile = syncFile,
+                        onIncomingFileHandled = onSyncFileConsumed,
+                    )
+                }
+                composable(Routes.MEDICINES) {
+                    MedicinesScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.FOODS) {
+                    FoodsScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.TREATMENTS) {
+                    TreatmentsScreen(onBack = { navController.popBackStack() })
+                }
+                composable(
+                    Routes.REPORT,
+                    arguments = listOf(navArgument("babyId") { type = NavType.LongType }),
+                ) { entry ->
+                    ReportScreen(
+                        babyId = entry.arguments?.getLong("babyId") ?: 0L,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
             }
-        },
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Routes.HOME,
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            composable(Routes.HOME) {
-                HomeScreen(
-                    onNavigate = { route -> navController.navigateToKnown(route) },
-                    onQuickFeed = { side -> openNursing(side) },
-                    onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
-                )
-            }
-            composable(Routes.BABY) {
-                BabyScreen(
-                    onNavigate = { route -> navController.navigateToKnown(route) },
-                    onQuickFeed = { side -> openNursing(side) },
-                    onShareRecord = { babyId -> navController.navigate(Routes.report(babyId)) },
-                )
-            }
-            composable(Routes.YOU) {
-                YouScreen(onNavigate = { route -> navController.navigateToKnown(route) })
-            }
-            composable(Routes.FEEDING) {
-                FeedingScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenNursing = { side -> navController.navigateToNursing(side) },
-                )
-            }
-            composable(
-                Routes.FEEDING_NURSING,
-                arguments = listOf(navArgument("side") { type = NavType.StringType }),
-            ) { entry ->
-                val side = entry.arguments?.getString("side")
-                    ?.let { runCatching { BreastSide.valueOf(it) }.getOrNull() }
-                    ?: BreastSide.LEFT
-                // Share the feeding screen's ViewModel so the live session is the
-                // same one its bottom bar started and can resume.
-                val feedingEntry = remember(entry) { navController.getBackStackEntry(Routes.FEEDING) }
-                val vm: FeedingViewModel = viewModel(
-                    viewModelStoreOwner = feedingEntry,
-                    factory = rememberSproutViewModelFactory(),
-                )
-                NursingScreen(side = side, onDone = { navController.popBackStack() }, vm = vm)
-            }
-            composable(Routes.PUMPING) {
-                PumpingScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.SLEEP) {
-                SleepScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.DIAPER) {
-                DiaperScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.GROWTH) {
-                GrowthScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.HEALTH) {
-                HealthScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.STATS) {
-                StatsScreen()
-            }
-            composable(Routes.CHECKIN) {
-                CheckInRoute(onDone = { navController.popBackStack() })
-            }
-            composable(Routes.PROFILE) {
-                ProfileScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.SETTINGS) {
-                SettingsScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenSync = { navController.navigate(Routes.SYNC) },
-                )
-            }
-            composable(Routes.SYNC) {
-                SyncScreen(
-                    onBack = { navController.popBackStack() },
-                    incomingFile = syncFile,
-                    onIncomingFileHandled = onSyncFileConsumed,
-                )
-            }
-            composable(Routes.MEDICINES) {
-                MedicinesScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.FOODS) {
-                FoodsScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Routes.TREATMENTS) {
-                TreatmentsScreen(onBack = { navController.popBackStack() })
-            }
-            composable(
-                Routes.REPORT,
-                arguments = listOf(navArgument("babyId") { type = NavType.LongType }),
-            ) { entry ->
-                ReportScreen(
-                    babyId = entry.arguments?.getLong("babyId") ?: 0L,
-                    onBack = { navController.popBackStack() },
-                )
-            }
+        }
+
+        // Over the whole scaffold, bottom bar included, and never inside the
+        // dashboard itself: the screenshot run renders HomeScreen on its own and
+        // so never meets the tour.
+        val step = tourStep
+        if (step != null && tourShown) {
+            val steps = tourSteps(tourBabies)
+            TourOverlay(
+                step = step,
+                position = steps.indexOf(step) + 1,
+                count = steps.size,
+                isLast = tourStepAfter(step, steps) == null,
+                target = tourTargets[step],
+                onNext = { tourStep = tourStepAfter(step, steps) },
+                onSkip = { tourStep = null },
+            )
         }
     }
 }

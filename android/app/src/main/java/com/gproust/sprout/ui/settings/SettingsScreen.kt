@@ -72,10 +72,11 @@ private data class LanguageChoice(
 
 @Composable
 // onBack stays last so `SettingsScreen {}` keeps reading like its siblings
-// (ProfileScreen, TreatmentsScreen); the sync hop defaults to a no-op for
-// previews and screenshot captures, which only render the screen.
+// (ProfileScreen, TreatmentsScreen); the sync hop and the tour default to
+// no-ops for previews and screenshot captures, which only render the screen.
 fun SettingsScreen(
     onOpenSync: () -> Unit = {},
+    onReplayTour: () -> Unit = {},
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -238,6 +239,9 @@ fun SettingsScreen(
             item { SharingSection(onOpenSync = onOpenSync) }
 
             item { Spacer(Modifier.height(24.dp)) }
+            item { TourSection(onReplay = onReplayTour) }
+
+            item { Spacer(Modifier.height(24.dp)) }
             item {
                 SupportSection(
                     onOpen = { url ->
@@ -325,6 +329,35 @@ private fun SharingSection(onOpenSync: () -> Unit) {
                 Text(stringResource(R.string.screen_sync))
                 Text(
                     stringResource(R.string.settings_sync_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+        }
+    }
+}
+
+/**
+ * The way back to the guided tour (BDR-27). It runs once on its own, right
+ * after onboarding; this row is the only other way it ever appears.
+ */
+@Composable
+private fun TourSection(onReplay: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.settings_tour),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onReplay).padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(R.string.settings_tour_replay))
+                Text(
+                    stringResource(R.string.settings_tour_replay_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

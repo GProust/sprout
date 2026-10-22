@@ -5,8 +5,12 @@ import android.graphics.Canvas
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasScrollAction
@@ -61,6 +65,8 @@ import com.gproust.sprout.data.local.WellbeingEntity
 import com.gproust.sprout.data.sync.Pairing
 import com.gproust.sprout.data.sync.SyncSecret
 import com.gproust.sprout.data.sync.nearby.NearbySettings
+import com.gproust.sprout.data.TourStep
+import com.gproust.sprout.data.tourSteps
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import com.gproust.sprout.ui.checkin.DailyCheckInScreen
 import com.gproust.sprout.ui.diaper.DiaperScreen
@@ -84,6 +90,9 @@ import com.gproust.sprout.ui.sleep.SleepScreen
 import com.gproust.sprout.ui.stats.StatsScreen
 import com.gproust.sprout.ui.sync.SyncScreen
 import com.gproust.sprout.ui.sync.SyncViewModel
+import com.gproust.sprout.ui.tour.LocalTourTargets
+import com.gproust.sprout.ui.tour.TourOverlay
+import com.gproust.sprout.ui.tour.TourTargets
 import com.gproust.sprout.ui.treatments.TreatmentsScreen
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.theme.SproutTheme
@@ -844,5 +853,28 @@ class ScreenshotTest {
         show { HomeScreen(onNavigate = {}, onQuickFeed = {}) }
         scrollTo("Share a record")
         save("04-home-2-one-baby")
+
+        // The guided tour's first step over that same dashboard (BDR-27). The
+        // shell draws it, and this run never launches the shell, so it is put
+        // together here the way MainScaffold does it: the dashboard reporting
+        // to the targets, and the overlay on top of it.
+        val tourTargets = TourTargets()
+        show {
+            Box(Modifier.fillMaxSize()) {
+                CompositionLocalProvider(LocalTourTargets provides tourTargets) {
+                    HomeScreen(onNavigate = {}, onQuickFeed = {})
+                }
+                TourOverlay(
+                    step = TourStep.LOG_TILES,
+                    position = 1,
+                    count = tourSteps(1).size,
+                    isLast = false,
+                    target = tourTargets[TourStep.LOG_TILES],
+                    onNext = {},
+                    onSkip = {},
+                )
+            }
+        }
+        save("04-home-3-tour")
     }
 }
