@@ -623,6 +623,8 @@
     <string name="cd_whats_new_dismiss">Nascondi le novità</string>
     <string name="whats_new_1_title">Svezzamento</string>
     <string name="whats_new_1_body">Un pasto solido ora può dire cosa conteneva, e la pagina Svezzamento raccoglie ogni alimento che il tuo bambino ha conosciuto: quante volte, la prima e l\'ultima. Anche le allergie note hanno un posto tutto loro.</string>
+    <string name="whats_new_2_title">Una poppata nella schermata di blocco, e altro</string>
+    <string name="whats_new_2_body">La poppata che stai cronometrando ora può apparire nelle notifiche — su iPhone, nella schermata di blocco — con «Pausa», «Cambia lato» e «Ferma &amp; salva»: attivala nelle Impostazioni. I gemelli possono avere ciascuno una poppata in corso nello stesso momento. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine, e un ? in alto in ogni pagina la spiega.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Aiuto</string>
     <string name="help_section_purpose">A cosa serve questa pagina</string>

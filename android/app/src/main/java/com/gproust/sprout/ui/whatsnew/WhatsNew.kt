@@ -48,6 +48,9 @@ data class AnnouncementContent(
  */
 fun announcementContent(id: Int): AnnouncementContent? = when (id) {
     1 -> AnnouncementContent(R.string.whats_new_1_title, R.string.whats_new_1_body, Routes.FOODS)
+    // Settings, where both things it names live: the running feed outside
+    // the app, and Customise home.
+    2 -> AnnouncementContent(R.string.whats_new_2_title, R.string.whats_new_2_body, Routes.SETTINGS)
     else -> null
 }
 

@@ -20,6 +20,14 @@ func announcementContent(_ id: Int) -> AnnouncementContent? {
             body: Str.t("whats_new_1_body"),
             destination: .foods
         )
+    case 2:
+        // Settings, where both things it names live: the running feed outside
+        // the app, and Customise home.
+        return AnnouncementContent(
+            title: Str.t("whats_new_2_title"),
+            body: Str.t("whats_new_2_body"),
+            destination: .settings
+        )
     default:
         return nil
     }

@@ -623,6 +623,8 @@
     <string name="cd_whats_new_dismiss">Neuigkeiten ausblenden</string>
     <string name="whats_new_1_title">Beikost</string>
     <string name="whats_new_1_body">Eine Breimahlzeit kann jetzt festhalten, was darin war, und die Seite Beikost zeigt jedes Lebensmittel, das dein Baby kennengelernt hat: wie oft, das erste und das letzte Mal. Bekannte Allergien haben auch einen eigenen Platz.</string>
+    <string name="whats_new_2_title">Stillen auf dem Sperrbildschirm und mehr</string>
+    <string name="whats_new_2_body">Eine laufende Stillmahlzeit kann jetzt in den Benachrichtigungen erscheinen – auf dem iPhone auf dem Sperrbildschirm – mit „Pause“, „Seite wechseln“ und „Stoppen &amp; speichern“: schalte es in den Einstellungen ein. Zwillinge können jeweils gleichzeitig eine laufende Mahlzeit haben. „Start anpassen“ wählt, welche Protokolle das Dashboard zeigt und in welcher Reihenfolge, und ein ? oben auf jeder Seite erklärt sie.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Hilfe</string>
     <string name="help_section_purpose">Wofür diese Seite da ist</string>

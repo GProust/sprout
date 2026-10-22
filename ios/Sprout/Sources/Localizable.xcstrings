@@ -41997,6 +41997,98 @@
         }
       }
     },
+    "whats_new_2_body": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine laufende Stillmahlzeit kann jetzt in den Benachrichtigungen erscheinen – auf dem iPhone auf dem Sperrbildschirm – mit „Pause“, „Seite wechseln“ und „Stoppen & speichern“: schalte es in den Einstellungen ein. Zwillinge können jeweils gleichzeitig eine laufende Mahlzeit haben. „Start anpassen“ wählt, welche Protokolle das Dashboard zeigt und in welcher Reihenfolge, und ein ? oben auf jeder Seite erklärt sie."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A breastfeed you're timing can now show in the notifications — on iPhone, on the lock screen — with “Pause”, “Switch side” and “Stop & save”: turn it on in Settings. Twins can each have a feed running at the same time. “Customise home” chooses which logs the dashboard shows and in which order, and a ? at the top of every page explains it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La toma que estás cronometrando ya puede aparecer en las notificaciones —en iPhone, en la pantalla de bloqueo— con «Pausar», «Cambiar de lado» y «Parar y guardar»: actívalo en Ajustes. Los gemelos pueden tener cada uno una toma en curso a la vez. «Personalizar el inicio» elige qué registros muestra el panel y en qué orden, y un ? arriba en cada página la explica."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tétée que vous chronométrez peut maintenant s'afficher dans les notifications — sur iPhone, sur l'écran verrouillé — avec « Pause », « Changer de sein » et « Arrêter et enregistrer » : activez-la dans les Paramètres. Des jumeaux peuvent chacun avoir une tétée en cours en même temps. « Personnaliser l'accueil » choisit les journaux que le tableau de bord affiche et dans quel ordre, et un ? en haut de chaque page l'explique."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La poppata che stai cronometrando ora può apparire nelle notifiche — su iPhone, nella schermata di blocco — con «Pausa», «Cambia lato» e «Ferma & salva»: attivala nelle Impostazioni. I gemelli possono avere ciascuno una poppata in corso nello stesso momento. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine, e un ? in alto in ogni pagina la spiega."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mierzone karmienie piersią może teraz pojawiać się w powiadomieniach – na iPhonie na ekranie blokady – z przyciskami „Pauza”, „Zmień pierś” i „Zatrzymaj & zapisz”: włącz to w Ustawieniach. Bliźnięta mogą mieć jednocześnie po jednym trwającym karmieniu. „Dostosuj ekran startowy” wybiera, które dzienniki pokazuje pulpit i w jakiej kolejności, a ? u góry każdej strony ją objaśnia."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mamada que está a cronometrar já pode aparecer nas notificações — no iPhone, no ecrã de bloqueio — com «Pausar», «Trocar de lado» e «Parar & guardar»: ative-a nas Definições. Gémeos podem ter cada um uma mamada em curso ao mesmo tempo. «Personalizar o início» escolhe que registos o painel mostra e por que ordem, e um ? no topo de cada página explica-a."
+          }
+        }
+      }
+    },
+    "whats_new_2_title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stillen auf dem Sperrbildschirm und mehr"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A feed on the lock screen, and more"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una toma en la pantalla de bloqueo, y más"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une tétée sur l'écran verrouillé, et plus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una poppata nella schermata di blocco, e altro"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmienie na ekranie blokady i więcej"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma mamada no ecrã de bloqueio, e mais"
+          }
+        }
+      }
+    },
     "whats_new_label": {
       "localizations": {
         "de": {

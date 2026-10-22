@@ -9,7 +9,7 @@ import Foundation
 /// same text on both phones. Append, never renumber or reuse one: a phone
 /// remembers the newest id it has shown, and a reused number would read as
 /// already seen.
-public let announcementIds: [Int] = [1]
+public let announcementIds: [Int] = [1, 2]
 
 /// Which announcements the dashboard's card offers, newest first.
 ///

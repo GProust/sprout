@@ -10,7 +10,7 @@ package com.gproust.sprout.data
  * Append, never renumber or reuse one: a phone remembers the newest id it has
  * shown, and a reused number would read as already seen.
  */
-val ANNOUNCEMENT_IDS: List<Int> = listOf(1)
+val ANNOUNCEMENT_IDS: List<Int> = listOf(1, 2)
 
 /**
  * Which announcements the dashboard's card offers, newest first.
