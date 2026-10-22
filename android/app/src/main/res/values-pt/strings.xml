@@ -623,6 +623,8 @@
     <string name="cd_whats_new_dismiss">Ocultar novidades</string>
     <string name="whats_new_1_title">Diversificação</string>
     <string name="whats_new_1_body">Uma refeição sólida já pode dizer o que levava, e a página Diversificação reúne cada alimento que o seu bebé já conheceu: quantas vezes, a primeira e a última. As alergias conhecidas também têm um lugar próprio.</string>
+    <string name="whats_new_2_title">Uma mamada no ecrã de bloqueio, e mais</string>
+    <string name="whats_new_2_body">A mamada que está a cronometrar já pode aparecer nas notificações — no iPhone, no ecrã de bloqueio — com «Pausar», «Trocar de lado» e «Parar &amp; guardar»: ative-a nas Definições. Gémeos podem ter cada um uma mamada em curso ao mesmo tempo. «Personalizar o início» escolhe que registos o painel mostra e por que ordem, e um ? no topo de cada página explica-a.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Ajuda</string>
     <string name="help_section_purpose">Para que serve esta página</string>

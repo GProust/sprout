@@ -709,6 +709,8 @@
     <string name="cd_whats_new_dismiss">Dismiss what\'s new</string>
     <string name="whats_new_1_title">First foods</string>
     <string name="whats_new_1_body">A solid meal can now say what was in it, and the First foods page gathers every food your baby has met: how many times, the first time and the last. Known allergies have a place of their own too.</string>
+    <string name="whats_new_2_title">A feed on the lock screen, and more</string>
+    <string name="whats_new_2_body">A breastfeed you\'re timing can now show in the notifications — on iPhone, on the lock screen — with “Pause”, “Switch side” and “Stop &amp; save”: turn it on in Settings. Twins can each have a feed running at the same time. “Customise home” chooses which logs the dashboard shows and in which order, and a ? at the top of every page explains it.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Help</string>
     <string name="help_section_purpose">What this page is for</string>

@@ -644,6 +644,8 @@
     <string name="cd_whats_new_dismiss">Ukryj nowości</string>
     <string name="whats_new_1_title">Nowe pokarmy</string>
     <string name="whats_new_1_body">Posiłek stały może teraz mówić, co w nim było, a strona Nowe pokarmy zbiera każdy pokarm, który poznało Twoje dziecko: ile razy, pierwszy i ostatni raz. Znane alergie też mają swoje miejsce.</string>
+    <string name="whats_new_2_title">Karmienie na ekranie blokady i więcej</string>
+    <string name="whats_new_2_body">Mierzone karmienie piersią może teraz pojawiać się w powiadomieniach – na iPhonie na ekranie blokady – z przyciskami „Pauza”, „Zmień pierś” i „Zatrzymaj &amp; zapisz”: włącz to w Ustawieniach. Bliźnięta mogą mieć jednocześnie po jednym trwającym karmieniu. „Dostosuj ekran startowy” wybiera, które dzienniki pokazuje pulpit i w jakiej kolejności, a ? u góry każdej strony ją objaśnia.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Pomoc</string>
     <string name="help_section_purpose">Do czego służy ta strona</string>

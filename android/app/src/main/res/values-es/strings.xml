@@ -623,6 +623,8 @@
     <string name="cd_whats_new_dismiss">Ocultar novedades</string>
     <string name="whats_new_1_title">Alimentos</string>
     <string name="whats_new_1_body">Una comida sólida ya puede decir qué llevaba, y la página Alimentos reúne cada alimento que tu bebé ha probado: cuántas veces, la primera y la última. Las alergias conocidas también tienen su propio lugar.</string>
+    <string name="whats_new_2_title">Una toma en la pantalla de bloqueo, y más</string>
+    <string name="whats_new_2_body">La toma que estás cronometrando ya puede aparecer en las notificaciones —en iPhone, en la pantalla de bloqueo— con «Pausar», «Cambiar de lado» y «Parar y guardar»: actívalo en Ajustes. Los gemelos pueden tener cada uno una toma en curso a la vez. «Personalizar el inicio» elige qué registros muestra el panel y en qué orden, y un ? arriba en cada página la explica.</string>
     <!-- Help on every page, opened only from its ? (BDR-26). About the app, never about the baby: each page's own rules apply to its help, and both apps show the same list (ui/help/HelpPages.kt). -->
     <string name="cd_help">Ayuda</string>
     <string name="help_section_purpose">Para qué sirve esta página</string>
