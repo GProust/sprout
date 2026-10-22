@@ -3,7 +3,7 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
-## [Unreleased]
+## [1.15.0] — 2026-10-22
 
 - 👶👶 **Twins can feed together.** Each baby can now have a breastfeed running
   at the same time — one at each breast is timed as two feeds, side by side.
