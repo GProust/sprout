@@ -67,7 +67,7 @@ struct HelpSheet: View {
 
 /// A page's **?** and the sheet behind it, held together so a screen gains
 /// help with one line.
-private struct HelpModifier: ViewModifier {
+struct HelpModifier: ViewModifier {
     let page: HelpPage
 
     @State private var showing = false

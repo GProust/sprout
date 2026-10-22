@@ -15352,7 +15352,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "I bambini di cui Sprout tiene il registro, che sia uno, due gemelli o fratelli."
+            "value": "I bambini di cui Sprout tiene il registro: uno solo, gemelli o fratelli."
           }
         },
         "pl": {
@@ -15726,13 +15726,13 @@
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "„Zacznij od lewej” albo „Zacznij od prawej” otwiera stoper. Zmieniaj stronę w trakcie, dotknij „Pauza” na odbicie albo zmianę pieluchy, a potem „Wznów lewą” albo „Wznów prawą”, zależnie od tego, która pierś jest następna. Dotknij „Zatrzymaj & zapisz”, gdy karmienie się skończy.\n\nDotknij +, aby zapisać karmienie po fakcie, butelkę albo posiłek. „Szczegóły” przy karmieniu piersią pokazują każdy odcinek z godzinami."
+            "value": "„Zacznij od lewej” albo „Zacznij od prawej” otwiera stoper. Zmieniaj stronę w trakcie, dotknij „Pauza” na odbijanie albo zmianę pieluchy, a potem „Wznów lewą” albo „Wznów prawą”, zależnie od tego, która pierś jest następna. Dotknij „Zatrzymaj & zapisz”, gdy karmienie się skończy.\n\nDotknij +, aby zapisać karmienie po fakcie, butelkę albo posiłek. „Szczegóły” przy karmieniu piersią pokazują każdy odcinek z godzinami."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "«Começar à esquerda» ou «Começar à direita» abre o cronómetro. Mude de lado pelo caminho, toque em «Pausar» para arrotar ou mudar a fralda e depois em «Retomar à esquerda» ou «Retomar à direita», conforme a mama que vem a seguir. Toque em «Parar & guardar» quando a mamada terminar.\n\nToque em + para registar uma refeição depois de acontecer, um biberão ou uma refeição sólida. «Detalhes», numa mamada, mostra cada período com as suas horas."
+            "value": "«Começar à esquerda» ou «Começar à direita» abre o cronómetro. Mude de lado pelo caminho, toque em «Pausar» para o arroto ou para mudar a fralda e depois em «Retomar à esquerda» ou «Retomar à direita», conforme a mama que vem a seguir. Toque em «Parar & guardar» quando a mamada terminar.\n\nToque em + para registar uma refeição depois de acontecer, um biberão ou uma refeição sólida. «Detalhes», numa mamada, mostra cada período com as suas horas."
           }
         }
       }
@@ -15788,7 +15788,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auch nur Probieren zählt als Angebot. Es gibt kein Ziel, keine Reihenfolge und keine Bewertung: Die Zahlen zeigen nur, was eingetragen wurde. Sprouts Liste enthält nur Namen, kein Alter und kein Lebensmittel, das als Allergen markiert ist.\n\nSprout schlägt nie eine Allergie vor und hindert dich nie daran, ein Lebensmittel einzutragen: Eines, das du notiert hast, zeigt „Allergie eingetragen“, mehr nicht. Wenn du glaubst, dass dein Baby auf etwas reagiert hat, frag eine Ärztin oder einen Arzt."
+            "value": "Auch nur Probieren zählt als einmal angeboten. Es gibt kein Ziel, keine Reihenfolge und keine Bewertung: Die Zahlen zeigen nur, was eingetragen wurde. Sprouts Liste enthält nur Namen, kein Alter und kein Lebensmittel, das als Allergen markiert ist.\n\nSprout schlägt nie eine Allergie vor und hindert dich nie daran, ein Lebensmittel einzutragen: Eines, das du notiert hast, zeigt „Allergie eingetragen“, mehr nicht. Wenn du glaubst, dass dein Baby auf etwas reagiert hat, frag eine Ärztin oder einen Arzt."
           }
         },
         "en": {
@@ -15800,13 +15800,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una probada cuenta como una vez ofrecido. No hay objetivo, ni orden que seguir, ni nota: los recuentos solo dicen lo que se anotó. La lista de Sprout son solo nombres, sin edades y sin ningún alimento marcado como alérgeno.\n\nSprout nunca sugiere una alergia y nunca te impide anotar un alimento: el que hayas anotado muestra «Alergia anotada», nada más. Si crees que tu bebé ha reaccionado a algo, consulta a un médico."
+            "value": "Un alimento que solo se probó ya cuenta como ofrecido una vez. No hay objetivo, ni orden que seguir, ni nota: los recuentos solo dicen lo que se anotó. La lista de Sprout son solo nombres, sin edades y sin ningún alimento marcado como alérgeno.\n\nSprout nunca sugiere una alergia y nunca te impide anotar un alimento: el que hayas anotado muestra «Alergia anotada», nada más. Si crees que tu bebé ha reaccionado a algo, consulta a un médico."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un simple goût compte comme une fois proposé. Il n'y a ni objectif, ni ordre à suivre, ni note : les compteurs ne disent que ce qui a été noté. La liste de Sprout n'est que des noms, sans âges et sans aucun aliment marqué comme allergène.\n\nSprout ne suggère jamais d'allergie et ne vous empêche jamais de noter un aliment : celui que vous avez signalé affiche « Allergie notée », rien de plus. Si vous pensez que votre bébé a réagi à quelque chose, demandez à un médecin."
+            "value": "Un simple goût compte déjà comme une fois où l'aliment a été proposé. Il n'y a ni objectif, ni ordre à suivre, ni note : les compteurs ne disent que ce qui a été noté. La liste de Sprout n'est que des noms, sans âges et sans aucun aliment marqué comme allergène.\n\nSprout ne suggère jamais d'allergie et ne vous empêche jamais de noter un aliment : celui que vous avez signalé affiche « Allergie notée », rien de plus. Si vous pensez que votre bébé a réagi à quelque chose, demandez à un médecin."
           }
         },
         "it": {
