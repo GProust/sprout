@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Uno scatto di crescita è frequente %1$s: potrebbe iniziare nei prossimi giorni.</string>
     <string name="settings_growth_spurts">Avvisi scatti di crescita</string>
     <string name="settings_growth_spurts_desc">Avvisami quando inizia un tipico periodo di scatto di crescita.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La poppata in corso nelle notifiche</string>
+    <string name="settings_nursing_notification_desc">Mentre una poppata è cronometrata, mostrarla nelle notifiche con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Il nome del tuo bambino non compare nella schermata di blocco, a meno che il telefono non vi mostri tutto il contenuto delle notifiche.</string>
+    <string name="settings_live_activity">La poppata in corso nella schermata di blocco</string>
+    <string name="settings_live_activity_desc">Mentre una poppata è cronometrata, mostrarla nella schermata di blocco e nella Dynamic Island con Pausa, Cambia lato e Ferma &amp; salva, senza dover sbloccare il telefono. Non mostra mai il nome del tuo bambino.</string>
+    <string name="nursing_channel_name">Poppata in corso</string>
+    <string name="nursing_channel_desc">Una poppata mentre è cronometrata, con i pulsanti per metterla in pausa, cambiare lato e salvarla</string>
+    <string name="nursing_switch_side">Cambia lato</string>
+    <string name="nursing_notif_on_break">In pausa · %1$s al seno</string>
+    <string name="nursing_notif_feed_number">Poppata %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avvisi scatti di crescita</string>
     <string name="growth_spurt_channel_desc">Un avviso quando inizia un tipico periodo di scatto di crescita</string>
     <string name="growth_spurt_notif_title">Potrebbe iniziare uno scatto di crescita</string>

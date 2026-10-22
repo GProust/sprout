@@ -25,6 +25,13 @@ settings:
     # should ever need an exception. Left at the default deny.
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     SWIFT_STRICT_CONCURRENCY: complete
+    # What App Store Connect shows as the version, and what the listing's
+    # Version field has to match. The iOS app keeps its own numbering: it is
+    # a first release, not Android's 1.13. Here rather than on the app target
+    # because the Live Activity extension is shipped inside the app and has to
+    # carry the same version and build, or App Store Connect refuses the upload.
+    MARKETING_VERSION: '1.0'
+    CURRENT_PROJECT_VERSION: '1'
 
 packages:
   SproutKit:
@@ -36,11 +43,16 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      # What the app and its Live Activity both need to agree on: the
+      # activity's shape, and the intent its buttons run (ADR-0020).
+      - path: Shared
     dependencies:
       - package: SproutKit
         product: SproutKit
       - package: SproutKit
         product: SproutData
+      # The one extension, embedded in the app (ADR-0020).
+      - target: SproutLiveActivity
     # Generated rather than hand-written. A plist assembled by hand is missing
     # CFBundleIdentifier and CFBundleExecutable until the day something tries to
     # *launch* the app — it builds perfectly without them — and the failure then
@@ -89,6 +101,10 @@ targets:
         # of a locked export (BDR-13) — which Apple treats as exempt. A cipher
         # of our own, or a crypto library, would make this answer wrong.
         ITSAppUsesNonExemptEncryption: false
+        # A running breastfeed on the lock screen and in the Dynamic Island
+        # (BDR-24, ADR-0020). Updated by the app alone — there is no push, and
+        # `aps-environment` stays refused.
+        NSSupportsLiveActivities: true
         # Deliberately absent, and the absence is the point (ADR-0014): no
         # NSAppTransportSecurity, no URL scheme, no networking usage string,
         # because there is no networking. That is the iOS equivalent of Android's
@@ -101,11 +117,6 @@ targets:
         # ios/tools/make_app_icon.py — one product, one icon, and CI checks the
         # committed PNG is still what that vector produces.
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        # What App Store Connect shows as the version, and what the listing's
-        # Version field has to match. The iOS app keeps its own numbering: it is
-        # a first release, not Android's 1.13.
-        MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '1'
         # iPhone only. Nothing here has been laid out or looked at on an iPad,
         # and declaring one brings two obligations with it: a set of iPad
         # screenshots for the listing, and — because the app is portrait-only —
@@ -130,6 +141,41 @@ targets:
           CODE_SIGN_IDENTITY: Apple Distribution
           DEVELOPMENT_TEAM: $(SPROUT_TEAM_ID)
           PROVISIONING_PROFILE_SPECIFIER: $(SPROUT_PROVISIONING_PROFILE)
+
+  # The Live Activity (BDR-24, ADR-0020) — the first extension, and the only
+  # one. It draws a running breastfeed and nothing else: no database, no
+  # session store, no entitlements, no network. Its buttons are intents the
+  # system runs in the app's own process. check_attack_surface.py pins it like
+  # the app, and check_no_network.py scans its sources like the app's.
+  SproutLiveActivity:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: LiveActivity
+      - path: Shared
+    info:
+      path: LiveActivity/Info.plist
+      properties:
+        CFBundleDisplayName: Sprout
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gproust.sprout.LiveActivity
+        TARGETED_DEVICE_FAMILY: '1'
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        # Signed like the app, with an App Store profile of its own: every
+        # bundle inside the upload is signed for its own identifier. The
+        # release workflow reads the profile's UUID from its own secret and
+        # passes it in here, as it does the app's (docs/RELEASING.md §9).
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          DEVELOPMENT_TEAM: $(SPROUT_TEAM_ID)
+          PROVISIONING_PROFILE_SPECIFIER: $(SPROUT_LIVE_ACTIVITY_PROFILE)
 
   SproutUITests:
     type: bundle.ui-testing

@@ -507,6 +507,16 @@
     <string name="growth_spurt_soon_body">A growth spurt is common %1$s — it may start in the next few days.</string>
     <string name="settings_growth_spurts">Growth spurt alerts</string>
     <string name="settings_growth_spurts_desc">Give me a heads-up when a typical growth spurt period begins.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">A running feed in the notifications</string>
+    <string name="settings_nursing_notification_desc">While a breastfeed is being timed, show it in the notifications with Pause, Switch side and Stop &amp; save, so you don\'t have to unlock the phone. Your baby\'s name stays off the lock screen unless your phone shows all notification content.</string>
+    <string name="settings_live_activity">A running feed on the lock screen</string>
+    <string name="settings_live_activity_desc">While a breastfeed is being timed, show it on the lock screen and in the Dynamic Island with Pause, Switch side and Stop &amp; save, so you don\'t have to unlock the phone. It never shows your baby\'s name.</string>
+    <string name="nursing_channel_name">Running breastfeed</string>
+    <string name="nursing_channel_desc">A breastfeed while it is being timed, with buttons to pause it, switch side and save it</string>
+    <string name="nursing_switch_side">Switch side</string>
+    <string name="nursing_notif_on_break">On a break · %1$s at the breast</string>
+    <string name="nursing_notif_feed_number">Feed %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Growth spurt alerts</string>
     <string name="growth_spurt_channel_desc">A heads-up when a typical growth spurt period begins</string>
     <string name="growth_spurt_notif_title">A growth spurt may be starting</string>

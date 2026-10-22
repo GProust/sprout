@@ -65,7 +65,7 @@ final class NursingSessionStore {
 
     /// Bank `babyUid`'s current breast as a completed stretch and switch to the other.
     func switchBreast(for babyUid: String?, at now: Int64) {
-        change(babyUid) { $0.switched(at: now) }
+        apply(.SWITCH, for: babyUid, at: now)
     }
 
     /// Bank the breast `babyUid` is nursing at and start a break — the burp
@@ -73,12 +73,20 @@ final class NursingSessionStore {
     /// keeps its start time; only the clock at the breast stops (BDR-17).
     /// Another baby's feed carries on.
     func pause(for babyUid: String?, at now: Int64) {
-        change(babyUid) { $0.paused(at: now) }
+        apply(.PAUSE, for: babyUid, at: now)
     }
 
     /// Come back from a break, on whichever breast `babyUid`'s feed carries on with.
     func resume(for babyUid: String?, on side: BreastSide, at now: Int64) {
-        change(babyUid) { $0.resumed(on: side, at: now) }
+        apply(side == .RIGHT ? .RESUME_RIGHT : .RESUME_LEFT, for: babyUid, at: now)
+    }
+
+    /// `control` on `babyUid`'s running feed and nothing else — from the timer
+    /// screen or from a Live Activity's button, which is the point: both are the
+    /// same act (BDR-24). One that no longer fits the feed changes nothing.
+    /// `.STOP` is ``consume(_:)``, not this.
+    func apply(_ control: NursingControl, for babyUid: String?, at now: Int64) {
+        change(babyUid) { $0.after(control, at: now) }
     }
 
     /// Takes `babyUid`'s session and clears it, in one step. Every other baby's
@@ -115,6 +123,9 @@ final class NursingSessionStore {
         } else {
             defaults.set(value.map(Self.encode), forKey: key)
         }
+        // Whatever changed it — the timer, the dashboard, a Live Activity's own
+        // button — the Live Activities follow (BDR-24).
+        NursingLiveActivities.sync(value)
     }
 
     private static func encode(_ value: NursingSession) -> [String: Any] {

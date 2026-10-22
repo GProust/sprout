@@ -31,6 +31,7 @@ struct SettingsScreen: View {
     @State private var feedingReminders = false
     @State private var feedingInterval = FeedingReminderSettings.defaultIntervalMinutes
     @State private var growthSpurtAlerts = false
+    @State private var runningFeedOutside = false
     /// Shown when iOS has been asked and said no. There is nothing to do about
     /// it from here — only Settings can change it — so the switch goes back off
     /// rather than sitting on while nothing arrives.
@@ -59,6 +60,7 @@ struct SettingsScreen: View {
             feedingReminders = FeedingReminderSettings.isEnabled(sprout.settingsStore)
             feedingInterval = FeedingReminderSettings.intervalMinutes(sprout.settingsStore)
             growthSpurtAlerts = GrowthSpurtSettings.isEnabled(sprout.settingsStore)
+            runningFeedOutside = NursingNotificationSettings.isEnabled(sprout.settingsStore)
         }
         .task {
             await observe(sprout.repository.parentProfile) { profile = $0 }
@@ -185,6 +187,20 @@ struct SettingsScreen: View {
                 }
             }
 
+            // A Live Activity rather than a notification (ADR-0020), so there
+            // is no notification permission to ask for: iOS's own switch for
+            // Live Activities is the parent's, in iOS Settings.
+            Toggle(isOn: Binding(
+                get: { runningFeedOutside },
+                set: { setRunningFeedOutside($0) }
+            )) {
+                settingLabel(
+                    Str.t("settings_live_activity"),
+                    Str.t("settings_live_activity_desc")
+                )
+            }
+            .accessibilityIdentifier("settings-running-feed")
+
             Toggle(isOn: Binding(
                 get: { growthSpurtAlerts },
                 set: { setGrowthSpurtAlerts($0) }
@@ -225,6 +241,14 @@ struct SettingsScreen: View {
     private func setGrowthSpurtAlerts(_ on: Bool) {
         growthSpurtAlerts = on
         Task { await apply(on) { GrowthSpurtSettings.setEnabled($0, in: sprout.settingsStore) } }
+    }
+
+    /// A running breastfeed on the lock screen (BDR-24): shown or taken away at
+    /// once, so a feed already running follows the switch.
+    private func setRunningFeedOutside(_ on: Bool) {
+        runningFeedOutside = on
+        NursingNotificationSettings.setEnabled(on, in: sprout.settingsStore)
+        NursingLiveActivities.sync(NursingSessionStore.shared.sessions)
     }
 
     private func setFeedingInterval(_ minutes: Int) {

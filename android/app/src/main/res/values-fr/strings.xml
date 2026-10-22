@@ -480,6 +480,16 @@
     <string name="growth_spurt_soon_body">Un pic de croissance est fréquent %1$s — il peut commencer dans les prochains jours.</string>
     <string name="settings_growth_spurts">Alertes pics de croissance</string>
     <string name="settings_growth_spurts_desc">Me prévenir quand une période typique de pic de croissance commence.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La tétée en cours dans les notifications</string>
+    <string name="settings_nursing_notification_desc">Pendant qu\'une tétée est chronométrée, l\'afficher dans les notifications avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n\'apparaît pas sur l\'écran verrouillé, sauf si votre téléphone y affiche tout le contenu des notifications.</string>
+    <string name="settings_live_activity">La tétée en cours sur l\'écran verrouillé</string>
+    <string name="settings_live_activity_desc">Pendant qu\'une tétée est chronométrée, l\'afficher sur l\'écran verrouillé et dans la Dynamic Island avec Pause, Changer de sein et Arrêter et enregistrer, sans avoir à déverrouiller le téléphone. Le prénom de votre bébé n\'y apparaît jamais.</string>
+    <string name="nursing_channel_name">Tétée en cours</string>
+    <string name="nursing_channel_desc">Une tétée pendant qu\'elle est chronométrée, avec des boutons pour la mettre en pause, changer de sein et l\'enregistrer</string>
+    <string name="nursing_switch_side">Changer de sein</string>
+    <string name="nursing_notif_on_break">En pause · %1$s au sein</string>
+    <string name="nursing_notif_feed_number">Tétée %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Alertes pics de croissance</string>
     <string name="growth_spurt_channel_desc">Un petit signe quand une période typique de pic de croissance commence</string>
     <string name="growth_spurt_notif_title">Un pic de croissance commence peut-être</string>

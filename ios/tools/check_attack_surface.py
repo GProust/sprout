@@ -19,6 +19,12 @@ own manifest and the whole merged build:
   uploads — it also reads the entitlements the signature carries, which come
   from the provisioning profile as much as from `Sprout.entitlements`.
 
+Both layers check the app's extensions too (ADR-0020). An extension is code that
+ships inside the app and runs in a process of its own, so an unpinned one would
+be a way in the app's own pins never look at: which extensions exist is pinned,
+and each one's Info.plist, linked libraries and entitlements are held to the
+same refusals as the app's.
+
 The two are separate modes rather than one cumulative run, and deliberately: the
 built layer needs nothing but the standard library, because the macOS runners
 refuse `pip install` (PEP 668) and a check that cannot run is not a check.
@@ -51,9 +57,27 @@ INFO_PLIST_KEYS = {
     # pinned so that changing it is as visible as adding one.
     "ITSAppUsesNonExemptEncryption",
     "NSBluetoothAlwaysUsageDescription",
+    # A running breastfeed on the lock screen (BDR-24, ADR-0020). Updated by the
+    # app alone: no push, and `aps-environment` stays refused below.
+    "NSSupportsLiveActivities",
     "UILaunchScreen",
     "UISupportedInterfaceOrientations",
     "UTExportedTypeDeclarations",
+}
+
+# The app's extensions — the whole list, by target name, with the one extension
+# point each may plug into. A second extension is a door like any other: a line
+# here, in the same commit, and a decision record (ADR-0020).
+EXTENSIONS = {
+    "SproutLiveActivity": "com.apple.widgetkit-extension",
+}
+
+# Every key an extension declares, and no others.
+EXTENSION_INFO_PLIST_KEYS = {
+    "CFBundleDisplayName",
+    "CFBundleShortVersionString",
+    "CFBundleVersion",
+    "NSExtension",
 }
 
 # Keys Xcode adds to the built plist on its own. Not decisions of ours, so the
@@ -199,6 +223,46 @@ def check_info(properties: dict, where: str, fail: Failures, pin: bool) -> None:
             fail.add(f"{where} takes a document role other than Viewer")
 
 
+def check_extension_info(properties: dict, name: str, where: str, fail: Failures) -> None:
+    """One extension's Info.plist: the pinned keys, the refusals, and the one
+    extension point it is allowed to plug into."""
+    declared = set(properties)
+    for extra in sorted(declared - EXTENSION_INFO_PLIST_KEYS):
+        fail.add(f"{where} declares {extra}, which is not in the pinned list")
+    for missing in sorted(EXTENSION_INFO_PLIST_KEYS - declared):
+        fail.add(f"{where} no longer declares {missing} — pin it or drop it from the list")
+
+    nested: set = set()
+    walk_keys(properties, nested)
+    for key, why in FORBIDDEN_INFO_KEYS.items():
+        if key in nested:
+            fail.add(f"{where} declares {key} — {why}")
+
+    point = properties.get("NSExtension", {}).get("NSExtensionPointIdentifier")
+    if point != EXTENSIONS.get(name):
+        fail.add(f"{where} plugs into {point}, expected {EXTENSIONS.get(name)}")
+
+
+def check_extensions_source(project: dict, fail: Failures) -> None:
+    targets = project["targets"]
+    declared = {name for name, target in targets.items() if target.get("type") == "app-extension"}
+    for extra in sorted(declared - set(EXTENSIONS)):
+        fail.add(f"project.yml declares the extension {extra}, which is not in the pinned list")
+    for missing in sorted(set(EXTENSIONS) - declared):
+        fail.add(f"project.yml no longer declares the extension {missing} — pin it or drop it from the list")
+
+    for name in sorted(declared & set(EXTENSIONS)):
+        target = targets[name]
+        properties = target.get("info", {}).get("properties", {})
+        check_extension_info(properties, name, f"project.yml's {name}", fail)
+        # An extension holds no entitlements at all: everything it does, it
+        # does through the app (ADR-0020).
+        settings = target.get("settings", {})
+        layers = [settings.get("base", {})] + list(settings.get("configs", {}).values())
+        if any("CODE_SIGN_ENTITLEMENTS" in (layer or {}) for layer in layers):
+            fail.add(f"project.yml gives {name} entitlements; an extension holds none (ADR-0020)")
+
+
 def check_entitlements(fail: Failures) -> None:
     with ENTITLEMENTS.open("rb") as handle:
         entitlements = plistlib.load(handle)
@@ -210,6 +274,7 @@ def check_entitlements(fail: Failures) -> None:
 
 
 def check_linked_frameworks(app: pathlib.Path, fail: Failures) -> None:
+    # An app's binary and an extension's are both named after their bundle.
     binary = app / app.stem
     if not binary.is_file():
         fail.add(f"no binary at {binary}")
@@ -249,11 +314,12 @@ def check_signed_entitlements(app: pathlib.Path, fail: Failures) -> None:
     if entitlements.get("keychain-access-groups") == [entitlements.get("application-identifier")]:
         del entitlements["keychain-access-groups"]
 
+    what = f"the signed {app.name}"
     for key in sorted(set(entitlements) - ALLOWED_ENTITLEMENTS - SIGNING_ADDED_ENTITLEMENTS):
-        fail.add(f"the signed app holds {key}, which neither Sprout.entitlements allows nor signing adds")
+        fail.add(f"{what} holds {key}, which neither Sprout.entitlements allows nor signing adds")
     for key, why in FORBIDDEN_ENTITLEMENTS.items():
         if key in entitlements:
-            fail.add(f"the signed app holds {key} — {why}")
+            fail.add(f"{what} holds {key} — {why}")
 
 
 def check_source(fail: Failures) -> None:
@@ -262,6 +328,7 @@ def check_source(fail: Failures) -> None:
 
     project = yaml.safe_load(PROJECT.read_text())
     check_info(project["targets"]["Sprout"]["info"]["properties"], "project.yml", fail, pin=True)
+    check_extensions_source(project, fail)
     check_entitlements(fail)
 
 
@@ -277,6 +344,32 @@ def check_built(app: pathlib.Path, fail: Failures) -> None:
         check_info(ours, "the built Info.plist", fail, pin=True)
     check_linked_frameworks(app, fail)
     check_signed_entitlements(app, fail)
+    check_extensions_built(app, fail)
+
+
+def check_extensions_built(app: pathlib.Path, fail: Failures) -> None:
+    """What actually shipped inside the app's PlugIns folder, held to the pins."""
+    plugins = app / "PlugIns"
+    built = sorted(p for p in plugins.glob("*.appex")) if plugins.is_dir() else []
+    names = {p.stem for p in built}
+    for extra in sorted(names - set(EXTENSIONS)):
+        fail.add(f"the built app carries the extension {extra}, which is not in the pinned list")
+    for missing in sorted(set(EXTENSIONS) - names):
+        fail.add(f"the built app no longer carries the extension {missing}")
+
+    for appex in built:
+        if appex.stem not in EXTENSIONS:
+            continue
+        plist = appex / "Info.plist"
+        if not plist.is_file():
+            fail.add(f"no Info.plist at {plist}")
+            continue
+        with plist.open("rb") as handle:
+            info = plistlib.load(handle)
+        ours = {k: v for k, v in info.items() if k not in BUILD_ADDED_KEYS}
+        check_extension_info(ours, appex.stem, f"the built {appex.name}", fail)
+        check_linked_frameworks(appex, fail)
+        check_signed_entitlements(appex, fail)
 
 
 def main() -> int:

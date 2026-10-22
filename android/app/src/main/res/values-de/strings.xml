@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Ein Wachstumsschub ist %1$s häufig — er kann in den nächsten Tagen beginnen.</string>
     <string name="settings_growth_spurts">Wachstumsschub-Hinweise</string>
     <string name="settings_growth_spurts_desc">Sag mir Bescheid, wenn eine typische Wachstumsschub-Phase beginnt.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">Laufende Stillmahlzeit in den Benachrichtigungen</string>
+    <string name="settings_nursing_notification_desc">Während eine Stillmahlzeit gestoppt wird, sie in den Benachrichtigungen zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint nicht auf dem Sperrbildschirm, außer dein Handy zeigt dort alle Benachrichtigungsinhalte.</string>
+    <string name="settings_live_activity">Laufende Stillmahlzeit auf dem Sperrbildschirm</string>
+    <string name="settings_live_activity_desc">Während eine Stillmahlzeit gestoppt wird, sie auf dem Sperrbildschirm und in der Dynamic Island zeigen – mit Pause, Seite wechseln und Stoppen &amp; speichern, ohne das Handy zu entsperren. Der Name deines Babys erscheint dort nie.</string>
+    <string name="nursing_channel_name">Laufende Stillmahlzeit</string>
+    <string name="nursing_channel_desc">Eine Stillmahlzeit, während sie gestoppt wird, mit Tasten zum Pausieren, Seitenwechseln und Speichern</string>
+    <string name="nursing_switch_side">Seite wechseln</string>
+    <string name="nursing_notif_on_break">Pausiert · %1$s an der Brust</string>
+    <string name="nursing_notif_feed_number">Stillmahlzeit %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Wachstumsschub-Hinweise</string>
     <string name="growth_spurt_channel_desc">Ein Hinweis, wenn eine typische Wachstumsschub-Phase beginnt</string>
     <string name="growth_spurt_notif_title">Vielleicht beginnt gerade ein Wachstumsschub</string>
