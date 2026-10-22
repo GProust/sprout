@@ -677,8 +677,23 @@
     <string name="help_report_how">Escolha o período, cujas datas exatas aparecem antes de qualquer ficheiro ser criado, e o que incluir. Depois toque em «Relatório PDF» ou «Folha de cálculo» e escolha para onde enviar. «Proteger com uma palavra-passe» põe os dois ficheiros num único zip cifrado.</string>
     <string name="help_report_good_to_know">O documento diz o que foi registado e não interpreta nada. A referência da OMS que escolher vale só para este ficheiro e é esquecida quando sair; por omissão usam-se as duas, apresentadas como intervalo. As notas ficam de fora, a não ser que as inclua, e a extração e o seu bem-estar nunca lá aparecem.\n\nOs ficheiros são criados neste telemóvel e não vão para lado nenhum até os enviar. O Sprout não guarda nenhuma cópia da palavra-passe: dê-a pessoalmente ou por telefone, não junto com o ficheiro.</string>
     <string name="help_settings_purpose">Como o Sprout funciona neste telemóvel: a língua, os lembretes, a verificação diária e a partilha com o seu agregado.</string>
-    <string name="help_settings_how">Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Também pode mostrar a mamada que está a cronometrar fora da app — nas notificações ou no ecrã de bloqueio — com os seus botões. «Personalizar o início» escolhe que registos o painel mostra e por que ordem. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis.</string>
+    <string name="help_settings_how">Escolha uma língua ou mantenha a do telemóvel. Ative «Lembretes de refeições» para um aviso quando já passou algum tempo desde a última refeição, e «Alertas de saltos de crescimento» quando começa um período típico de salto. Também pode mostrar a mamada que está a cronometrar fora da app — nas notificações ou no ecrã de bloqueio — com os seus botões. «Personalizar o início» escolhe que registos o painel mostra e por que ordem. Ative ou desative a verificação diária, ou qualquer uma das suas perguntas. Em «Partilha do agregado» associam-se os telemóveis. «Rever a visita» mostra de novo a breve visita ao painel.</string>
     <string name="help_settings_good_to_know">Os lembretes de refeições, os alertas de saltos de crescimento e a mamada em curso fora da app ficam desligados até os ativar, e a verificação nunca é uma notificação. Estas definições pertencem a este telemóvel e não são partilhadas. As ligações no fim abrem uma página de donativos no navegador; um donativo não desbloqueia nada, porque já está tudo aqui.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Saltar a visita</string>
+    <string name="tour_done">Concluído</string>
+    <string name="tour_step_count">%1$d de %2$d</string>
+    <string name="tour_step_1_title">Tudo o que regista</string>
+    <string name="tour_step_1_body">Mais abaixo, há um quadrado para cada coisa que pode registar: a alimentação, o sono, a fralda, o crescimento, os medicamentos, a diversificação e mais. Toque num para acrescentar um registo ou rever o que já lá está.</string>
+    <string name="tour_step_2_title">Começar uma mamada</string>
+    <string name="tour_step_2_body">Os botões por baixo do nome do bebé iniciam o cronómetro da mamada, do lado indicado. Enquanto a mamada decorre, fica no topo deste ecrã: toque em Abrir para mudar de lado, fazer uma pausa ou guardá-la.</string>
+    <string name="tour_step_3_title">Na parte de baixo</string>
+    <string name="tour_step_3_body">Mesmo em baixo, Início volta a este ecrã. Tendências mostra os dias e as semanas em números e gráficos. Eu reúne os seus próprios registos, como a extração. Com dois ou mais bebés, cada um tem também ali o seu separador, com todos os seus quadrados.</string>
+    <string name="tour_step_4_title">Definições e partilha</string>
+    <string name="tour_step_4_body">No canto superior direito, a roda dentada abre as Definições: o idioma, os lembretes e a Partilha do agregado, que mantém o telemóvel da outra mãe ou do outro pai a par deste — sem conta e sem nuvem. Esta visita também lá está, se a quiser rever.</string>
+    <string name="settings_tour">Orientar-se</string>
+    <string name="settings_tour_replay">Rever a visita</string>
+    <string name="settings_tour_replay_hint">Alguns cartões breves sobre onde está cada coisa no ecrã principal.</string>
     <string name="sleep_woke_up">Acordou</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">A extração, o seu bem-estar e a verificação diária.</string>

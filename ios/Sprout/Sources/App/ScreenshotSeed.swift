@@ -67,6 +67,11 @@ enum ScreenshotSeed {
             // captures show the dashboard as it is every other day (BDR-22).
             // The first-run capture needs nothing: onboarding marks it.
             WhatsNewSettings(store: environment.settingsStore).markAllSeen()
+            // Nor the tour, which is for a phone that has just been set up
+            // (BDR-27). A seeded profile with nothing stored already means no
+            // tour; spelled out so the captures do not lean on that. The
+            // first-run capture meets it on purpose, and skips it.
+            TourSettings(store: environment.settingsStore).set(.done)
         }
         return environment
     }

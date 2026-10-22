@@ -46,6 +46,17 @@ All notable changes to Sprout are documented here. This project follows
   goes to the other phones in your household and what never leaves yours. It
   only opens when you tap it, it's in your language, and it explains the app,
   never your baby.
+- 🧭 **A short tour, right after you set up.** When onboarding is done, a few
+  cards point out where things are: the tiles for logging a feed, a sleep or a
+  nappy, starting a breastfeed and where its timer then shows, the tabs along
+  the bottom, and Settings, where sharing with the other parent's phone lives.
+  *Skip tour* is on every card — so are Back and a tap outside — and once it's
+  finished or skipped it never comes back on its own; **Settings → Replay the
+  tour** shows it again whenever you like. It stays out of the way: it doesn't
+  start if you opened Sprout from the widget or a shared file, and it steps
+  aside the moment you tap something or start a feed. Each card says in words
+  where to look, so it works with TalkBack and VoiceOver too. If you already use
+  Sprout, nothing changes.
 
 ## [1.14.0] — 2026-10-20
 

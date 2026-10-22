@@ -763,8 +763,23 @@
     <string name="help_report_how">Pick the period, whose exact dates are shown before anything is made, and choose what to include. Then tap “PDF report” or “Spreadsheet” and pick where to send it. “Protect with a password” puts both files in one encrypted zip.</string>
     <string name="help_report_good_to_know">The document states what was logged and interprets nothing. The WHO reference you pick is for this file only and forgotten when you leave; by default both are used and shown as a span. Notes are left out unless you include them, and pumping and your wellbeing are never in it.\n\nThe files are made on this phone and go nowhere until you send them. Sprout keeps no copy of the password: give it in person or by phone, not with the file.</string>
     <string name="help_settings_purpose">How Sprout works on this phone: its language, reminders, the daily check-in, and sharing with your household.</string>
-    <string name="help_settings_how">Choose a language, or keep the phone\'s. Turn on “Feeding reminders” for a nudge when it\'s been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. You can also show a breastfeed you\'re timing outside the app — in the notifications or on the lock screen — with its buttons. “Customise home” chooses which logs the dashboard shows, and in which order. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired.</string>
+    <string name="help_settings_how">Choose a language, or keep the phone\'s. Turn on “Feeding reminders” for a nudge when it\'s been a while since a feed, and “Growth spurt alerts” for a heads-up when a typical growth spurt period begins. You can also show a breastfeed you\'re timing outside the app — in the notifications or on the lock screen — with its buttons. “Customise home” chooses which logs the dashboard shows, and in which order. Switch the daily check-in, or any of its questions, on or off. “Household sharing” is where phones are paired. “Replay the tour” shows the short tour of the dashboard again.</string>
     <string name="help_settings_good_to_know">Feeding reminders, growth spurt alerts and a running feed outside the app stay off until you turn them on, and the check-in is never a notification. These settings belong to this phone and aren\'t shared. The links at the bottom open a donation page in your browser; a donation unlocks nothing, because everything is already here.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Skip tour</string>
+    <string name="tour_done">Done</string>
+    <string name="tour_step_count">%1$d of %2$d</string>
+    <string name="tour_step_1_title">Everything you log</string>
+    <string name="tour_step_1_body">Further down, a tile for each thing you can log: a feed, a sleep, a nappy, growth, medicines, first foods and more. Tap one to add an entry or to look back at what\'s there.</string>
+    <string name="tour_step_2_title">Start a breastfeed</string>
+    <string name="tour_step_2_body">The buttons under the baby\'s name start a breastfeed timer on the side they show. While the feed runs, it stays at the top of this screen: tap Open to switch sides, pause or save it.</string>
+    <string name="tour_step_3_title">Along the bottom</string>
+    <string name="tour_step_3_body">At the bottom of the screen, Home brings you back here. Trends shows the days and weeks in figures and charts. You holds your own logs, such as pumping. With two or more babies, each baby gets a tab there too, with all of their tiles.</string>
+    <string name="tour_step_4_title">Settings and sharing</string>
+    <string name="tour_step_4_body">At the top right, the gear opens Settings: language, reminders, and Household sharing, which keeps the other parent\'s phone up to date with this one — no account, no cloud. This tour is there too, if you want it again.</string>
+    <string name="settings_tour">Finding your way</string>
+    <string name="settings_tour_replay">Replay the tour</string>
+    <string name="settings_tour_replay_hint">A few short cards on where things are on the main screen.</string>
     <string name="sleep_woke_up">Woke up</string>
     <string name="cd_open_baby">Open %1$s</string>
     <string name="you_intro">Pumping, your wellbeing and the daily check-in.</string>

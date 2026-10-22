@@ -62,5 +62,6 @@ ADR log and are cross-linked from here.
 | [0024](0024-a-running-feed-outside-the-app.md) | A running feed is shown outside the app, and can be paused, switched and stopped from there | Product / UX | Accepted |
 | [0025](0025-the-home-screen-is-the-parents-to-arrange.md) | The home screen's logs are the parent's to arrange | Product / UX | Accepted |
 | [0026](0026-help-on-every-page-on-demand.md) | Help is on every page, on demand, and it explains the app, never the baby | Product / UX | Accepted |
+| [0027](0027-a-tour-after-onboarding-once-and-never-in-the-way.md) | A tour after onboarding, once, and never in the way | Product / UX | Accepted |
 
 See also the [Architecture Decision Records](../adr/) for technical decisions.

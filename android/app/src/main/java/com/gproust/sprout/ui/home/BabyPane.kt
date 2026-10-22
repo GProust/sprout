@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gproust.sprout.R
 import com.gproust.sprout.data.HOME_TILE_IDS
+import com.gproust.sprout.data.TourStep
 import com.gproust.sprout.data.arrangeTiles
 import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.data.MedicineWatch
@@ -66,8 +67,9 @@ import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.runningFor
 import com.gproust.sprout.ui.feeding.sideForNextFeed
 import com.gproust.sprout.ui.navigation.Routes
-import kotlinx.coroutines.delay
 import com.gproust.sprout.ui.settings.HomeLayoutSettings
+import com.gproust.sprout.ui.tour.tourTarget
+import kotlinx.coroutines.delay
 
 /**
  * Everything about one baby that isn't a history list: how long since each of
@@ -102,7 +104,9 @@ fun BabyPane(
         SinceChips(summary, now)
 
         Spacer(Modifier.height(12.dp))
-        FeedOrRunning(summary, sessions, onFeed)
+        // Both marked for the tour (BDR-27), which only reads them on the
+        // dashboard: on the baby's own tab they report nothing.
+        FeedOrRunning(summary, sessions, onFeed, modifier = Modifier.tourTarget(TourStep.BREASTFEED))
 
         // Under the feed buttons, and above the log grid the medicine would
         // otherwise be three taps down in. Feeding is what this screen is opened
@@ -122,7 +126,7 @@ fun BabyPane(
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_log))
         Spacer(Modifier.height(8.dp))
-        LogGrid(tracksWellbeing, onNavigate)
+        LogGrid(tracksWellbeing, onNavigate, modifier = Modifier.tourTarget(TourStep.LOG_TILES))
 
         Spacer(Modifier.height(20.dp))
         SectionLabel(stringResource(R.string.home_today))
@@ -181,6 +185,7 @@ fun BabyCard(
     onDismissMedicine: (MedicineWatch) -> Unit,
     onOpenMedicines: () -> Unit,
     modifier: Modifier = Modifier,
+    feedModifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     Card(modifier = modifier.fillMaxWidth()) {
@@ -208,7 +213,7 @@ fun BabyCard(
             SinceChips(summary, now)
 
             Spacer(Modifier.height(12.dp))
-            FeedOrRunning(summary, sessions, onFeed)
+            FeedOrRunning(summary, sessions, onFeed, modifier = feedModifier)
 
             if (summary.medicines.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
@@ -294,14 +299,15 @@ private fun FeedOrRunning(
     summary: BabySummary,
     sessions: List<NursingSession>,
     onFeed: (BreastSide) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val running = sessions.runningFor(summary.baby.uid)
     if (running != null) {
         // The same path as starting: the timer finds the feed already running
         // and shows it rather than starting another.
-        RunningFeed(running, onOpen = { onFeed(running.currentSide) })
+        RunningFeed(running, onOpen = { onFeed(running.currentSide) }, modifier = modifier)
     } else {
-        QuickFeed(sideForNextFeed(sessions, summary.baby.uid, summary.nextSide), onFeed)
+        QuickFeed(sideForNextFeed(sessions, summary.baby.uid, summary.nextSide), onFeed, modifier)
     }
 }
 
@@ -312,7 +318,7 @@ private fun FeedOrRunning(
  * the one thing on the card with a second hand, so it keeps its own.
  */
 @Composable
-private fun RunningFeed(session: NursingSession, onOpen: () -> Unit) {
+private fun RunningFeed(session: NursingSession, onOpen: () -> Unit, modifier: Modifier = Modifier) {
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     LaunchedEffect(session.sessionStart) {
         while (true) {
@@ -320,7 +326,7 @@ private fun RunningFeed(session: NursingSession, onOpen: () -> Unit) {
             delay(1_000)
         }
     }
-    FilledTonalButton(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
+    FilledTonalButton(onClick = onOpen, modifier = modifier.fillMaxWidth()) {
         Icon(
             Icons.Filled.LocalDrink,
             contentDescription = null,

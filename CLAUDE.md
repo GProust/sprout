@@ -546,6 +546,30 @@ of text about that page: what it is for, how to use it, what is good to know
   all seven languages — nothing fails if it is forgotten. Controls are named by
   their labels, in each language's own quotation marks, and a sheet describes
   only what both apps do: "where this phone offers it" covers the rest.
+## A tour after onboarding
+
+Right after onboarding, a few cards point at the dashboard's main areas, once
+([BDR-27](docs/decisions/0027-a-tour-after-onboarding-once-and-never-in-the-way.md)).
+The rules are `data/Tour.kt` and `SproutData/Tour.swift`, with the same cases
+tested on both sides. Four things a change can quietly undo:
+
+- **Absent means never.** Only finishing onboarding writes `pending`, and the
+  first dashboard after a launch spends it to `done` whether or not the tour
+  started. That is what keeps existing users and restored phones out: a mark
+  that defaults to "not done yet" shows the tour to every one of them.
+- **Once, on that launch, and only Settings brings it back.** A tour cut short
+  is not resumed on a later launch, which could be mid-feed (BDR-6). No "what's
+  new" announcement for it either.
+- **What the parent asked for wins.** A widget tap or a file at launch means no
+  tour; going anywhere or starting a feed ends one (`tourStepsAside`). The
+  cut-out stays live, so tapping the thing a card describes does it.
+- **Drawn at the shell, never inside `HomeScreen`** — `MainScaffold` on
+  Android, `RootView` on iOS. Areas report only under `LocalTourTargets` /
+  `\.tourTargets`, provided around the dashboard alone, so the baby's tab and
+  `ScreenshotTest` (which renders screens directly) never meet it. No library:
+  a tour library's manifest lands in the merged build `AttackSurfaceTest` pins.
+  On iOS the seed marks the tour done, and `testCaptureFirstRun` skips it by
+  `tour-skip`.
 
 ## Asking for support
 

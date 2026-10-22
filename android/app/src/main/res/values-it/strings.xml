@@ -677,8 +677,23 @@
     <string name="help_report_how">Scegli il periodo, le cui date esatte vengono mostrate prima di creare qualsiasi cosa, e cosa includere. Poi tocca «Referto PDF» o «Foglio di calcolo» e scegli dove inviarlo. «Proteggi con una password» mette entrambi i file in un unico zip cifrato.</string>
     <string name="help_report_good_to_know">Il documento riporta ciò che è stato registrato e non interpreta nulla. Il riferimento OMS che scegli vale solo per questo file e viene dimenticato quando esci; di base si usano entrambi, dati come intervallo. Le note restano fuori a meno che tu non le includa, e il tiralatte e il tuo benessere non ci sono mai.\n\nI file vengono creati su questo telefono e non vanno da nessuna parte finché non li invii. Sprout non conserva alcuna copia della password: dalla di persona o al telefono, non insieme al file.</string>
     <string name="help_settings_purpose">Come funziona Sprout su questo telefono: la lingua, i promemoria, il check-in quotidiano e la condivisione con la tua famiglia.</string>
-    <string name="help_settings_how">Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l\'ultimo pasto è di un po\' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall\'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni.</string>
+    <string name="help_settings_how">Scegli una lingua o tieni quella del telefono. Attiva «Promemoria pasti» per un avviso quando l\'ultimo pasto è di un po\' fa, e «Avvisi scatti di crescita» quando inizia un tipico periodo di scatto. Puoi anche mostrare la poppata che stai cronometrando fuori dall\'app — nelle notifiche o nella schermata di blocco — con i suoi pulsanti. «Personalizza la Home» sceglie quali registri mostra la dashboard e in che ordine. Attiva o disattiva il check-in quotidiano, o una qualsiasi delle sue domande. In «Condivisione in famiglia» si collegano i telefoni. «Rivedi il tour» mostra di nuovo il breve tour della dashboard.</string>
     <string name="help_settings_good_to_know">I promemoria dei pasti, gli avvisi sugli scatti di crescita e la poppata in corso fuori dall\'app restano spenti finché non li attivi, e il check-in non è mai una notifica. Queste impostazioni appartengono a questo telefono e non sono condivise. I link in fondo aprono una pagina di donazione nel browser; una donazione non sblocca nulla, perché c\'è già tutto.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Salta il tour</string>
+    <string name="tour_done">Fatto</string>
+    <string name="tour_step_count">%1$d di %2$d</string>
+    <string name="tour_step_1_title">Tutto ciò che registri</string>
+    <string name="tour_step_1_body">Più in basso c\'è un riquadro per ogni cosa che puoi registrare: un pasto, un sonno, un pannolino, la crescita, i medicinali, lo svezzamento e altro ancora. Toccane uno per aggiungere una voce o rivedere quello che c\'è già.</string>
+    <string name="tour_step_2_title">Iniziare una poppata</string>
+    <string name="tour_step_2_body">I pulsanti sotto il nome del bambino avviano il timer della poppata, dal lato indicato. Finché la poppata è in corso, resta in alto in questa schermata: tocca Apri per cambiare lato, fare una pausa o salvarla.</string>
+    <string name="tour_step_3_title">In fondo allo schermo</string>
+    <string name="tour_step_3_body">In fondo allo schermo, Home ti riporta qui. Andamento mostra i giorni e le settimane in numeri e grafici. Tu raccoglie le tue registrazioni, come il tiralatte. Con due o più bambini, ognuno ha lì anche una sua scheda, con tutti i suoi riquadri.</string>
+    <string name="tour_step_4_title">Impostazioni e condivisione</string>
+    <string name="tour_step_4_body">In alto a destra, l\'ingranaggio apre le Impostazioni: la lingua, i promemoria e Condivisione in famiglia, che tiene il telefono dell\'altro genitore aggiornato con questo, senza account e senza cloud. Anche questo tour è lì, se vuoi rivederlo.</string>
+    <string name="settings_tour">Orientarsi</string>
+    <string name="settings_tour_replay">Rivedi il tour</string>
+    <string name="settings_tour_replay_hint">Qualche breve scheda su dove si trovano le cose nella schermata principale.</string>
     <string name="sleep_woke_up">Risveglio</string>
     <string name="cd_open_baby">Apri %1$s</string>
     <string name="you_intro">Il tiralatte, il tuo benessere e il check-in quotidiano.</string>

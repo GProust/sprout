@@ -68,12 +68,23 @@ struct RootView: View {
     }
 
     @Environment(\.sprout) private var sprout
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var model: HomeViewModel?
     @State private var startup: Startup = .loading
     @State private var selection: Tab = .home
     @State private var homePath: [LogDestination] = []
     @State private var babyPath: [LogDestination] = []
     @State private var youPath: [LogDestination] = []
+
+    /// The guided tour (BDR-27): the step on screen, if one is, and the steps
+    /// it was started with — which depend on how many babies the dashboard
+    /// lists.
+    @State private var tourStep: TourStep?
+    @State private var tourPlan: [TourStep] = []
+    @State private var tourTargets = TourTargets()
+    /// Whether the dashboard has come up on this launch yet. The tour is
+    /// decided once, the first time it does.
+    @State private var arrived = false
 
     var body: some View {
         Group {
@@ -95,6 +106,11 @@ struct RootView: View {
                     // "what's new" to catch up on (BDR-22). Before the profile
                     // is written, because writing it is what opens the dashboard.
                     WhatsNewSettings(store: sprout.settingsStore).markAllSeen()
+                    // This is also the one launch that cannot be the middle of
+                    // a feed, so the dashboard about to open owes a short tour
+                    // of itself (BDR-27). Nothing else ever writes it: a phone
+                    // that already had a profile is never shown round.
+                    TourSettings(store: sprout.settingsStore).markPending()
                     try? completeOnboarding(answers, into: sprout.repository)
                 }
             case .main:
@@ -129,6 +145,79 @@ struct RootView: View {
             // would have been reached from rather than on the dashboard.
             homePath = [.settings, .sync]
         }
+        // The dashboard has come up. Whether the tour starts is decided here,
+        // once a launch, and an owed tour is spent either way.
+        .onChange(of: startup) { _, stage in
+            guard stage == .main, !arrived else { return }
+            arrived = true
+            startTour(.arrival)
+        }
+        // The tour gets out of the way the moment the parent goes anywhere — a
+        // tile, a tab, Settings, a file arriving — or a feed starts.
+        .onChange(of: TourSurroundings(
+            onDashboard: onDashboard,
+            feeding: Set(NursingSessionStore.shared.sessions.map(\.babyUid))
+        )) { before, now in
+            guard tourStep != nil,
+                  tourStepsAside(
+                      onDashboard: now.onDashboard,
+                      feedingBefore: before.feeding,
+                      feedingNow: now.feeding
+                  )
+            else { return }
+            tourStep = nil
+        }
+    }
+
+    /// The dashboard itself, with nothing pushed on top of it.
+    private var onDashboard: Bool {
+        selection == .home && homePath.isEmpty
+    }
+
+    /// Starts the tour if `trigger` should, on the steps the dashboard can show.
+    private func startTour(_ trigger: TourTrigger) {
+        let settings = TourSettings(store: sprout.settingsStore)
+        let mark = settings.mark
+        if trigger == .arrival {
+            let spent = tourMarkAfterArrival(mark)
+            if spent != mark { settings.set(spent) }
+        }
+        // A file handed to Sprout has already put the sharing screen on the
+        // dashboard's stack, and what the parent opened the app for wins.
+        let openedForSomethingElse = sprout.pendingSyncFile != nil || !homePath.isEmpty
+        guard tourStarts(trigger, mark: mark, openedForSomethingElse: openedForSomethingElse) else { return }
+        let steps = tourSteps(babyCount: (try? sprout.repository.activeBabies().count) ?? 0)
+        tourPlan = steps
+        tourStep = steps.first
+    }
+
+    /// Settings → *Replay the tour*: back to the dashboard it is about, then
+    /// from the top.
+    private func replayTour() {
+        selection = .home
+        homePath = []
+        startTour(.replay)
+    }
+
+    /// Over the whole shell, tab bar included, and never inside the dashboard
+    /// itself, so the dashboard's own captures never meet it.
+    private var tourOverlay: some View {
+        ZStack {
+            if let step = tourStep, onDashboard {
+                TourOverlay(
+                    step: step,
+                    position: (tourPlan.firstIndex(of: step) ?? 0) + 1,
+                    count: tourPlan.count,
+                    isLast: tourStepAfter(step, in: tourPlan) == nil,
+                    target: tourTargets.frames[step],
+                    onNext: { tourStep = tourStepAfter(step, in: tourPlan) },
+                    onSkip: { tourStep = nil }
+                )
+                .transition(.opacity)
+            }
+        }
+        // A short fade in and out, and none at all with Reduce Motion on.
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: tourStep)
     }
 
     @ViewBuilder
@@ -137,7 +226,20 @@ struct RootView: View {
             NavigationStack(path: $homePath) {
                 HomeScreen(model: model, onOpen: open(_:))
                     .navigationDestination(for: LogDestination.self, destination: screen(for:))
+                    // Where the dashboard's safe area ends at each edge, which
+                    // is where the navigation bar and the tab bar begin. Both
+                    // are UIKit's, with no view of their own to measure, so the
+                    // tour's steps for them start here (`TourOverlay`). No
+                    // height, so the dashboard is laid out exactly as before.
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        Color.clear.frame(height: 0).tourTarget(.settings)
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        Color.clear.frame(height: 0).tourTarget(.bottomBar)
+                    }
             }
+            // The dashboard is the only screen whose areas the tour points at.
+            .environment(\.tourTargets, tourTargets)
             .tabItem { Label(Tab.home.label, systemImage: Tab.home.systemImage) }
             .tag(Tab.home)
 
@@ -172,6 +274,10 @@ struct RootView: View {
             .tag(Tab.you)
         }
         .tint(SproutColor.primary)
+        // While a step is up, what the scrim dims is hidden from VoiceOver as
+        // well as from sight: the card is the only thing on the screen.
+        .accessibilityHidden(tourStep != nil && onDashboard)
+        .overlay { tourOverlay }
     }
 
     /// Opens a log on whichever tab asked for it, so a screen reached from the
@@ -206,7 +312,7 @@ struct RootView: View {
         case .report(let babyId): ReportScreen(babyId: babyId)
         case .stats: StatsScreen()
         case .profile: ProfileScreen()
-        case .settings: SettingsScreen()
+        case .settings: SettingsScreen(onReplayTour: replayTour)
         case .sync: SyncScreen()
         case .customiseHome:
             // The dashboard's own model, because what this screen changes is
@@ -215,4 +321,13 @@ struct RootView: View {
             if let model { CustomiseHomeScreen(model: model) }
         }
     }
+}
+
+/// What the tour watches to know when to get out of the way, as one value so a
+/// feed started from the dashboard — which also leaves it — is one change.
+private struct TourSurroundings: Equatable {
+    var onDashboard: Bool
+    /// The babies with a feed running, by uid: a twin's feed starting beside
+    /// the other's is a feed starting too (BDR-23).
+    var feeding: Set<String?>
 }
