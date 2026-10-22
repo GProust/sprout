@@ -682,6 +682,21 @@
     <string name="cd_whats_new_dismiss">Dismiss what\'s new</string>
     <string name="whats_new_1_title">First foods</string>
     <string name="whats_new_1_body">A solid meal can now say what was in it, and the First foods page gathers every food your baby has met: how many times, the first time and the last. Known allergies have a place of their own too.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Skip tour</string>
+    <string name="tour_done">Done</string>
+    <string name="tour_step_count">%1$d of %2$d</string>
+    <string name="tour_step_1_title">Everything you log</string>
+    <string name="tour_step_1_body">Further down, a tile for each thing you can log: a feed, a sleep, a nappy, growth, medicines, first foods and more. Tap one to add an entry or to look back at what\'s there.</string>
+    <string name="tour_step_2_title">Start a breastfeed</string>
+    <string name="tour_step_2_body">The buttons under the baby\'s name start a breastfeed timer on the side they show. While the feed runs, it stays at the top of this screen: tap Open to switch sides, pause or save it.</string>
+    <string name="tour_step_3_title">Along the bottom</string>
+    <string name="tour_step_3_body">At the bottom of the screen, Home brings you back here. Trends shows the days and weeks in figures and charts. You holds your own logs, such as pumping. With two or more babies, each baby gets a tab there too, with all of their tiles.</string>
+    <string name="tour_step_4_title">Settings and sharing</string>
+    <string name="tour_step_4_body">At the top right, the gear opens Settings: language, reminders, and Household sharing, which keeps the other parent\'s phone up to date with this one — no account, no cloud. This tour is there too, if you want it again.</string>
+    <string name="settings_tour">Finding your way</string>
+    <string name="settings_tour_replay">Replay the tour</string>
+    <string name="settings_tour_replay_hint">A few short cards on where things are on the main screen.</string>
     <string name="sleep_woke_up">Woke up</string>
     <string name="cd_open_baby">Open %1$s</string>
     <string name="you_intro">Pumping, your wellbeing and the daily check-in.</string>

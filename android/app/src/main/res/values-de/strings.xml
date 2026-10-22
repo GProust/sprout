@@ -596,6 +596,21 @@
     <string name="cd_whats_new_dismiss">Neuigkeiten ausblenden</string>
     <string name="whats_new_1_title">Beikost</string>
     <string name="whats_new_1_body">Eine Breimahlzeit kann jetzt festhalten, was darin war, und die Seite Beikost zeigt jedes Lebensmittel, das dein Baby kennengelernt hat: wie oft, das erste und das letzte Mal. Bekannte Allergien haben auch einen eigenen Platz.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Tour überspringen</string>
+    <string name="tour_done">Fertig</string>
+    <string name="tour_step_count">%1$d von %2$d</string>
+    <string name="tour_step_1_title">Alles, was du einträgst</string>
+    <string name="tour_step_1_body">Weiter unten gibt es für alles, was du eintragen kannst, eine Kachel: Mahlzeit, Schlaf, Windel, Wachstum, Medikamente, Beikost und mehr. Tippe auf eine, um etwas einzutragen oder nachzusehen, was schon da ist.</string>
+    <string name="tour_step_2_title">Stillen starten</string>
+    <string name="tour_step_2_body">Die Tasten unter dem Namen des Babys starten die Stilluhr auf der angezeigten Seite. Solange gestillt wird, bleibt sie oben auf diesem Bildschirm: Tippe auf Öffnen, um die Seite zu wechseln, zu pausieren oder zu speichern.</string>
+    <string name="tour_step_3_title">Unten am Bildschirm</string>
+    <string name="tour_step_3_body">Ganz unten am Bildschirm bringt dich Start hierher zurück. Trends zeigt die Tage und Wochen in Zahlen und Diagrammen. Unter Du findest deine eigenen Einträge, zum Beispiel das Abpumpen. Ab zwei Babys bekommt dort jedes auch einen eigenen Tab mit all seinen Kacheln.</string>
+    <string name="tour_step_4_title">Einstellungen und Teilen</string>
+    <string name="tour_step_4_body">Oben rechts öffnet das Zahnrad die Einstellungen: Sprache, Erinnerungen und Haushalt teilen, damit das Handy des anderen Elternteils auf demselben Stand bleibt wie dieses — ohne Konto, ohne Cloud. Auch diese Tour findest du dort, falls du sie noch einmal sehen möchtest.</string>
+    <string name="settings_tour">Zurechtfinden</string>
+    <string name="settings_tour_replay">Tour noch einmal ansehen</string>
+    <string name="settings_tour_replay_hint">Ein paar kurze Karten dazu, wo auf dem Hauptbildschirm was zu finden ist.</string>
     <string name="sleep_woke_up">Aufgewacht</string>
     <string name="cd_open_baby">%1$s öffnen</string>
     <string name="you_intro">Abpumpen, dein Wohlbefinden und der tägliche Check-in.</string>

@@ -596,6 +596,21 @@
     <string name="cd_whats_new_dismiss">Ocultar novedades</string>
     <string name="whats_new_1_title">Alimentos</string>
     <string name="whats_new_1_body">Una comida sólida ya puede decir qué llevaba, y la página Alimentos reúne cada alimento que tu bebé ha probado: cuántas veces, la primera y la última. Las alergias conocidas también tienen su propio lugar.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Saltar el recorrido</string>
+    <string name="tour_done">Hecho</string>
+    <string name="tour_step_count">%1$d de %2$d</string>
+    <string name="tour_step_1_title">Todo lo que registras</string>
+    <string name="tour_step_1_body">Más abajo hay un recuadro para cada cosa que puedes registrar: una toma, un sueño, un pañal, el crecimiento, los medicamentos, los alimentos y más. Toca uno para añadir una entrada o repasar lo que ya hay.</string>
+    <string name="tour_step_2_title">Empezar una toma</string>
+    <string name="tour_step_2_body">Los botones bajo el nombre del bebé ponen en marcha el cronómetro de la toma, en el lado que indican. Mientras dura, se queda arriba en esta pantalla: toca Abrir para cambiar de lado, hacer una pausa o guardarla.</string>
+    <string name="tour_step_3_title">En la parte de abajo</string>
+    <string name="tour_step_3_body">Abajo del todo, Inicio te trae de vuelta aquí. Tendencias muestra los días y las semanas en cifras y gráficos. Tú reúne tus propios registros, como la extracción. Con dos bebés o más, cada uno tiene ahí también su pestaña, con todos sus recuadros.</string>
+    <string name="tour_step_4_title">Ajustes y compartir</string>
+    <string name="tour_step_4_body">Arriba a la derecha, el engranaje abre los Ajustes: el idioma, los recordatorios y Compartir en el hogar, que mantiene el teléfono de la otra madre o del otro padre al día con este, sin cuenta y sin nube. Este recorrido también está ahí, por si quieres verlo otra vez.</string>
+    <string name="settings_tour">Orientarse</string>
+    <string name="settings_tour_replay">Repetir el recorrido</string>
+    <string name="settings_tour_replay_hint">Unas tarjetas breves sobre dónde está cada cosa en la pantalla principal.</string>
     <string name="sleep_woke_up">Se despertó</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">La extracción, tu bienestar y el chequeo diario.</string>

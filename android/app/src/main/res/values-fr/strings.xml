@@ -655,6 +655,21 @@
     <string name="cd_whats_new_dismiss">Masquer les nouveautés</string>
     <string name="whats_new_1_title">Diversification</string>
     <string name="whats_new_1_body">Un repas solide peut maintenant dire ce qu\'il contenait, et la page Diversification rassemble chaque aliment que votre bébé a découvert : combien de fois, la première et la dernière. Les allergies connues ont aussi leur place.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Passer la visite</string>
+    <string name="tour_done">Terminé</string>
+    <string name="tour_step_count">%1$d sur %2$d</string>
+    <string name="tour_step_1_title">Tout ce que vous notez</string>
+    <string name="tour_step_1_body">Plus bas, une tuile pour chaque chose à noter : un repas, un sommeil, une couche, la croissance, les médicaments, la diversification et le reste. Touchez-en une pour ajouter une entrée ou revoir ce qui s\'y trouve déjà.</string>
+    <string name="tour_step_2_title">Démarrer une tétée</string>
+    <string name="tour_step_2_body">Les boutons sous le prénom du bébé démarrent le chronomètre d\'une tétée, du côté indiqué. Pendant la tétée, il reste en haut de cet écran : touchez Ouvrir pour changer de côté, faire une pause ou l\'enregistrer.</string>
+    <string name="tour_step_3_title">En bas de l\'écran</string>
+    <string name="tour_step_3_body">Tout en bas de l\'écran, Accueil vous ramène ici. Tendances montre les jours et les semaines en chiffres et en graphiques. Vous regroupe ce qui vous concerne, comme le tirage. Avec deux bébés ou plus, chacun y a aussi son onglet, avec toutes ses tuiles.</string>
+    <string name="tour_step_4_title">Paramètres et partage</string>
+    <string name="tour_step_4_body">En haut à droite, la roue dentée ouvre les Paramètres : la langue, les rappels, et le Partage du foyer, qui tient le téléphone de l\'autre parent à jour avec celui-ci — sans compte, sans cloud. Cette visite s\'y trouve aussi, si vous voulez la revoir.</string>
+    <string name="settings_tour">Se repérer</string>
+    <string name="settings_tour_replay">Revoir la visite</string>
+    <string name="settings_tour_replay_hint">Quelques courtes cartes pour savoir où se trouvent les choses sur l\'écran principal.</string>
     <string name="sleep_woke_up">Réveil</string>
     <string name="cd_open_baby">Ouvrir %1$s</string>
     <string name="you_intro">Le tirage, votre bien-être et le bilan du jour.</string>

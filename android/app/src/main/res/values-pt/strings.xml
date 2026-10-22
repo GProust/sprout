@@ -596,6 +596,21 @@
     <string name="cd_whats_new_dismiss">Ocultar novidades</string>
     <string name="whats_new_1_title">Diversificação</string>
     <string name="whats_new_1_body">Uma refeição sólida já pode dizer o que levava, e a página Diversificação reúne cada alimento que o seu bebé já conheceu: quantas vezes, a primeira e a última. As alergias conhecidas também têm um lugar próprio.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Saltar a visita</string>
+    <string name="tour_done">Concluído</string>
+    <string name="tour_step_count">%1$d de %2$d</string>
+    <string name="tour_step_1_title">Tudo o que regista</string>
+    <string name="tour_step_1_body">Mais abaixo, há um quadrado para cada coisa que pode registar: a alimentação, o sono, a fralda, o crescimento, os medicamentos, a diversificação e mais. Toque num para acrescentar um registo ou rever o que já lá está.</string>
+    <string name="tour_step_2_title">Começar uma mamada</string>
+    <string name="tour_step_2_body">Os botões por baixo do nome do bebé iniciam o cronómetro da mamada, do lado indicado. Enquanto a mamada decorre, fica no topo deste ecrã: toque em Abrir para mudar de lado, fazer uma pausa ou guardá-la.</string>
+    <string name="tour_step_3_title">Na parte de baixo</string>
+    <string name="tour_step_3_body">Mesmo em baixo, Início volta a este ecrã. Tendências mostra os dias e as semanas em números e gráficos. Eu reúne os seus próprios registos, como a extração. Com dois ou mais bebés, cada um tem também ali o seu separador, com todos os seus quadrados.</string>
+    <string name="tour_step_4_title">Definições e partilha</string>
+    <string name="tour_step_4_body">No canto superior direito, a roda dentada abre as Definições: o idioma, os lembretes e a Partilha do agregado, que mantém o telemóvel da outra mãe ou do outro pai a par deste — sem conta e sem nuvem. Esta visita também lá está, se a quiser rever.</string>
+    <string name="settings_tour">Orientar-se</string>
+    <string name="settings_tour_replay">Rever a visita</string>
+    <string name="settings_tour_replay_hint">Alguns cartões breves sobre onde está cada coisa no ecrã principal.</string>
     <string name="sleep_woke_up">Acordou</string>
     <string name="cd_open_baby">Abrir %1$s</string>
     <string name="you_intro">A extração, o seu bem-estar e a verificação diária.</string>

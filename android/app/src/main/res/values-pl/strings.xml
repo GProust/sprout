@@ -615,6 +615,21 @@
     <string name="cd_whats_new_dismiss">Ukryj nowości</string>
     <string name="whats_new_1_title">Nowe pokarmy</string>
     <string name="whats_new_1_body">Posiłek stały może teraz mówić, co w nim było, a strona Nowe pokarmy zbiera każdy pokarm, który poznało Twoje dziecko: ile razy, pierwszy i ostatni raz. Znane alergie też mają swoje miejsce.</string>
+    <!-- The guided tour after onboarding, and Settings' way back to it (BDR-27). Each card says in words where its area is: the cut-out is visual only. -->
+    <string name="tour_skip">Pomiń przewodnik</string>
+    <string name="tour_done">Gotowe</string>
+    <string name="tour_step_count">%1$d z %2$d</string>
+    <string name="tour_step_1_title">Wszystko, co zapisujesz</string>
+    <string name="tour_step_1_body">Niżej jest kafelek na wszystko, co możesz zapisać: karmienie, sen, pieluchę, wzrost, leki, nowe pokarmy i więcej. Dotknij jednego, aby dodać wpis albo przejrzeć to, co już jest.</string>
+    <string name="tour_step_2_title">Rozpocznij karmienie piersią</string>
+    <string name="tour_step_2_body">Przyciski pod imieniem dziecka uruchamiają stoper karmienia po wskazanej stronie. Dopóki karmienie trwa, widać je u góry tego ekranu: dotknij Otwórz, aby zmienić stronę, zrobić przerwę albo je zapisać.</string>
+    <string name="tour_step_3_title">Na dole ekranu</string>
+    <string name="tour_step_3_body">Na samym dole ekranu Start przenosi Cię z powrotem tutaj. Trendy pokazują dni i tygodnie w liczbach i na wykresach. Ty zbiera Twoje własne wpisy, na przykład odciąganie. Gdy dzieci jest dwoje lub więcej, każde ma tam też własną kartę ze wszystkimi swoimi kafelkami.</string>
+    <string name="tour_step_4_title">Ustawienia i współdzielenie</string>
+    <string name="tour_step_4_body">W prawym górnym rogu zębatka otwiera Ustawienia: język, przypomnienia i Współdzielenie w domu, dzięki któremu telefon drugiego rodzica jest na bieżąco z tym — bez konta i bez chmury. Jest tam też ten przewodnik, jeśli zechcesz obejrzeć go jeszcze raz.</string>
+    <string name="settings_tour">Pierwsze kroki</string>
+    <string name="settings_tour_replay">Obejrzyj przewodnik ponownie</string>
+    <string name="settings_tour_replay_hint">Kilka krótkich kart o tym, gdzie co jest na ekranie głównym.</string>
     <string name="sleep_woke_up">Pobudka</string>
     <string name="cd_open_baby">Otwórz: %1$s</string>
     <string name="you_intro">Odciąganie, Twoje samopoczucie i codzienny wpis.</string>
