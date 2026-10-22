@@ -3,6 +3,16 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- ❓ **Help on every page, when you want it.** A small **?** at the top of each
+  screen opens a few lines about that page: what it's for, how to use it, and
+  the things that surprise people — why the timer stops during a burp, what
+  *No set gap* means on a medicine, why a taste counts as an offer, and what
+  goes to the other phones in your household and what never leaves yours. It
+  only opens when you tap it, it's in your language, and it explains the app,
+  never your baby.
+
 ## [1.14.0] — 2026-10-20
 
 - 🥕 **A page for first foods.** Logging a solid meal now lets you list what was
