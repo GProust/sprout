@@ -3,6 +3,20 @@
 All notable changes to Sprout are documented here. This project follows
 [Semantic Versioning](https://semver.org/) for `versionName`.
 
+## [Unreleased]
+
+- 🧭 **A short tour, right after you set up.** When onboarding is done, a few
+  cards point out where things are: the tiles for logging a feed, a sleep or a
+  nappy, starting a breastfeed and where its timer then shows, the tabs along
+  the bottom, and Settings, where sharing with the other parent's phone lives.
+  *Skip tour* is on every card — so are Back and a tap outside — and once it's
+  finished or skipped it never comes back on its own; **Settings → Replay the
+  tour** shows it again whenever you like. It stays out of the way: it doesn't
+  start if you opened Sprout from the widget or a shared file, and it steps
+  aside the moment you tap something or start a feed. Each card says in words
+  where to look, so it works with TalkBack and VoiceOver too. If you already use
+  Sprout, nothing changes.
+
 ## [1.14.0] — 2026-10-20
 
 - 🥕 **A page for first foods.** Logging a solid meal now lets you list what was
