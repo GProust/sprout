@@ -56,6 +56,7 @@ struct SettingsScreen: View {
         }
         .navigationTitle(Str.t("screen_settings"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.settings)
         .alert(Str.t("settings_support_no_browser"), isPresented: $noBrowser) {
             Button(Str.t("action_close"), role: .cancel) {}
         }

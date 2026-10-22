@@ -66,6 +66,7 @@ struct DailyCheckInScreen: View {
         }
         .navigationTitle(Str.t("home_checkin_title"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.wellbeing)
         .task {
             let model = model ?? CheckInViewModel(repository: sprout.repository)
             self.model = model

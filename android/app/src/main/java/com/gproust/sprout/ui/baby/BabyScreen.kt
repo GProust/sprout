@@ -27,6 +27,8 @@ import com.gproust.sprout.data.local.BreastSide
 import com.gproust.sprout.ui.common.EmptyHint
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.babyAge
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.home.BabyPane
 import com.gproust.sprout.ui.home.GrowthSpurtNote
 import com.gproust.sprout.ui.home.HomeViewModel
@@ -71,7 +73,10 @@ fun BabyScreen(
 
     Scaffold(
         topBar = {
-            SproutTopBar(summary?.baby?.name ?: stringResource(R.string.nav_baby))
+            SproutTopBar(
+                summary?.baby?.name ?: stringResource(R.string.nav_baby),
+                actions = { HelpButton(HelpPage.BABY) },
+            )
         },
     ) { padding ->
         if (summary == null) {

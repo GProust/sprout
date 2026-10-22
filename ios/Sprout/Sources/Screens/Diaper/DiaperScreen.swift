@@ -39,6 +39,7 @@ struct DiaperScreen: View {
         }
         .navigationTitle(Str.t("screen_diapers"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.diaper)
         .task {
             let model = model ?? DiaperViewModel(repository: sprout.repository)
             self.model = model

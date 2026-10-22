@@ -45,6 +45,7 @@ struct BabyScreen: View {
         }
         .navigationTitle(model.selectedBaby?.baby.name ?? Str.t("nav_baby"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.baby)
         .sproutStyle()
     }
 }
@@ -98,6 +99,7 @@ struct YouScreen: View {
         }
         .navigationTitle(Str.t("nav_you"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.you)
         .sproutStyle()
     }
 }

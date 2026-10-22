@@ -61,6 +61,8 @@ import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.healingQuestion
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -129,7 +131,13 @@ fun SettingsScreen(
     ) { refreshNursingNotification() }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_settings), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_settings),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.SETTINGS) },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         LazyColumn(

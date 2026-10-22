@@ -53,6 +53,8 @@ import com.gproust.sprout.ui.common.NotesField
 import com.gproust.sprout.ui.common.NumberField
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.formatDate
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -93,7 +95,13 @@ fun GrowthScreen(onBack: () -> Unit = {}) {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_growth), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_growth),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.GROWTH) },
+            )
+        },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.growth_log_title)) { adding = true }
         },

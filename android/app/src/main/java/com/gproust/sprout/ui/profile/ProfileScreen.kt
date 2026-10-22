@@ -62,6 +62,8 @@ import com.gproust.sprout.ui.common.FieldLabel
 import com.gproust.sprout.ui.common.SproutTopBar
 import com.gproust.sprout.ui.common.babyAge
 import com.gproust.sprout.ui.common.formatDuration
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.settings.FeedingReminderSettings
 import kotlinx.coroutines.flow.SharingStarted
@@ -129,7 +131,15 @@ fun ProfileScreen(onBack: () -> Unit) {
     var deleteTarget by remember { mutableStateOf<BabyEntity?>(null) }
     var reminderTarget by remember { mutableStateOf<BabyEntity?>(null) }
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_babies), onBack = onBack) }) { padding ->
+    Scaffold(
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_babies),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.BABIES) },
+            )
+        },
+    ) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

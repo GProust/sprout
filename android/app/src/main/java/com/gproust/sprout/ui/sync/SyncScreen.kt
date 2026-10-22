@@ -45,6 +45,8 @@ import com.gproust.sprout.data.sync.MergeSummary
 import com.gproust.sprout.data.sync.SyncFiles
 import com.gproust.sprout.data.sync.nearby.NearbyPermissions
 import com.gproust.sprout.ui.common.SproutTopBar
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 
 /**
@@ -113,7 +115,15 @@ fun SyncScreen(
         }
     }
 
-    Scaffold(topBar = { SproutTopBar(stringResource(R.string.screen_sync), onBack = onBack) }) { padding ->
+    Scaffold(
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_sync),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.SHARING) },
+            )
+        },
+    ) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

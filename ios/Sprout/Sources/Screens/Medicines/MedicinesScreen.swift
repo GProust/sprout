@@ -85,6 +85,7 @@ struct MedicinesScreen: View {
         }
         .navigationTitle(Str.t("screen_medicines"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.medicines)
         .onReceive(tick) { _ in now = Clock.millis }
         .task {
             let model = model ?? MedicinesViewModel(repository: sprout.repository)

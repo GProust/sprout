@@ -518,6 +518,35 @@ with the same cases on both sides. Five things a change can quietly undo:
   Android and from `HomeViewModel` on iOS, so Home with one baby and each baby's
   tab cannot draw two different grids.
 
+## Help on every page
+
+Every page has a **?** at the trailing end of its top bar, and it opens a sheet
+of text about that page: what it is for, how to use it, what is good to know
+([BDR-26](docs/decisions/0026-help-on-every-page-on-demand.md)). The list is
+`ui/help/HelpPages.kt` and `Screens/Help/HelpPages.swift`; the strings are
+`help_<page>_<section>`. Four things a change can quietly undo:
+
+- **It opens from the ? and from nowhere else.** No first launch, no badge, no
+  tip that appears by itself. Help that shows itself is the screen in front of
+  the dashboard that BDR-6 took out.
+- **One list, both apps, in the same order.** The two files name the section
+  headings, then the pages' titles, then each page's entries, with literal keys;
+  `HelpPagesTest` reads the Swift against the Kotlin and `check_string_keys.py`
+  the Kotlin against the Swift. A page or a section is added to both in one
+  commit, and no other string key goes in either file — both checks read every
+  key there, in order.
+- **The app, never the baby.** Each page's rules are its help's rules: no
+  medicine names, doses or intervals, the light as arithmetic on the parent's
+  own figures and "No set gap" as no gap rule (BDR-15, BDR-18); no ages, no
+  order of introduction, nothing about allergens (BDR-20, BDR-21); the band and
+  the span, never what a centile means (BDR-8, BDR-12); a break is not time at
+  the breast, and joining is offered, never done (BDR-17, BDR-19); what travels
+  between phones and what never does (ADR-0007 to 0011).
+- **A change to what a page does is a change to its help**, in the same PR and
+  all seven languages — nothing fails if it is forgotten. Controls are named by
+  their labels, in each language's own quotation marks, and a sheet describes
+  only what both apps do: "where this phone offers it" covers the rest.
+
 ## Asking for support
 
 Settings ends with two donation links (GitHub Sponsors, Buy Me a Coffee). The

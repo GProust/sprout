@@ -55,6 +55,8 @@ import com.gproust.sprout.ui.common.formatDuration
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.nextDay
 import com.gproust.sprout.ui.common.startOfDay
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -108,7 +110,13 @@ fun SleepScreen(onBack: () -> Unit = {}) {
     val byDay = remember(sleeps) { sleeps.groupBy { startOfDay(it.startTime) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_sleep), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_sleep),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.SLEEP) },
+            )
+        },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.sleep_log_title)) { adding = true }
         },

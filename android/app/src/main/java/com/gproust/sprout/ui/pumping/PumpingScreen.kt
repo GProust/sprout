@@ -72,6 +72,8 @@ import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDateTime
 import com.gproust.sprout.ui.common.formatTime
 import com.gproust.sprout.ui.common.startOfDay
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -161,7 +163,13 @@ fun PumpingScreen(onBack: () -> Unit) {
     val byDay = remember(entries) { entries.groupBy { startOfDay(it.time) } }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_pumping), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_pumping),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.PUMPING) },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             AddEntryFab(stringResource(R.string.pumping_log_title)) { adding = true }

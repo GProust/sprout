@@ -48,6 +48,8 @@ struct CustomiseHomeScreen: View {
             }
         }
         .navigationTitle(Str.t("screen_customise_home"))
+        // A part of Settings, so it opens Settings' sheet (BDR-26).
+        .helpButton(.settings)
         .navigationBarTitleDisplayMode(.inline)
     }
 

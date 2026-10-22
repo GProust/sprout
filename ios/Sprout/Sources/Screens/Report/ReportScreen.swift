@@ -263,6 +263,7 @@ struct ReportScreen: View {
         }
         .navigationTitle(Str.t("report_screen_title"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.report)
         .task {
             let model = model ?? ReportViewModel(repository: sprout.repository)
             self.model = model

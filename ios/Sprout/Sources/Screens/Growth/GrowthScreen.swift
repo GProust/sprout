@@ -38,6 +38,7 @@ struct GrowthScreen: View {
         }
         .navigationTitle(Str.t("screen_growth"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.growth)
         .task {
             let model = model ?? GrowthViewModel(repository: sprout.repository)
             self.model = model

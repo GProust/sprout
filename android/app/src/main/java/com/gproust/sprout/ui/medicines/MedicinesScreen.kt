@@ -79,6 +79,8 @@ import com.gproust.sprout.ui.common.TimePickerField
 import com.gproust.sprout.ui.common.formatDateTime
 import com.gproust.sprout.ui.common.formatDecimal
 import com.gproust.sprout.ui.common.parseDecimal
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -236,7 +238,13 @@ fun MedicinesScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_medicines), onBack = onBack) },
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_medicines),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.MEDICINES) },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { editing = newMedicine() }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.medicine_add))

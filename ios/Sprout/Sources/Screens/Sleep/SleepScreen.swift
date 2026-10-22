@@ -60,6 +60,7 @@ struct SleepScreen: View {
         }
         .navigationTitle(Str.t("screen_sleep"))
         .navigationBarTitleDisplayMode(.inline)
+        .helpButton(.sleep)
         .task {
             let model = model ?? SleepViewModel(repository: sprout.repository)
             self.model = model

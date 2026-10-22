@@ -75,6 +75,8 @@ import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.common.upcomingGrowthSpurt
 import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
 import com.gproust.sprout.ui.whatsnew.WhatsNewCard
@@ -377,6 +379,8 @@ fun HomeScreen(
                             contentDescription = stringResource(R.string.cd_settings),
                         )
                     }
+                    // Last, where every other page keeps its help (BDR-26).
+                    HelpButton(HelpPage.HOME)
                 },
             )
         },

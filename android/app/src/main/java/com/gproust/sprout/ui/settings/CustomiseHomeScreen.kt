@@ -46,6 +46,8 @@ import com.gproust.sprout.data.HOME_TILE_IDS
 import com.gproust.sprout.data.listedTiles
 import com.gproust.sprout.data.moveTile
 import com.gproust.sprout.ui.common.SproutTopBar
+import com.gproust.sprout.ui.help.HelpButton
+import com.gproust.sprout.ui.help.HelpPage
 import com.gproust.sprout.ui.home.homeTile
 
 /**
@@ -82,7 +84,15 @@ fun CustomiseHomeScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        topBar = { SproutTopBar(stringResource(R.string.screen_customise_home), onBack = onBack) },
+        // A part of Settings, so it opens Settings' sheet, which says what
+        // this page does (BDR-26).
+        topBar = {
+            SproutTopBar(
+                stringResource(R.string.screen_customise_home),
+                onBack = onBack,
+                actions = { HelpButton(HelpPage.SETTINGS) },
+            )
+        },
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
