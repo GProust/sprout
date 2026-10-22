@@ -434,6 +434,16 @@
     <string name="growth_spurt_soon_body">Skok rozwojowy często pojawia się %1$s — może zacząć się w najbliższych dniach.</string>
     <string name="settings_growth_spurts">Powiadomienia o skokach rozwojowych</string>
     <string name="settings_growth_spurts_desc">Daj mi znać, gdy zaczyna się typowy okres skoku rozwojowego.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">Trwające karmienie w powiadomieniach</string>
+    <string name="settings_nursing_notification_desc">Gdy mierzysz czas karmienia piersią, pokazuj je w powiadomieniach z przyciskami Pauza, Zmień pierś i Zatrzymaj &amp; zapisz – bez odblokowywania telefonu. Imię dziecka nie pojawia się na ekranie blokady, chyba że telefon pokazuje tam pełną treść powiadomień.</string>
+    <string name="settings_live_activity">Trwające karmienie na ekranie blokady</string>
+    <string name="settings_live_activity_desc">Gdy mierzysz czas karmienia piersią, pokazuj je na ekranie blokady i w Dynamic Island z przyciskami Pauza, Zmień pierś i Zatrzymaj &amp; zapisz – bez odblokowywania telefonu. Imię dziecka nigdy się tam nie pojawia.</string>
+    <string name="nursing_channel_name">Trwające karmienie</string>
+    <string name="nursing_channel_desc">Karmienie piersią w trakcie mierzenia czasu, z przyciskami do wstrzymania, zmiany piersi i zapisania</string>
+    <string name="nursing_switch_side">Zmień pierś</string>
+    <string name="nursing_notif_on_break">Przerwa · %1$s przy piersi</string>
+    <string name="nursing_notif_feed_number">Karmienie %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Powiadomienia o skokach rozwojowych</string>
     <string name="growth_spurt_channel_desc">Powiadomienie, gdy zaczyna się typowy okres skoku rozwojowego</string>
     <string name="growth_spurt_notif_title">Być może zaczyna się skok rozwojowy</string>

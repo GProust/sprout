@@ -421,6 +421,16 @@
     <string name="growth_spurt_soon_body">Es habitual un estirón de crecimiento %1$s; puede empezar en los próximos días.</string>
     <string name="settings_growth_spurts">Avisos de estirones</string>
     <string name="settings_growth_spurts_desc">Avísame cuando empiece una época típica de estirón de crecimiento.</string>
+    <!-- A running breastfeed in the notifications (BDR-24) -->
+    <string name="settings_nursing_notification">La toma en curso en las notificaciones</string>
+    <string name="settings_nursing_notification_desc">Mientras se cronometra una toma, mostrarla en las notificaciones con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. El nombre de tu bebé no aparece en la pantalla de bloqueo, salvo que tu teléfono muestre allí todo el contenido de las notificaciones.</string>
+    <string name="settings_live_activity">La toma en curso en la pantalla de bloqueo</string>
+    <string name="settings_live_activity_desc">Mientras se cronometra una toma, mostrarla en la pantalla de bloqueo y en la Dynamic Island con Pausar, Cambiar de lado y Parar y guardar, sin tener que desbloquear el teléfono. Nunca muestra el nombre de tu bebé.</string>
+    <string name="nursing_channel_name">Toma en curso</string>
+    <string name="nursing_channel_desc">Una toma mientras se cronometra, con botones para pausarla, cambiar de lado y guardarla</string>
+    <string name="nursing_switch_side">Cambiar de lado</string>
+    <string name="nursing_notif_on_break">En pausa · %1$s al pecho</string>
+    <string name="nursing_notif_feed_number">Toma %1$d · %2$s</string>
     <string name="growth_spurt_channel_name">Avisos de estirones</string>
     <string name="growth_spurt_channel_desc">Un aviso cuando empieza una época típica de estirón de crecimiento</string>
     <string name="growth_spurt_notif_title">Puede que empiece un estirón de crecimiento</string>

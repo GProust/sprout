@@ -58,6 +58,20 @@ final class AppEnvironment {
         )
     }
 
+    /// The one on-disk environment this process has, opened on first use.
+    ///
+    /// The app's window asks for it, and so does a Live Activity's button, which
+    /// iOS can run with the app in the background or not running at all — before
+    /// any window exists (ADR-0020). Both get the same one: a second open of the
+    /// same database would be a second writer nobody coordinates.
+    @MainActor
+    static func live() throws -> AppEnvironment {
+        if let opened = LiveEnvironment.opened { return opened }
+        let environment = try onDisk()
+        LiveEnvironment.opened = environment
+        return environment
+    }
+
     /// The real thing, on disk.
     ///
     /// In Application Support rather than Documents: this is the app's own
@@ -96,6 +110,13 @@ final class AppEnvironment {
             deviceStore: InMemoryStore()
         )
     }
+}
+
+/// Where ``AppEnvironment/live()`` keeps the one it opened — outside the
+/// observable class, which has no business tracking it.
+@MainActor
+private enum LiveEnvironment {
+    static var opened: AppEnvironment?
 }
 
 private struct AppEnvironmentKey: EnvironmentKey {

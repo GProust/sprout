@@ -92,7 +92,6 @@ import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.foods.MealFoodsEditor
 import com.gproust.sprout.ui.foods.displayName
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
-import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -145,9 +144,12 @@ class FeedingViewModel(
     /** The selected baby's uid, read now rather than whenever the flow next emits. */
     suspend fun activeBabyUidNow(): String? = repository.activeBabyUidNow()
 
-    /** The widget draws the running timers, so it follows every change to them. */
+    /**
+     * The widget and the notification draw the running timers, so they follow
+     * every change to them (BDR-24).
+     */
     private fun refreshWidget() {
-        viewModelScope.launch { updateSproutWidget(context) }
+        viewModelScope.launch { NursingActions.refreshOutside(context, repository) }
     }
 
     fun add(entity: FeedingEntity) = viewModelScope.launch {
@@ -179,22 +181,13 @@ class FeedingViewModel(
      * feed is no obstacle — twins can feed together (BDR-23).
      */
     fun startNursing(side: BreastSide, babyUid: String?) {
-        val now = System.currentTimeMillis()
-        NursingSessionStore.startIfIdle(
-            context,
-            NursingSession(
-                sessionStart = now,
-                currentSide = side,
-                segmentStart = now,
-                babyUid = babyUid,
-            ),
-        )
+        NursingActions.start(context, side, babyUid)
         refreshWidget()
     }
 
     /** Bank [babyUid]'s current breast as a completed segment and switch to the other. */
     fun switchBreast(babyUid: String?) {
-        NursingSessionStore.update(context, babyUid) { it.switched(System.currentTimeMillis()) }
+        NursingActions.apply(context, babyUid, NursingControl.SWITCH)
         refreshWidget()
     }
 
@@ -205,13 +198,14 @@ class FeedingViewModel(
      * feed carries on.
      */
     fun pauseNursing(babyUid: String?) {
-        NursingSessionStore.update(context, babyUid) { it.paused(System.currentTimeMillis()) }
+        NursingActions.apply(context, babyUid, NursingControl.PAUSE)
         refreshWidget()
     }
 
     /** Come back from a break, on whichever breast [babyUid]'s feed carries on with. */
     fun resumeNursing(babyUid: String?, side: BreastSide) {
-        NursingSessionStore.update(context, babyUid) { it.resumed(side, System.currentTimeMillis()) }
+        val control = if (side == BreastSide.RIGHT) NursingControl.RESUME_RIGHT else NursingControl.RESUME_LEFT
+        NursingActions.apply(context, babyUid, control)
         refreshWidget()
     }
 
@@ -224,20 +218,19 @@ class FeedingViewModel(
      * one is ever handed something to log.
      */
     fun stopNursing(babyUid: String?, notes: String = "") {
-        val s = NursingSessionStore.consume(context, babyUid) ?: return
-        val feed = s.toFeeding(System.currentTimeMillis(), notes)
+        val s = NursingActions.take(context, babyUid) ?: return
+        val now = System.currentTimeMillis()
         viewModelScope.launch {
             // To the baby the session was started for, not to whoever is
             // selected now. With twins, those two are not always the same.
-            val babyId = repository.addTimedFeeding(s.babyUid, feed) ?: return@launch
-            FeedingReminders.rescheduleForBaby(context, repository, babyId)
+            NursingActions.save(context, repository, s, notes, now)
         }
         refreshWidget()
     }
 
     /** Discard [babyUid]'s running session without saving it. */
     fun cancelNursing(babyUid: String?) {
-        NursingSessionStore.consume(context, babyUid)
+        NursingActions.take(context, babyUid)
         refreshWidget()
     }
 }

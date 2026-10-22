@@ -2,11 +2,16 @@
 """Checks the App Store signing material before anything is built with it.
 
     security find-identity -v -p codesigning <keychain> \\
-      | python3 ios/tools/check_signing.py <profile.plist>
+      | python3 ios/tools/check_signing.py <profile.plist> [<bundle id> <secret name>]
 
 `<profile.plist>` is the provisioning profile decoded with `security cms -D`;
 standard input is what `security find-identity` says the imported certificate
 became. On success this prints `team=…` and `profile=…` for `$GITHUB_OUTPUT`.
+
+Without the last two arguments it checks the app's own profile. Every bundle
+inside the upload is signed for its own identifier, so the Live Activity
+extension (ADR-0020) has a profile of its own, checked by naming its bundle id
+and the secret it came from.
 
 Every failure below is one `xcodebuild` reports eventually, and badly: minutes
 into the archive, as "No profiles for 'com.gproust.sprout' were found" or
@@ -38,17 +43,23 @@ PROFILE_SECRET = "APPLE_PROVISIONING_PROFILE_BASE64"
 CERTIFICATE_SECRET = "APPLE_DISTRIBUTION_P12_BASE64"
 
 
-def check(profile: dict, identities: list[tuple[str, str]], now: datetime.datetime) -> list[str]:
+def check(
+    profile: dict,
+    identities: list[tuple[str, str]],
+    now: datetime.datetime,
+    bundle_id: str = BUNDLE_ID,
+    profile_secret: str = PROFILE_SECRET,
+) -> list[str]:
     """Every reason this profile and these identities cannot sign the App Store build."""
     problems = []
 
     entitlements = profile.get("Entitlements", {})
     prefix = (profile.get("ApplicationIdentifierPrefix") or [""])[0]
     app_id = entitlements.get("application-identifier", "")
-    if app_id != f"{prefix}.{BUNDLE_ID}":
+    if app_id != f"{prefix}.{bundle_id}":
         problems.append(
-            f"{PROFILE_SECRET} is a profile for {app_id or 'no app'}, not {BUNDLE_ID}. "
-            f"Make one for the {BUNDLE_ID} App ID."
+            f"{profile_secret} is a profile for {app_id or 'no app'}, not {bundle_id}. "
+            f"Make one for the {bundle_id} App ID."
         )
 
     # An App Store profile names no devices and does not let a debugger attach;
@@ -58,7 +69,7 @@ def check(profile: dict, identities: list[tuple[str, str]], now: datetime.dateti
     if devices or profile.get("ProvisionsAllDevices") or entitlements.get("get-task-allow"):
         kind = "an in-house" if profile.get("ProvisionsAllDevices") else "a development or ad hoc"
         problems.append(
-            f"{PROFILE_SECRET} is {kind} profile"
+            f"{profile_secret} is {kind} profile"
             + (f" listing {len(devices)} device(s)" if devices else "")
             + ". Make one of type App Store Connect (Distribution)."
         )
@@ -68,7 +79,7 @@ def check(profile: dict, identities: list[tuple[str, str]], now: datetime.dateti
         if expires.tzinfo is None:
             expires = expires.replace(tzinfo=datetime.timezone.utc)
         if expires <= now:
-            problems.append(f"{PROFILE_SECRET} expired on {expires:%Y-%m-%d}. Make a new one.")
+            problems.append(f"{profile_secret} expired on {expires:%Y-%m-%d}. Make a new one.")
 
     # The profile names the certificates it may be signed with, by their DER
     # bytes; the keychain names its identities by the SHA-1 of the same bytes.
@@ -86,7 +97,7 @@ def check(profile: dict, identities: list[tuple[str, str]], now: datetime.dateti
         )
     elif not any(sha1.upper() in allowed for sha1, _ in distribution):
         problems.append(
-            f"{PROFILE_SECRET} was made for a different certificate than the one in "
+            f"{profile_secret} was made for a different certificate than the one in "
             f"{CERTIFICATE_SECRET}. Edit the profile, tick this certificate, and download it again."
         )
 
@@ -98,13 +109,20 @@ def parse_identities(text: str) -> list[tuple[str, str]]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 4):
         print(__doc__, file=sys.stderr)
         return 2
     with open(sys.argv[1], "rb") as handle:
         profile = plistlib.load(handle)
+    bundle_id, profile_secret = (sys.argv[2], sys.argv[3]) if len(sys.argv) == 4 else (BUNDLE_ID, PROFILE_SECRET)
 
-    problems = check(profile, parse_identities(sys.stdin.read()), datetime.datetime.now(datetime.timezone.utc))
+    problems = check(
+        profile,
+        parse_identities(sys.stdin.read()),
+        datetime.datetime.now(datetime.timezone.utc),
+        bundle_id,
+        profile_secret,
+    )
     for problem in problems:
         print(f"::error::{problem}", file=sys.stderr)
     if problems:
