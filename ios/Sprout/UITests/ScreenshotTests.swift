@@ -124,7 +124,8 @@ final class ScreenshotTests: XCTestCase {
     ///
     /// Seeding a profile is exactly what makes onboarding not appear, so this is
     /// a second launch with nothing in the database — the only way to photograph
-    /// the four screens every parent actually starts on.
+    /// the four screens every parent actually starts on, and the tour that
+    /// follows them.
     func testCaptureFirstRun() throws {
         let language = ProcessInfo.processInfo.environment["SPROUT_LANGUAGE"] ?? "en"
         let app = XCUIApplication()
@@ -159,11 +160,25 @@ final class ScreenshotTests: XCTestCase {
         try file(app, named: "00-onboarding-3-baby", language: language, waitingFor: next)
 
         next.tap()
-        try file(
-            app,
-            named: "00-onboarding-4-care",
-            language: language,
-            waitingFor: app.buttons["onboarding-finish"]
+        let finish = app.buttons["onboarding-finish"]
+        try file(app, named: "00-onboarding-4-care", language: language, waitingFor: finish)
+
+        // Finishing lands on the dashboard with the guided tour's first step
+        // over it (BDR-27) — filed, because no other capture reaches it, and
+        // then skipped by its identifier, as a parent would in any language.
+        finish.tap()
+        let skip = app.buttons["tour-skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 15), "no tour after onboarding")
+        try file(app, named: "00-onboarding-5-tour", language: language, waitingFor: skip)
+        skip.tap()
+
+        // Skipped means gone, and the dashboard it was hiding from VoiceOver is
+        // reachable again.
+        let gone = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: skip)
+        wait(for: [gone], timeout: 10)
+        XCTAssertTrue(
+            app.buttons["home-settings"].waitForExistence(timeout: 15),
+            "the dashboard did not come back after skipping the tour"
         )
     }
 

@@ -20,6 +20,10 @@ import UIKit
 ///   `ACTION_VIEW` intent. Same act: the URL leaves for the browser and Sprout
 ///   fetches nothing (BDR-11).
 struct SettingsScreen: View {
+    /// *Replay the tour*: the shell takes the parent back to the dashboard and
+    /// starts it from the top (BDR-27).
+    var onReplayTour: () -> Void = {}
+
     @Environment(\.sprout) private var sprout
     @Environment(\.openURL) private var openURL
     @State private var profile: ParentProfile?
@@ -48,6 +52,7 @@ struct SettingsScreen: View {
             }
 
             sharingSection
+            tourSection
             supportSection
         }
         .navigationTitle(Str.t("screen_settings"))
@@ -280,6 +285,26 @@ struct SettingsScreen: View {
                         .foregroundStyle(SproutColor.onSurfaceVariant)
                 }
             }
+        }
+    }
+
+    // MARK: - The tour
+
+    /// The way back to the guided tour (BDR-27). It runs once on its own, right
+    /// after onboarding; this row is the only other way it ever appears.
+    private var tourSection: some View {
+        Section(Str.t("settings_tour")) {
+            Button(action: onReplayTour) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(Str.t("settings_tour_replay"))
+                        .foregroundStyle(SproutColor.onSurface)
+                    Text(Str.t("settings_tour_replay_hint"))
+                        .font(.caption)
+                        .foregroundStyle(SproutColor.onSurfaceVariant)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .accessibilityIdentifier("settings-replay-tour")
         }
     }
 

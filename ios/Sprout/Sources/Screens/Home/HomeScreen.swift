@@ -347,7 +347,8 @@ struct HomeScreen: View {
                                 onOpenMedicines: {
                                     model.select(summary.baby)
                                     onOpen(.medicines)
-                                }
+                                },
+                                feedTourTarget: summary.id == model.babies.first?.id ? .breastfeed : nil
                             )
                             if let spurt = GrowthSpurtNote(birthDate: summary.baby.birthDate, now: model.now) {
                                 spurt

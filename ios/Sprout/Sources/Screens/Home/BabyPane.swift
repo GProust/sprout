@@ -25,7 +25,10 @@ struct BabyPane<Header: View>: View {
             header()
 
             SinceChips(summary: summary, now: now)
+            // Both marked for the tour (BDR-27), which only reads them on the
+            // dashboard: on the baby's own tab they report nothing.
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
+                .tourTarget(.breastfeed)
 
             // Under the feed buttons, and above the log grid the medicine would
             // otherwise be three taps down in. Feeding is what this screen is
@@ -42,6 +45,7 @@ struct BabyPane<Header: View>: View {
 
             SectionLabel(Str.t("home_log"))
             LogGrid(tracksWellbeing: tracksWellbeing, onOpen: onOpen)
+                .tourTarget(.logTiles)
 
             SectionLabel(Str.t("home_today"))
             TodayRow(summary: summary)
@@ -86,6 +90,9 @@ struct BabyCardView: View {
     let onGiveMedicine: (MedicineWatch) -> Void
     let onDismissMedicine: (MedicineWatch) -> Void
     let onOpenMedicines: () -> Void
+    /// The tour's step for this card's feed buttons, which only the first card
+    /// carries: one ring rather than whichever card reported last.
+    var feedTourTarget: TourStep?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.snug) {
@@ -108,6 +115,7 @@ struct BabyCardView: View {
 
             SinceChips(summary: summary, now: now)
             QuickFeed(next: summary.nextSide, onFeed: onFeed)
+                .tourTarget(feedTourTarget)
             MedicineWatchCard(
                 watches: summary.medicines,
                 now: now,
