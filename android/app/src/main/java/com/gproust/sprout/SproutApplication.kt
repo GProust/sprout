@@ -10,6 +10,7 @@ import com.gproust.sprout.data.sync.SyncEngine
 import com.gproust.sprout.notifications.FeedingReminders
 import com.gproust.sprout.notifications.GrowthSpurtReminders
 import com.gproust.sprout.notifications.TreatmentReminders
+import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.widget.updateSproutWidget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,10 @@ class SproutApplication : Application() {
         GrowthSpurtReminders.ensureChannel(this)
         // Alarms don't survive process death/reboot; re-arm them on launch.
         CoroutineScope(Dispatchers.IO).launch {
+            // A feed left running across the update to one-feed-per-baby has
+            // no baby recorded; it is the selected baby's, as it would have
+            // been saved (BDR-23). Does nothing on every later launch.
+            NursingSessionStore.adoptUnnamed(this@SproutApplication, repository.activeBabyUidNow())
             TreatmentReminders.scheduleAll(this@SproutApplication, repository.treatmentsWithReminders())
             FeedingReminders.rescheduleAll(this@SproutApplication, repository)
             GrowthSpurtReminders.rescheduleAll(this@SproutApplication, repository)

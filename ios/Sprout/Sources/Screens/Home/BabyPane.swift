@@ -13,6 +13,9 @@ struct BabyPane<Header: View>: View {
     let summary: BabySummary
     let tracksWellbeing: Bool
     let now: Int64
+    /// Every feed running on this phone; this baby's, if any, replaces the
+    /// start buttons.
+    let sessions: [NursingSession]
     let onFeed: (BreastSide) -> Void
     let onOpen: (LogDestination) -> Void
     let onGiveMedicine: (MedicineWatch) -> Void
@@ -25,7 +28,7 @@ struct BabyPane<Header: View>: View {
             header()
 
             SinceChips(summary: summary, now: now)
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
+            FeedOrRunning(summary: summary, sessions: sessions, onFeed: onFeed)
 
             // Under the feed buttons, and above the log grid the medicine would
             // otherwise be three taps down in. Feeding is what this screen is
@@ -81,6 +84,9 @@ struct BabyPane<Header: View>: View {
 struct BabyCardView: View {
     let summary: BabySummary
     let now: Int64
+    /// Every feed running on this phone; this baby's, if any, replaces the
+    /// start buttons.
+    let sessions: [NursingSession]
     let onOpen: () -> Void
     let onFeed: (BreastSide) -> Void
     let onGiveMedicine: (MedicineWatch) -> Void
@@ -107,7 +113,7 @@ struct BabyCardView: View {
             .accessibilityLabel(Str.t("cd_open_baby", summary.baby.name))
 
             SinceChips(summary: summary, now: now)
-            QuickFeed(next: summary.nextSide, onFeed: onFeed)
+            FeedOrRunning(summary: summary, sessions: sessions, onFeed: onFeed)
             MedicineWatchCard(
                 watches: summary.medicines,
                 now: now,
@@ -149,6 +155,68 @@ struct SinceChips: View {
             .padding(.vertical, Spacing.hairline + 2)
             .background(SproutColor.background, in: Capsule())
             .foregroundStyle(SproutColor.onSurfaceVariant)
+    }
+}
+
+/// A baby's feed buttons — or, while that baby is feeding, the feed itself.
+///
+/// A baby has one mouth, so a baby whose feed is running is offered that feed
+/// back rather than a second one; the other twin's card still starts theirs, on
+/// the breast nobody is at (BDR-23).
+struct FeedOrRunning: View {
+    let summary: BabySummary
+    let sessions: [NursingSession]
+    let onFeed: (BreastSide) -> Void
+
+    var body: some View {
+        if let running = sessions.runningFor(summary.baby.uid) {
+            // The same path as starting: the store hands back the feed already
+            // running, and the timer shows it rather than starting another.
+            RunningFeedButton(session: running) { onFeed(running.currentSide) }
+        } else {
+            QuickFeed(
+                next: sideForNextFeed(sessions, babyUid: summary.baby.uid, fromHistory: summary.nextSide),
+                onFeed: onFeed
+            )
+        }
+    }
+}
+
+/// "Feeding · Left   4:12" on a baby's own card, one tap back to the timer.
+///
+/// Time at the breast, as everywhere (BDR-17): the clock stops on a break. It is
+/// the one thing on the card with a second hand, so it keeps its own.
+private struct RunningFeedButton: View {
+    let session: NursingSession
+    let onOpen: () -> Void
+
+    @State private var now = Clock.millis
+
+    var body: some View {
+        Button(action: onOpen) {
+            HStack {
+                Image(systemName: session.isPaused ? "pause.circle.fill" : "drop.fill")
+                Text(Str.t("home_live_nursing", session.stateLabel))
+                    .font(.callout.weight(.medium))
+                Spacer()
+                Text(SproutFormat.clock(millis: session.nursedMs(at: now)))
+                    .font(.callout.weight(.semibold))
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, Spacing.regular)
+            .padding(.vertical, Spacing.snug)
+            .frame(maxWidth: .infinity)
+            .background(SproutColor.primaryContainer, in: RoundedRectangle(cornerRadius: Radius.control))
+            .foregroundStyle(SproutColor.onPrimaryContainer)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("baby-running-feed")
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                now = Clock.millis
+            }
+        }
     }
 }
 

@@ -20,6 +20,7 @@ struct BabyScreen: View {
                             summary: summary,
                             tracksWellbeing: model.tracksWellbeing,
                             now: model.now,
+                            sessions: NursingSessionStore.shared.sessions,
                             onFeed: { model.startFeed(for: summary.baby, on: $0); onOpen(.feeding) },
                             onOpen: onOpen,
                             onGiveMedicine: { model.giveDose(of: $0) },

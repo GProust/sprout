@@ -73,6 +73,7 @@ import com.gproust.sprout.ui.common.growthSpurtAgeLabel
 import com.gproust.sprout.ui.common.shouldOfferCheckIn
 import com.gproust.sprout.ui.common.startOfDay
 import com.gproust.sprout.ui.common.upcomingGrowthSpurt
+import com.gproust.sprout.ui.feeding.NursingSession
 import com.gproust.sprout.ui.feeding.NursingSessionStore
 import com.gproust.sprout.ui.navigation.Routes
 import com.gproust.sprout.ui.rememberSproutViewModelFactory
@@ -146,6 +147,14 @@ class HomeViewModel(
      * awaits this before it navigates, rather than firing both and hoping.
      */
     suspend fun selectBaby(id: Long) = repository.setActiveBaby(id)
+
+    /**
+     * Every breastfeed running on this phone, at most one per baby (BDR-23).
+     * The shared store, not a snapshot: a row has to go the moment its feed is
+     * saved, wherever it was saved from, or it offers to reopen a timer that is
+     * no longer running.
+     */
+    val nursing = NursingSessionStore.sessions(context)
 
     /**
      * The announcements the "New in Sprout" card offers, newest first; empty
@@ -309,11 +318,13 @@ class HomeViewModel(
 @Composable
 fun HomeScreen(
     onNavigate: (String) -> Unit,
-    onQuickFeed: (BreastSide) -> Unit,
+    /** Opens the live timer on a breast, for the baby named by uid. */
+    onQuickFeed: (BreastSide, String?) -> Unit,
     onShareRecord: (Long) -> Unit = {},
 ) {
     val vm: HomeViewModel = viewModel(factory = rememberSproutViewModelFactory())
     val state by vm.uiState.collectAsState()
+    val sessions by vm.nursing.collectAsState()
     val whatsNew by vm.whatsNew.collectAsState()
     // What the open sheet lists. Held here rather than read from [whatsNew],
     // because opening the sheet marks the announcements seen and empties that.
@@ -334,6 +345,19 @@ fun HomeScreen(
     fun withBaby(babyId: Long, then: () -> Unit) = scope.launch {
         vm.selectBaby(babyId)
         then()
+    }
+
+    /**
+     * Back to a running feed. Its baby is selected on the way, so the history
+     * under the timer is the history of the baby being fed.
+     */
+    fun openFeed(session: NursingSession) {
+        val baby = state.babies.firstOrNull { it.baby.uid == session.babyUid }?.baby
+        if (baby == null) {
+            onQuickFeed(session.currentSide, session.babyUid)
+        } else {
+            withBaby(baby.id) { onQuickFeed(session.currentSide, session.babyUid) }
+        }
     }
 
     Scaffold(
@@ -379,8 +403,10 @@ fun HomeScreen(
             }
 
             LiveRow(
+                sessions = sessions,
+                babies = state.babies,
                 sleeping = state.babies.firstOrNull { it.ongoingSleep != null },
-                onOpenNursing = onQuickFeed,
+                onOpenNursing = { openFeed(it) },
                 onWakeUp = vm::wakeUp,
             )
 
@@ -405,7 +431,8 @@ fun HomeScreen(
                     summary = single,
                     tracksWellbeing = state.tracksWellbeing,
                     now = now,
-                    onFeed = { side -> withBaby(single.baby.id) { onQuickFeed(side) } },
+                    sessions = sessions,
+                    onFeed = { side -> withBaby(single.baby.id) { onQuickFeed(side, single.baby.uid) } },
                     onNavigate = onNavigate,
                     onGiveMedicine = vm::giveDose,
                     onDismissMedicine = vm::dismiss,
@@ -433,8 +460,11 @@ fun HomeScreen(
                     BabyCard(
                         summary = summary,
                         now = now,
+                        sessions = sessions,
                         onOpen = { withBaby(summary.baby.id) { onNavigate(Routes.BABY) } },
-                        onFeed = { side -> withBaby(summary.baby.id) { onQuickFeed(side) } },
+                        onFeed = { side ->
+                            withBaby(summary.baby.id) { onQuickFeed(side, summary.baby.uid) }
+                        },
                         onGiveMedicine = vm::giveDose,
                         onDismissMedicine = vm::dismiss,
                         // Selects the baby on the way, so the screen that opens
@@ -481,44 +511,42 @@ fun HomeScreen(
  * launcher widget, but never here — so the app's own front door was the one
  * place that didn't know a timer was running. A sleep with no end time is the
  * same story, and the one it needs is "woke up".
+ *
+ * One row per running feed, each naming its baby: twins feeding together are
+ * two timers, and a row that did not say whose it was would be the dashboard
+ * asking the parent to remember (BDR-23).
  */
 @Composable
 private fun LiveRow(
+    sessions: List<NursingSession>,
+    babies: List<BabySummary>,
     sleeping: BabySummary?,
-    onOpenNursing: (BreastSide) -> Unit,
+    onOpenNursing: (NursingSession) -> Unit,
     onWakeUp: (SleepEntity) -> Unit,
 ) {
-    val context = LocalContext.current
-    // The shared session, not a snapshot: the card has to go the moment the
-    // feed is saved, wherever it was saved from, or it offers to reopen a
-    // timer that is no longer running.
-    val nursing = NursingSessionStore.sessions(context).collectAsState().value
-    if (nursing == null && sleeping == null) return
+    if (sessions.isEmpty() && sleeping == null) return
 
     // Ticks only while something is actually running.
     var tick by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(nursing != null, sleeping != null) {
+    LaunchedEffect(sessions.isNotEmpty(), sleeping != null) {
         while (true) {
             delay(1_000)
             tick = System.currentTimeMillis()
         }
     }
 
-    if (nursing != null) {
+    sessions.forEach { nursing ->
+        val name = babies.firstOrNull { it.baby.uid == nursing.babyUid }?.baby?.name
+        // A feed on a break says so here too, or the dashboard shows a side
+        // that nobody is actually feeding on.
+        val state = stringResource(nursingStateRes(nursing))
         LiveCard(
             icon = Icons.Filled.LocalDrink,
-            title = stringResource(
-                R.string.home_live_nursing,
-                stringResource(
-                    when {
-                        // A feed on a break says so here too, or the dashboard
-                        // shows a side that nobody is actually feeding on.
-                        nursing.isPaused -> R.string.feeding_paused
-                        nursing.currentSide == BreastSide.RIGHT -> R.string.side_right
-                        else -> R.string.side_left
-                    },
-                ),
-            ),
+            title = if (name != null) {
+                stringResource(R.string.home_live_nursing_named, name, state)
+            } else {
+                stringResource(R.string.home_live_nursing, state)
+            },
             // Time at the breast, not time since the feed began: the clock
             // stops while the break runs, exactly as it does on the timer.
             value = formatClock(nursing.nursedMs(tick)),
@@ -526,7 +554,7 @@ private fun LiveRow(
             // The same path the quick feed button takes, which puts the feed
             // history under the timer; the session is already running, so
             // arriving there resumes it rather than starting a second one.
-            onAction = { onOpenNursing(nursing.currentSide) },
+            onAction = { onOpenNursing(nursing) },
         )
         Spacer(Modifier.height(12.dp))
     }

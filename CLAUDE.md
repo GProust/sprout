@@ -214,6 +214,21 @@ things a change can quietly undo:
   selection is a mode that moves while the timer runs, and resolving it at save
   time is how one twin's feed was filed under the other (#115).
 
+Twins feed together, so the store holds **one running session per baby**, not
+one per phone ([BDR-23](docs/decisions/0023-one-running-breastfeed-per-baby.md)).
+`ui/feeding/NursingSessions.kt` and `SproutData/NursingSessions.swift` are the
+rules, as pure functions with the same cases on both sides:
+
+- **Everything is keyed by the baby's uid.** `startIfIdle` hands back the running
+  feed for *that* baby and starts one for any other; `consume`, pause, resume and
+  switch act on one baby's feed and leave the rest running. A screen looks its
+  feed up with `runningFor(uid)` — never "the first session", which with two
+  running is whichever started first. The nursing route carries `?baby=<uid>`.
+- **The old single session is still read once.** Android's flat keys in
+  `nursing_session.xml` and iOS's `nursing_session` dictionary become the list on
+  the next write; one without a baby is adopted by the selected baby at launch
+  (`adoptUnnamed`). Keep that read until no phone can still be carrying one.
+
 Two feeds saved apart can also be joined back into the one feed they were
 ([BDR-19](docs/decisions/0019-two-breastfeeds-saved-apart-can-be-joined.md)) —
 the same break, after the fact. `data/BreastfeedJoin.kt` and
