@@ -1,7 +1,6 @@
 package com.gproust.sprout
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.test.core.app.ApplicationProvider
 import com.gproust.sprout.ui.help.HelpPage
@@ -13,9 +12,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.File
-import java.util.Locale
 
 /**
  * The help sheets (BDR-26): every page says something, in every language, and
@@ -40,10 +39,14 @@ class HelpPagesTest {
 
     private fun name(@StringRes id: Int): String = context.resources.getResourceEntryName(id)
 
-    private fun localized(language: String): Context {
-        val config = Configuration(context.resources.configuration)
-        config.setLocale(Locale.forLanguageTag(language))
-        return context.createConfigurationContext(config)
+    /**
+     * Every listed string as [language] reads it. Through Robolectric's
+     * qualifiers, the documented way to change language mid-test: the app's
+     * own resources follow them.
+     */
+    private fun textsIn(language: String): Map<Int, String> {
+        RuntimeEnvironment.setQualifiers(language)
+        return keysInOrder().associateWith { context.resources.getString(it) }
     }
 
     /**
@@ -88,18 +91,16 @@ class HelpPagesTest {
     /** The words resolve, are not blank, and are not English in another language. */
     @Test
     fun everyKeyReadsInEveryLanguage() {
-        val english = localized("en")
+        val english = textsIn("en")
         languages.forEach { language ->
-            val resources = localized(language).resources
-            keysInOrder().forEach { id ->
-                val text = resources.getString(id)
+            textsIn(language).forEach { (id, text) ->
                 assertTrue("${name(id)} is blank in $language", text.isNotBlank())
                 // Help only: a page title such as "Home" is the same word in
                 // Italian, but a paragraph that is is an untranslated one.
                 if (language != "en" && name(id).startsWith("help_")) {
                     assertNotEquals(
                         "${name(id)} is still in English in $language",
-                        english.resources.getString(id),
+                        english.getValue(id),
                         text,
                     )
                 }
