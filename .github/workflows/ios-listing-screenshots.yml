@@ -218,7 +218,7 @@ jobs:
       # Connect and uploaded by hand — deliver does not carry it — so a failure
       # here is reported without holding back the screenshots.
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
