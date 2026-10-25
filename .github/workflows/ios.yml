@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
@@ -90,7 +90,7 @@ jobs:
       # The string catalog is generated from Android's resources, for the same
       # reason as the vectors: one source, so the two apps cannot drift on copy.
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 

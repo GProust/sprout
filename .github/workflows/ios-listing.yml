@@ -98,7 +98,7 @@ jobs:
       # listing-screenshots.txt names, numbered into its order.
       - name: Download the screenshots
         if: env.WITH_SCREENSHOTS == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: app-store-listing-6.3in
           path: ${{ runner.temp }}/screenshots
